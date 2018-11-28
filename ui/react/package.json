@@ -1,0 +1,60 @@
+{
+  "name": "@littleorca/ferris-wheel",
+  "version": "0.0.1",
+  "author": {
+    "name": "Liu Haifeng",
+    "email": "haifeng.813@gmail.com"
+  },
+  "license": "MIT",
+  "private": false,
+  "main": "build/lib/index",
+  "dependencies": {
+    "@handsontable/react": "^1.1.0",
+    "@types/chart.js": "^2.7.34",
+    "@types/moment": "^2.13.0",
+    "@types/react-color": "^2.13.6",
+    "@types/react-datepicker": "^1.1.7",
+    "@types/react-grid-layout": "^0.16.5",
+    "@types/react-popover": "^0.5.2",
+    "@types/react-sortable-hoc": "^0.6.4",
+    "chart.js": "^2.7.2",
+    "handsontable": "^6.0.1",
+    "moment": "^2.22.2",
+    "react-chartjs-2": "^2.7.4",
+    "react-color": "^2.14.1",
+    "react-datepicker": "^1.6.0",
+    "react-grid-layout": "^0.16.6",
+    "react-loading": "^2.0.3",
+    "react-popover": "^0.5.7",
+    "react-sortable-hoc": "^0.8.3"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "clean": "rimraf build/*",
+    "prebuild": "npm run clean",
+    "build": "copyfiles -u 1 src/**/*.css build/lib && tsc",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@storybook/addon-actions": "^4.0.0-alpha.24",
+    "@storybook/addon-info": "^4.0.0-alpha.24",
+    "@storybook/addon-links": "^4.0.0-alpha.24",
+    "@storybook/addons": "^4.0.0-alpha.24",
+    "@storybook/react": "^4.0.0-alpha.24",
+    "@types/jest": "^23.3.1",
+    "@types/node": "^10.9.4",
+    "@types/react": "^16.4.13",
+    "@types/react-dom": "^16.0.7",
+    "awesome-typescript-loader": "^5.2.1",
+    "babel-loader": "^8.0.4",
+    "copyfiles": "^2.1.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-scripts-ts": "2.17.0",
+    "typescript": "^3.1.1"
+  }
+}

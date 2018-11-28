@@ -1,0 +1,20 @@
+.interval-input {
+    display: inline-block;
+    padding: 0;
+}
+
+.interval-input .interval-input-from,
+.interval-input .interval-input-to {
+    box-sizing: border-box;
+    margin: 0;
+    width: 50%;
+}
+
+.interval-input .separater {
+    display: none;
+}
+
+.interval-input.invalid {
+    background: rgba(255, 255, 0, 0.75);
+    box-shadow: 0 0 .3125em rgba(255, 255, 0, 0.75);
+}

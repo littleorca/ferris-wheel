@@ -1,0 +1,23 @@
+.group-view .group-view-item .group-view-title {
+    cursor: pointer;
+}
+
+.group-view .group-view-item .group-view-title::before {
+    display: inline-block;
+    margin-right: .5em;
+    width: 1em;
+    color: #aaa;
+    font-size: .75rem;
+}
+
+.group-view .group-view-item.active .group-view-title::before {
+    content: "▼";
+}
+
+.group-view .group-view-item.inactive .group-view-title::before {
+    content: "►";
+}
+
+.group-view .group-view-item.inactive .group-view-content {
+    display: none;
+}

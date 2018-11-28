@@ -1,0 +1,41 @@
+.manipulable-list {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    padding: 0;
+    min-width: 1em;
+    min-height: 1em;
+    text-align: left;
+    list-style: none;
+}
+
+.manipulable-list.horizontal {
+    flex-direction: row;
+    min-height: 1.5em;
+    outline: 0;
+}
+
+.manipulable-list .manipulable-item,
+.manipulable-list-sort-helper {
+    display: block;
+    margin: 0;
+    padding: 0 .3125em;
+    min-width: 1em;
+    height: 1.5em;
+    line-height: 1.5em;
+    flex-shrink: 0;
+    list-style: none;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.manipulable-list .manipulable-item.selected,
+.manipulable-list-sort-helper.manipulable-item.selected {
+    color: #fff;
+    background: #09f;
+}
+
+.manipulable-list-sort-helper {
+    z-index: 999;
+}

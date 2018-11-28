@@ -1,0 +1,14 @@
+.text-view {
+    box-sizing: border-box;
+    margin: 0;
+    padding: .75em 1em;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.text-view span.display {
+    display: block;
+    width: inherit;
+    height: inherit;
+    white-space: pre-wrap;
+}

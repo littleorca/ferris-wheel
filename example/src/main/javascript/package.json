@@ -1,0 +1,32 @@
+{
+  "name": "ferris-wheel-example",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@littleorca/ferris-wheel": "0.0.1",
+    "moment": "^2.22.2",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "react-loading": "^2.0.3",
+    "react-moment": "^0.7.7",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-runtime": "^6.26.0",
+    "react-scripts": "1.1.4"
+  },
+  "proxy": {
+    "/wsapi": {
+      "target": "ws://127.0.0.1:8080/",
+      "ws": true
+    }
+  }
+}

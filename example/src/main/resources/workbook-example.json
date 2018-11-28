@@ -1,0 +1,1688 @@
+{
+  "flags": "0",
+  "name": "Demo",
+  "sheets": [
+    {
+      "name": "Overview",
+      "assets": [
+        {
+          "table": {
+            "name": "category",
+            "rows": [
+              {
+                "rowIndex": 0,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Clothes"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "101"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 1,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Digit"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "31"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 2,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Food"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "405"
+                    }
+                  }
+                ]
+              }
+            ],
+            "automaton": {
+              "pivotAutomaton": {
+                "data": {
+                  "formulaString": "Detail!order!A:E"
+                },
+                "filters": [],
+                "rows": [
+                  {
+                    "field": "Category"
+                  }
+                ],
+                "columns": [],
+                "values": [
+                  {
+                    "field": "Amount",
+                    "aggregateType": "AT_SUMMARY",
+                    "label": ""
+                  }
+                ]
+              }
+            },
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 7,
+                  "end": 10
+                },
+                "row": {
+                  "start": 7,
+                  "end": 14
+                }
+              }
+            }
+          }
+        },
+        {
+          "chart": {
+            "name": "chart 1",
+            "type": "Gauge",
+            "title": {
+              "formulaString": "",
+              "string": "Gauge 1"
+            },
+            "categories": {
+              "formulaString": "",
+              "list": {
+                "items": [
+                  {
+                    "formulaString": "",
+                    "string": "Clothes"
+                  }
+                ],
+                "columns": 0
+              }
+            },
+            "series": [
+              {
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "101"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 1,
+                  "end": 4
+                },
+                "row": {
+                  "start": 1,
+                  "end": 7
+                }
+              }
+            },
+            "binder": {
+              "data": {
+                "formulaString": "category!A1:B1"
+              },
+              "orientation": "ORIENT_VERTICAL",
+              "categoriesPlacement": "PLCMT_LEFT",
+              "seriesNamePlacement": "PLCMT_UNSET"
+            },
+            "xAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_BOTTOM",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "yAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_LEFT",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 500.0
+              },
+              "bands": [
+                {
+                  "interval": {
+                    "from": 0.0,
+                    "to": 200.0
+                  },
+                  "label": "",
+                  "color": {
+                    "red": 0.49411765,
+                    "green": 0.827451,
+                    "blue": 0.12941177,
+                    "alpha": 1.0
+                  }
+                },
+                {
+                  "interval": {
+                    "from": 200.0,
+                    "to": 400.0
+                  },
+                  "label": "",
+                  "color": {
+                    "red": 0.9607843,
+                    "green": 0.6509804,
+                    "blue": 0.13725491,
+                    "alpha": 1.0
+                  }
+                },
+                {
+                  "interval": {
+                    "from": 400.0,
+                    "to": 500.0
+                  },
+                  "label": "",
+                  "color": {
+                    "red": 0.8156863,
+                    "green": 0.007843138,
+                    "blue": 0.105882354,
+                    "alpha": 1.0
+                  }
+                }
+              ],
+              "stacking": "STACKING_UNSET"
+            },
+            "zAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_UNSET",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            }
+          }
+        },
+        {
+          "chart": {
+            "name": "chart 2",
+            "type": "Gauge",
+            "title": {
+              "formulaString": "",
+              "string": "Gauge 2"
+            },
+            "categories": {
+              "formulaString": "",
+              "list": {
+                "items": [
+                  {
+                    "formulaString": "",
+                    "string": "Digit"
+                  }
+                ],
+                "columns": 0
+              }
+            },
+            "series": [
+              {
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "31"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 4,
+                  "end": 7
+                },
+                "row": {
+                  "start": 1,
+                  "end": 7
+                }
+              }
+            },
+            "binder": {
+              "data": {
+                "formulaString": "category!A2:B2"
+              },
+              "orientation": "ORIENT_VERTICAL",
+              "categoriesPlacement": "PLCMT_LEFT",
+              "seriesNamePlacement": "PLCMT_UNSET"
+            },
+            "xAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_BOTTOM",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "yAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_LEFT",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 500.0
+              },
+              "bands": [
+                {
+                  "interval": {
+                    "from": 0.0,
+                    "to": 200.0
+                  },
+                  "label": "",
+                  "color": {
+                    "red": 0.49411765,
+                    "green": 0.827451,
+                    "blue": 0.12941177,
+                    "alpha": 1.0
+                  }
+                },
+                {
+                  "interval": {
+                    "from": 200.0,
+                    "to": 400.0
+                  },
+                  "label": "",
+                  "color": {
+                    "red": 0.9607843,
+                    "green": 0.6509804,
+                    "blue": 0.13725491,
+                    "alpha": 1.0
+                  }
+                },
+                {
+                  "interval": {
+                    "from": 400.0,
+                    "to": 500.0
+                  },
+                  "label": "",
+                  "color": {
+                    "red": 0.8156863,
+                    "green": 0.007843138,
+                    "blue": 0.105882354,
+                    "alpha": 1.0
+                  }
+                }
+              ],
+              "stacking": "STACKING_UNSET"
+            },
+            "zAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_UNSET",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            }
+          }
+        },
+        {
+          "chart": {
+            "name": "chart 3",
+            "type": "Line",
+            "title": {
+              "formulaString": "",
+              "string": "Trend"
+            },
+            "categories": {
+              "formulaString": "",
+              "list": {
+                "items": [
+                  {
+                    "formulaString": "",
+                    "string": "Mon"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Tue"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Wed"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Thu"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Fri"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Sat"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Sun"
+                  }
+                ],
+                "columns": 0
+              }
+            },
+            "series": [
+              {
+                "name": {
+                  "formulaString": "",
+                  "string": "foo"
+                },
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "265"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "255"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "678"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "182"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "568"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "582"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "425"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              },
+              {
+                "name": {
+                  "formulaString": "",
+                  "string": "bar"
+                },
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "640"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "454"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "438"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "630"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "214"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "916"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "358"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 1,
+                  "end": 7
+                },
+                "row": {
+                  "start": 18,
+                  "end": 25
+                }
+              }
+            },
+            "binder": {
+              "data": {
+                "formulaString": "Detail!trend!A:H"
+              },
+              "orientation": "ORIENT_HORIZONTAL",
+              "categoriesPlacement": "PLCMT_TOP",
+              "seriesNamePlacement": "PLCMT_LEFT"
+            },
+            "xAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_BOTTOM",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "yAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_LEFT",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "zAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_UNSET",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            }
+          }
+        },
+        {
+          "chart": {
+            "name": "chart 4",
+            "type": "Bar",
+            "title": {
+              "formulaString": "",
+              "string": "Bar Chart"
+            },
+            "categories": {
+              "formulaString": "",
+              "list": {
+                "items": [
+                  {
+                    "formulaString": "",
+                    "string": "Mon"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Tue"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Wed"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Thu"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Fri"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Sat"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Sun"
+                  }
+                ],
+                "columns": 0
+              }
+            },
+            "series": [
+              {
+                "name": {
+                  "formulaString": "",
+                  "string": "foo"
+                },
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "265"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "255"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "678"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "182"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "568"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "582"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "425"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              },
+              {
+                "name": {
+                  "formulaString": "",
+                  "string": "bar"
+                },
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "640"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "454"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "438"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "630"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "214"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "916"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "358"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 7,
+                  "end": 13
+                },
+                "row": {
+                  "start": 1,
+                  "end": 7
+                }
+              }
+            },
+            "binder": {
+              "data": {
+                "formulaString": "Detail!trend!A:H"
+              },
+              "orientation": "ORIENT_HORIZONTAL",
+              "categoriesPlacement": "PLCMT_TOP",
+              "seriesNamePlacement": "PLCMT_LEFT"
+            },
+            "xAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_BOTTOM",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "yAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_LEFT",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "zAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_UNSET",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            }
+          }
+        },
+        {
+          "chart": {
+            "name": "chart",
+            "type": "Doughnut",
+            "title": {
+              "formulaString": "",
+              "string": "Doughnut"
+            },
+            "categories": {
+              "formulaString": "",
+              "list": {
+                "items": [
+                  {
+                    "formulaString": "",
+                    "string": "Clothes"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Digit"
+                  },
+                  {
+                    "formulaString": "",
+                    "string": "Food"
+                  }
+                ],
+                "columns": 0
+              }
+            },
+            "series": [
+              {
+                "yValues": {
+                  "formulaString": "",
+                  "list": {
+                    "items": [
+                      {
+                        "formulaString": "",
+                        "decimal": "101"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "31"
+                      },
+                      {
+                        "formulaString": "",
+                        "decimal": "405"
+                      }
+                    ],
+                    "columns": 0
+                  }
+                }
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 10,
+                  "end": 13
+                },
+                "row": {
+                  "start": 7,
+                  "end": 14
+                }
+              }
+            },
+            "binder": {
+              "data": {
+                "formulaString": "category!A:B"
+              },
+              "orientation": "ORIENT_VERTICAL",
+              "categoriesPlacement": "PLCMT_LEFT",
+              "seriesNamePlacement": "PLCMT_UNSET"
+            },
+            "xAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_BOTTOM",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "yAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_LEFT",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            },
+            "zAxis": {
+              "title": "",
+              "label": "",
+              "placement": "PLCMT_UNSET",
+              "reversed": false,
+              "interval": {
+                "from": 0.0,
+                "to": 0.0
+              },
+              "bands": [],
+              "stacking": "STACKING_UNSET"
+            }
+          }
+        }
+      ],
+      "layout": {
+        "display": "DISP_GRID",
+        "width": 1200,
+        "height": 720,
+        "align": "PLCMT_LEFT",
+        "verticalAlign": "PLCMT_TOP",
+        "grid": {
+          "columns": 12,
+          "rows": 0
+        }
+      }
+    },
+    {
+      "name": "Detail",
+      "assets": [
+        {
+          "table": {
+            "name": "order",
+            "rows": [
+              {
+                "rowIndex": 0,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "ID"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Category"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Item"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Unit Price"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Amount"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 1,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "1"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Digit"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Computer"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "7600"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "6"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 2,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "2"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Digit"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Camera"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "3980"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "5"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 3,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "3"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Digit"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Cell phone"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "5000"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "20"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 4,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "4"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Food"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Egg"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "5"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "86"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 5,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "5"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Food"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Vegetable"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "7"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "120"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 6,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "6"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Food"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Meat"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "8"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "98"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 7,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "7"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Food"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Milk"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "4"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "101"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 8,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "8"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Clothes"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "T-shirt"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "30"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "55"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 9,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "9"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Clothes"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Trousers"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "25"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "37"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 10,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "10"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Clothes"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Hat"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "10"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "9"
+                    }
+                  }
+                ]
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 1,
+                  "end": 7
+                },
+                "row": {
+                  "start": 1,
+                  "end": 10
+                }
+              }
+            }
+          }
+        },
+        {
+          "table": {
+            "name": "summary",
+            "rows": [
+              {
+                "rowIndex": 0,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Total Sum"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "SUM(order!D2:D10)",
+                      "decimal": "16659"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 1,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Total Amount"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "SUM(order!E2:E10)",
+                      "decimal": "528"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 3,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "ID=5 (VLOOKUP)"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "VLOOKUP(5, order!A:E, 3, false)",
+                      "string": "Vegetable"
+                    }
+                  }
+                ]
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 7,
+                  "end": 13
+                },
+                "row": {
+                  "start": 1,
+                  "end": 6
+                }
+              }
+            }
+          }
+        },
+        {
+          "table": {
+            "name": "trend",
+            "rows": [
+              {
+                "rowIndex": 0,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": ""
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Mon"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Tue"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Wed"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Thu"
+                    }
+                  },
+                  {
+                    "columnIndex": 5,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Fri"
+                    }
+                  },
+                  {
+                    "columnIndex": 6,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Sat"
+                    }
+                  },
+                  {
+                    "columnIndex": 7,
+                    "value": {
+                      "formulaString": "",
+                      "string": "Sun"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 1,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "foo"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "265"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "255"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "678"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "182"
+                    }
+                  },
+                  {
+                    "columnIndex": 5,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "568"
+                    }
+                  },
+                  {
+                    "columnIndex": 6,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "582"
+                    }
+                  },
+                  {
+                    "columnIndex": 7,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "425"
+                    }
+                  }
+                ]
+              },
+              {
+                "rowIndex": 2,
+                "cells": [
+                  {
+                    "columnIndex": 0,
+                    "value": {
+                      "formulaString": "",
+                      "string": "bar"
+                    }
+                  },
+                  {
+                    "columnIndex": 1,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "640"
+                    }
+                  },
+                  {
+                    "columnIndex": 2,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "454"
+                    }
+                  },
+                  {
+                    "columnIndex": 3,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "438"
+                    }
+                  },
+                  {
+                    "columnIndex": 4,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "630"
+                    }
+                  },
+                  {
+                    "columnIndex": 5,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "214"
+                    }
+                  },
+                  {
+                    "columnIndex": 6,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "916"
+                    }
+                  },
+                  {
+                    "columnIndex": 7,
+                    "value": {
+                      "formulaString": "",
+                      "decimal": "358"
+                    }
+                  }
+                ]
+              }
+            ],
+            "layout": {
+              "display": "DISP_BLOCK",
+              "width": 0,
+              "height": 0,
+              "align": "PLCMT_UNSET",
+              "verticalAlign": "PLCMT_UNSET",
+              "grid": {
+                "columns": 0,
+                "rows": 0,
+                "column": {
+                  "start": 7,
+                  "end": 13
+                },
+                "row": {
+                  "start": 6,
+                  "end": 10
+                }
+              }
+            }
+          }
+        }
+      ],
+      "layout": {
+        "display": "DISP_GRID",
+        "width": 1200,
+        "height": 720,
+        "align": "PLCMT_LEFT",
+        "verticalAlign": "PLCMT_TOP",
+        "grid": {
+          "columns": 12,
+          "rows": 0
+        }
+      }
+    }
+  ]
+}

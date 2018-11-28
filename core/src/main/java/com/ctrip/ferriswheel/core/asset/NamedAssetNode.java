@@ -1,0 +1,28 @@
+package com.ctrip.ferriswheel.core.asset;
+
+import com.ctrip.ferriswheel.core.intf.AssetManager;
+import com.ctrip.ferriswheel.core.intf.NamedAsset;
+
+abstract class NamedAssetNode extends AssetNode implements NamedAsset {
+    private String name;
+
+    protected NamedAssetNode(String name, AssetManager assetManager) {
+        super(assetManager);
+        this.name = name;
+    }
+
+    public NamedAssetNode(String name, AssetNode parentAsset) {
+        super(parentAsset);
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    void setName(String name) {
+        this.name = name;
+    }
+
+}

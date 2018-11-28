@@ -1,0 +1,21 @@
+.chart-view {
+    display: flex;
+    flex-flow: column nowrap;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.chart-view > .title {
+    flex: none;
+    text-align: center;
+}
+
+.chart-view > .content {
+    flex: 1 1;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 1em;
+    overflow: hidden;
+}

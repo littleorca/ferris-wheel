@@ -1,0 +1,60 @@
+<quarks> ::= <expression>
+<expression> ::= <cmp>
+               | <term1>
+<cmp> ::= <eq>
+        | <lt>
+        | <gt>
+        | <le>
+        | <ge>
+        | <ne>
+<eq> ::= <term1> "=" <term1>
+<lt> ::= <term1> "<" <term1>
+<gt> ::= <term1> ">" <term1>
+<le> ::= <term1> "<=" <term1>
+<ge> ::= <term1> ">=" <term1>
+<ne> ::= <term1> "<>" <term1>
+<term1> ::= <concat>
+          | <additive>
+<concat> ::= <term1> "&" <additive>
+<additive> ::= <add>
+             | <sub>
+             | <term2>
+<add> ::= <additive> "+" <term2>
+<sub> ::= <additive> "-" <term2>
+<term2> ::= <mul>
+          | <div>
+          | <term3>
+<mul> ::= <term2> "*" <term3>
+<div> ::= <term2> "/" <term3>
+<term3> ::= <pow>
+          | <factor>
+<pow> ::= <term3> "^" <factor>
+<factor> ::= <unary>
+           | <parenthesis>
+           | <function>
+           | <reference>
+           | <string>
+           | <number>
+           | "true"
+           | "false"
+<unary> ::= <positive>
+          | <negative>
+          | <percent>
+<positive> ::= "+" <factor>
+<negative> ::= "-" <factor>
+<percent> ::= <factor> "%"
+<parenthesis> ::= "(" <expression> ")"
+<function> ::= <identifier> "(" <params> ")"
+             | <identifier> "(" ")"
+<params> ::= <params> "," <expression>
+           | <expression>
+<reference> ::= <qualifier> "!" <qualifier> "!" <local_reference>
+              | <qualifier> "!" <local_reference>
+              | <local_reference>
+<qualifier> ::= <identifier>
+              | <string>
+<local_reference> ::= <range_reference>
+                    | <cell_reference>
+<range_reference> ::= <identifier> ":" <identifier>
+                    | <number> ":" <number>
+<cell_reference> ::= <identifier>

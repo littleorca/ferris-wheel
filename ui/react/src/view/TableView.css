@@ -1,0 +1,21 @@
+.table-view {
+    display: flex;
+    flex-flow: column nowrap;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.table-view > .title,
+.table-view > .action {
+    flex: none;
+}
+
+.table-view > .content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.table-view > .title h3 {
+    text-align: center;
+}

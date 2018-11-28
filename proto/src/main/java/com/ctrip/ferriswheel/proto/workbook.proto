@@ -1,0 +1,273 @@
+syntax = "proto3";
+package ferriswheel.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.ctrip.ferriswheel.proto.v1";
+
+// Protocol of spreadsheet
+
+message Version {
+    uint32 major = 1;
+    uint32 minor = 2;
+    uint32 build = 3;
+}
+
+message Workbook {
+    Version version = 1;
+    uint64 flags = 2; // reserved for future use
+    string name = 3;
+    repeated Sheet sheets = 4;
+}
+
+message Sheet {
+    string name = 1;
+    repeated SheetAsset assets = 2;
+    Layout layout = 3;
+}
+
+message SheetAsset {
+    oneof asset {
+        Table table = 1;
+        Chart chart = 2;
+        Text text = 3;
+    }
+}
+
+message Table {
+    string name = 1;
+    repeated Row rows = 2;
+    TableAutomaton automaton = 3;
+    Layout layout = 4;
+}
+
+message Row {
+    int32 row_index = 1;
+    repeated Cell cells = 2;
+}
+
+message Cell {
+    int32 column_index = 1;
+    UnionValue value = 2;
+}
+
+message UnionValue {
+    string formula_string = 1;
+    oneof value {
+        ErrorCode error = 2;
+        string decimal = 3;
+        bool boolean = 4;
+        google.protobuf.Timestamp date = 5;
+        string string = 6;
+        ListValue list = 7;
+    }
+}
+
+enum ErrorCode {
+    EC_UNSET = 0;
+    EC_OK = 1;
+    EC_UNKNOWN = 2;
+    EC_ILLEGAL_REF = 3;
+    EC_ILLEGAL_VALUE = 4;
+    EC_DIV_0 = 5;
+}
+
+message ListValue {
+    repeated UnionValue items = 1;
+    int32 columns = 2; /* optional column size for 2D array. */
+}
+
+message TableAutomaton {
+    oneof automaton {
+        QueryAutomaton query_automaton = 1;
+        PivotAutomaton pivot_automaton = 2;
+    }
+}
+
+message QueryAutomaton {
+    QueryTemplate template = 1;
+    repeated NamedValue params = 2;
+    DataQuery query = 3;
+}
+
+message QueryTemplate {
+    string scheme = 1;
+    repeated NamedValue builtin_params = 2;
+    repeated ParamRule user_param_rules = 3;
+}
+
+message DataQuery {
+    string scheme = 1;
+    repeated NamedValue params = 2;
+}
+
+message PivotAutomaton {
+    UnionValue data = 1;
+    repeated PivotFilter filters = 2;
+    repeated PivotField rows = 3;
+    repeated PivotField columns = 4;
+    repeated PivotValue values = 5;
+}
+
+message PivotFilter {
+    string field = 1;
+}
+
+message PivotField {
+    string field = 1;
+}
+
+message PivotValue {
+    string field = 1;
+    AggregateType aggregate_type = 2;
+    string label = 3;
+}
+
+enum AggregateType {
+    AT_UNSET = 0;
+    AT_SUMMARY = 1;
+    AT_COUNT = 2;
+    AT_AVERAGE = 3;
+    AT_MAXIMUM = 4;
+    AT_MINIMUM = 5;
+    AT_PRODUCT = 6;
+    AT_DECIMAL_ONLY_COUNT = 7;
+    AT_STANDARD_DEVIATION = 8;
+    AT_GLOBAL_STANDARD_DEVIATION = 9;
+    AT_VARIANCE = 10;
+    AT_GLOBAL_VARIANCE = 11;
+}
+
+message NamedValue {
+    string name = 1;
+    UnionValue value = 2;
+}
+
+message ParamRule {
+    string name = 1;
+    VariantType type = 2;
+    bool nullable = 3;
+    repeated UnionValue allowed_values = 4;
+}
+
+enum VariantType {
+    VT_UNSET = 0;
+    VT_ERROR = 1;
+    VT_BLANK = 2;
+    VT_DECIMAL = 3;
+    VT_BOOL = 4;
+    VT_DATE = 5;
+    VT_STRING = 6;
+    VT_LIST = 7;
+}
+
+message Chart {
+    string name = 1;
+    string type = 2;
+    UnionValue title = 3;
+    UnionValue categories = 4;
+    repeated Series series = 5;
+    Layout layout = 6;
+    ChartBinder binder = 7;
+    Axis x_axis = 8;
+    Axis y_axis = 9;
+    Axis z_axis = 10;
+}
+
+message Series {
+    UnionValue name = 1;
+    UnionValue x_values = 2;
+    UnionValue y_values = 3;
+    UnionValue z_values = 4;
+}
+
+message Layout {
+    Display display = 1;
+    int32 width = 2;
+    int32 height = 3;
+    Placement align = 4;
+    Placement vertical_align = 5;
+    Grid grid = 6;
+}
+
+enum Display {
+    DISP_UNSET = 0;
+    DISP_NONE = 1;
+    DISP_BLOCK = 2;
+    DISP_GRID = 5;
+}
+
+message Grid {
+    int32 columns = 1;
+    int32 rows = 2;
+    Span column = 3;
+    Span row = 4;
+}
+
+message Span {
+    int32 start = 1;
+    int32 end = 2;
+}
+
+message ChartBinder {
+    UnionValue data = 1;
+    Orientation orientation = 2;
+    Placement categories_placement = 3;
+    Placement series_name_placement = 4;
+}
+
+enum Orientation {
+    ORIENT_UNSET = 0;
+    ORIENT_HORIZONTAL = 1;
+    ORIENT_VERTICAL = 2;
+}
+
+enum Placement {
+    PLCMT_UNSET = 0;
+    PLCMT_LEFT = 1;
+    PLCMT_TOP = 2;
+    PLCMT_RIGHT = 3;
+    PLCMT_BOTTOM = 4;
+    PLCMT_CENTER = 5;
+}
+
+message Axis {
+    string title = 1;
+    string label = 2;
+    Placement placement = 3;
+    bool reversed = 4;
+    Interval interval = 5;
+    repeated AxisBand bands = 6;
+    Stacking stacking = 7;
+}
+
+message Interval {
+    double from = 1;
+    double to = 2;
+}
+
+message AxisBand {
+    Interval interval = 1;
+    string label = 2;
+    Color color = 3;
+}
+
+enum Stacking {
+    STACKING_UNSET = 0;
+    STACKING_ABSOLUTE = 1;
+    STACKING_PERCENT = 2;
+}
+
+message Color {
+    float red = 1;
+    float green = 2;
+    float blue = 3;
+    float alpha = 4;
+}
+
+message Text {
+    string name = 1;
+    UnionValue content = 2;
+    Layout layout = 3;
+}

@@ -1,0 +1,37 @@
+.editable-list {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.editable-list > .list-container > .manipulable-list {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+.editable-list.vertical > .editor-container {
+    padding-left: .75rem;
+}
+
+.editable-list.horizontal {
+    flex-direction: column;
+}
+
+.editable-list.horizontal > .list-container {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.editable-list.horizontal > .list-container > .manipulable-list {
+    height: 1.5em;
+    border: 0 none;
+    background: inherit;
+}
+
+.editable-list.horizontal > .editor-container {
+    padding-top: .75rem;
+}

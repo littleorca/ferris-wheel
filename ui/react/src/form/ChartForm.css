@@ -1,0 +1,22 @@
+.chart-form .manual-binder .manipulable-list {
+    height: 7.5em;
+}
+
+.chart-form .manual-binder .editor-container .series-form .field {
+    padding-left: 3em;
+}
+
+.chart-form .manual-binder .editor-container .series-form .field .field-name {
+    display: inline-block;
+    margin: 0 .5em 0 -3em;
+    width: 2.5em;
+    text-align: right;
+}
+
+.chart-form .manual-binder .category-settings {
+    margin-top: .5em;
+}
+
+.chart-form .auto-binder .field.orientation label:last-child {
+    margin-left: .5em;
+}

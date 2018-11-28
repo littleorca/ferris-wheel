@@ -1,0 +1,90 @@
+.workbook-view {
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: hidden;
+}
+
+.workbook-view .sheet-tabs {
+    flex: none;
+    display: flex;
+    flex-flow: row wrap;
+    margin: 0;
+    padding: .125rem;
+    background: #f9f9f9;
+    outline: 0;
+}
+
+.workbook-view .sheet-tabs .button,
+.sheet-tab-sort-helper.manipulable-item .button {
+    border: 0 none;
+    border-radius: 0;
+    background: transparent;
+}
+
+.workbook-view .sheet-tabs .button[name="add-sheet"] {
+    padding: 0 .5em;
+    color: #666;
+    font-weight: bold;
+    background: transparent;
+}
+
+.workbook-view .sheet-tabs ol {
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+}
+
+.workbook-view .sheet-tabs .button,
+.workbook-view .sheet-tabs li,
+.sheet-tab-sort-helper.manipulable-item {
+    box-sizing: border-box;
+    margin: .125rem;
+    padding: 0 1em;
+    height: 2rem;
+    line-height: 2rem;
+    color: #666;
+    background: #f3f3f3;
+    border-radius: 1rem;
+    transition: 200ms all;
+}
+
+.workbook-view .sheet-tabs li:hover {
+    color: #333;
+    background: #eee;
+    transition: 200ms all;
+}
+
+.workbook-view .sheet-tabs li.selected,
+.sheet-tab-sort-helper.manipulable-item.selected {
+    color: #000;
+    background: #e9e9e9;
+    transition: 200ms all;
+}
+.workbook-view .sheet-tabs li .button,
+.sheet-tab-sort-helper.manipulable-item .button {
+    display: none;
+}
+
+.workbook-view .sheet-tabs li.selected .button,
+.sheet-tab-sort-helper.manipulable-item.selected .button {
+    display: inline-block;
+    margin: 0 -.25em 0 .25em;
+    padding: 0;
+    color: #bbb;
+    background: transparent;
+}
+
+.workbook-view .sheet-tabs li.selected .button span,
+.sheet-tab-sort-helper.manipulable-item.selected .button span {
+    padding: .125em .25em;
+    border-radius: 1em;
+}
+
+.workbook-view .sheet-tabs li.selected .button:hover span {
+    color: #fff;
+    background: #d00;
+}
+
+.workbook-view .sheet-view {
+    flex: 1 1;
+}

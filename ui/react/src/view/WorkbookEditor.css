@@ -1,0 +1,229 @@
+.workbook-editor {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-width: 40rem;
+    min-height: 30rem;
+    width: 100%;
+    height: 100%;
+}
+
+.workbook-editor > .editor-header,
+.workbook-editor > .editor-body,
+.workbook-editor > .editor-footer {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.workbook-editor > .editor-header,
+.workbook-editor > .editor-footer {
+    flex: none;
+}
+
+.workbook-editor > .editor-body {
+    flex: 1 1;
+    display: flex;
+    flex-flow: row nowrap;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.workbook-editor > .editor-body > .workbook-view {
+    flex: 1 1;
+}
+
+.workbook-editor > .editor-body > .sidebar {
+    flex: none;
+    min-width: 16rem;
+    max-width: 24rem;
+    width: 25%;
+    border-left: 1px solid #ddd;
+    background: #f3f3f3;
+    overflow: auto;
+}
+
+.workbook-editor > .editor-body > .sidebar > .realtime-edit,
+.workbook-editor > .editor-body > .sidebar > .realtime-edit .group-view-content {
+    margin: 0;
+    padding: .5em;
+}
+
+.workbook-editor > .editor-body > .sidebar > .realtime-edit .group-view-item {
+    margin-bottom: .5em;
+}
+
+.workbook-editor > .editor-body > .sidebar > .realtime-edit .group-view-title {
+    padding: .25em .5em;
+    border-radius: .25em;
+    background: #e3e3e3;
+}
+
+.workbook-editor > .editor-body > .sidebar > .realtime-edit .chart-form {
+    display: block;
+}
+
+.workbook-editor > .editor-body > .sidebar > .realtime-edit .chart-form .axes-option {
+    margin-left: 0;
+    margin-top: 1em;
+}
+
+.workbook-editor > .editor-footer {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    font-size: .875rem;
+    line-height: 1.5rem;
+    color: #555;
+    background: #fcfcfc;
+}
+
+.workbook-editor > .editor-footer > .editor-footer-item {
+    margin: 0;
+    padding: 0 .5em;
+    width: 0; /* initial width */
+    border-left: 1px solid #ccc;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.workbook-editor > .editor-footer > .editor-footer-item:first-child {
+    border-left: 0 none;
+}
+
+.workbook-editor > .editor-footer > .message {
+    flex-grow: 4;
+}
+
+.workbook-editor > .editor-footer > .context {
+    flex-grow: 2;
+}
+
+.workbook-editor > .editor-footer > .status {
+    flex: none;
+    width: 10rem;
+}
+
+/* --- sidebar forms --- */
+
+.workbook-editor > .editor-body > .sidebar h3 {
+    margin: 0;
+}
+
+.workbook-editor > .editor-body > .sidebar select,
+.workbook-editor > .editor-body > .sidebar input[type="text"] {
+    font-size: .875rem;
+    padding: .2857em;
+}
+
+.workbook-editor > .editor-body > .sidebar input[type="radio"],
+.workbook-editor > .editor-body > .sidebar input[type="checkbox"] {
+    margin-right: .5em;
+}
+
+.workbook-editor > .editor-body > .sidebar h4 {
+    margin: .5em 0;
+}
+
+.workbook-editor > .editor-body > .sidebar .field {
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.workbook-editor > .editor-body > .sidebar .field .field-name {
+    display: block;
+}
+
+.workbook-editor > .editor-body > .sidebar .field .field-name::after {
+    content: ":";
+}
+
+.workbook-editor > .editor-body > .sidebar .field > input[type="text"],
+.workbook-editor > .editor-body > .sidebar .field > .interval-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.workbook-editor > .editor-body > .sidebar .editable-list.vertical .list-container {
+    width: 36%;
+}
+
+.workbook-editor > .editor-body > .sidebar .editable-list.vertical .editor-container {
+    width: 64%;
+}
+
+/* chart */
+
+.workbook-editor > .editor-body > .sidebar .data-binder-form .placement {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.workbook-editor > .editor-body > .sidebar .data-binder-form .placement .placement-selector {
+    margin-left: 1em;
+}
+
+.workbook-editor > .editor-body > .sidebar .manipulable-list.horizontal .manipulable-item.selected {
+    color: #fff;
+    border-radius: .3125em;
+    background: #aaa;
+    box-shadow: inset 0 0 .125em rgba(0, 0, 0, .5);
+}
+
+.workbook-editor > .editor-body > .sidebar .axis-bands .list-container .manipulable-list {
+    height: 7.5rem;
+}
+
+.workbook-editor > .editor-body > .sidebar .axis-form .field.axis-reversed .field-name,
+.workbook-editor > .editor-body > .sidebar .band-form .field.band-color .field-name {
+    display: inline-block;
+    margin-right: .5em;
+}
+
+/* query table */
+
+.workbook-editor > .editor-body > .sidebar .query-template-form > * {
+    margin-bottom: .5rem;
+}
+
+.workbook-editor > .editor-body > .sidebar .query-template-form .manipulable-list {
+    height: 10rem;
+}
+
+.workbook-editor > .editor-body > .sidebar .query-template-form .union-value-list-edit .manipulable-list {
+    width: 100%;
+    height: 4rem;
+}
+
+.workbook-editor > .editor-body > .sidebar .query-template-form .rule-type .field-name {
+    display: inline-block;
+    margin-right: .5em;
+}
+
+/* pivot table */
+
+.workbook-editor > .editor-body > .sidebar .pivot-form .editable-list .manipulable-list {
+    height: 6rem;
+}
+
+/* editor mask */
+
+.workbook-editor > .editor-mask {
+    position: absolute;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.workbook-editor > .editor-mask > .workbook-loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

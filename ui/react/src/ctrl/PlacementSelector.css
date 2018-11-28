@@ -1,0 +1,73 @@
+.placement-selector {
+    width: 6em;
+    height: 6em;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    background:#fff;
+}
+
+.placement-selector .row-top,
+.placement-selector .row-middle,
+.placement-selector .row-bottom {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    width: auto;
+    height: .5em;
+}
+
+.placement-selector .row-top,
+.placement-selector .row-bottom,
+.placement-selector .col-left,
+.placement-selector .col-right {
+    flex-grow: 1;
+}
+
+.placement-selector .row-middle,
+.placement-selector .col-middle {
+    flex-grow: 3;
+}
+
+.placement-selector label {
+    display: block;
+    margin: 1px;
+    padding: 0;
+    width: .5em;
+    height: auto;
+    color: #333;
+    background: #eee;
+    border: 2px solid #eee;
+    text-indent: -1000em;
+    overflow: hidden;
+}
+
+.placement-selector label.checked {
+    color: #fff;
+    background: #777;
+    border-color: #777;
+}
+
+.placement-selector label.checked.left,
+.placement-selector label.checked.top-left,
+.placement-selector label.checked.bottom-left {
+    border-left-color: #000;
+}
+
+.placement-selector label.checked.top,
+.placement-selector label.checked.top-left,
+.placement-selector label.checked.top-right {
+    border-top-color: #000;
+}
+
+.placement-selector label.checked.right,
+.placement-selector label.checked.top-right,
+.placement-selector label.checked.bottom-right {
+    border-right-color: #000;
+}
+
+.placement-selector label.checked.bottom,
+.placement-selector label.checked.bottom-left,
+.placement-selector label.checked.bottom-right {
+    border-bottom-color: #000;
+}

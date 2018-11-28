@@ -1,0 +1,43 @@
+.button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 .75em;
+    height: 2em;
+    color: #333;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    border-radius: .25em;
+    border: 1px solid #ccc;
+    background: #fcfcfc;
+    cursor: pointer;
+    user-select: none;
+    transition: 200ms all;
+}
+
+.button:hover {
+    background: #eee;
+    transition: 200ms all;
+}
+
+.button:active {
+    box-shadow: inset 0 0 1em rgba(0, 0, 0, .4);
+    transition: 200ms all;
+}
+
+.button.big {
+    font-size: 1.25rem;
+}
+
+.button.small {
+    font-size: .875rem;
+}
+
+.button:disabled,
+.button.disabled {
+    color: #999;
+    background: #f6f6f6;
+    box-shadow: none;
+}

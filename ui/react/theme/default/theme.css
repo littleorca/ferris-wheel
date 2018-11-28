@@ -1,0 +1,228 @@
+@font-face {
+    font-family: 'icomoon';
+    src: url('fonts/icomoon.eot?m042gr');
+    src: url('fonts/icomoon.eot?m042gr#iefix') format('embedded-opentype'),
+      url('fonts/icomoon.ttf?m042gr') format('truetype'),
+      url('fonts/icomoon.woff?m042gr') format('woff'),
+      url('fonts/icomoon.svg?m042gr#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}  
+
+.workbook-editor,
+.workbook-view {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.workbook-editor .editor-header {
+    background: linear-gradient(#fcfff9, #d9dcd6);
+}
+
+.workbook-editor .editor-header .toolbar {
+    padding: .3125em;
+}
+
+.workbook-editor .editor-header .toolbar .tool-group > .button {
+    height: 2.5em;
+    box-shadow: 0 0 .25em rgba(0, 0, 0, .1);
+}
+
+.workbook-editor .editor-header .toolbar .tool-group > .button:active {
+    box-shadow: 0 0 .25em rgba(0, 0, 0, .1),
+      inset 0 0 1em rgba(0, 0, 0, .4);
+}
+
+.workbook-editor .editor-header .toolbar .button.primary {
+    color: #fff;
+    background: #399;
+    border-color: #388;
+}
+
+.workbook-editor .editor-header .toolbar .button.primary:hover {
+    background: #388;
+}
+
+/* toolbar button icons */
+
+.workbook-editor .editor-header .toolbar button[name="save"]::before,
+.workbook-editor .editor-header .toolbar button[name="copy"]::before,
+.workbook-editor .editor-header .toolbar button[name="paste"]::before,
+.workbook-editor .editor-header .toolbar button[name="remove"]::before,
+.workbook-editor .editor-header .toolbar button[name^="add-"]::before,
+.workbook-editor .editor-header .toolbar button[name^="toggle-"]::before {
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: bold;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    margin-right: .357em;
+}
+
+.workbook-editor .toolbar button[name="save"]::before {
+    content: "\e9bf";
+    color: #dfe;
+}
+
+.workbook-editor .toolbar button[name="copy"]::before {
+    content: "\e944";
+    color: #456;
+}
+
+.workbook-editor .toolbar button[name="paste"]::before {
+    content: "\e944";
+    color: #456;
+}
+
+.workbook-editor .toolbar button[name="remove"]::before {
+    content: "\e952";
+    color: #c30;
+}
+
+.workbook-editor .toolbar button[name="add-table"]::before {
+    content: "\e973";
+    color: #c93;
+}
+
+.workbook-editor .toolbar button[name="add-pivot-table"]::before {
+    content: "\e9ba";
+    color: #a9c;
+}
+
+.workbook-editor .toolbar button[name="add-query-table"]::before {
+    content: "\e951";
+    color: #675;
+}
+
+.workbook-editor .toolbar button[name="add-line-chart"]::before {
+    content: "\e900";
+    color: #69e;
+}
+
+.workbook-editor .toolbar button[name="add-bar-chart"]::before {
+    content: "\e91a";
+    color: #3a6;
+}
+
+.workbook-editor .toolbar button[name="add-pie-chart"]::before {
+    content: "\e9ae";
+    color: #a63;
+}
+
+.workbook-editor .toolbar button[name="add-gauge-chart"]::before {
+    color: #85c;
+}
+
+.workbook-editor .toolbar button[name="add-text"]::before {
+    content: "\e964";
+    color: #888;
+}
+
+.workbook-editor .toolbar button[name="toggle-sidebar"]::before {
+    content: "\e9cc";
+    color: #999;
+}
+
+/* editor side bar */
+
+.workbook-editor .editor-body > .sidebar {
+    font-size: .9375rem;
+    color: #333;
+}
+
+.workbook-editor .editor-body > .sidebar > .realtime-edit .group-view-title {
+    background: #e3e6e6;
+}
+
+/* workbook view */
+
+.workbook-view .sheet-tabs {
+    background: #f6f9f6;
+    box-shadow: 0 0 .3125em rgba(0, 0, 0, .2);
+    z-index: 9;
+}
+
+.workbook-view.presentation .sheet-tabs {
+    padding: .25rem;
+    font-size: 1.125rem;
+    /* font-weight: bold; */
+}
+
+.workbook-view .sheet-tabs li,
+.sheet-tab-sort-helper.manipulable-item {
+    background: transparent;
+}
+
+.workbook-view .sheet-tabs li:hover,
+.sheet-tab-sort-helper.manipulable-item:hover {
+    color: #000;
+    background: #dfecdf;
+}
+
+.workbook-view .sheet-tabs li.selected,
+.sheet-tab-sort-helper.manipulable-item.selected {
+    color: #345;
+    background: #d6dfdc;
+}
+
+.workbook-view.presentation .sheet-tabs li {
+    display: flex;
+    align-items: center;
+    /* height: 2.2222em;
+    border-radius: 1.1111em; */
+}
+
+.workbook-view .sheet-view {
+    background: #d6dfd9;
+}
+
+.workbook-view .sheet-view .asset-container {
+    box-shadow: 0 0 .25rem rgba(0, 0, 0, .1);
+}
+
+.workbook-view .sheet-view .asset-container.selected {
+    box-shadow: 0 0 0.125rem 0.25rem rgba(51, 153, 255, .75);
+}
+
+.workbook-view .sheet-view .asset-view .title h3 {
+    margin: 0;
+    line-height: 3em;
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #666;
+}
+
+.workbook-view .sheet-view .table-view {
+    background: #f6f6f6;
+}
+
+.workbook-view .sheet-view .table-view .auto-form {
+    background: #fcfcfc;
+}
+
+.workbook-view .sheet-view .table-view .auto-form > .field {
+    padding: .25em .5em;
+    background: #e6ecec;
+    /* background: linear-gradient(#f8f9f9, #e0ece9); */
+}
+
+.workbook-view .sheet-view .table-view .auto-form > .field > .field-name {
+    color: #666;
+}
+
+.workbook-view .sheet-view .table-view .auto-form .button[name="query"] {
+    color: #fff;
+    border: 1px solid #688;
+    background: #699;
+}
+
+.workbook-view .sheet-view .table-view .auto-form .button[name="query"]::before {
+    margin-right: .25em;
+    content: "\e9c1";
+    font-family: "icomoon";
+}
+
+.workbook-loading {
+    fill: rgba(82, 133, 125, 0.75) !important;
+}

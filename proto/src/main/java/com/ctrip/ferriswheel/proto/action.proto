@@ -1,0 +1,283 @@
+syntax = "proto3";
+package ferriswheel.v1;
+
+import "com/ctrip/ferriswheel/proto/workbook.proto";
+
+option java_multiple_files = true;
+option java_package = "com.ctrip.ferriswheel.proto.v1";
+
+// Protocol of actions
+
+// ------------------
+// manipulate actions
+// ------------------
+
+message AddChart {
+    string sheet_name = 1;
+    Chart chart = 2;
+}
+
+message AddSheet {
+    string sheet_name = 1;
+    int32 index = 2;
+}
+
+message AddTable {
+    string sheet_name = 1;
+    Table table = 2;
+}
+
+message AutomateTable {
+    string sheet_name = 1;
+    string table_name = 2;
+    TableAutomaton automaton = 3;
+}
+
+message SetCellValue {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 column_index = 4;
+    UnionValue value = 5;
+}
+
+// set formula
+message SetCellFormula {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 column_index = 4;
+    string formula_string = 5;
+}
+
+// used for internal cell update (both value and formula)
+message RefreshCellValue {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 column_index = 4;
+    UnionValue value = 5;
+}
+
+message ChartConsult {
+    string sheet_name = 1;
+    string table_name = 2;
+    string type = 3;
+    int32 left = 4;
+    int32 top = 5;
+    int32 right = 6;
+    int32 bottom = 7;
+}
+
+message EraseColumns {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 column_index = 3;
+    int32 n_columns = 4;
+}
+
+message EraseRows {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 n_rows = 4;
+}
+
+message FillUp {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 first_column = 4;
+    int32 last_column = 5;
+    int32 n_rows = 6;
+}
+
+message FillRight {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 first_row = 3;
+    int32 last_row = 4;
+    int32 column_index = 5;
+    int32 n_columns = 6;
+}
+
+message FillDown {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 first_column = 4;
+    int32 last_column = 5;
+    int32 n_rows = 6;
+}
+
+message FillLeft {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 first_row = 3;
+    int32 last_row = 4;
+    int32 column_index = 5;
+    int32 n_columns = 6;
+}
+
+message InsertColumns {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 column_index = 3;
+    int32 n_columns = 4;
+}
+
+message InsertRows {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 n_rows = 4;
+}
+
+message MoveSheet {
+    string sheet_name = 1;
+    int32 target_index = 2;
+}
+
+message RemoveAsset {
+    string sheet_name = 1;
+    string asset_name = 2;
+}
+
+message RemoveColumns {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 column_index = 3;
+    int32 n_columns = 4;
+}
+
+message RemoveRows {
+    string sheet_name = 1;
+    string table_name = 2;
+    int32 row_index = 3;
+    int32 n_rows = 4;
+}
+
+message RemoveSheet {
+    string sheet_name = 1;
+}
+
+message RenameAsset {
+    string sheet_name = 1;
+    string old_asset_name = 2;
+    string new_asset_name = 3;
+}
+
+message RenameSheet {
+    string old_sheet_name = 1;
+    string new_sheet_name = 2;
+}
+
+message TransferAsset {
+    string from_sheet_name = 1;
+    string from_asset_name = 2;
+    string to_sheet_name = 3;
+    string to_asset_name = 4;
+}
+
+message UpdateAutomaton {
+    string sheet_name = 1;
+    string table_name = 2;
+    TableAutomaton automaton = 3;
+}
+
+message UpdateChart {
+    string sheet_name = 1;
+    Chart chart = 2;
+}
+
+message LayoutAsset {
+    string sheet_name = 1;
+    string asset_name = 2;
+    Layout layout = 3;
+}
+
+message AddText {
+    string sheet_name = 1;
+    Text text = 2;
+}
+
+message UpdateText {
+    string sheet_name = 1;
+    Text text = 2;
+}
+
+message ExecuteQuery {
+    string sheet_name = 1;
+    string table_name = 2;
+    repeated NamedValue params = 3;
+}
+
+message ResetTable {
+    string sheet_name = 1;
+    Table table = 2;
+}
+
+// workbook operation
+message WorkbookOperation {
+    string pathname = 1;
+}
+
+message Action {
+    oneof action {
+        AddChart add_chart = 1;
+        AddSheet add_sheet = 2;
+        AddTable add_table = 3;
+        AutomateTable automate_table = 4;
+        SetCellValue set_cell_value = 5;
+        SetCellFormula set_cell_formula = 6;
+        RefreshCellValue refresh_cell_value = 7;
+        ChartConsult chart_consult = 8;
+        EraseColumns erase_columns = 9;
+        EraseRows erase_rows = 10;
+        FillUp fill_up = 11;
+        FillRight fill_right = 12;
+        FillDown fill_down = 13;
+        FillLeft fill_left = 14;
+        InsertColumns insert_columns = 15;
+        InsertRows insert_rows = 16;
+        MoveSheet move_sheet = 17;
+        RemoveAsset remove_asset = 18;
+        RemoveColumns remove_columns = 19;
+        RemoveRows remove_rows = 20;
+        RemoveSheet remove_sheet = 21;
+        RenameAsset rename_asset = 22;
+        RenameSheet rename_sheet = 23;
+        TransferAsset transfer_asset = 24;
+        UpdateAutomaton update_automaton = 25;
+        UpdateChart update_chart = 26;
+        WorkbookOperation create_workbook = 27;
+        WorkbookOperation open_workbook = 28;
+        WorkbookOperation save_workbook = 29;
+        WorkbookOperation close_workbook = 30;
+        LayoutAsset layout_asset = 31;
+        AddText add_text = 32;
+        UpdateText update_text = 33;
+        ExecuteQuery execute_query = 34;
+        ResetTable reset_table = 35;
+    }
+}
+
+message EditRequest {
+    int64 tx_id = 1;
+    Action action = 2;
+}
+
+message ChangeList {
+    repeated Action actions = 1;
+}
+
+message EditResponse {
+    int64 tx_id = 1;
+    int32 status_code = 2;
+    string message = 3;
+    oneof response {
+        ChangeList changes = 4;
+        Workbook workbook = 5;
+        Chart suggested_chart = 6;
+    }
+}

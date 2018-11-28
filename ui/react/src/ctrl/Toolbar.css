@@ -1,0 +1,32 @@
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row wrap;
+    margin: 0;
+    padding: .125rem;
+    box-sizing: border-box;
+}
+
+.toolbar > .tool-group {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: .125rem;
+    padding: .125rem;
+}
+
+.toolbar > .tool-group .button {
+    display: flex;
+    margin: 0;
+    outline: 0;
+}
+
+.toolbar > .tool-group > .button:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.toolbar > .tool-group > .button:not(:last-child) {
+    border-right-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}

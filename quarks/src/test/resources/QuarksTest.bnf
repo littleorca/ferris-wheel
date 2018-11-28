@@ -1,0 +1,25 @@
+<quarks> ::= <exp> | <select>
+<exp> ::= <add> | <or> | <assign> | <cmp>
+<add> ::= <add> "+" <mul> | <add> "-" <mul> | <mul>
+<mul> ::= <mul> "*" <pri> | <mul> "/" <pri> | <pri>
+<or> ::= <or> "||" <and> | <and>
+<and> ::= <and> "&&" <not> | <not>
+<not> ::= <cmp> | "!" <pri> | <pri>
+<assign> ::= <identifier> "=" <exp>
+<cmp> ::= <pri> "<" <pri> | <pri> "<=" <pri> | <pri> "==" <pri> | <pri> ">=" <pri> | <pri> ">" <pri> | <pri> "!=" <pri>
+<pri> ::= "(" <exp> ")" | <func> | <refer> | <identifier> | <string> | <number> | "true" | "false" | "null"
+<func> ::= <identifier> "(" <params> ")" | <identifier> "(" ")"
+<params> ::= <params> "," <param> | <param>
+<param> ::= <exp>
+<refer> ::= <refer> "." <identifier> | <identifier>
+<select> ::= <full_select> | <medium_select> | <tiny_select>
+<full_select> ::= "select" <fields> "from" <targets> "where" <condition> "limit" <limit>
+<medium_select> ::= "select" <fields> "from" <targets> "where" <condition>
+<short_select> ::= "select" <fields> "from" <targets>
+<tiny_select> ::= "select" <fields>
+<fields> ::= <fields> "," <item> | <item> | "*"
+<targets> ::= <targets> "," <item> | <item>
+<item> ::= <refer> "as" <identifier> | <exp> "as" <identifier> | <refer> | <exp>
+<condition> ::= <exp>
+<limit> ::= <number> "," <number> | <number>
+

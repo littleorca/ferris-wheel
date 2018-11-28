@@ -1,0 +1,20 @@
+.color-input {
+    border-radius: .25em;
+    overflow: hidden;
+    box-shadow: 0 0 .375em rgba(0, 0, 0, 0.25),
+                0 0 0 .25em #fff inset;
+    cursor: pointer;
+}
+
+.color-input span {
+    display: inline-block;
+    margin: .25em;
+    width: 2.5em;
+    height: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.color-input-popover {
+    fill: #ccc;
+}
