@@ -16,7 +16,7 @@ public class DefaultChartBinder extends AssetNode implements ChartBinder {
     }
 
     DefaultChart getChart() {
-        return (DefaultChart) getParentAsset();
+        return (DefaultChart) getParent();
     }
 
     @Override

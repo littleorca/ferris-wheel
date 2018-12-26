@@ -2,10 +2,6 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.ColumnHeader;
-import com.ctrip.ferriswheel.core.formula.Formula;
-import com.ctrip.ferriswheel.core.view.Layout;
-import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.core.bean.ColumnHeader;
 import com.ctrip.ferriswheel.core.bean.RowHeader;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.bean.Value;
@@ -14,11 +10,10 @@ import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.util.References;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import com.ctrip.ferriswheel.core.view.Layout;
+import com.ctrip.ferriswheel.core.view.Rectangle;
 import com.ctrip.ferriswheel.core.view.TableLayout;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 class DefaultTable extends NamedAssetNode implements Table {
@@ -30,6 +25,8 @@ class DefaultTable extends NamedAssetNode implements Table {
     private boolean readOnly = false;
     private final TableLayout layout = new TableLayout();
     private TableAutomaton automaton;
+    private Map<Range, Set<Long>> rangeToNodes = new HashMap<>();
+    private Map<Long, Set<Range>> nodeToRanges = new HashMap<>();
 
     DefaultTable(String name, AssetManager assetManager) {
         super(name, assetManager);
@@ -454,6 +451,13 @@ class DefaultTable extends NamedAssetNode implements Table {
     void handleAction(AutomateTable automateTable) {
         publicly(automateTable, () -> {
             createAndRegisterAutomaton(automateTable.getSolution());
+            for (DefaultRow row : rows) {
+                row.setEphemeral(true);
+                for (Cell cell : row) {
+                    ((DefaultCell) cell).setEphemeral(true);
+                    cell.getDependents().forEach(d -> ((AssetNode) d).addDependency(this));
+                }
+            }
             getWorkbook().onTableAutomated(this);
         });
     }
@@ -513,6 +517,9 @@ class DefaultTable extends NamedAssetNode implements Table {
         if (row == null) {
             row = new DefaultRow(getAssetManager());
             setRow(rowIndex, row);
+            if (getAutomaton() != null) {
+                row.setEphemeral(true);
+            }
         }
         return row;
     }
@@ -523,7 +530,10 @@ class DefaultTable extends NamedAssetNode implements Table {
         if (cell == null) {
             cell = new DefaultCell((DefaultAssetManager) getAssetManager());
             row.setCell(columnIndex, cell);
-            cell.addDependencies(getAssetId());
+            // cell.addDependency(this); // TODO review if it is needed
+            if (getAutomaton() != null) {
+                row.setEphemeral(true);
+            }
         }
         return cell;
     }
@@ -617,7 +627,7 @@ class DefaultTable extends NamedAssetNode implements Table {
 
     @Override
     public DefaultSheet getSheet() {
-        return (DefaultSheet) getParentAsset();
+        return (DefaultSheet) getParent();
     }
 
     DefaultWorkbook getWorkbook() {
@@ -700,6 +710,141 @@ class DefaultTable extends NamedAssetNode implements Table {
                     throw new RuntimeException(e);
                 }
             }
+        }
+    }
+
+    /**
+     * Watch range.
+     *
+     * @param range  Table range.
+     * @param nodeId ID of the node which depends on the specified range.
+     */
+    void subscribeRange(Range range, long nodeId) {
+        Set<Long> nodeIds = rangeToNodes.get(range);
+        if (nodeIds == null) {
+            nodeIds = new HashSet<>();
+            rangeToNodes.put(range, nodeIds);
+        }
+        nodeIds.add(nodeId);
+        Set<Range> ranges = nodeToRanges.get(nodeId);
+        if (ranges == null) {
+            ranges = new HashSet<>();
+            nodeToRanges.put(nodeId, ranges);
+        }
+        ranges.add(range);
+    }
+
+    /**
+     * Clear range watchers related to the specified node ID.
+     *
+     * @param nodeId
+     */
+    void clearRangeWatcher(long nodeId) {
+        Set<Range> ranges = nodeToRanges.remove(nodeId);
+        if (ranges == null) {
+            return;
+        }
+        for (Range r : ranges) {
+            Set<Long> nodeIds = rangeToNodes.get(r);
+            nodeIds.remove(nodeId);
+            if (nodeIds.isEmpty()) {
+                rangeToNodes.remove(r);
+            }
+        }
+    }
+
+    /**
+     * Find overlapped ranges.
+     *
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @return
+     */
+    List<Range> findOverlappedRanges(Integer left,
+                                     Integer top,
+                                     Integer right,
+                                     Integer bottom) {
+        // 先用笨方法实现功能
+        List<Range> ranges = new LinkedList<>();
+        for (Range range : rangeToNodes.keySet()) {
+            if (range.tableId != getAssetId()) {
+                continue;
+            }
+            if (range.isOverlap(left, top, right, bottom)) {
+                ranges.add(range);
+            }
+        }
+        return ranges;
+    }
+
+    /**
+     * Get node IDs which depend on the specified range.
+     *
+     * @param range
+     * @return
+     */
+    Set<Long> getWatchers(Range range) {
+        Set<Long> set = rangeToNodes.get(range);
+        return set == null ? Collections.emptySet() : set;
+    }
+
+    Range tableRange(int rowIndex, int colIndex) {
+        return tableRange(colIndex, rowIndex, colIndex, rowIndex);
+    }
+
+    Range tableRange(int left, int top, int right, int bottom) {
+        if (left == -1) {
+            left = 0;
+        }
+        if (top == -1) {
+            top = 0;
+        }
+        if (right == -1) {
+            right = Integer.MAX_VALUE;
+        }
+        if (bottom == -1) {
+            bottom = Integer.MAX_VALUE;
+        }
+        return new Range(getAssetId(), left, top, right, bottom);
+    }
+
+    class Range extends Rectangle {
+        long tableId;
+
+        Range() {
+        }
+
+        Range(long tableId, int left, int top, int right, int bottom) {
+            super(left, top, right, bottom);
+            this.tableId = tableId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            Range range = (Range) o;
+            return Objects.equals(tableId, range.tableId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), tableId);
+        }
+
+        public boolean isOverlap(Integer left, Integer top, Integer right, Integer bottom) {
+            return isRowOverlap(top, bottom) && isColumnOverlap(left, right);
+        }
+
+        private boolean isRowOverlap(Integer top, Integer bottom) {
+            return (top == null || top <= this.getBottom()) && (bottom == null || bottom >= this.getTop());
+        }
+
+        private boolean isColumnOverlap(Integer left, Integer right) {
+            return (left == null || left <= this.getRight()) && (right == null || right >= this.getLeft());
         }
     }
 

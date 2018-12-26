@@ -19,7 +19,8 @@
 }
 
 .workbook-editor .editor-header .toolbar {
-    padding: .3125em;
+    padding: .25rem;
+    font-size: .9375rem;
 }
 
 .workbook-editor .editor-header .toolbar .tool-group > .button {
@@ -49,7 +50,8 @@
 .workbook-editor .editor-header .toolbar button[name="paste"]::before,
 .workbook-editor .editor-header .toolbar button[name="remove"]::before,
 .workbook-editor .editor-header .toolbar button[name^="add-"]::before,
-.workbook-editor .editor-header .toolbar button[name^="toggle-"]::before {
+.workbook-editor .editor-header .toolbar button[name^="toggle-"]::before,
+.workbook-view .sheet-tabs .button[name="add-sheet"]::before {
     font-family: 'icomoon' !important;
     speak: none;
     font-style: normal;
@@ -57,7 +59,7 @@
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    margin-right: .357em;
+    margin-right: .25em;
 }
 
 .workbook-editor .toolbar button[name="save"]::before {
@@ -124,6 +126,14 @@
     color: #999;
 }
 
+.workbook-view .sheet-tabs .button[name="add-sheet"]::before {
+    content: "\e9b1";
+}
+
+.workbook-view .sheet-tabs .button[name="add-sheet"] span {
+    display: none;
+}
+
 /* editor side bar */
 
 .workbook-editor .editor-body > .sidebar {
@@ -144,9 +154,7 @@
 }
 
 .workbook-view.presentation .sheet-tabs {
-    padding: .25rem;
-    font-size: 1.125rem;
-    /* font-weight: bold; */
+    font-size: 1rem;
 }
 
 .workbook-view .sheet-tabs li,
@@ -164,13 +172,6 @@
 .sheet-tab-sort-helper.manipulable-item.selected {
     color: #345;
     background: #d6dfdc;
-}
-
-.workbook-view.presentation .sheet-tabs li {
-    display: flex;
-    align-items: center;
-    /* height: 2.2222em;
-    border-radius: 1.1111em; */
 }
 
 .workbook-view .sheet-view {

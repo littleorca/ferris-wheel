@@ -126,6 +126,9 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
     }
 
     protected handleKeyDown(event: React.KeyboardEvent) {
+        if (event.target !== event.currentTarget) {
+            return; // ignore child events
+        }
         switch (event.key) {
             case 'ArrowUp':
                 if (this.props.selectable && !this.props.horizontal) {

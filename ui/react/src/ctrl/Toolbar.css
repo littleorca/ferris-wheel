@@ -3,21 +3,22 @@
     justify-content: space-between;
     flex-flow: row wrap;
     margin: 0;
-    padding: .125rem;
+    padding: .125em;
     box-sizing: border-box;
 }
 
 .toolbar > .tool-group {
     display: flex;
     flex-flow: row nowrap;
-    margin: .125rem;
-    padding: .125rem;
+    margin: .125em;
+    padding: .125em;
 }
 
 .toolbar > .tool-group .button {
     display: flex;
     margin: 0;
     outline: 0;
+    padding: 0 .625em;
 }
 
 .toolbar > .tool-group > .button:not(:first-child) {
@@ -29,4 +30,8 @@
     border-right-width: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+.toolbar > .tool-group .dropdown-button {
+    padding: 0;
 }

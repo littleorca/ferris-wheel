@@ -27,11 +27,11 @@ class DefaultCell extends ValueNode implements Cell {
 
     @Override
     public DefaultRow getRow() {
-        return (DefaultRow) getParentAsset();
+        return (DefaultRow) getParent();
     }
 
     void setRow(DefaultRow row) {
-        setParentAsset(row);
+        setParent(row);
     }
 
     @Override
@@ -55,7 +55,6 @@ class DefaultCell extends ValueNode implements Cell {
 
     void setStyle(CellStyle style) {
         this.style = style;
-        setDependencies(null); // dependencies will be decide later
     }
 
     @Override

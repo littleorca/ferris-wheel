@@ -12,6 +12,7 @@
     padding: .125rem;
     background: #f9f9f9;
     outline: 0;
+    font-size: .875rem;
 }
 
 .workbook-view .sheet-tabs .button,
@@ -40,8 +41,8 @@
     box-sizing: border-box;
     margin: .125rem;
     padding: 0 1em;
-    height: 2rem;
-    line-height: 2rem;
+    height: 2em;
+    line-height: 2em;
     color: #666;
     background: #f3f3f3;
     border-radius: 1rem;
@@ -85,6 +86,27 @@
     background: #d00;
 }
 
+.workbook-view .sheet-list {
+    flex: 1 1;
+    display: flex;
+}
+
 .workbook-view .sheet-view {
     flex: 1 1;
+}
+
+.workbook-view .sheet-view.active {
+    z-index: 1;
+}
+
+/*
+ * Here hides the inactive sheet by set position to absolute and visibility to
+ * hidden. By this way handsontable can render properly other than setting
+ * display to none.
+ */
+.workbook-view .sheet-view.inactive {
+    position: absolute;
+    width: 0;
+    height: 0;
+    visibility: hidden;
 }

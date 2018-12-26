@@ -285,7 +285,7 @@ public class TestAssetManagement extends TestCase {
 
         TableAutomaton automaton = table.getAutomaton();
         if (automaton != null) {
-            assertEquals(table, ((AssetNode) automaton).getParentAsset());
+            assertEquals(table, ((AssetNode) automaton).getParent());
             assertTrue(pendingAssetIds.remove(automaton.getAssetId()));
             assertEquals(1, assetMap.get(automaton.getAssetId()).referenceCount.get());
             checkAssetMap(assetMap, pendingAssetIds, automaton);
@@ -308,13 +308,13 @@ public class TestAssetManagement extends TestCase {
                        Set<Long> pendingAssetIds, TableAutomaton automaton) {
         if (automaton instanceof DefaultQueryAutomaton) {
             DefaultQueryTemplate template = ((DefaultQueryAutomaton) automaton).getTemplate();
-            assertEquals(automaton, template.getParentAsset());
+            assertEquals(automaton, template.getParent());
             assertTrue(pendingAssetIds.remove(template.getAssetId()));
             assertEquals(1, assetMap.get(template.getAssetId()).referenceCount.get());
 
             for (String name : template.getBuiltinParamNames()) {
                 ValueNode param = template.getBuiltinParam(name);
-                assertEquals(template, param.getParentAsset());
+                assertEquals(template, param.getParent());
                 assertTrue(pendingAssetIds.remove(param.getAssetId()));
                 assertEquals(1, assetMap.get(param.getAssetId()).referenceCount.get());
             }
@@ -328,10 +328,10 @@ public class TestAssetManagement extends TestCase {
 
     void checkAssetMap(Map<Long, DefaultAssetManager.AssetReference> assetMap,
                        Set<Long> pendingAssetIds, DefaultChart chart) {
-        assertEquals(chart, chart.getTitle().getParentAsset());
+        assertEquals(chart, chart.getTitle().getParent());
         assertTrue(pendingAssetIds.remove(chart.getTitle().getAssetId()));
         assertEquals(1, assetMap.get(chart.getTitle().getAssetId()).referenceCount.get());
-        assertEquals(chart, chart.getCategories().getParentAsset());
+        assertEquals(chart, chart.getCategories().getParent());
         assertTrue(pendingAssetIds.remove(chart.getCategories().getAssetId()));
         assertEquals(1, assetMap.get(chart.getCategories().getAssetId()).referenceCount.get());
 
@@ -347,17 +347,17 @@ public class TestAssetManagement extends TestCase {
     void checkAssetMap(Map<Long, DefaultAssetManager.AssetReference> assetMap,
                        Set<Long> pendingAssetIds, DefaultDataSeries series) {
         if (series.getName() != null) {
-            assertEquals(series, series.getName().getParentAsset());
+            assertEquals(series, series.getName().getParent());
             assertTrue(pendingAssetIds.remove(series.getName().getAssetId()));
             assertEquals(1, assetMap.get(series.getName().getAssetId()).referenceCount.get());
         }
         if (series.getxValues() != null) {
-            assertEquals(series, series.getxValues().getParentAsset());
+            assertEquals(series, series.getxValues().getParent());
             assertTrue(pendingAssetIds.remove(series.getxValues().getAssetId()));
             assertEquals(1, assetMap.get(series.getxValues().getAssetId()).referenceCount.get());
         }
         if (series.getyValues() != null) {
-            assertEquals(series, series.getyValues().getParentAsset());
+            assertEquals(series, series.getyValues().getParent());
             assertTrue(pendingAssetIds.remove(series.getyValues().getAssetId()));
             assertEquals(1, assetMap.get(series.getyValues().getAssetId()).referenceCount.get());
         }

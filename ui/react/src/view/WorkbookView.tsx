@@ -2,6 +2,7 @@ import * as React from 'react';
 import Workbook from '../model/Workbook';
 import SharedViewProps from './SharedViewProps';
 import Sheet from '../model/Sheet';
+import SheetAsset from '../model/SheetAsset';
 import SheetView from './SheetView';
 import ManipulableList from '../ctrl/ManipulableList';
 import EditableText from '../ctrl/EditableText';
@@ -25,6 +26,7 @@ interface WorkbookViewProps extends SharedViewProps<WorkbookView> {
 
 interface WorkbookViewState {
     selected?: Sheet;
+    lastSelectedSheetAsset: Map<Sheet, SheetAsset>;
 }
 
 class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState> implements ActionHerald {
@@ -39,6 +41,7 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
 
         this.state = {
             selected: props.workbook.sheets[0],
+            lastSelectedSheetAsset: new Map<Sheet, SheetAsset>(),
         };
         this.sendSelectSheetAction(props.workbook.sheets[0]);
 
@@ -50,6 +53,7 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
         this.handleRemoveSheet = this.handleRemoveSheet.bind(this);
         this.handleMoveSheet = this.handleMoveSheet.bind(this);
         this.handleSelectSheet = this.handleSelectSheet.bind(this);
+        this.handleSheetAction = this.handleSheetAction.bind(this);
     }
 
     public componentDidUpdate(prevProps: WorkbookViewProps) {
@@ -209,8 +213,9 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
                     afterChange={afterChange} />
                 {this.props.editable && (
                     <Button
+                        className="small"
                         name={"remove-sheet" + props.value.name}
-                        label="x"
+                        label="X"
                         tips="删除该 Sheet"
                         onClick={onRemove} />
                 )}
@@ -226,13 +231,29 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
         this.setState({
             selected: sheet,
         });
-        this.sendSelectSheetAction(sheet);
+        const asset = (typeof sheet !== 'undefined') ?
+            this.state.lastSelectedSheetAsset.get(sheet) : undefined;
+        this.sendSelectSheetAction(sheet, asset);
     }
 
-    protected sendSelectSheetAction(sheet?: Sheet) {
+    protected sendSelectSheetAction(sheet?: Sheet, asset?: SheetAsset) {
         if (typeof this.props.onAction !== 'undefined') {
-            const selectAsset = new SelectAsset(sheet);
+            const selectAsset = new SelectAsset(sheet, asset);
             this.props.onAction(selectAsset.wrapper());
+        }
+    }
+
+    protected handleSheetAction(action: Action) {
+        if (typeof action.selectAsset !== 'undefined' &&
+            typeof action.selectAsset.sheet !== 'undefined') {
+            if (typeof action.selectAsset.asset !== 'undefined') {
+                this.state.lastSelectedSheetAsset.set(action.selectAsset.sheet, action.selectAsset.asset);
+            } else {
+                this.state.lastSelectedSheetAsset.delete(action.selectAsset.sheet);
+            }
+        }
+        if (typeof this.props.onAction !== 'undefined') {
+            this.props.onAction(action);
         }
     }
 
@@ -334,14 +355,17 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
                         onSelect={this.handleSelectSheet} />
                 </div>
 
-                {this.state.selected && (
-                    <SheetView
-                        key={this.state.selected.name}
-                        sheet={this.state.selected}
-                        editable={this.props.editable}
-                        onAction={this.props.onAction}
-                        herald={this} />
-                )}
+                <div className="sheet-list">
+                    {this.props.workbook.sheets.map(sheet =>
+                        <SheetView
+                            key={sheet.name}
+                            sheet={sheet}
+                            className={(this.state.selected === sheet) ? "active" : "inactive"}
+                            editable={this.props.editable}
+                            onAction={this.handleSheetAction}
+                            herald={this} />
+                    )}
+                </div>
             </div>
         );
     }

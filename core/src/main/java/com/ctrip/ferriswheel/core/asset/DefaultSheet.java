@@ -5,13 +5,10 @@ import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.RowData;
 import com.ctrip.ferriswheel.core.view.Layout;
 import com.ctrip.ferriswheel.core.view.SheetLayout;
-import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
-import com.ctrip.ferriswheel.core.view.Layout;
-import com.ctrip.ferriswheel.core.view.SheetLayout;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
@@ -29,7 +26,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
 
     @Override
     public DefaultWorkbook getWorkbook() {
-        return (DefaultWorkbook) getParentAsset();
+        return (DefaultWorkbook) getParent();
     }
 
     @Override
@@ -95,27 +92,28 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
         if (getAsset(renameAsset.getNewAssetName()) != null) {
             throw new IllegalArgumentException("Duplicated asset name: " + renameAsset.getNewAssetName());
         }
-        publicly(renameAsset, () -> {
-            if (!assets.rename(renameAsset.getOldAssetName(), renameAsset.getNewAssetName())) {
-                throw new RuntimeException("Failed to rename asset.");
-            }
-            // if renamed asset is  a table, there could be formulas which need update.
-            if (asset instanceof DefaultTable) {
-                DefaultTable table = (DefaultTable) asset;
-                getWorkbook().updateRangeReferences(table,
-                        0,
-                        0,
-                        null, // null means unlimited
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-            }
-        });
+        getWorkbook().withoutRefresh(() ->
+                publicly(renameAsset, () -> {
+                    if (!assets.rename(renameAsset.getOldAssetName(), renameAsset.getNewAssetName())) {
+                        throw new RuntimeException("Failed to rename asset.");
+                    }
+                    // if renamed asset is  a table, there could be formulas which need update.
+                    if (asset instanceof DefaultTable) {
+                        DefaultTable table = (DefaultTable) asset;
+                        getWorkbook().updateRangeReferences(table,
+                                0,
+                                0,
+                                null, // null means unlimited
+                                null,
+                                null,
+                                null,
+                                null,
+                                null);
+                    }
+                }));
         // technically rename a table doesn't affect any cell value or chart property value,
         // it just affect formulas.
-        //refreshIfNeeded();
+        getWorkbook().refreshIfNeeded();
     }
 
     @Override

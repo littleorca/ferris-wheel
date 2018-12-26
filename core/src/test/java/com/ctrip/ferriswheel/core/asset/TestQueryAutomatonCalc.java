@@ -68,6 +68,7 @@ public class TestQueryAutomatonCalc extends TestCase {
 
         // test circular dependencies via automaton
         try {
+            // auto->param2->normal!A1->normal!B1->auto!A1
             normalTable.setCellFormula(0, 0, "B1");
             fail("Expects circular dependency exception.");
         } catch (IllegalArgumentException e) {

@@ -3,7 +3,6 @@ package com.ctrip.ferriswheel.core.asset;
 import com.ctrip.ferriswheel.core.view.Layout;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.intf.Text;
-import com.ctrip.ferriswheel.core.view.Layout;
 import com.ctrip.ferriswheel.core.view.TextLayout;
 
 public class DefaultText extends NamedAssetNode implements Text {
@@ -12,7 +11,7 @@ public class DefaultText extends NamedAssetNode implements Text {
 
     protected DefaultText(String name, DefaultSheet sheet) {
         super(name, sheet.getWorkbook().getAssetManager());
-        setParentAsset(sheet);
+        setParent(sheet);
         this.content = new ValueNode(getAssetManager(), Value.BLANK, null);
 
         bindChild(content);
@@ -29,7 +28,7 @@ public class DefaultText extends NamedAssetNode implements Text {
     }
 
     DefaultSheet getSheet() {
-        return (DefaultSheet) getParentAsset();
+        return (DefaultSheet) getParent();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.ctrip.ferriswheel.core.formula;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Directed acyclic graph
@@ -164,6 +165,33 @@ public class DirectedAcyclicGraph<Id, Data> {
 
     public void clear() {
         nodes.clear();
+    }
+
+    public String toDot(Function<Id, String> mapper) {
+        StringBuilder sb = new StringBuilder("digraph G {\n");
+        if (mapper != null) {
+            nodes.values().forEach(node -> sb.append("  ")
+                    .append(node.id)
+                    .append("[label=\"")
+                    .append(filterLabel(mapper.apply(node.id), "" + node.id))
+                    .append("\"]\n"));
+            sb.append("\n");
+        }
+        nodes.values().forEach(node -> {
+            if (!node.outbounds.isEmpty()) {
+                sb.append("  ").append(node.id).append("->");
+                node.outbounds.values().forEach(o -> sb.append(o.id).append(","));
+                sb.delete(sb.length() - 1, sb.length()).append("\n");
+            }
+        });
+        return sb.append("}\n").toString();
+    }
+
+    private String filterLabel(String label, String defVal) {
+        if (label == null) {
+            return defVal;
+        }
+        return label.replaceAll("\"", "\\\"");
     }
 
     /**

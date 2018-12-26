@@ -69,11 +69,11 @@ class DefaultRow extends AssetNode implements Row {
 
     @Override
     public DefaultTable getTable() {
-        return (DefaultTable) getParentAsset();
+        return (DefaultTable) getParent();
     }
 
     void setSheet(DefaultTable sheet) {
-        setParentAsset(sheet);
+        setParent(sheet);
     }
 
     @Override

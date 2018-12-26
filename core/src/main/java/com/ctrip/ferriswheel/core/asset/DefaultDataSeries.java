@@ -14,11 +14,11 @@ class DefaultDataSeries extends AssetNode implements DataSeries {
 
     @Override
     public DefaultChart getChart() {
-        return (DefaultChart) getParentAsset();
+        return (DefaultChart) getParent();
     }
 
     void setChart(DefaultChart chartModel) {
-        setParentAsset(chartModel);
+        setParent(chartModel);
     }
 
     @Override

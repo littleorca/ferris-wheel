@@ -12,14 +12,13 @@ import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
 import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
-import com.ctrip.ferriswheel.core.util.FlagStack;
+import com.ctrip.ferriswheel.core.util.GraphHelper;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -32,11 +31,8 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     private final NamedAssetList<DefaultSheet> sheets;
     private final ActionListenerChain listenerChain;
     private final Set<Long> evaluableNodes = new HashSet<>();
-    private final DependencyTracer dependencyTracer;
     private final AutoFiller autoFiller = new AutoFiller(this);
-    private final FlagStack skipWelding = new FlagStack(false);
-    private final FlagStack skipRefresh = new FlagStack(false);
-    private final FlagStack forceRefresh = new FlagStack(false);
+    private final ActionContextManager actionContextManager = new DefaultActionContextManager();
 
     DefaultWorkbook(Environment environment) {
         // FIXME workbook name
@@ -45,7 +41,6 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         this.environment = environment;
         this.sheets = new NamedAssetList<>(this);
         this.listenerChain = createListenerChain();
-        this.dependencyTracer = new DependencyTracer(getAssetManager());
     }
 
     @Override
@@ -107,28 +102,30 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             return; // nothing changed
         }
         checkSheetName(newName);
-        listenerChain.publicly(new RenameSheet(sheet.getName(), newName), () -> {
-            if (!sheets.rename(oldName, newName)) {
-                throw new RuntimeException("Failed to rename sheet.");
-            }
-            for (NamedAsset asset : sheet) {
-                if (asset instanceof DefaultTable) {
-                    DefaultTable table = (DefaultTable) asset;
-                    updateRangeReferences(table,
-                            0,
-                            0,
-                            table.getColumnCount(),
-                            table.getRowCount(),
-                            null,
-                            null,
-                            null,
-                            null);
-                }
-            }
-        });
+        withoutRefresh(() -> listenerChain.publicly(new RenameSheet(sheet.getName(), newName),
+                () -> {
+                    if (!sheets.rename(oldName, newName)) {
+                        throw new RuntimeException("Failed to rename sheet.");
+                    }
+                    for (NamedAsset asset : sheet) {
+                        if (asset instanceof DefaultTable) {
+                            DefaultTable table = (DefaultTable) asset;
+                            updateRangeReferences(table,
+                                    0,
+                                    0,
+                                    table.getColumnCount(),
+                                    table.getRowCount(),
+                                    null,
+                                    null,
+                                    null,
+                                    null);
+                        }
+                    }
+                }));
+
         // technically rename a sheet doesn't affect any cell value or chart property value,
         // it just affect formulas.
-        //refreshIfNeeded();
+        refreshIfNeeded();
     }
 
     @Override
@@ -173,7 +170,8 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
      * @param forceRefresh
      */
     void batch(Consumer<Workbook> consumer, boolean forceRefresh) {
-        skipWelding.runWith(true, this, consumer);
+        actionContextManager.withContext(new DefaultActionContext(true, isSkipRefresh(), isForceRefresh()),
+                this, consumer);
         resettle();
         refresh(forceRefresh);
     }
@@ -256,7 +254,8 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
 
     @Override
     public void refresh(boolean force) {
-        forceRefresh.runWith(force, () -> refresh0());
+        actionContextManager.withContext(new DefaultActionContext(isSkipWelding(), isSkipRefresh(), force),
+                () -> refresh0());
     }
 
     /**
@@ -264,7 +263,9 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
      */
     void refresh0() {
         LOG.debug("refresh0");
-        rebuildDependencies();
+        if (isForceRefresh()) {
+            //rebuildDependencies();
+        }
         refresh1();
     }
 
@@ -291,7 +292,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             } else if (asset instanceof DefaultTable) {
                 DefaultTable table = (DefaultTable) asset;
                 if (table.getAutomaton() != null) {
-                    table.getAutomaton().execute(forceRefresh.get());
+                    table.getAutomaton().execute(isForceRefresh());
                 }
 
             } else if (asset instanceof DefaultChart) {
@@ -310,7 +311,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             } else if (asset instanceof DefaultTable) {
                 DefaultTable table = (DefaultTable) asset;
                 if (table.getAutomaton() != null) {
-                    table.getAutomaton().execute(forceRefresh.get());
+                    table.getAutomaton().execute(isForceRefresh());
                 }
             }
         }
@@ -336,7 +337,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             return;
         }
 
-        AssetNode parent = node.getParentAsset();
+        AssetNode parent = node.getParent();
 
         if (parent instanceof DefaultDataSeries) {
             evaluateChartProperty(evaluator, ((DefaultDataSeries) parent).getChart(), node);
@@ -356,8 +357,8 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         } else if (parent instanceof DefaultPivotAutomaton) {
             long sn = node.getLastUpdateSequenceNumber();
             if (node.getDependencies() != null) {
-                for (long id : node.getDependencies()) {
-                    long depSn = ((AssetNode) getAsset(id)).getLastUpdateSequenceNumber();
+                for (AssetNode dependencyNode : node.getDependencies()) {
+                    long depSn = dependencyNode.getLastUpdateSequenceNumber();
                     if (depSn > sn) {
                         sn = depSn;
                     }
@@ -411,7 +412,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         if (param.getFormulaElements() == null) {
             throw new IllegalArgumentException();
         }
-        DefaultQueryAutomaton automaton = (DefaultQueryAutomaton) queryTemplate.getParentAsset();
+        DefaultQueryAutomaton automaton = (DefaultQueryAutomaton) queryTemplate.getParent();
         DefaultTable table = automaton.getTable();
         evaluator.setCurrentSheet(table.getSheet());
         evaluator.setCurrentTable(table);
@@ -441,21 +442,21 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     }
 
     protected void refreshIfNeeded() {
-        if (!isSkipRefresh()) {
+        if (!isSkipWelding() && !isSkipRefresh()) {
             refresh();
         }
     }
 
     boolean isSkipRefresh() {
-        return skipRefresh.get();
+        return actionContextManager.isSkipRefresh();
     }
 
     boolean isSkipWelding() {
-        return skipWelding.get();
+        return actionContextManager.isSkipWelding();
     }
 
     boolean isForceRefresh() {
-        return forceRefresh.get();
+        return actionContextManager.isForceRefresh();
     }
 
     private void checkSheetName(String name) throws IllegalArgumentException {
@@ -525,90 +526,92 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     }
 
     CalcChain getCalcChain() {
-        return dependencyTracer.getCalcChain();
+        return GraphHelper.buildCalcChain(this);
     }
 
-    void rebuildDependencies() {
-        dependencyTracer.clearDependencyGraph();
-        evaluableNodes.clear();
-        for (Sheet sheet : this) {
-            DefaultSheet defaultSheet = (DefaultSheet) sheet;
-            for (NamedAsset asset : defaultSheet) {
-                if (asset instanceof DefaultTable) {
-                    collectDependencies((DefaultTable) asset);
-                } else if (asset instanceof DefaultChart) {
-                    collectDependencies((DefaultChart) asset);
-                } else if (asset instanceof DefaultText) {
-                    collectDependencies((DefaultText) asset);
-                } else {
-                    throw new RuntimeException("Unknown asset: " + asset);
-                }
-            }
-        }
-        dependencyTracer.rebuildCalcChain();
-    }
+//    /**
+//     * This method should be removed after the core workflow is robust.
+//     */
+//    void rebuildDependencies() {
+//        dependencyTracer.clearDependencyGraph();
+//        evaluableNodes.clear();
+//        for (Sheet sheet : this) {
+//            DefaultSheet defaultSheet = (DefaultSheet) sheet;
+//            for (NamedAsset asset : defaultSheet) {
+//                if (asset instanceof DefaultTable) {
+//                    collectDependencies((DefaultTable) asset);
+//                } else if (asset instanceof DefaultChart) {
+//                    collectDependencies((DefaultChart) asset);
+//                } else if (asset instanceof DefaultText) {
+//                    collectDependencies((DefaultText) asset);
+//                } else {
+//                    throw new RuntimeException("Unknown asset: " + asset);
+//                }
+//            }
+//        }
+//    }
 
-    private void collectDependencies(DefaultTable table) {
-        if (table.getDependencies() != null) {
-            for (Long id : table.getDependencies()) {
-                dependencyTracer.addDependencies(table.getAssetId(), id);
-            }
-        }
-        for (Row row : table) {
-            for (Cell cell : row) {
-                collectDependencies((DefaultCell) cell);
-            }
-        }
-        if (table.getAutomaton() != null) {
-            collectDependencies(table, table.getAutomaton());
-        }
-    }
+//    private void collectDependencies(DefaultTable table) {
+//        if (table.getDependencies() != null) {
+//            for (AssetNode dependencyNode : table.getDependencies()) {
+//                dependencyTracer.addDependencies(table.getAssetId(), dependencyNode.getAssetId());
+//            }
+//        }
+//        for (Row row : table) {
+//            for (Cell cell : row) {
+//                collectDependencies((DefaultCell) cell);
+//            }
+//        }
+//        if (table.getAutomaton() != null) {
+//            collectDependencies(table, table.getAutomaton());
+//        }
+//    }
 
-    private void collectDependencies(DefaultTable table, TableAutomaton automaton) {
-        evaluableNodes.add(table.getAssetId());
-        if (automaton instanceof DefaultQueryAutomaton) {
-            DefaultQueryTemplate template = ((DefaultQueryAutomaton) automaton).getTemplate();
-            for (String name : template.getBuiltinParamNames()) {
-                ValueNode param = template.getBuiltinParam(name);
-                collectDependencies(param);
-            }
-        } else if (automaton instanceof DefaultPivotAutomaton) {
-            collectDependencies(((DefaultPivotAutomaton) automaton).getData());
-        }
-    }
+//    private void collectDependencies(DefaultTable table, TableAutomaton automaton) {
+//        evaluableNodes.add(table.getAssetId());
+//        if (automaton instanceof DefaultQueryAutomaton) {
+//            DefaultQueryTemplate template = ((DefaultQueryAutomaton) automaton).getTemplate();
+//            for (String name : template.getBuiltinParamNames()) {
+//                ValueNode param = template.getBuiltinParam(name);
+//                collectDependencies(param);
+//            }
+//        } else if (automaton instanceof DefaultPivotAutomaton) {
+//            collectDependencies(((DefaultPivotAutomaton) automaton).getData());
+//        }
+//    }
+//
+//    private void collectDependencies(DefaultChart chart) {
+//        if (chart.getDependencies() != null) {
+//            for (AssetNode dependencyNode : chart.getDependencies()) {
+//                dependencyTracer.addDependencies(chart.getAssetId(), dependencyNode.getAssetId());
+//            }
+//        }
+//        collectDependencies(chart.getTitle());
+//        collectDependencies(chart.getCategories());
+//        for (int j = 0; j < chart.getSeriesCount(); j++) {
+//            DefaultDataSeries series = chart.getSeries(j);
+//            collectDependencies(series.getName());
+//            collectDependencies(series.getxValues());
+//            collectDependencies(series.getyValues());
+//        }
+//    }
+//
+//    private void collectDependencies(DefaultText text) {
+//        collectDependencies(text.getContent());
+//    }
 
-    private void collectDependencies(DefaultChart chart) {
-        if (chart.getDependencies() != null) {
-            for (Long id : chart.getDependencies()) {
-                dependencyTracer.addDependencies(chart.getAssetId(), id);
-            }
-        }
-        collectDependencies(chart.getTitle());
-        collectDependencies(chart.getCategories());
-        for (int j = 0; j < chart.getSeriesCount(); j++) {
-            DefaultDataSeries series = chart.getSeries(j);
-            collectDependencies(series.getName());
-            collectDependencies(series.getxValues());
-            collectDependencies(series.getyValues());
-        }
-    }
-
-    private void collectDependencies(DefaultText text) {
-        collectDependencies(text.getContent());
-    }
-
-    private void collectDependencies(ValueNode node) {
-        if (node == null) {
-            return;
-        }
-        evaluableNodes.add(node.getAssetId());
-        Set<Long> dependencies = node.getDependencies();
-        if (dependencies != null) {
-            for (Long dependency : dependencies) {
-                dependencyTracer.addDependencies(node.getAssetId(), dependency);
-            }
-        }
-    }
+//    private void collectDependencies(ValueNode node) {
+//        if (node == null) {
+//            return;
+//        }
+//        evaluableNodes.add(node.getAssetId());
+//        Set<? extends AssetNode> dependencies = node.getDependencies();
+//        if (dependencies != null) {
+//            for (AssetNode dependency : dependencies) {
+//                dependencyTracer.addDependencies(node.getAssetId(), dependency.getAssetId());
+//            }
+//        }
+//    }
 
     public DefaultAssetManager getAssetManager() {
         return (DefaultAssetManager) super.getAssetManager();
@@ -689,21 +692,19 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             return; // should manually resolve later
         }
         valueNode.clearDependencies();
-        if (table != null) {
-            valueNode.addDependencies(table.getAssetId());
-        } else if (valueNode.getParentAsset() instanceof DefaultChart) {
-            valueNode.addDependencies(valueNode.getParentAsset().getAssetId());
-        }
+//        dependencyTracer.clearRangeDependencies(valueNode.getAssetId());
 
-        dependencyTracer.clearRangeDependencies(valueNode.getAssetId());
+        // TODO review if it is needed
+//        if (table != null) {
+//            valueNode.addDependency(table);
+//        } else if (valueNode.getParentAsset() instanceof DefaultChart) {
+//            valueNode.addDependency(valueNode.getParentAsset());
+//        }
 
         evaluableNodes.remove(valueNode.getAssetId());
 
         if (valueNode.isFormula()) {
             evaluableNodes.add(valueNode.getAssetId());
-            if (valueNode.getDependencies() == null) {
-                valueNode.setDependencies(new HashSet<>());
-            }
             Formula f = valueNode.getFormula();
             for (FormulaElement e : f.getElements()) {
                 if (e instanceof CellReferenceElement) {
@@ -732,7 +733,10 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         }
         DefaultCell depCell = table.getCell(cellRef.getRowIndex(), cellRef.getColumnIndex());
         cellRef.setCellId(depCell.getAssetId()); // fill runtime id for convenience.
-        fromNode.getDependencies().add(depCell.getAssetId());
+        fromNode.addDependency(depCell);
+        if (depCell.isEphemeral()) {
+            fromNode.addDependency(depCell.getRow().getTable());
+        }
         return true;
     }
 
@@ -766,7 +770,10 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             for (int col = left; col <= right; col++) {
                 DefaultCell depCell = table.getCell(row, col);
                 if (depCell != null) {
-                    fromNode.getDependencies().add(depCell.getAssetId());
+                    fromNode.addDependency(depCell);
+                    if (depCell.isEphemeral()) {
+                        fromNode.addDependency(depCell.getRow().getTable());
+                    }
                 }
             }
         }
@@ -777,10 +784,12 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         if (!cellRef.isValid()) {
             return;
         }
-        dependencyTracer.traceRange(getReferredTable(cellRef, fromSheet, fromTable),
+        DefaultTable referredTable = getReferredTable(cellRef, fromSheet, fromTable);
+        fromNode.watchRange(referredTable,
+                cellRef.getColumnIndex(),
                 cellRef.getRowIndex(),
                 cellRef.getColumnIndex(),
-                fromNode.getAssetId());
+                cellRef.getRowIndex());
     }
 
     private void traceRange(DefaultSheet fromSheet, DefaultTable fromTable, ValueNode fromNode, RangeRef rangeRef) {
@@ -791,24 +800,21 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         }
 
         if (rangeRef.getUpperLeft().isValid() && rangeRef.getLowerRight().isValid()) {
-            dependencyTracer.traceRange(targetTable,
+            fromNode.watchRange(targetTable,
                     rangeRef.getLeft(),
                     rangeRef.getTop(),
                     rangeRef.getRight(),
-                    rangeRef.getBottom(),
-                    fromNode.getAssetId());
+                    rangeRef.getBottom());
 
         } else if (rangeRef.getUpperLeft().isValid()) {
-            dependencyTracer.traceRange(targetTable,
+            fromNode.watchRange(targetTable,
                     rangeRef.getUpperLeft().getRowIndex(),
-                    rangeRef.getUpperLeft().getColumnIndex(),
-                    fromNode.getAssetId());
+                    rangeRef.getUpperLeft().getColumnIndex());
 
         } else if (rangeRef.getLowerRight().isValid()) {
-            dependencyTracer.traceRange(targetTable,
+            fromNode.watchRange(targetTable,
                     rangeRef.getLowerRight().getRowIndex(),
-                    rangeRef.getLowerRight().getColumnIndex(),
-                    fromNode.getAssetId());
+                    rangeRef.getLowerRight().getColumnIndex());
         }
     }
 
@@ -909,13 +915,13 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         if (isSkipWelding()) {
             return; // should manually update later.
         }
-        List<DependencyTracer.Range> ranges = dependencyTracer.findOverlappedRanges(table, left, top, right, bottom);
+        List<DefaultTable.Range> ranges = table.findOverlappedRanges(left, top, right, bottom);
         if (ranges == null || ranges.isEmpty()) {
             return; // nothing to do
         }
         Set<Long> nodes = new HashSet<>();
-        for (DependencyTracer.Range range : ranges) {
-            nodes.addAll(dependencyTracer.getDependencies(range));
+        for (DefaultTable.Range range : ranges) {
+            nodes.addAll(table.getWatchers(range));
         }
         for (Long id : nodes) {
             VariantNode node = getValueNodeByAssetId(id);
@@ -1029,9 +1035,9 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             DefaultCell cell = (DefaultCell) node;
             cell.getRow().getTable().setCellFormula(cell.getRowIndex(), cell.getColumnIndex(), newFormula); // this will trigger onCellUpdate, some other businesses will be done there.
 
-        } else if (node.getParentAsset() instanceof Chart
-                || node.getParentAsset() instanceof DataSeries
-                || node.getParentAsset() instanceof ChartBinder) {
+        } else if (node.getParent() instanceof Chart
+                || node.getParent() instanceof DataSeries
+                || node.getParent() instanceof ChartBinder) {
             // chart property update is not as easy as a cell, property of chart may be a little
             // difficult to trace as it doesn't has row/column index. a chart property can be
             // a categories formula, or one property of any series.
@@ -1039,9 +1045,9 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             // should we notify the listeners (especially the revise collector)?
             // currently just tell listeners the chart has changed, either model or data.
             DefaultChart chart = (DefaultChart)
-                    (((node.getParentAsset() instanceof DataSeries)
-                            || node.getParentAsset() instanceof ChartBinder) ?
-                            node.getParentAsset().getParentAsset() : node.getParentAsset());
+                    (((node.getParent() instanceof DataSeries)
+                            || node.getParent() instanceof ChartBinder) ?
+                            node.getParent().getParent() : node.getParent());
             UpdateChart action = new UpdateChart(chart.getSheet().getName(), chart.getName(), null);
             listenerChain.publicly(action, () -> {
                 node.setFormula(new Formula(newFormula));
@@ -1049,13 +1055,19 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
                 return chart;
             });
 
-        } else if (node.getParentAsset() instanceof Text) {
-            DefaultText text = (DefaultText) node.getParentAsset();
+        } else if (node.getParent() instanceof Text) {
+            DefaultText text = (DefaultText) node.getParent();
             text.getSheet().updateText(text.getName(), new TextData(new DynamicValue(newFormula), null));
 
-        } else if (node.getParentAsset() instanceof DefaultPivotAutomaton) {
-            DefaultPivotAutomaton pivotAutomaton = (DefaultPivotAutomaton) node.getParentAsset();
-            onValueNodeUpdate(pivotAutomaton.getTable().getSheet(), node);
+        } else if (node.getParent() instanceof DefaultQueryAutomaton) {
+            node.setDynamicVariant(new DynamicValue(newFormula));
+            DefaultQueryAutomaton auto = (DefaultQueryAutomaton) node.getParent();
+            auto.getTable().automate(auto.getQueryAutomatonInfo());
+
+        } else if (node.getParent() instanceof DefaultPivotAutomaton) {
+            node.setDynamicVariant(new DynamicValue(newFormula));
+            DefaultPivotAutomaton auto = (DefaultPivotAutomaton) node.getParent();
+            auto.getTable().automate(auto.getPivotAutomatonInfo());
 
         } else {
             throw new RuntimeException("Unsupported value node: " + node);
@@ -1162,7 +1174,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
                 DefaultQueryTemplate template = ((DefaultQueryAutomaton) auto).getTemplate();
                 for (String name : template.getBuiltinParamNames()) {
                     ValueNode param = template.getBuiltinParam(name);
-                    table.addDependencies(param.getAssetId());
+                    table.addDependency(param);
                     // cannot pass table parameter here, which mislead the method to deal
                     // the node as a table cell
                     onValueNodeUpdate(sheet, param);
@@ -1170,7 +1182,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
 
             } else if (auto instanceof DefaultPivotAutomaton) {
                 ValueNode data = ((DefaultPivotAutomaton) auto).getData();
-                table.addDependencies(data.getAssetId());
+                table.addDependency(data);
                 onValueNodeUpdate(sheet, data);
             }
 
@@ -1181,7 +1193,8 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     }
 
     void onAutomatonExecuted(DefaultTable table) {
-
+        // TODO This is a TEST
+        // System.out.println(actionContextManager);
     }
 
     void onTextCreated(DefaultText text) {
@@ -1216,15 +1229,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     }
 
     void withoutRefresh(Runnable runnable) {
-        this.skipRefresh.runWith(true, runnable);
-    }
-
-    <V> V withoutRefresh(Callable<V> callable) {
-        try {
-            return this.skipRefresh.runWith(true, callable);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        actionContextManager.withContext(new DefaultActionContext(isSkipWelding(), true, isForceRefresh()), runnable);
     }
 
     /*

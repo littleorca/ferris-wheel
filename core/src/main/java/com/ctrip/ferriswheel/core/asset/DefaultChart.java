@@ -9,20 +9,11 @@ import com.ctrip.ferriswheel.core.formula.ReferenceElement;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.view.Layout;
-import com.ctrip.ferriswheel.core.action.UpdateChart;
 import com.ctrip.ferriswheel.core.bean.Axis;
 import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
-import com.ctrip.ferriswheel.core.formula.FormulaElement;
-import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
-import com.ctrip.ferriswheel.core.formula.ReferenceElement;
 import com.ctrip.ferriswheel.core.intf.*;
-import com.ctrip.ferriswheel.core.ref.CellRef;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
-import com.ctrip.ferriswheel.core.view.Layout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,11 +67,11 @@ class DefaultChart extends NamedAssetNode implements Chart {
     }
 
     public DefaultSheet getSheet() {
-        return (DefaultSheet) getParentAsset();
+        return (DefaultSheet) getParent();
     }
 
     void setSheet(DefaultSheet sheet) {
-        setParentAsset(sheet);
+        setParent(sheet);
     }
 
     @Override
@@ -174,7 +165,7 @@ class DefaultChart extends NamedAssetNode implements Chart {
         this.binder = binder;
         if (this.binder != null) {
             bindChild(this.binder);
-            addDependencies(this.binder.getData().getAssetId());
+            addDependency(this.binder.getData());
         }
     }
 

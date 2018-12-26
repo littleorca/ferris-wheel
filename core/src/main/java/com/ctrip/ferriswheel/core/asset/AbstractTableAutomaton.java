@@ -80,8 +80,8 @@ public abstract class AbstractTableAutomaton extends AssetNode implements TableA
         }
     }
 
-    protected DefaultTable getTable() {
-        return (DefaultTable) getParentAsset();
+    public DefaultTable getTable() {
+        return (DefaultTable) getParent();
     }
 
     protected void clearTable() {

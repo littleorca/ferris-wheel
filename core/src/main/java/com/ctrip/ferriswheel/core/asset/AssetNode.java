@@ -3,30 +3,29 @@ package com.ctrip.ferriswheel.core.asset;
 import com.ctrip.ferriswheel.core.intf.Asset;
 import com.ctrip.ferriswheel.core.intf.AssetManager;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-// TODO make asset node a tree node for asset ownership and a graph node for dependency graph
-// TODO make asset node able to subscribe/publish events of ownership change/dependency change.
+// TODO make asset node be able to subscribe/publish events of ownership/dependency changes.
 abstract class AssetNode implements Asset {
     private final AssetManager assetManager;
     private final long assetId;
-    private AssetNode parentAsset;
+    private AssetNode parent;
     private Set<AssetNode> children = new LinkedHashSet<>(); // bound children
-    private Set<Long> dependencies;
+    private Set<AssetNode> dependencies = new HashSet<>();
+    private Set<AssetNode> dependents = new HashSet<>();
+    private Map<DefaultTable, Set<DefaultTable.Range>> watchedRanges = new HashMap<>();
     private long lastUpdateSequenceNumber = 0; // revision sequence number
     private boolean valid = true;
+    private boolean ephemeral = false;
 
     protected AssetNode(AssetManager assetManager) {
         this.assetManager = assetManager;
         this.assetId = assetManager.nextAssetId();
     }
 
-    protected AssetNode(AssetNode parentAsset) {
-        this(parentAsset.getAssetManager());
-        parentAsset.bindChild(this);
+    protected AssetNode(AssetNode parent) {
+        this(parent.getAssetManager());
+        parent.bindChild(this);
     }
 
     @Override
@@ -48,7 +47,7 @@ abstract class AssetNode implements Asset {
 
     protected void bindChild(AssetNode child) {
         children.add(child);
-        child.parentAsset = this;
+        child.parent = this;
         if (isEmployed()) {
             assetManager.employ(child);
             child.onEmployed();
@@ -57,7 +56,7 @@ abstract class AssetNode implements Asset {
 
     protected void unbindChild(AssetNode child) {
         children.remove(child);
-        child.parentAsset = null;
+        child.parent = null;
         if (isEmployed()) {
             assetManager.dismiss(child);
             child.onDismissed();
@@ -65,6 +64,7 @@ abstract class AssetNode implements Asset {
     }
 
     protected void onEmployed() {
+        // addDependency(getParentAsset()); // TODO review if it is needed
         if (lastUpdateSequenceNumber == 0) {
             updateSequenceNumber();
         }
@@ -76,6 +76,7 @@ abstract class AssetNode implements Asset {
     }
 
     protected void onDismissed() {
+        clearDependencies();
         for (AssetNode child : children) {
             assetManager.dismiss(child);
             child.onDismissed();
@@ -92,9 +93,9 @@ abstract class AssetNode implements Asset {
     }
 
     protected <T extends AssetNode> T parent(Class<T> parentClass) {
-        AssetNode parent = getParentAsset();
+        AssetNode parent = getParent();
         while (parent != null && !parentClass.isInstance(parent)) {
-            parent = parent.getParentAsset();
+            parent = parent.getParent();
         }
         if (parent != null && parentClass.isInstance(parent)) {
             return (T) parent;
@@ -103,25 +104,14 @@ abstract class AssetNode implements Asset {
         }
     }
 
-    protected void clearDependencies() {
-        this.dependencies = null;
-    }
-
-    protected boolean addDependencies(long targetAssetId) {
-        if (dependencies == null) {
-            dependencies = new HashSet<>();
-        }
-        return dependencies.add(targetAssetId);
-    }
-
     protected long getLastUpdateSequenceNumber() {
         return lastUpdateSequenceNumber;
     }
 
     protected void setLastUpdateSequenceNumber(long lastUpdateSequenceNumber) {
         this.lastUpdateSequenceNumber = lastUpdateSequenceNumber;
-        if (parentAsset != null) {
-            parentAsset.afterChildUpdate(this);
+        if (parent != null) {
+            parent.afterChildUpdate(this);
         }
     }
 
@@ -148,9 +138,8 @@ abstract class AssetNode implements Asset {
         if (getDependencies() == null) {
             return false;
         }
-        for (long dependencyId : getDependencies()) {
-            AssetNode dependencyAsset = (AssetNode) assetManager.get(dependencyId);
-            if (dependencyAsset.getLastUpdateSequenceNumber() > getLastUpdateSequenceNumber()) {
+        for (AssetNode dependency : getDependencies()) {
+            if (dependency.getLastUpdateSequenceNumber() > getLastUpdateSequenceNumber()) {
                 return true;
             }
         }
@@ -171,28 +160,105 @@ abstract class AssetNode implements Asset {
         this.valid = valid;
     }
 
+    @Override
+    public boolean isEphemeral() {
+        return ephemeral;
+    }
+
+    protected void setEphemeral(boolean ephemeral) {
+        this.ephemeral = ephemeral;
+    }
+
     protected AssetManager getAssetManager() {
         return assetManager;
     }
 
-    protected AssetNode getParentAsset() {
-        return parentAsset;
+    public AssetNode getParent() {
+        return parent;
     }
 
-    protected void setParentAsset(AssetNode parentAsset) {
-        this.parentAsset = parentAsset;
+    protected void setParent(AssetNode parent) {
+        this.parent = parent;
     }
 
-    protected Set<Long> getDependencies() {
-        return dependencies;
+    @Override
+    public Set<AssetNode> getDependencies() {
+        return Collections.unmodifiableSet(dependencies);
     }
 
-    protected void setDependencies(Set<Long> dependencies) {
+    private void setDependencies(Set<AssetNode> dependencies) {
         this.dependencies = dependencies;
     }
 
-    protected Set<AssetNode> getChildren() {
-        return children;
+    void addDependency(AssetNode dependency) {
+        this.dependencies.add(dependency);
+        dependency.addDependent(this);
+    }
+
+    private void removeDependency(AssetNode dependency) {
+        if (this.dependencies.remove(dependency)) {
+            if (this.dependencies.isEmpty()) {
+                this.dependencies = new HashSet<>();
+            }
+        }
+        dependency.removeDependent(this);
+    }
+
+    void clearDependencies() {
+        for (AssetNode dependency : dependencies) {
+            dependency.removeDependent(this);
+        }
+        this.dependencies = new HashSet<>();
+        endWatch();
+    }
+
+    @Override
+    public Set<AssetNode> getDependents() {
+        return Collections.unmodifiableSet(dependents);
+    }
+
+    private void setDependents(Set<AssetNode> dependents) {
+        this.dependents = dependents;
+    }
+
+    void addDependent(AssetNode dependent) {
+        this.dependents.add(dependent);
+    }
+
+    private void removeDependent(AssetNode dependent) {
+        if (this.dependents.remove(dependent)) {
+            if (this.dependents.isEmpty()) {
+                this.dependents = new HashSet<>();
+            }
+        }
+    }
+
+    void watchRange(DefaultTable table, int rowIndex, int columnIndex) {
+        watchRange(table, columnIndex, rowIndex, columnIndex, rowIndex);
+    }
+
+    void watchRange(DefaultTable table, int left, int top, int right, int bottom) {
+        DefaultTable.Range range = table.tableRange(left, top, right, bottom);
+        table.subscribeRange(range, getAssetId());
+        Set<DefaultTable.Range> rangeSet = watchedRanges.get(table);
+        if (rangeSet == null) {
+            rangeSet = new HashSet<>();
+            watchedRanges.put(table, rangeSet);
+        }
+        rangeSet.add(range);
+    }
+
+    void endWatch() {
+        for (Map.Entry<DefaultTable, Set<DefaultTable.Range>> entry : watchedRanges.entrySet()) {
+            DefaultTable table = entry.getKey();
+            table.clearRangeWatcher(getAssetId());
+        }
+        watchedRanges = new HashMap<>();
+    }
+
+    @Override
+    public List<AssetNode> getChildren() {
+        return Collections.unmodifiableList(new ArrayList<>(children));
     }
 
     protected void setChildren(Set<AssetNode> children) {

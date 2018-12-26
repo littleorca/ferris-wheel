@@ -6,7 +6,7 @@
     padding: 0 .75em;
     height: 2em;
     color: #333;
-    font-size: 1rem;
+    font-size: 1em;
     text-align: center;
     text-decoration: none;
     border-radius: .25em;
@@ -28,11 +28,11 @@
 }
 
 .button.big {
-    font-size: 1.25rem;
+    font-size: 1.25em;
 }
 
 .button.small {
-    font-size: .875rem;
+    font-size: .875em;
 }
 
 .button:disabled,

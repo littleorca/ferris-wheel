@@ -51,11 +51,11 @@
 }
 
 .dropdown-popover {
-    border-radius: .25rem;
+    border-radius: .25em;
     border: 1px solid #ccc;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 .25rem 1rem rgba(0, 0, 0, .2);
+    box-shadow: 0 .25em 1em rgba(0, 0, 0, .2);
 }
 
 .dropdown-popover .dropdown-content {
