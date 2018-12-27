@@ -1,15 +1,16 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.analysis.DimensionalAggregator;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
-import com.ctrip.ferriswheel.core.bean.PivotField;
-import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
-import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.api.table.PivotField;
+import com.ctrip.ferriswheel.api.table.PivotFilter;
+import com.ctrip.ferriswheel.api.table.PivotValue;
+import com.ctrip.ferriswheel.api.table.AggregateType;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.table.PivotSolution;
+import com.ctrip.ferriswheel.api.table.TableAutomaton;
+import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.analysis.DimensionalAggregator;
 import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
     private List<FieldMeta> columns;
     private List<ValueMeta> values;
 
-    DefaultPivotAutomaton(AssetManager assetManager, TableAutomatonInfo.PivotAutomatonInfo pivot) {
+    DefaultPivotAutomaton(AssetManager assetManager, PivotSolution pivot) {
         super(assetManager);
 
         this.data = new ValueNode(getAssetManager(), Value.BLANK, null);
@@ -45,7 +46,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         }
     }
 
-    private void updatePivot(TableAutomatonInfo.PivotAutomatonInfo pivot) {
+    private void updatePivot(PivotSolution pivot) {
         if (pivot.getData() == null || pivot.getRows() == null || pivot.getValues() == null) {
             throw new IllegalArgumentException("Missing at least one of the required fields: [data, rows, values].");
         }
@@ -92,6 +93,8 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         if (!forceUpdate && getLastUpdateSequenceNumber() > data.getLastUpdateSequenceNumber()) {
             return;
         }
+        // TODO remove this debugging code.
+        LOG.info("Executing pivot automaton with forceUpdate=" + forceUpdate);
         try {
             doExecute();
         } catch (RuntimeException e) {
@@ -312,13 +315,13 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         List<PivotValue> valueList = new ArrayList<>(values.size());
 
         for (FieldMeta fm : rows) {
-            rowList.add(new PivotField(fm));
+            rowList.add(new PivotFieldImpl(fm));
         }
         for (FieldMeta fm : columns) {
-            columnList.add(new PivotField(fm));
+            columnList.add(new PivotFieldImpl(fm));
         }
         for (ValueMeta vm : values) {
-            valueList.add(new PivotValue(vm));
+            valueList.add(new PivotValueImpl(vm));
         }
 
         return new TableAutomatonInfo.PivotAutomatonInfo(
@@ -345,7 +348,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         return values;
     }
 
-    class FieldMeta extends PivotField {
+    class FieldMeta extends PivotFieldImpl {
         private int columnIndex;
 
         public FieldMeta(PivotField field, int columnIndex) {
@@ -362,7 +365,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         }
     }
 
-    class ValueMeta extends PivotValue {
+    class ValueMeta extends PivotValueImpl {
         private int columnIndex;
 
         public ValueMeta(PivotValue value, int columnIndex) {

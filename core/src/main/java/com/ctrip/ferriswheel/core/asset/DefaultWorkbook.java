@@ -1,15 +1,29 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.api.Workbook;
+import com.ctrip.ferriswheel.api.action.ActionContextManager;
+import com.ctrip.ferriswheel.api.action.ActionListener;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.chart.ChartBinder;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.table.TableAutomaton;
+import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.TextData;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.bean.Version;
+import com.ctrip.ferriswheel.core.bean.VersionImpl;
 import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.util.GraphHelper;
@@ -22,9 +36,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler, ReferenceResolver {
+public class DefaultWorkbook extends NamedAssetNode implements Workbook, ReferenceResolver {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultWorkbook.class);
-    private static final Version VERSION = new Version(0, 0, 0);
+    private static final VersionImpl VERSION = new VersionImpl(0, 0, 0);
     // revision sequence number is used to mark last update (like last modified timestamp)
     private final Environment environment;
     private final AtomicLong nextSequenceNumber = new AtomicLong(0);
@@ -49,7 +63,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     }
 
     @Override
-    public Version getVersion() {
+    public VersionImpl getVersion() {
         return VERSION;
     }
 
@@ -107,7 +121,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
                     if (!sheets.rename(oldName, newName)) {
                         throw new RuntimeException("Failed to rename sheet.");
                     }
-                    for (NamedAsset asset : sheet) {
+                    for (SheetAsset asset : sheet) {
                         if (asset instanceof DefaultTable) {
                             DefaultTable table = (DefaultTable) asset;
                             updateRangeReferences(table,
@@ -186,7 +200,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
         withoutRefresh(() -> {
             for (Sheet sheet : this) {
                 DefaultSheet defaultSheet = (DefaultSheet) sheet;
-                for (NamedAsset asset : defaultSheet) {
+                for (SheetAsset asset : defaultSheet) {
                     if (asset instanceof DefaultTable) {
                         resolveFormulas((DefaultTable) asset);
                     } else if (asset instanceof DefaultChart) {
@@ -294,10 +308,12 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
                 if (table.getAutomaton() != null) {
                     table.getAutomaton().execute(isForceRefresh());
                 }
+                pendingNodes.remove(id);
 
             } else if (asset instanceof DefaultChart) {
                 DefaultChart chart = (DefaultChart) asset;
                 chart.rebindIfPossible();
+                pendingNodes.remove(id);
             }
         }
         // these are formulas without any dependency
@@ -434,7 +450,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             UpdateText action = new UpdateText(sheet.getName(), text.getName(), null);
             listenerChain.publicly(action, () -> {
                 node.setValue(value);
-                action.setTextData(new TextData(
+                action.setTextData(new TextData(text.getName(),
                         new DynamicValue(node.getFormulaString(), Value.from(node.getValue())),
                         text.getLayout()));
             });
@@ -620,14 +636,14 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
     @Override
     public Variant resolve(CellRef cellRef, FormulaEvaluationContext context) {
         if (!cellRef.isValid()) {
-            return Value.err(ErrorCode.ILLEGAL_REF);
+            return Value.err(ErrorCodes.ILLEGAL_REF);
         }
         if (cellRef.getCellId() != Asset.UNSPECIFIED_ASSET_ID) {
             Asset asset = getAssetManager().get(cellRef.getCellId());
             if (asset == null || !(asset instanceof Cell)) {
-                return Value.err(ErrorCode.ILLEGAL_REF);
+                return Value.err(ErrorCodes.ILLEGAL_REF);
             }
-            return ((Cell) asset).getValue();
+            return ((DefaultCell) asset).getValue();
         }
 
         DefaultCell cell = null;
@@ -642,7 +658,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
             }
         }
         if (cell == null) {
-            return Value.err(ErrorCode.ILLEGAL_REF); // cell not found
+            return Value.err(ErrorCodes.ILLEGAL_REF); // cell not found
         }
         return cell.getValue();
     }
@@ -1057,7 +1073,7 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
 
         } else if (node.getParent() instanceof Text) {
             DefaultText text = (DefaultText) node.getParent();
-            text.getSheet().updateText(text.getName(), new TextData(new DynamicValue(newFormula), null));
+            text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
 
         } else if (node.getParent() instanceof DefaultQueryAutomaton) {
             node.setDynamicVariant(new DynamicValue(newFormula));
@@ -1230,15 +1246,6 @@ class DefaultWorkbook extends NamedAssetNode implements Workbook, ActionHandler,
 
     void withoutRefresh(Runnable runnable) {
         actionContextManager.withContext(new DefaultActionContext(isSkipWelding(), true, isForceRefresh()), runnable);
-    }
-
-    /*
-     * Action handler
-     */
-
-    @Override
-    public void handle(Action action) {
-// TODO implements this method so that DefaultWorkbook can be manipulated in command style.
     }
 
     @Override

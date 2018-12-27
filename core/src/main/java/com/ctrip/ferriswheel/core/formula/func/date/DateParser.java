@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.formula.func.date;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.func.Function;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ public abstract class DateParser implements Function {
                 }
             }
             if (result == null) {
-                context.pushOperand(Value.err(ErrorCode.ILLEGAL_VALUE));
+                context.pushOperand(Value.err(ErrorCodes.ILLEGAL_VALUE));
             } else {
                 context.pushOperand(Value.date(result));
             }
@@ -79,7 +79,7 @@ public abstract class DateParser implements Function {
                 }
             }
             if (result == null) {
-                context.pushOperand(Value.err(ErrorCode.ILLEGAL_VALUE));
+                context.pushOperand(Value.err(ErrorCodes.ILLEGAL_VALUE));
             } else {
                 context.pushOperand(Value.date(result));
             }

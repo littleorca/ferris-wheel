@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.formula.func;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 
 public class Not implements Function {
@@ -30,7 +30,7 @@ public class Not implements Function {
             booleanValue = null;
         }
         context.pushOperand(booleanValue == null ?
-                Value.err(ErrorCode.ILLEGAL_VALUE) : Value.bool(booleanValue));
+                Value.err(ErrorCodes.ILLEGAL_VALUE) : Value.bool(booleanValue));
     }
 
 }

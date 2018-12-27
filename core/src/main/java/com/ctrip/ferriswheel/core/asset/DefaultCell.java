@@ -1,12 +1,10 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.table.Cell;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Cell;
-import com.ctrip.ferriswheel.core.view.CellStyle;
 
-class DefaultCell extends ValueNode implements Cell {
+public class DefaultCell extends ValueNode implements Cell {
     private int columnIndex;
-    private CellStyle style;
     private boolean fillUp;
     private boolean fillDown;
     private boolean fillLeft;
@@ -17,12 +15,11 @@ class DefaultCell extends ValueNode implements Cell {
     }
 
     DefaultCell(DefaultAssetManager assetManager, Value value) {
-        this(assetManager, value, null, null);
+        this(assetManager, value, null);
     }
 
-    DefaultCell(DefaultAssetManager assetManager, Value value, String formulaString, CellStyle style) {
+    DefaultCell(DefaultAssetManager assetManager, Value value, String formulaString) {
         super(assetManager, value, formulaString);
-        this.style = style;
     }
 
     @Override
@@ -46,15 +43,6 @@ class DefaultCell extends ValueNode implements Cell {
 
     void setColumnIndex(int columnIndex) {
         this.columnIndex = columnIndex;
-    }
-
-    @Override
-    public CellStyle getStyle() {
-        return style;
-    }
-
-    void setStyle(CellStyle style) {
-        this.style = style;
     }
 
     @Override

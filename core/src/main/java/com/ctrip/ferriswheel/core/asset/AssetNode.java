@@ -1,8 +1,5 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.Asset;
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-
 import java.util.*;
 
 // TODO make asset node be able to subscribe/publish events of ownership/dependency changes.

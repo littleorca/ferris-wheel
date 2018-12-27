@@ -3,8 +3,8 @@ package com.ctrip.ferriswheel.core.formula.func;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.util.VariantMath;
 
 import java.math.BigDecimal;

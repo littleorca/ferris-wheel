@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.PositionRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
@@ -128,7 +128,7 @@ public class References {
 
     public static String toFormula(CellRef cellRef, int nShiftRows, int nShiftCols) {
         if (!cellRef.isValid()) {
-            return ErrorCode.ILLEGAL_REF.getFullName();
+            return ErrorCodes.ILLEGAL_REF.getFullName();
         }
 
         StringBuilder sb = new StringBuilder();
@@ -143,7 +143,7 @@ public class References {
 
     public static String toFormula(RangeRef rangeRef, int nShiftRows, int nShiftCols) {
         if (!rangeRef.isValid()) {
-            return ErrorCode.ILLEGAL_REF.getFullName();
+            return ErrorCodes.ILLEGAL_REF.getFullName();
 
         } else if (rangeRef.getTop() == -1 && rangeRef.getLeft() == -1) {
             throw new IllegalArgumentException();

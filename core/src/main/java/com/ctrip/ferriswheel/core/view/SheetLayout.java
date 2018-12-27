@@ -1,9 +1,10 @@
 package com.ctrip.ferriswheel.core.view;
 
-import com.ctrip.ferriswheel.core.intf.Display;
-import com.ctrip.ferriswheel.core.intf.Placement;
+import com.ctrip.ferriswheel.api.view.Display;
+import com.ctrip.ferriswheel.api.view.Layout;
+import com.ctrip.ferriswheel.api.view.Placement;
 
-public class SheetLayout extends Layout {
+public class SheetLayout extends LayoutImpl {
     private static final int DEFAULT_WIDTH = 1200;
     private static final int DEFAULT_HEIGHT = 720;
     private static final int DEFAULT_COLUMNS = 12;
@@ -15,7 +16,7 @@ public class SheetLayout extends Layout {
                 DEFAULT_HEIGHT,
                 Placement.LEFT,
                 Placement.TOP,
-                new Grid(DEFAULT_COLUMNS, DEFAULT_ROWS, null, null));
+                new GridImpl(DEFAULT_COLUMNS, DEFAULT_ROWS, null, null));
     }
 
     @Override
@@ -28,7 +29,7 @@ public class SheetLayout extends Layout {
             setHeight(DEFAULT_HEIGHT);
             setAlign(Placement.LEFT);
             setVerticalAlign(Placement.TOP);
-            setGrid(new Grid(DEFAULT_COLUMNS, DEFAULT_ROWS, null, null));
+            setGrid(new GridImpl(DEFAULT_COLUMNS, DEFAULT_ROWS, null, null));
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.Action;
-import com.ctrip.ferriswheel.core.intf.ActionListener;
-import com.ctrip.ferriswheel.core.intf.ActionNotifier;
+import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.action.ActionListener;
+import com.ctrip.ferriswheel.api.action.ActionNotifier;
 import com.ctrip.ferriswheel.core.util.FlagStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

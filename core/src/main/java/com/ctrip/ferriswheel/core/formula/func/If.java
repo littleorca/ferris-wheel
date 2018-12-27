@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.formula.func;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 public class If implements Function {
     public static final String IF = "IF";
@@ -36,7 +36,7 @@ public class If implements Function {
             }
 
         } else {
-            context.pushOperand(Value.err(ErrorCode.UNKNOWN)); // TODO error code
+            context.pushOperand(Value.err(ErrorCodes.UNKNOWN)); // TODO error code
         }
     }
 

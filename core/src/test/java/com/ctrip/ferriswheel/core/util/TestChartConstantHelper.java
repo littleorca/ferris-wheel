@@ -1,12 +1,13 @@
 package com.ctrip.ferriswheel.core.util;
 
+import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Environment;
-import com.ctrip.ferriswheel.core.intf.Table;
-import com.ctrip.ferriswheel.core.intf.Workbook;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.Workbook;
 import junit.framework.TestCase;
 
 public class TestChartConstantHelper extends TestCase {
@@ -30,7 +31,7 @@ public class TestChartConstantHelper extends TestCase {
 
         assertEquals(3, chart.getSeriesList().size());
 
-        ChartData.Series s = chart.getSeriesList().get(0);
+        DataSeries s = chart.getSeriesList().get(0);
         assertEquals("sheet1!table1!$A$2", s.getName().getFormulaString());
 //        assertEquals("d", s.getName().strValue());
         assertEquals("sheet1!table1!$B$2:$D$2", s.getyValues().getFormulaString());

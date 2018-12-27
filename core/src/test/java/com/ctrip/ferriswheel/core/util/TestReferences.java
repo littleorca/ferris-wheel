@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.intf.Asset;
+import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import junit.framework.TestCase;

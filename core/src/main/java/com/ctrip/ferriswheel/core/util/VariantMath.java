@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.core.util;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 
 import java.math.BigDecimal;
 
@@ -22,7 +22,7 @@ public class VariantMath {
                         .doubleValue());
             case ERROR:
             default:
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
         }
     }
 
@@ -39,7 +39,7 @@ public class VariantMath {
                         .doubleValue());
             case ERROR:
             default:
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
         }
     }
 
@@ -57,7 +57,7 @@ public class VariantMath {
                         .doubleValue());
             case ERROR:
             default:
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
         }
     }
 
@@ -68,14 +68,14 @@ public class VariantMath {
             case BLANK:
             case DECIMAL:
                 if (BigDecimal.ZERO.equals(op2.decimalValue())) {
-                    return Value.err(ErrorCode.DIV_0);
+                    return Value.err(ErrorCodes.DIV_0);
                 } else {
                     return Value.dec(op1.decimalValue()
                             .divide(op2.decimalValue(), Value.DecimalValue.mathContext));
                 }
             case DATE:
                 if (BigDecimal.ZERO.equals(op2.decimalValue())) {
-                    return Value.err(ErrorCode.DIV_0);
+                    return Value.err(ErrorCodes.DIV_0);
                 } else {
                     return Value.date(op1.decimalValue()
                             .divide(op2.decimalValue(), Value.DecimalValue.mathContext)
@@ -83,7 +83,7 @@ public class VariantMath {
                 }
             case ERROR:
             default:
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
         }
     }
 
@@ -98,7 +98,7 @@ public class VariantMath {
                 return dec.pow(op2);
             case ERROR:
             default:
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
         }
     }
 

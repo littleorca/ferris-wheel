@@ -1,15 +1,13 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.formula.Formula;
-import com.ctrip.ferriswheel.core.formula.FormulaElement;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
+import com.ctrip.ferriswheel.api.variant.ErrorCode;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
-import com.ctrip.ferriswheel.core.intf.*;
 
 import java.math.BigDecimal;
 import java.util.Date;

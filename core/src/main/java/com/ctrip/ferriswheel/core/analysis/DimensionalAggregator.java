@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.analysis;
 
-import com.ctrip.ferriswheel.core.intf.AggregateType;
-import com.ctrip.ferriswheel.core.intf.Aggregator;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.table.AggregateType;
+import com.ctrip.ferriswheel.api.table.Aggregator;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.io.Serializable;
 import java.util.*;

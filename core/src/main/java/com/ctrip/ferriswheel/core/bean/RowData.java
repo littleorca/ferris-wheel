@@ -1,21 +1,24 @@
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.core.util.SparseArray;
+import com.ctrip.ferriswheel.api.table.DryCellData;
+import com.ctrip.ferriswheel.api.table.DryRowData;
+import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 
 import java.io.Serializable;
 
-public class RowData implements Serializable {
+public class RowData implements DryRowData, Serializable {
     private int index;
-    private SparseArray<CellData> cells;
+    private TreeSparseArray<DryCellData> cells;
 
     public RowData() {
     }
 
-    public RowData(int index, SparseArray<CellData> cells) {
+    public RowData(int index, TreeSparseArray<DryCellData> cells) {
         this.index = index;
         this.cells = cells;
     }
 
+    @Override
     public int getIndex() {
         return index;
     }
@@ -24,11 +27,12 @@ public class RowData implements Serializable {
         this.index = index;
     }
 
-    public SparseArray<CellData> getCells() {
+    @Override
+    public TreeSparseArray<DryCellData> getCells() {
         return cells;
     }
 
-    public void setCells(SparseArray<CellData> cells) {
+    public void setCells(TreeSparseArray<DryCellData> cells) {
         this.cells = cells;
     }
 }

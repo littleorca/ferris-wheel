@@ -1,8 +1,5 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-import com.ctrip.ferriswheel.core.intf.NamedAsset;
-
 abstract class NamedAssetNode extends AssetNode implements NamedAsset {
     private String name;
 

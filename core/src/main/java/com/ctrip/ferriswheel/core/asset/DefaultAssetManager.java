@@ -1,8 +1,5 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.Asset;
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

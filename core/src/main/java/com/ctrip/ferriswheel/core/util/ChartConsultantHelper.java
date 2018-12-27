@@ -1,9 +1,10 @@
 package com.ctrip.ferriswheel.core.util;
 
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.core.asset.DefaultCell;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Table;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.view.Rectangle;
@@ -33,7 +34,7 @@ public class ChartConsultantHelper {
             // scan series
             chartData.setSeriesList(new ArrayList<>(rc.getBottom() - rc.getTop() + 1));
             for (int row = rc.getTop(); row <= rc.getBottom(); row++) {
-                ChartData.Series s = new ChartData.Series();
+                ChartData.SeriesImpl s = new ChartData.SeriesImpl();
                 if (rc.getLeft() - 1 >= left) {
                     s.setName(new DynamicValue(formula(table, row, rc.getLeft() - 1)));
                 }
@@ -51,7 +52,7 @@ public class ChartConsultantHelper {
             // scan series
             chartData.setSeriesList(new ArrayList(rc.getBottom() - rc.getTop() + 1));
             for (int col = rc.getLeft(); col <= rc.getRight(); col++) {
-                ChartData.Series s = new ChartData.Series();
+                ChartData.SeriesImpl s = new ChartData.SeriesImpl();
                 if (rc.getTop() - 1 >= top) {
                     s.setName(new DynamicValue(formula(table, rc.getTop() - 1, col)));
                 }
@@ -68,13 +69,13 @@ public class ChartConsultantHelper {
     }
 
     static private String formula(Table table, int row, int column) {
-        return References.toFormula(new CellRef(table.getCell(row, column), true, true));
+        return References.toFormula(new CellRef((DefaultCell) table.getCell(row, column), true, true));
     }
 
     static private String formula(Table table, int left, int top, int right, int bottom) {
         return References.toFormula(new RangeRef(
-                new CellRef(table.getCell(top, left), true, true),
-                new CellRef(table.getCell(bottom, right), true, true)));
+                new CellRef((DefaultCell) table.getCell(top, left), true, true),
+                new CellRef((DefaultCell) table.getCell(bottom, right), true, true)));
     }
 
 

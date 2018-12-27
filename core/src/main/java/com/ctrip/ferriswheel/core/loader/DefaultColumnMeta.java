@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.loader;
 
-import com.ctrip.ferriswheel.core.intf.DataSet;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 
 public class DefaultColumnMeta implements DataSet.ColumnMeta {
     private final String name;

@@ -1,7 +1,6 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-import com.ctrip.ferriswheel.core.intf.DataSeries;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
 
 class DefaultDataSeries extends AssetNode implements DataSeries {
     private ValueNode name;
@@ -12,7 +11,6 @@ class DefaultDataSeries extends AssetNode implements DataSeries {
         super(assetManager);
     }
 
-    @Override
     public DefaultChart getChart() {
         return (DefaultChart) getParent();
     }

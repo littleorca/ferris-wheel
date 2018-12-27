@@ -1,5 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.view.Orientation;
+import com.ctrip.ferriswheel.api.view.Placement;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
@@ -8,25 +14,24 @@ import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.formula.ReferenceElement;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
-import com.ctrip.ferriswheel.core.view.Layout;
-import com.ctrip.ferriswheel.core.bean.Axis;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
+import com.ctrip.ferriswheel.core.bean.AxisImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class DefaultChart extends NamedAssetNode implements Chart {
+public class DefaultChart extends SheetAssetNode implements Chart {
     private String type;
     private final ValueNode title;
     private final ValueNode categories;
     private final AssetList<DefaultDataSeries> seriesList;
-    private Axis xAxis;
-    private Axis yAxis;
-    private Axis zAxis;
+    private AxisImpl xAxis;
+    private AxisImpl yAxis;
+    private AxisImpl zAxis;
     private final ChartLayout layout = new ChartLayout();
     private DefaultChartBinder binder;
 
@@ -99,7 +104,7 @@ class DefaultChart extends NamedAssetNode implements Chart {
         this.categories.setDynamicVariant(categories);
     }
 
-    public List<DefaultDataSeries> getSeriesList() {
+    public List<DataSeries> getSeriesList() {
         return Collections.unmodifiableList(seriesList); // internal list is not allowed to modify directly.
     }
 
@@ -121,32 +126,32 @@ class DefaultChart extends NamedAssetNode implements Chart {
         seriesList.clear();
     }
 
-    public Axis getxAxis() {
+    public AxisImpl getxAxis() {
         return xAxis;
     }
 
-    public void setxAxis(Axis xAxis) {
+    public void setxAxis(AxisImpl xAxis) {
         this.xAxis = xAxis;
     }
 
-    public Axis getyAxis() {
+    public AxisImpl getyAxis() {
         return yAxis;
     }
 
-    public void setyAxis(Axis yAxis) {
+    public void setyAxis(AxisImpl yAxis) {
         this.yAxis = yAxis;
     }
 
-    public Axis getzAxis() {
+    public AxisImpl getzAxis() {
         return zAxis;
     }
 
-    public void setzAxis(Axis zAxis) {
+    public void setzAxis(AxisImpl zAxis) {
         this.zAxis = zAxis;
     }
 
     @Override
-    public Layout getLayout() {
+    public LayoutImpl getLayout() {
         return layout;
     }
 

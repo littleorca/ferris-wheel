@@ -1,11 +1,12 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.table.PivotValue;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
-import com.ctrip.ferriswheel.core.bean.PivotField;
+import com.ctrip.ferriswheel.api.table.PivotField;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.AggregateType;
-import com.ctrip.ferriswheel.core.intf.Environment;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.table.AggregateType;
+import com.ctrip.ferriswheel.api.Environment;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -60,9 +61,9 @@ public class TestPivotAutomaton extends TestCase {
 
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
         pivot.setData(new DynamicValue("normal!A:C"));
-        pivot.setRows(Arrays.asList(new PivotField("a")));
-        pivot.setColumns(Arrays.asList(new PivotField("b")));
-        pivot.setValues(Arrays.asList(new PivotValue("c", AggregateType.SUMMARY, "SUM:c")));
+        pivot.setRows(Arrays.asList(new PivotFieldImpl("a")));
+        pivot.setColumns(Arrays.asList(new PivotFieldImpl("b")));
+        pivot.setValues(Arrays.asList(new PivotValueImpl("c", AggregateType.SUMMARY, "SUM:c")));
         autoTable.automate(pivot);
 
         System.out.println(autoTable);
@@ -86,16 +87,16 @@ public class TestPivotAutomaton extends TestCase {
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
         pivot.setData(new DynamicValue("normal!A:F"));
         pivot.setRows(Arrays.asList(
-                new PivotField("f1"),
-                new PivotField("f2")
+                new PivotFieldImpl("f1"),
+                new PivotFieldImpl("f2")
         ));
         pivot.setColumns(Arrays.asList(
-                new PivotField("f3"),
-                new PivotField("f4")
+                new PivotFieldImpl("f3"),
+                new PivotFieldImpl("f4")
         ));
         pivot.setValues(Arrays.asList(
-                new PivotValue("f5", AggregateType.SUMMARY, "SUM:f5"),
-                new PivotValue("f6", AggregateType.STANDARD_DEVIATION, "STD:f6")
+                new PivotValueImpl("f5", AggregateType.SUMMARY, "SUM:f5"),
+                new PivotValueImpl("f6", AggregateType.STANDARD_DEVIATION, "STD:f6")
         ));
 
         autoTable.automate(pivot);
@@ -145,11 +146,11 @@ public class TestPivotAutomaton extends TestCase {
         assertEquals("f1-bar", autoTable.getCell(row, 0).strValue());
         assertEquals("f2-bar", autoTable.getCell(row, 1).strValue());
         assertEquals(35, autoTable.getCell(row, 2).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 3).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 3).getValue());
         assertEquals(Value.BLANK, autoTable.getCell(row, 4).getValue());
         assertEquals(Value.BLANK, autoTable.getCell(row, 5).getValue());
         assertEquals(30, autoTable.getCell(row, 6).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 7).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 7).getValue());
         assertEquals(Value.BLANK, autoTable.getCell(row, 8).getValue());
         assertEquals(Value.BLANK, autoTable.getCell(row, 9).getValue());
 
@@ -157,7 +158,7 @@ public class TestPivotAutomaton extends TestCase {
         assertEquals("f1-bar", autoTable.getCell(row, 0).strValue());
         assertEquals("f2-foo", autoTable.getCell(row, 1).strValue());
         assertEquals(25, autoTable.getCell(row, 2).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 3).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 3).getValue());
         assertEquals(242, autoTable.getCell(row, 4).intValue());
         assertEquals(32.52691193, autoTable.getCell(row, 5).doubleValue(), 0.00000001);
         assertEquals(Value.BLANK, autoTable.getCell(row, 6).getValue());
@@ -175,19 +176,19 @@ public class TestPivotAutomaton extends TestCase {
         assertEquals(140, autoTable.getCell(row, 6).intValue());
         assertEquals(4.242640687, autoTable.getCell(row, 7).doubleValue(), 0.00000001);
         assertEquals(20, autoTable.getCell(row, 8).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 9).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 9).getValue());
 
         row++;
         assertEquals("f1-foo", autoTable.getCell(row, 0).strValue());
         assertEquals("f2-foo", autoTable.getCell(row, 1).strValue());
         assertEquals(5, autoTable.getCell(row, 2).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 3).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 3).getValue());
         assertEquals(10, autoTable.getCell(row, 4).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 5).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 5).getValue());
         assertEquals(15, autoTable.getCell(row, 6).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 7).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 7).getValue());
         assertEquals(40, autoTable.getCell(row, 8).intValue());
-        assertEquals(Value.err(ErrorCode.DIV_0), autoTable.getCell(row, 9).getValue());
+        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 9).getValue());
     }
 
     private void prepareSampleData(DefaultTable table) {

@@ -1,13 +1,13 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.util.SparseArray;
+import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 
 import java.util.Iterator;
 import java.util.Map;
 
 class SparseAssetArray<E extends AssetNode> implements Iterable<E> {
     private final AssetNode owner;
-    private SparseArray<E> sparseArray = new SparseArray<>();
+    private TreeSparseArray<E> sparseArray = new TreeSparseArray<>();
 
     SparseAssetArray(AssetNode owner) {
         this.owner = owner;

@@ -1,13 +1,12 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-import com.ctrip.ferriswheel.core.intf.Cell;
-import com.ctrip.ferriswheel.core.intf.Row;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.Row;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 
 import java.util.Iterator;
 
-class DefaultRow extends AssetNode implements Row {
+public class DefaultRow extends AssetNode implements Row {
     private int rowIndex;
     private final SparseAssetArray<DefaultCell> cells;
 

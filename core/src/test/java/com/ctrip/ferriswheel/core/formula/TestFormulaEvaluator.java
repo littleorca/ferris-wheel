@@ -1,5 +1,8 @@
 package com.ctrip.ferriswheel.core.formula;
 
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
@@ -8,8 +11,6 @@ import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.intf.*;
-import com.ctrip.ferriswheel.core.ref.CellRef;
 import junit.framework.TestCase;
 
 public class TestFormulaEvaluator extends TestCase {
@@ -33,7 +34,7 @@ public class TestFormulaEvaluator extends TestCase {
 
         elements = FormulaParser.parse("\"abc\"+\"def\"");
         value = evaluator.evaluate(elements);
-        assertEquals(ErrorCode.ILLEGAL_VALUE, value.errorValue());
+        assertEquals(ErrorCodes.ILLEGAL_VALUE, value.errorValue());
 
         elements = FormulaParser.parse("\"abc\"&\"def\"");
         value = evaluator.evaluate(elements);

@@ -1,10 +1,19 @@
 package com.ctrip.ferriswheel.proto.util;
 
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.query.DataProvider;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
+import com.ctrip.ferriswheel.api.variant.VariantRule;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.*;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -99,10 +108,10 @@ public class TestPbHelper extends TestCase {
         table1.setCellValue(0, 1, Value.dec(2));
         table1.setCellValue(0, 2, Value.dec(3));
         Chart chart1 = sheet1.addChart("chart1",
-                new ChartData("Line",
+                new ChartData("chart1", "Line",
                         new DynamicValue("\"Chart 1 (Line)\""),
                         null,
-                        Arrays.asList(new ChartData.Series(
+                        Arrays.asList(new ChartData.SeriesImpl(
                                 new DynamicValue("table1!A1"),
                                 null,
                                 new DynamicValue("table1!B1:C1")))));
@@ -151,7 +160,7 @@ public class TestPbHelper extends TestCase {
     }
 
     public void testVariantToProto() {
-        com.ctrip.ferriswheel.proto.v1.UnionValue v = PbHelper.pb(Value.err(ErrorCode.ILLEGAL_VALUE));
+        com.ctrip.ferriswheel.proto.v1.UnionValue v = PbHelper.pb(Value.err(ErrorCodes.ILLEGAL_VALUE));
         assertEquals("", v.getFormulaString());
         assertEquals(com.ctrip.ferriswheel.proto.v1.UnionValue.ValueCase.ERROR, v.getValueCase());
         assertEquals(com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_ILLEGAL_VALUE.getNumber(), v.getError().getNumber());
@@ -241,15 +250,15 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 1, Value.dec(21));
         t1.setCellValue(2, 2, Value.dec(22));
         t1.setCellFormula(2, 3, "t0!B1");
-        s1.addChart("c1", new ChartData("Line",
+        s1.addChart("c1", new ChartData("c1","Line",
                 new DynamicValue("\"Line Chart 1\""),
                 new DynamicValue("t1!B1:D1"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("t1!A2"),
                                 null,
                                 new DynamicValue("t1!B2:D2")),
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("t1!A3"),
                                 null,
                                 new DynamicValue("t1!B3:D3"))
@@ -276,11 +285,11 @@ public class TestPbHelper extends TestCase {
         DefaultQueryAutomaton auto = (DefaultQueryAutomaton) t0.getAutomaton();
         TableAutomatonInfo.QueryTemplateInfo template = auto.getQueryAutomatonInfo().getTemplate();
         assertEquals(scheme, template.getScheme());
-        assertEquals(1, template.getBuiltinParams().size());
-        DynamicValue param = (DynamicValue) template.getBuiltinParams().get("Greeting");
+        assertEquals(1, template.getAllBuiltinParams().size());
+        DynamicValue param = (DynamicValue) template.getAllBuiltinParams().get("Greeting");
         assertEquals("\"hello world\"", param.getFormulaString());
-        assertEquals(1, template.getUserParamRules().size());
-        VariantRule rule = template.getUserParamRules().get("Name");
+        assertEquals(1, template.getAllUserParamRules().size());
+        VariantRule rule = template.getAllUserParamRules().get("Name");
         assertEquals(VariantType.STRING, rule.getType());
         assertTrue(rule.isNullable());
         assertEquals(2, rule.getAllowedValues().size());
@@ -346,10 +355,10 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 1, Value.dec(21));
         t1.setCellValue(2, 2, Value.dec(22));
 
-        s1.addChart("chart1", new ChartData("Line",
+        s1.addChart("chart1", new ChartData("chart1", "Line",
                 new DynamicValue("\"Hello Line Chart1\""),
                 new DynamicValue("table1!B1:C1"),
-                Arrays.asList(new ChartData.Series(
+                Arrays.asList(new ChartData.SeriesImpl(
                         new DynamicValue("table1!A2"),
                         null,
                         new DynamicValue("table1!B2:C2")))));

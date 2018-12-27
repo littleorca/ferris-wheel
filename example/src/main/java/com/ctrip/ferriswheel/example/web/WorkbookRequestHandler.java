@@ -1,11 +1,14 @@
 package com.ctrip.ferriswheel.example.web;
 
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.ReviseCollector;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import com.ctrip.ferriswheel.core.util.ChartConsultantHelper;
 import com.ctrip.ferriswheel.proto.util.PbActionHelper;

@@ -1,20 +1,35 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.action.ActionNotifier;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.chart.ChartBinder;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.table.DryCellData;
+import com.ctrip.ferriswheel.api.table.DryRowData;
+import com.ctrip.ferriswheel.api.table.DryTableData;
+import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.api.view.Display;
+import com.ctrip.ferriswheel.api.view.Displayable;
+import com.ctrip.ferriswheel.api.view.Grid;
+import com.ctrip.ferriswheel.api.view.Layout;
 import com.ctrip.ferriswheel.core.action.*;
+import com.ctrip.ferriswheel.core.bean.AxisImpl;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
-import com.ctrip.ferriswheel.core.bean.RowData;
-import com.ctrip.ferriswheel.core.view.Layout;
-import com.ctrip.ferriswheel.core.view.SheetLayout;
-import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.intf.*;
+import com.ctrip.ferriswheel.core.bean.TableData;
+import com.ctrip.ferriswheel.core.bean.TextData;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
+import com.ctrip.ferriswheel.core.view.SheetLayout;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 
-class DefaultSheet extends NamedAssetNode implements Sheet {
-    private final NamedAssetList<NamedAssetNode> assets;
+public class DefaultSheet extends NamedAssetNode implements Sheet {
+    private final NamedAssetList<SheetAssetNode> assets;
     private final SheetLayout layout = new SheetLayout();
     private ActionNotifier notifier;
 
@@ -35,34 +50,34 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public NamedAssetNode getAsset(int index) {
+    public SheetAssetNode getAsset(int index) {
         return assets.get(index);
     }
 
     @Override
-    public NamedAssetNode getAsset(String name) {
+    public SheetAssetNode getAsset(String name) {
         return assets.get(name);
     }
 
     @Override
-    public NamedAssetNode removeAsset(int index) {
+    public SheetAssetNode removeAsset(int index) {
         return doRemoveAsset(getAsset(index));
     }
 
     @Override
-    public NamedAssetNode removeAsset(String name) {
+    public SheetAssetNode removeAsset(String name) {
         return doRemoveAsset(getAsset(name));
     }
 
-    private NamedAssetNode doRemoveAsset(NamedAsset asset) {
+    private SheetAssetNode doRemoveAsset(NamedAsset asset) {
         if (asset == null) {
             return null;
         }
         return handleAction(new RemoveAsset(getName(), asset.getName()));
     }
 
-    NamedAssetNode handleAction(RemoveAsset removeAsset) {
-        NamedAssetNode asset = getAsset(removeAsset.getAssetName());
+    SheetAssetNode handleAction(RemoveAsset removeAsset) {
+        SheetAssetNode asset = getAsset(removeAsset.getAssetName());
         if (asset == null) {
             return null;
         }
@@ -127,7 +142,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public DefaultTable addTable(String name, TableData tableData) {
+    public DefaultTable addTable(String name, DryTableData tableData) {
         return handleAction(new AddTable(getName(), name, tableData));
     }
 
@@ -143,11 +158,11 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
             assets.add(table);
 
             notifier.privately(() -> {
-                TableData td = addTable.getTableData();
+                DryTableData td = addTable.getTableData();
                 if (td.getRows() != null) {
-                    for (RowData rd : td.getRows().values()) {
+                    for (DryRowData rd : td.getRows().values()) {
                         if (rd.getCells() != null) {
-                            for (CellData cd : rd.getCells().values()) {
+                            for (DryCellData cd : rd.getCells().values()) {
                                 if (cd.getValue().isFormula()) {
                                     table.setCellFormula(rd.getIndex(), cd.getIndex(), cd.getValue().getFormulaString());
                                 } else {
@@ -158,8 +173,8 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
                     }
                 }
 
-                if (td.getAutomatonInfo() != null) {
-                    table.automate(td.getAutomatonInfo());
+                if (td.getAutomatonSolution() != null) {
+                    table.automate(td.getAutomatonSolution());
                 }
 
                 // TODO use user specified layout?
@@ -169,7 +184,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
             if (addTable.getTableData() == null) {
                 addTable.setTableData(new TableData());
             }
-            addTable.getTableData().setLayout(new Layout(table.getLayout()));
+            addTable.getTableData().setLayout(new LayoutImpl(table.getLayout()));
             return table;
         });
     }
@@ -184,7 +199,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public DefaultChart addChart(String name, ChartData chartData) {
+    public DefaultChart addChart(String name, Chart chartData) {
         return handleAction(new AddChart(getName(), name, chartData));
     }
 
@@ -196,7 +211,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
             throw new IllegalArgumentException("Duplicated name: " + addChart.getChartName());
         }
         return publicly(addChart, () -> {
-            ChartData chartData = addChart.getChartData();
+            Chart chartData = addChart.getChartData();
             DefaultChart chart = new DefaultChart(addChart.getChartName(), chartData.getType(), this);
             assets.add(chart);
             // now fill data
@@ -208,13 +223,13 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public DefaultChart updateChart(String name, ChartData chartData) {
+    public DefaultChart updateChart(String name, Chart chartData) {
         return handleAction(new UpdateChart(getName(), name, chartData));
     }
 
     DefaultChart handleAction(UpdateChart updateChart) {
         DefaultChart chart = getChart(updateChart.getChartName());
-        ChartData chartData = updateChart.getChartData();
+        Chart chartData = updateChart.getChartData();
         if (chart == null || chartData == null) {
             throw new IllegalArgumentException();
         }
@@ -225,7 +240,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
         });
     }
 
-    private void updateChart(DefaultChart chart, ChartData chartData) {
+    private void updateChart(DefaultChart chart, Chart chartData) {
         chart.setType(chartData.getType());
         chart.setTitle(chartData.getTitle());
 
@@ -234,7 +249,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
         }
 
         if (isValidBinder(chartData.getBinder())) {
-            ChartData.Binder inputBinder = chartData.getBinder();
+            ChartBinder inputBinder = chartData.getBinder();
             DefaultChartBinder internalBinder = new DefaultChartBinder(getAssetManager());
             internalBinder.setData(inputBinder.getData());
             internalBinder.setOrientation(inputBinder.getOrientation());
@@ -251,24 +266,24 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
             chart.setCategories(chartData.getCategories());
             chart.clearSeries();
             if (chartData.getSeriesList() != null) {
-                for (ChartData.Series series : chartData.getSeriesList()) {
+                for (DataSeries series : chartData.getSeriesList()) {
                     chart.addSeries(series.getName(), series.getxValues(), series.getyValues());
                 }
             }
         }
 
         if (chartData.getxAxis() != null) {
-            chart.setxAxis(new Axis(chartData.getxAxis()));
+            chart.setxAxis(new AxisImpl(chartData.getxAxis()));
         }
         if (chartData.getyAxis() != null) {
-            chart.setyAxis(new Axis(chartData.getyAxis()));
+            chart.setyAxis(new AxisImpl(chartData.getyAxis()));
         }
         if (chartData.getzAxis() != null) {
-            chart.setzAxis(new Axis(chartData.getzAxis()));
+            chart.setzAxis(new AxisImpl(chartData.getzAxis()));
         }
     }
 
-    private boolean isValidBinder(ChartData.Binder binder) {
+    private boolean isValidBinder(ChartBinder binder) {
         if (binder == null || binder.getData() == null) {
             return false;
         }
@@ -281,7 +296,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public DefaultText addText(String name, TextData textData) {
+    public DefaultText addText(String name, Text textData) {
         return handleAction(new AddText(getName(), name, textData));
     }
 
@@ -299,7 +314,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
             fillTextData(text, addText.getTextData());
             if (addText.getTextData().getLayout() == null) {
                 layoutNewAsset(text);
-                addText.getTextData().setLayout(new Layout(text.getLayout()));
+                ((TextData) addText.getTextData()).setLayout(new LayoutImpl(text.getLayout()));
             }
             getWorkbook().onTextCreated(text);
             return text;
@@ -311,28 +326,28 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public DefaultText updateText(String name, TextData textData) {
+    public DefaultText updateText(String name, Text textData) {
         return handleAction(new UpdateText(getName(), name, textData));
     }
 
     DefaultText handleAction(UpdateText updateText) {
         DefaultText text = getText(updateText.getTextName());
-        TextData textData = updateText.getTextData();
+        Text textData = updateText.getTextData();
         if (text == null || textData == null) {
             throw new IllegalArgumentException();
         }
         return publicly(updateText, () -> {
             fillTextData(text, textData);
             if (updateText.getTextData().getLayout() == null) {
-                updateText.getTextData().setLayout(new Layout(text.getLayout()));
+                ((TextData) updateText.getTextData()).setLayout(new LayoutImpl(text.getLayout()));
             }
             getWorkbook().onTextUpdated(text);
             return text;
         });
     }
 
-    void fillTextData(DefaultText text, TextData data) {
-        DynamicValue dv = data.getContent();
+    void fillTextData(DefaultText text, Text data) {
+        DynamicValue dv = (DynamicValue) data.getContent();
         if (dv.isFormula()) {
             text.getContent().setFormula(dv.getFormula());
         } else {
@@ -347,9 +362,9 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     private void layoutNewAsset(NamedAsset namedAsset) {
         // just put the new asset to the bottom
         int rowEnd = 0;
-        for (Asset asset : this) {
+        for (SheetAsset asset : this) {
             if (asset instanceof Displayable) {
-                Layout.Grid grid = ((Displayable) asset).getLayout().getGrid();
+                Grid grid = ((Displayable) asset).getLayout().getGrid();
                 if (grid == null) {
                     continue;
                 }
@@ -359,12 +374,12 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
             }
         }
 
-        Layout l = new Layout();
+        LayoutImpl l = new LayoutImpl();
         l.setDisplay(Display.BLOCK);
         // let's put new asset to the bottom.
-        l.setGrid(new Layout.Grid(0, 0,
-                new Layout.Span(1, 7),
-                new Layout.Span(rowEnd, rowEnd + 4)));
+        l.setGrid(new LayoutImpl.GridImpl(0, 0,
+                new LayoutImpl.SpanImpl(1, 7),
+                new LayoutImpl.SpanImpl(rowEnd, rowEnd + 4)));
         handleAction(new LayoutAsset(getName(), namedAsset.getName(), l));
     }
 
@@ -382,7 +397,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
         }
         Displayable displayable = (Displayable) asset;
         publicly(layoutAsset, () -> {
-            displayable.getLayout().copy(layoutAsset.getLayout());
+            ((LayoutImpl) displayable.getLayout()).copy(layoutAsset.getLayout());
         });
     }
 
@@ -395,7 +410,7 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
 
     public void toString(StringBuilder sb) {
         sb.append("Sheet: ").append(getName()).append(", assets=").append(getAssetCount()).append("\n");
-        for (NamedAsset asset : this) {
+        for (SheetAsset asset : this) {
             if (asset instanceof DefaultTable) {
                 ((DefaultTable) asset).toString(sb);
             } else if (asset instanceof DefaultChart) {
@@ -441,12 +456,12 @@ class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public Layout getLayout() {
+    public LayoutImpl getLayout() {
         return layout;
     }
 
     @Override
-    public Iterator<NamedAsset> iterator() {
+    public Iterator<SheetAsset> iterator() {
         return new UnmodifiableIterator<>(assets.iterator());
     }
 }

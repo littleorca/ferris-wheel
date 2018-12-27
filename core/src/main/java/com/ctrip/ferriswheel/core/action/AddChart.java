@@ -1,16 +1,16 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.intf.Action;
+import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.chart.Chart;
 
 public final class AddChart extends SheetAction implements Action {
     private String chartName;
-    private ChartData chartData;
+    private Chart chartData;
 
     public AddChart() {
     }
 
-    public AddChart(String sheetName, String chartName, ChartData chartData) {
+    public AddChart(String sheetName, String chartName, Chart chartData) {
         super(sheetName);
         this.chartName = chartName;
         this.chartData = chartData;
@@ -33,11 +33,11 @@ public final class AddChart extends SheetAction implements Action {
         this.chartName = chartName;
     }
 
-    public ChartData getChartData() {
+    public Chart getChartData() {
         return chartData;
     }
 
-    public void setChartData(ChartData chartData) {
+    public void setChartData(Chart chartData) {
         this.chartData = chartData;
     }
 }

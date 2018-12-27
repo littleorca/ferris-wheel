@@ -1,12 +1,15 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.*;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import junit.framework.TestCase;
 
 import java.math.BigDecimal;
@@ -98,7 +101,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(63, table.getCell(3, 0).intValue());
         assertEquals(0.5238095238095238, table.getCell(4, 0).doubleValue());
         assertEquals(0, table.getCell(3, 1).intValue());
-        assertEquals(ErrorCode.DIV_0, table.getCell(4, 1).errorValue());
+        assertEquals(ErrorCodes.DIV_0, table.getCell(4, 1).errorValue());
         assertEquals(66, table.getCell(3, 2).intValue());
         assertEquals(0.5454545454545455, table.getCell(4, 2).doubleValue());
         assertEquals(69, table.getCell(3, 3).intValue());
@@ -185,17 +188,17 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultWorkbook workbook = createWorkbookWithTable33();
         DefaultSheet sheet = (DefaultSheet) workbook.getSheet(0);
         DefaultTable table = (DefaultTable) sheet.getTable("table1");
-        List<ChartData.Series> series = Arrays.asList(
-                new ChartData.Series(
+        List<DataSeries> series = Arrays.asList(
+                new ChartData.SeriesImpl(
                         new DynamicValue("table1!$A2"),
                         null,
                         new DynamicValue("table1!$B$2:$C$2")),
-                new ChartData.Series(
+                new ChartData.SeriesImpl(
                         new DynamicValue("table1!$A3"),
                         null,
                         new DynamicValue("table1!$B$3:$C$3"))
         );
-        sheet.addChart("c1", new ChartData("Line",
+        sheet.addChart("c1", new ChartData("c1", "Line",
                 new DynamicValue("\"hello world\""),
                 new DynamicValue("table1!$B$1:$C$1"),
                 series));
@@ -274,17 +277,17 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultWorkbook workbook = createWorkbookWithTable33();
         DefaultSheet sheet = (DefaultSheet) workbook.getSheet(0);
         DefaultTable table = (DefaultTable) sheet.getTable("table1");
-        List<ChartData.Series> series = Arrays.asList(
-                new ChartData.Series(
+        List<DataSeries> series = Arrays.asList(
+                new ChartData.SeriesImpl(
                         new DynamicValue("table1!$A2"),
                         null,
                         new DynamicValue("table1!$B$2:$C$2")),
-                new ChartData.Series(
+                new ChartData.SeriesImpl(
                         new DynamicValue("table1!$A3"),
                         null,
                         new DynamicValue("table1!$B$3:$C$3"))
         );
-        sheet.addChart("c1", new ChartData("Line",
+        sheet.addChart("c1", new ChartData("c1", "Line",
                 new DynamicValue("\"hello world\""),
                 new DynamicValue("table1!$B$1:$C$1"),
                 series));
@@ -310,39 +313,39 @@ public class TestDefaultWorkbook extends TestCase {
         table2.setCellValue(2, 1, new Value.DecimalValue(2000));
         table2.setCellValue(2, 2, new Value.DecimalValue(3000));
 
-        sheet1.addChart("chart1-1", new ChartData("Line",
+        sheet1.addChart("chart1-1", new ChartData("chart1-1", "Line",
                 new DynamicValue("\"Chart 1-1\""),
                 new DynamicValue("table1!B1:C1"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("table1!A2"),
                                 null,
                                 new DynamicValue("table1!B2:C2"))
                 )));
-        sheet1.addChart("chart1-2", new ChartData("Line",
+        sheet1.addChart("chart1-2", new ChartData("chart1-2", "Line",
                 new DynamicValue("\"Chart 1-2\""),
                 new DynamicValue("sheet2!table2!B2:C2"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet2!table2!A3"),
                                 null,
                                 new DynamicValue("sheet2!table2!B3:C3"))
                 )));
 
-        sheet2.addChart("chart2-1", new ChartData("Line",
+        sheet2.addChart("chart2-1", new ChartData("chart2-1", "Line",
                 new DynamicValue("\"Chart 2-1\""),
                 new DynamicValue("sheet1!table1!B1:C1"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!A2"),
                                 null,
                                 new DynamicValue("sheet1!table1!B2:C2"))
                 )));
-        sheet2.addChart("chart2-2", new ChartData("Line",
+        sheet2.addChart("chart2-2", new ChartData("chart2-1", "Line",
                 new DynamicValue("\"Chart 2-2\""),
                 new DynamicValue("table2!B2:C2"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("table2!A3"),
                                 null,
                                 new DynamicValue("table2!B3:C3"))

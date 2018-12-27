@@ -28,6 +28,10 @@
         </dependency>
         <dependency>
             <groupId>com.ctrip.ferriswheel</groupId>
+            <artifactId>ferris-wheel-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctrip.ferriswheel</groupId>
             <artifactId>quarks</artifactId>
         </dependency>
         <dependency>

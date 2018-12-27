@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.intf.VariantNode;
+import com.ctrip.ferriswheel.core.asset.VariantNode;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 
 public class AreaPatternAnalyzer {

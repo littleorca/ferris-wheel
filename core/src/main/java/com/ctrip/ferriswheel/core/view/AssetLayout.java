@@ -1,16 +1,17 @@
 package com.ctrip.ferriswheel.core.view;
 
-import com.ctrip.ferriswheel.core.intf.Display;
-import com.ctrip.ferriswheel.core.intf.Placement;
+import com.ctrip.ferriswheel.api.view.Display;
+import com.ctrip.ferriswheel.api.view.Layout;
+import com.ctrip.ferriswheel.api.view.Placement;
 
-public class AssetLayout extends Layout {
+public class AssetLayout extends LayoutImpl {
     public AssetLayout() {
         super(Display.BLOCK,
                 0,
                 0,
                 Placement.LEFT,
                 Placement.TOP,
-                new Grid(0, 0, new Span(1, 7), new Span(1, 6)));
+                new GridImpl(0, 0, new SpanImpl(1, 7), new SpanImpl(1, 6)));
     }
 
     @Override
@@ -23,7 +24,7 @@ public class AssetLayout extends Layout {
             setHeight(0);
             setAlign(Placement.LEFT);
             setVerticalAlign(Placement.TOP);
-            setGrid(new Grid(0, 0, new Span(1, 7), new Span(1, 6)));
+            setGrid(new GridImpl(0, 0, new SpanImpl(1, 7), new SpanImpl(1, 6)));
         }
     }
 

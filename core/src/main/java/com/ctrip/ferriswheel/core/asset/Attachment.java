@@ -1,8 +1,5 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-import com.ctrip.ferriswheel.core.intf.NamedAsset;
-
 public class Attachment extends NamedAssetNode implements NamedAsset {
     private String contentType;
     private byte[] content;

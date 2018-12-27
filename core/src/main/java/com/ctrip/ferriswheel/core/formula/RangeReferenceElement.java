@@ -3,10 +3,8 @@ package com.ctrip.ferriswheel.core.formula;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.intf.Table;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,14 +20,14 @@ public class RangeReferenceElement extends ReferenceElement {
     @Override
     public void evaluate(FormulaEvaluationContext context) {
         if (!rangeRef.isValid()) {
-            context.pushOperand(Value.err(ErrorCode.ILLEGAL_REF));
+            context.pushOperand(Value.err(ErrorCodes.ILLEGAL_REF));
             return;
         }
 
         Table table = context.resolveTable(rangeRef.sheetName(), rangeRef.tableName());
 
         if (table == null) {
-            context.pushOperand(Value.err(ErrorCode.ILLEGAL_REF));
+            context.pushOperand(Value.err(ErrorCodes.ILLEGAL_REF));
             return;
         }
 
@@ -40,7 +38,7 @@ public class RangeReferenceElement extends ReferenceElement {
         List<Variant> valueList = new LinkedList<>();
         for (int row = top; row <= bottom; row++) {
             for (int col = left; col <= right; col++) {
-                valueList.add(table.getCell(row, col).getValue());
+                valueList.add(Value.from(table.getCell(row, col)));
             }
         }
         context.pushOperand(new Value.ListValue(valueList, right - left + 1));

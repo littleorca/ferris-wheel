@@ -2,8 +2,8 @@ package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.util.VariantMath;
 import com.ctrip.ferriswheel.quarks.Token;
 
@@ -41,7 +41,7 @@ public abstract class UnaryElement extends FormulaElement {
         @Override
         protected Variant evaluate(Variant operand) {
             if (operand.valueType() == VariantType.LIST) {
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
             } else {
                 return operand;
             }
@@ -64,7 +64,7 @@ public abstract class UnaryElement extends FormulaElement {
             if (type == VariantType.DECIMAL) {
                 return Value.dec(operand.decimalValue().negate());
             } else {
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
             }
         }
     }
@@ -85,7 +85,7 @@ public abstract class UnaryElement extends FormulaElement {
             if (type == VariantType.DECIMAL) {
                 return VariantMath.divide(operand, Value.dec(100));
             } else {
-                return Value.err(ErrorCode.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.ILLEGAL_VALUE);
             }
         }
     }

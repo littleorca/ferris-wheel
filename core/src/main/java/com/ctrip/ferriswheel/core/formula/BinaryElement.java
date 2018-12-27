@@ -2,8 +2,8 @@ package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.util.VariantMath;
 
 public abstract class BinaryElement extends FormulaElement {
@@ -81,7 +81,7 @@ public abstract class BinaryElement extends FormulaElement {
         protected abstract boolean explain(int ret);
 
         protected Variant explainError(Exception e) {
-            return Value.err(ErrorCode.ILLEGAL_VALUE);
+            return Value.err(ErrorCodes.ILLEGAL_VALUE);
         }
     }
 

@@ -1,17 +1,45 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Ctrip.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.core.intf.DataQuery;
-import com.ctrip.ferriswheel.core.intf.DynamicVariant;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantRule;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.query.QueryTemplate;
+import com.ctrip.ferriswheel.api.table.*;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantRule;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 // TODO review class names.
-public abstract class TableAutomatonInfo implements Serializable {
+public abstract class TableAutomatonInfo implements AutomateSolution, Serializable {
 
     /**
      * Forbid user from extending this class.
@@ -19,7 +47,7 @@ public abstract class TableAutomatonInfo implements Serializable {
     private TableAutomatonInfo() {
     }
 
-    public static class QueryAutomatonInfo extends TableAutomatonInfo {
+    public static class QueryAutomatonInfo extends TableAutomatonInfo implements QuerySolution {
         private QueryTemplateInfo template;
         private Map<String, Variant> parameters;
         private QueryInfo query;
@@ -62,7 +90,7 @@ public abstract class TableAutomatonInfo implements Serializable {
         }
     }
 
-    public static class QueryTemplateInfo implements Serializable {
+    public static class QueryTemplateInfo implements QueryTemplate, Serializable {
         private String scheme;
         private Map<String, DynamicVariant> builtinParams;
         private Map<String, VariantRule> userParamRules;
@@ -106,24 +134,44 @@ public abstract class TableAutomatonInfo implements Serializable {
             this.scheme = scheme;
         }
 
-        public Map<String, DynamicVariant> getBuiltinParams() {
+        @Override
+        public Variant getBuiltinParam(String name) {
+            return builtinParams == null ? null : builtinParams.get(name);
+        }
+
+        @Override
+        public Set<String> getBuiltinParamNames() {
+            return builtinParams == null ? null : builtinParams.keySet();
+        }
+
+        public Map<String, DynamicVariant> getAllBuiltinParams() {
             return builtinParams;
         }
 
-        public void setBuiltinParams(Map<String, DynamicVariant> builtinParams) {
+        public void setAllBuiltinParams(Map<String, DynamicVariant> builtinParams) {
             this.builtinParams = builtinParams;
         }
 
-        public Map<String, VariantRule> getUserParamRules() {
+        @Override
+        public VariantRule getUserParamRule(String name) {
+            return userParamRules == null ? null : userParamRules.get(name);
+        }
+
+        @Override
+        public Set<String> getUserParamNames() {
+            return userParamRules == null ? null : userParamRules.keySet();
+        }
+
+        public Map<String, VariantRule> getAllUserParamRules() {
             return userParamRules;
         }
 
-        public void setUserParamRules(Map<String, VariantRule> userParamRules) {
+        public void setAllUserParamRules(Map<String, VariantRule> userParamRules) {
             this.userParamRules = userParamRules;
         }
     }
 
-    public static class QueryInfo implements Serializable {
+    public static class QueryInfo implements DataQuery, Serializable {
         private String scheme;
         private Map<String, Variant> parameters;
 
@@ -153,16 +201,26 @@ public abstract class TableAutomatonInfo implements Serializable {
             this.scheme = scheme;
         }
 
-        public Map<String, Variant> getParameters() {
+        @Override
+        public Variant getParam(String name) {
+            return parameters == null ? null : parameters.get(name);
+        }
+
+        @Override
+        public Set<String> getParamNames() {
+            return parameters == null ? null : parameters.keySet();
+        }
+
+        public Map<String, Variant> getAllParams() {
             return parameters;
         }
 
-        public void setParameters(Map<String, Variant> parameters) {
+        public void setAllParams(Map<String, Variant> parameters) {
             this.parameters = parameters;
         }
     }
 
-    public static class PivotAutomatonInfo extends TableAutomatonInfo {
+    public static class PivotAutomatonInfo extends TableAutomatonInfo implements PivotSolution {
         private DynamicVariant data;
         private List<PivotFilter> filters;
         private List<PivotField> rows;

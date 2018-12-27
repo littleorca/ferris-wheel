@@ -1,8 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Ctrip.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import junit.framework.TestCase;
 
 import java.time.Instant;
@@ -16,7 +41,7 @@ import java.util.Date;
 public class TestValue extends TestCase {
 
     public void testError() {
-        ErrorCode ec = ErrorCode.ILLEGAL_REF;
+        ErrorCodes ec = ErrorCodes.ILLEGAL_REF;
         Value.ErrorValue ev = Value.err(ec);
         assertTrue(ev.booleanValue());
         assertEquals(ec.getCode(), ev.intValue());
@@ -29,17 +54,17 @@ public class TestValue extends TestCase {
             fail();
         } catch (UnsupportedOperationException e) {
         }
-        assertFalse(Value.err(ErrorCode.OK).booleanValue());
+        assertFalse(Value.err(ErrorCodes.OK).booleanValue());
     }
 
     public void testBlank() {
-        assertEquals(ErrorCode.OK, Value.BLANK.errorValue());
+        assertEquals(ErrorCodes.OK, Value.BLANK.errorValue());
         assertEquals(0, Value.BLANK.intValue());
         assertEquals(0, Value.BLANK.longValue());
         assertFalse(Value.BLANK.booleanValue());
         assertEquals(Value.date(0).dateValue(), Value.BLANK.dateValue());
         assertEquals("", Value.BLANK.strValue());
-        assertEquals(ErrorCode.OK, Value.BLANK.errorValue());
+        assertEquals(ErrorCodes.OK, Value.BLANK.errorValue());
         try {
             Value.BLANK.listValue();
             fail();
@@ -48,7 +73,7 @@ public class TestValue extends TestCase {
     }
 
     public void testDecimal() {
-        assertEquals(ErrorCode.OK, Value.dec(0).errorValue());
+        assertEquals(ErrorCodes.OK, Value.dec(0).errorValue());
         assertEquals(0, Value.dec(0).intValue());
         assertEquals(3, Value.dec(3).longValue());
         assertEquals(10.24, Value.dec(10.24).floatValue(), 0.0001);
@@ -67,7 +92,7 @@ public class TestValue extends TestCase {
     }
 
     public void testBool() {
-        assertEquals(ErrorCode.OK, Value.TRUE.errorValue());
+        assertEquals(ErrorCodes.OK, Value.TRUE.errorValue());
         assertEquals(0, Value.FALSE.intValue());
         assertEquals(0, Value.FALSE.longValue());
         assertEquals(0, Value.FALSE.floatValue(), 0.00001);
@@ -95,8 +120,8 @@ public class TestValue extends TestCase {
     }
 
     public void testDate() {
-        assertEquals(ErrorCode.OK, Value.date(0).errorValue());
-        assertEquals(ErrorCode.OK, Value.date(new Date()).errorValue());
+        assertEquals(ErrorCodes.OK, Value.date(0).errorValue());
+        assertEquals(ErrorCodes.OK, Value.date(new Date()).errorValue());
         assertEquals(0, Value.date(0).intValue());
         assertEquals(0, Value.date(0).longValue());
         assertEquals(0, Value.date(0).floatValue(), 0.0001);
@@ -119,8 +144,8 @@ public class TestValue extends TestCase {
     }
 
     public void testString() {
-        assertEquals(ErrorCode.OK, Value.str("").errorValue());
-        assertEquals(ErrorCode.OK, Value.str("hello world").errorValue());
+        assertEquals(ErrorCodes.OK, Value.str("").errorValue());
+        assertEquals(ErrorCodes.OK, Value.str("hello world").errorValue());
         assertEquals(1, Value.str("1.2").intValue());
         assertEquals(1, Value.str("1.2").longValue());
         assertEquals(1.2, Value.str("1.2").floatValue(), 0.0001);
@@ -150,7 +175,7 @@ public class TestValue extends TestCase {
 
     public void testList() {
         Value.ListValue ls = Value.list(Collections.emptyList());
-        assertEquals(ErrorCode.OK, ls.errorValue());
+        assertEquals(ErrorCodes.OK, ls.errorValue());
         try {
             ls.decimalValue();
             fail();
@@ -180,32 +205,32 @@ public class TestValue extends TestCase {
     }
 
     public void testCompareErrorToError() {
-        checkCompare(0, Value.err(ErrorCode.ILLEGAL_VALUE), Value.err(ErrorCode.ILLEGAL_VALUE));
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_VALUE), Value.err(ErrorCode.ILLEGAL_REF));
+        checkCompare(0, Value.err(ErrorCodes.ILLEGAL_VALUE), Value.err(ErrorCodes.ILLEGAL_VALUE));
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_VALUE), Value.err(ErrorCodes.ILLEGAL_REF));
     }
 
     public void testCompareErrorToBlank() {
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_REF), Value.BLANK);
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.BLANK);
     }
 
     public void testCompareErrorToDecimal() {
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_REF), Value.dec(10));
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.dec(10));
     }
 
     public void testCompareErrorToBoolean() {
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_REF), Value.FALSE);
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.FALSE);
     }
 
     public void testCompareErrorToDate() {
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_REF), Value.date(new Date()));
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.date(new Date()));
     }
 
     public void testCompareErrorToString() {
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_REF), Value.str("hello world"));
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.str("hello world"));
     }
 
     public void testCompareErrorToList() {
-        checkUncomparable(Value.err(ErrorCode.ILLEGAL_REF), Value.list(Arrays.asList(Value.str("test"))));
+        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.list(Arrays.asList(Value.str("test"))));
     }
 
     public void testCompareBlankToBlank() {

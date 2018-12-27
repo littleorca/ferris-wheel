@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.core.intf.Action;
+import com.ctrip.ferriswheel.api.action.Action;
 
 public class RemoveSheet extends BaseAction implements Action {
     private String sheetName;

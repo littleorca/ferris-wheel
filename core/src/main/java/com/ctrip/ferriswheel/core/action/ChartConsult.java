@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.core.intf.Action;
+import com.ctrip.ferriswheel.api.action.Action;
 
 // TODO this is not a real action since it won't effect  the workbook, and chart consult not introduced in none of workbook/sheet/table interface
 public class ChartConsult extends SheetAction implements Action {

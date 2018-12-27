@@ -2,10 +2,9 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.core.action.ResetTable;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.AssetManager;
-import com.ctrip.ferriswheel.core.intf.DataSet;
-import com.ctrip.ferriswheel.core.intf.TableAutomaton;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.table.TableAutomaton;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 public abstract class AbstractTableAutomaton extends AssetNode implements TableAutomaton {
 

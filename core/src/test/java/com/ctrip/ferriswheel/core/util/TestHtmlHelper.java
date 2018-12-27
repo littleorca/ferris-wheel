@@ -1,12 +1,13 @@
 package com.ctrip.ferriswheel.core.util;
 
+import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Environment;
-import com.ctrip.ferriswheel.core.intf.Sheet;
-import com.ctrip.ferriswheel.core.intf.Table;
-import com.ctrip.ferriswheel.core.intf.Workbook;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.Workbook;
 import junit.framework.TestCase;
 
 public class TestHtmlHelper extends TestCase {
@@ -19,7 +20,7 @@ public class TestHtmlHelper extends TestCase {
 
     // WARN: demo only, no assertion
     public void testWorkbookToHtml() {
-        Workbook workbook = new FilingClerk(environment).createWorkbook("test-workbook");
+        DefaultWorkbook workbook = new FilingClerk(environment).createWorkbook("test-workbook");
         Sheet s1 = workbook.addSheet("sheet1");
         Table t11 = s1.addTable("table1");
         t11.setCellValue(0, 1, Value.str("foo"));

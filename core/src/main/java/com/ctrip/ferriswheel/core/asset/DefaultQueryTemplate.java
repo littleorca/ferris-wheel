@@ -1,28 +1,33 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
-import com.ctrip.ferriswheel.core.bean.ValueRule;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.query.QueryTemplate;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantRule;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.intf.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     private String scheme;
     private LinkedHashMap<String, ValueNode> builtinParams = new LinkedHashMap<>();
     private LinkedHashMap<String, VariantRule> userParamRules = new LinkedHashMap<>();
 
-    DefaultQueryTemplate(AssetManager assetManager, TableAutomatonInfo.QueryTemplateInfo templateInfo) {
+    DefaultQueryTemplate(AssetManager assetManager, QueryTemplate templateInfo) {
         super(assetManager);
         this.scheme = templateInfo.getScheme();
-        if (templateInfo.getBuiltinParams() != null) {
-            templateInfo.getBuiltinParams().forEach((name, variable) -> {
+        if (templateInfo.getAllBuiltinParams() != null) {
+            templateInfo.getAllBuiltinParams().forEach((name, variable) -> {
                 ValueNode param = new ValueNode(getAssetManager(), variable);
                 setBuiltinParam(name, param);
             });
         }
-        if (templateInfo.getUserParamRules() != null) {
-            templateInfo.getUserParamRules().forEach((name, rule) ->
+        if (templateInfo.getAllUserParamRules() != null) {
+            templateInfo.getAllUserParamRules().forEach((name, rule) ->
                     userParamRules.put(name, new ValueRule(rule)));
         }
     }
@@ -56,6 +61,11 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     }
 
     @Override
+    public Map<String, DynamicVariant> getAllBuiltinParams() {
+        return Collections.unmodifiableMap(builtinParams);
+    }
+
+    @Override
     public VariantRule getUserParamRule(String name) {
         return userParamRules.get(name);
     }
@@ -70,6 +80,10 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     }
 
     @Override
+    public Map<String, VariantRule> getAllUserParamRules() {
+        return Collections.unmodifiableMap(userParamRules);
+    }
+
     public DataQuery renderQuery(Map<String, Variant> userParams) {
         if (scheme == null) {
             throw new IllegalStateException("Query scheme not set.");

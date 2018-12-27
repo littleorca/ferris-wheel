@@ -1,8 +1,34 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Ctrip.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.variant.ErrorCode;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -228,7 +254,7 @@ public abstract class Value implements Variant {
 
     @Override
     public ErrorCode errorValue() {
-        return ErrorCode.OK;
+        return ErrorCodes.OK;
     }
 
     @Override
@@ -545,11 +571,11 @@ public abstract class Value implements Variant {
             switch (type) {
                 case DECIMAL:
                     if (BigDecimal.ZERO.equals(v.decimalValue())) {
-                        return new ErrorValue(ErrorCode.DIV_0);
+                        return new ErrorValue(ErrorCodes.DIV_0);
                     }
                     return new DecimalValue(decimalValue.divide(v.decimalValue(), mathContext));
                 default:
-                    return new ErrorValue(ErrorCode.ILLEGAL_VALUE);
+                    return new ErrorValue(ErrorCodes.ILLEGAL_VALUE);
             }
         }
 
@@ -569,7 +595,7 @@ public abstract class Value implements Variant {
                         return new DecimalValue(Math.pow(decimalValue.doubleValue(), v.doubleValue()));
                     }
                 default:
-                    return new ErrorValue(ErrorCode.ILLEGAL_VALUE);
+                    return new ErrorValue(ErrorCodes.ILLEGAL_VALUE);
             }
         }
 

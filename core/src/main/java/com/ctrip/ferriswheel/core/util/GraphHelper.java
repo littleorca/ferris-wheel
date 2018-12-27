@@ -25,12 +25,15 @@
 
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.asset.AbstractTableAutomaton;
-import com.ctrip.ferriswheel.core.asset.DefaultPivotAutomaton;
-import com.ctrip.ferriswheel.core.asset.ValueNode;
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.QueryAutomaton;
+import com.ctrip.ferriswheel.api.query.QueryTemplate;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.core.asset.*;
 import com.ctrip.ferriswheel.core.formula.CalcChain;
 import com.ctrip.ferriswheel.core.formula.DirectedAcyclicGraph;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +81,7 @@ public class GraphHelper {
         return calcChain;
     }
 
-    public static String graphToDot(Workbook workbook, AssetManager assetManager) {
+    public static String graphToDot(DefaultWorkbook workbook, AssetManager assetManager) {
         return graphToDot(buildGraph(workbook), assetManager);
     }
 
@@ -88,7 +91,7 @@ public class GraphHelper {
             if (asset instanceof Cell) {
                 return id +
                         "\\n" +
-                        References.toFormula(new CellRef((Cell) asset, false, false));
+                        References.toFormula(new CellRef((DefaultCell) asset, false, false));
             }
             if (asset instanceof Table) {
                 return id +
@@ -110,7 +113,7 @@ public class GraphHelper {
             if (asset instanceof Chart) {
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(((Chart) asset).getSheet().getName()) +
+                        EscapeHelper.escape(((DefaultChart) asset).getSheet().getName()) +
                         "#" +
                         EscapeHelper.escape(((Chart) asset).getName());
             }

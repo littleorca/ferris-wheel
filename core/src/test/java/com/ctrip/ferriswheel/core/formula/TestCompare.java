@@ -2,8 +2,8 @@ package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.BinaryElement.*;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -83,6 +83,6 @@ public class TestCompare extends TestCase {
         assertEquals(1, context.getOperands().size());
         Variant ret = context.popOperand();
         assertEquals(VariantType.ERROR, ret.valueType());
-        assertEquals(ErrorCode.ILLEGAL_VALUE, ret.errorValue());
+        assertEquals(ErrorCodes.ILLEGAL_VALUE, ret.errorValue());
     }
 }

@@ -1,10 +1,15 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.action.ExecuteQuery;
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.query.DataProvider;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.table.QueryAutomaton;
+import com.ctrip.ferriswheel.api.table.QuerySolution;
+import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.action.ExecuteQuery;
 import com.ctrip.ferriswheel.core.bean.DefaultDataQuery;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.core.intf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +24,11 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
     private transient Map<String, Variant> parameters;
     private transient DataQuery query;
 
-    DefaultQueryAutomaton(AssetManager assetManager, TableAutomatonInfo.QueryAutomatonInfo automatonInfo) {
+    DefaultQueryAutomaton(AssetManager assetManager, QuerySolution solution) {
         super(assetManager);
-        this.template = new DefaultQueryTemplate(assetManager, automatonInfo.getTemplate());
-        this.parameters = automatonInfo.getParameters() == null ? Collections.emptyMap() : new LinkedHashMap<>(automatonInfo.getParameters());
-        this.query = automatonInfo.getQuery() == null ? null : new DefaultDataQuery(automatonInfo.getQuery());
+        this.template = new DefaultQueryTemplate(assetManager, solution.getTemplate());
+        this.parameters = solution.getParameters() == null ? Collections.emptyMap() : new LinkedHashMap<>(solution.getParameters());
+        this.query = solution.getQuery() == null ? null : new DefaultDataQuery(solution.getQuery());
 
         bindChild(template);
 //        parameters = Collections.emptyMap();

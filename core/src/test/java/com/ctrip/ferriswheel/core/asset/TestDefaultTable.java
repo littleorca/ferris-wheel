@@ -1,8 +1,14 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.query.DataProvider;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.loader.DefaultColumnMeta;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
@@ -339,21 +345,21 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         table.setCellValue(2, 0, new Value.StrValue("boy"));
         table.setCellValue(3, 0, new Value.StrValue("cat"));
 
-        List<ChartData.Series> seriesList = new ArrayList<>(3);
-        seriesList.add(new ChartData.Series(
+        List<DataSeries> seriesList = new ArrayList<>(3);
+        seriesList.add(new ChartData.SeriesImpl(
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$2"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$D$2")));
-        seriesList.add(new ChartData.Series(
+        seriesList.add(new ChartData.SeriesImpl(
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$3"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$D$3")));
-        seriesList.add(new ChartData.Series(
+        seriesList.add(new ChartData.SeriesImpl(
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
 
-        ChartData chartSettings = new ChartData("Line",
+        ChartData chartSettings = new ChartData("foobar", "Line",
                 new DynamicValue("\"Hello Line Chart!\""),
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
                 seriesList);
@@ -466,21 +472,21 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         table.setCellValue(2, 0, new Value.StrValue("boy"));
         table.setCellValue(3, 0, new Value.StrValue("cat"));
 
-        List<ChartData.Series> seriesList = new ArrayList<>(3);
-        seriesList.add(new ChartData.Series(
+        List<DataSeries> seriesList = new ArrayList<>(3);
+        seriesList.add(new ChartData.SeriesImpl(
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$2"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$D$2")));
-        seriesList.add(new ChartData.Series(
+        seriesList.add(new ChartData.SeriesImpl(
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$3"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$D$3")));
-        seriesList.add(new ChartData.Series(
+        seriesList.add(new ChartData.SeriesImpl(
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
 
-        ChartData chartSettings = new ChartData("Line",
+        ChartData chartSettings = new ChartData("foobar","Line",
                 new DynamicValue("\"Hello Line Chart!\""),
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
                 seriesList);
@@ -488,13 +494,13 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         DefaultChart chart = table.getSheet().addChart("testChart", chartSettings);
 
         // update
-        seriesList.get(0).setyValues(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$C$2"));
-        seriesList.get(1).setyValues(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$C$3"));
+        ((ChartData.SeriesImpl)seriesList.get(0)).setyValues(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$C$2"));
+        ((ChartData.SeriesImpl)seriesList.get(1)).setyValues(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$C$3"));
         seriesList.remove(2);
-        seriesList.add(new ChartData.Series(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
+        seriesList.add(new ChartData.SeriesImpl(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$C$4")));
-        table.getSheet().updateChart("testChart", new ChartData("Line",
+        table.getSheet().updateChart("testChart", new ChartData("testChart","Line",
                 new DynamicValue("\"Hello New Line Chart!\""),
                 new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$C$1"),
                 seriesList
@@ -547,9 +553,9 @@ public class TestDefaultTable extends DefaultTableTestSupport {
     }
 
     public void testAutomateWithQuery() {
-        Workbook workbook = new FilingClerk(environment).createWorkbook("test-workbook");
-        Sheet sheet = workbook.addSheet("sheet1");
-        Table table = sheet.addTable("table1");
+        DefaultWorkbook workbook = new FilingClerk(environment).createWorkbook("test-workbook");
+        DefaultSheet sheet = workbook.addSheet("sheet1");
+        DefaultTable table = sheet.addTable("table1");
 
         TableAutomatonInfo.QueryTemplateInfo template = new TableAutomatonInfo.QueryTemplateInfo();
         template.setScheme(FAKE_QUERY_SCHEME);

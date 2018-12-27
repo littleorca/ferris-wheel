@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.intf.Environment;
-import com.ctrip.ferriswheel.core.intf.Workbook;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Workbook;
 
 import java.util.function.Consumer;
 
@@ -15,7 +15,7 @@ public class FilingClerk {
         this.environment = environment;
     }
 
-    public Workbook createWorkbook(String name) {
+    public DefaultWorkbook createWorkbook(String name) {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
 //        workbook.setName(name);
         return workbook;

@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.util.Map;
 

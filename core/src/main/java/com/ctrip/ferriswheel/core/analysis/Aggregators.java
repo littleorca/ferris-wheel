@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.analysis;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.AggregateType;
-import com.ctrip.ferriswheel.core.intf.Aggregator;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.table.AggregateType;
+import com.ctrip.ferriswheel.api.table.Aggregator;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -114,7 +114,7 @@ public abstract class Aggregators implements Aggregator {
         }
 
         protected Variant calcResult() {
-            return count == 0 ? Value.err(ErrorCode.DIV_0)
+            return count == 0 ? Value.err(ErrorCodes.DIV_0)
                     : Value.dec(summary.divide(new BigDecimal(count), DEFAULT_MC));
         }
     }
@@ -250,7 +250,7 @@ public abstract class Aggregators implements Aggregator {
             if (values.isEmpty()) {
                 return Value.BLANK;
             } else if (values.size() == 1) {
-                return Value.err(ErrorCode.DIV_0);
+                return Value.err(ErrorCodes.DIV_0);
             }
             BigDecimal tmp = new BigDecimal(0);
             for (BigDecimal value : values) {

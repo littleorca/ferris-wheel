@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.loader;
 
-import com.ctrip.ferriswheel.core.intf.DataProvider;
-import com.ctrip.ferriswheel.core.intf.DataQuery;
-import com.ctrip.ferriswheel.core.intf.ProviderManager;
+import com.ctrip.ferriswheel.api.query.DataProvider;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.ProviderManager;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 

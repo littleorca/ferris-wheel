@@ -1,8 +1,10 @@
 package com.ctrip.ferriswheel.core.bean;
 
+import com.ctrip.ferriswheel.api.table.DryCellData;
+
 import java.io.Serializable;
 
-public class CellData implements Serializable {
+public class CellData implements DryCellData, Serializable {
     private int index;
     private DynamicValue value;
 
@@ -14,6 +16,7 @@ public class CellData implements Serializable {
         this.value = value;
     }
 
+    @Override
     public int getIndex() {
         return index;
     }
@@ -22,6 +25,7 @@ public class CellData implements Serializable {
         this.index = index;
     }
 
+    @Override
     public DynamicValue getValue() {
         return value;
     }

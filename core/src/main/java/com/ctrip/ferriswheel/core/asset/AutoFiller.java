@@ -1,10 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.formula.FormulaElement;
-import com.ctrip.ferriswheel.core.formula.FormulaParser;
-import com.ctrip.ferriswheel.core.intf.Cell;
-import com.ctrip.ferriswheel.core.intf.Table;
-import com.ctrip.ferriswheel.core.intf.Workbook;
+import com.ctrip.ferriswheel.api.Workbook;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.FormulaParser;
 import com.ctrip.ferriswheel.core.util.AreaPatternAnalyzer;
@@ -174,7 +172,8 @@ public class AutoFiller {
 
                 } else {
                     table.setCellFormula(rowIndex, colIndex, null);
-                    table.setCellValue(rowIndex, colIndex, cell == null ? null : cell.getValue());
+                    table.setCellValue(rowIndex, colIndex, cell == null ? null :
+                            cell instanceof DefaultCell ? ((DefaultCell) cell).getValue() : cell);
                 }
             }
         }

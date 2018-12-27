@@ -3,10 +3,10 @@ package com.ctrip.ferriswheel.core.util;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.Environment;
-import com.ctrip.ferriswheel.core.intf.Table;
-import com.ctrip.ferriswheel.core.intf.Workbook;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.Workbook;
 import com.ctrip.ferriswheel.core.view.Rectangle;
 import junit.framework.TestCase;
 
@@ -69,7 +69,7 @@ public class TestTableScout extends TestCase {
         Table table = workbook.addSheet("sheet1").addTable("table1");
         initTable33WithLables(table);
         table.eraseCell(1, 2);
-        table.setCellValue(2, 1, Value.err(ErrorCode.DIV_0));
+        table.setCellValue(2, 1, Value.err(ErrorCodes.DIV_0));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(1, 2)));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(2, 1)));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(2, 2)));
@@ -80,7 +80,7 @@ public class TestTableScout extends TestCase {
         Table table = workbook.addSheet("sheet1").addTable("table1");
         initTable33WithLables(table);
         table.eraseCell(1, 2);
-        table.setCellValue(2, 1, Value.err(ErrorCode.DIV_0));
+        table.setCellValue(2, 1, Value.err(ErrorCodes.DIV_0));
         assertTrue(TableScout.isDecimalCompatible(table, 1, 1, 4, 4));
         assertFalse(TableScout.isDecimalCompatible(table, 0, 0, 3, 3));
     }

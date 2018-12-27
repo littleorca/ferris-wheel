@@ -1,22 +1,21 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.table.*;
+import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.core.bean.ColumnHeader;
-import com.ctrip.ferriswheel.core.bean.RowHeader;
-import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.Formula;
-import com.ctrip.ferriswheel.core.intf.*;
 import com.ctrip.ferriswheel.core.util.References;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
-import com.ctrip.ferriswheel.core.view.Layout;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import com.ctrip.ferriswheel.core.view.Rectangle;
 import com.ctrip.ferriswheel.core.view.TableLayout;
 
 import java.util.*;
 import java.util.concurrent.Callable;
 
-class DefaultTable extends NamedAssetNode implements Table {
+public class DefaultTable extends SheetAssetNode implements Table {
     static final int MAX_ROWS = 65535;
     static final int MAX_COLUMNS = 255;
 
@@ -444,7 +443,7 @@ class DefaultTable extends NamedAssetNode implements Table {
     }
 
     @Override
-    public void automate(TableAutomatonInfo solution) {
+    public void automate(AutomateSolution solution) {
         handleAction(new AutomateTable(getSheet().getName(), getName(), solution));
     }
 
@@ -455,28 +454,28 @@ class DefaultTable extends NamedAssetNode implements Table {
                 row.setEphemeral(true);
                 for (Cell cell : row) {
                     ((DefaultCell) cell).setEphemeral(true);
-                    cell.getDependents().forEach(d -> ((AssetNode) d).addDependency(this));
+                    ((DefaultCell) cell).getDependents().forEach(d -> d.addDependency(this));
                 }
             }
             getWorkbook().onTableAutomated(this);
         });
     }
 
-    private TableAutomaton createAndRegisterAutomaton(TableAutomatonInfo solution) {
+    private TableAutomaton createAndRegisterAutomaton(AutomateSolution solution) {
         if (this.automaton != null) {
             unbindChild((AssetNode) this.automaton);
         }
 
-        if (solution instanceof TableAutomatonInfo.QueryAutomatonInfo) {
+        if (solution instanceof QuerySolution) {
             DefaultQueryAutomaton queryAutomaton = new DefaultQueryAutomaton(getAssetManager(),
-                    (TableAutomatonInfo.QueryAutomatonInfo) solution);
+                    (QuerySolution) solution);
             bindChild(queryAutomaton);
             this.automaton = queryAutomaton;
             return queryAutomaton;
 
-        } else if (solution instanceof TableAutomatonInfo.PivotAutomatonInfo) {
+        } else if (solution instanceof PivotSolution) {
             DefaultPivotAutomaton pivotAutomaton = new DefaultPivotAutomaton(getAssetManager(),
-                    (TableAutomatonInfo.PivotAutomatonInfo) solution);
+                    (PivotSolution) solution);
             bindChild(pivotAutomaton);
             this.automaton = pivotAutomaton;
             return pivotAutomaton;
@@ -635,22 +634,12 @@ class DefaultTable extends NamedAssetNode implements Table {
     }
 
     @Override
-    public RowHeader getRowHeader(int rowIndex) {
-        return null;//TODO
-    }
-
-    @Override
-    public ColumnHeader getColumnHeader(int columnIndex) {
-        return null;//TODO
-    }
-
-    @Override
     public Iterator<Row> iterator() {
         return new UnmodifiableIterator(rows.iterator());
     }
 
     @Override
-    public Layout getLayout() {
+    public LayoutImpl getLayout() {
         return layout;
     }
 

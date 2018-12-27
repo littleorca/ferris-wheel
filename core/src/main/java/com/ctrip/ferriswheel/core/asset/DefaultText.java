@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.view.Layout;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Text;
+import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.core.view.TextLayout;
 
-public class DefaultText extends NamedAssetNode implements Text {
+public class DefaultText extends SheetAssetNode implements Text {
     private final TextLayout layout = new TextLayout();
     private final ValueNode content;
 
@@ -18,7 +18,7 @@ public class DefaultText extends NamedAssetNode implements Text {
     }
 
     @Override
-    public Layout getLayout() {
+    public LayoutImpl getLayout() {
         return layout;
     }
 

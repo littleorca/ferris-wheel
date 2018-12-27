@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.ref;
 
-import com.ctrip.ferriswheel.core.intf.Asset;
-import com.ctrip.ferriswheel.core.intf.Cell;
+import com.ctrip.ferriswheel.core.asset.Asset;
+import com.ctrip.ferriswheel.core.asset.DefaultCell;
 
 import java.io.Serializable;
 
@@ -14,7 +14,7 @@ public class CellRef extends PositionRef implements Serializable {
     public CellRef() {
     }
 
-    public CellRef(Cell cell, boolean isRowAbsolute, boolean isColumnAbsolute) {
+    public CellRef(DefaultCell cell, boolean isRowAbsolute, boolean isColumnAbsolute) {
         this(cell.getRow().getTable().getSheet().getName(),
                 cell.getRow().getTable().getName(),
                 cell.getRowIndex(),

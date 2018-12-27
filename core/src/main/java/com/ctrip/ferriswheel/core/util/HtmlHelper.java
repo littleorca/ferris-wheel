@@ -1,7 +1,15 @@
 package com.ctrip.ferriswheel.core.util;
 
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.core.asset.DefaultSheet;
+import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +23,7 @@ public class HtmlHelper {
 
     private Function<Chart, String> chartRenderer;
 
-    public String workbookToHtml(Workbook workbook, Option... options) {
+    public String workbookToHtml(DefaultWorkbook workbook, Option... options) {
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html>\n<html>\n<head>\n" +
                 "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n" +
@@ -30,9 +38,9 @@ public class HtmlHelper {
         html.append("\n<div id=\"sheet-list\">\n");
         for (Sheet sheet : workbook) {
             html.append("\n<section id=\"sheet-")
-                    .append(sheet.getAssetId())
+                    .append(((DefaultSheet) sheet).getAssetId())
                     .append("\" class=\"sheet-section\">\n<h2><a href=\"#sheet-")
-                    .append(sheet.getAssetId())
+                    .append(((DefaultSheet) sheet).getAssetId())
                     .append("\">")
                     .append(escapeHtml(sheet.getName()))
                     .append("</a></h2>\n<div class=\"sheet-content\">\n");
@@ -49,7 +57,7 @@ public class HtmlHelper {
     }
 
     public StringBuilder sheetToHtml(StringBuilder html, Sheet sheet, Option... options) {
-        for (NamedAsset asset : sheet) {
+        for (SheetAsset asset : sheet) {
             if (asset instanceof Table) {
                 tableToHtml(html, (Table) asset);
             } else if (asset instanceof Chart) {
@@ -91,9 +99,7 @@ public class HtmlHelper {
                 String info = "";
                 Cell cell = columnIndex < row.size() ? row.getCell(columnIndex) : null;
                 if (cell != null) {
-                    if (cell.getValue() != null) {
-                        type = cell.getValue().getClass().getSimpleName();
-                    }
+                    type = cell.valueType().toString();
                     value = escapeHtml(cell.strValue());
                     if (cell.isFormula()) {
                         info = cell.getFormulaString();

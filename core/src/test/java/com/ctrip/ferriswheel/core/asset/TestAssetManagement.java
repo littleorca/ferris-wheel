@@ -1,8 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.api.table.TableAutomaton;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.intf.*;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -176,15 +179,15 @@ public class TestAssetManagement extends TestCase {
         t1.setCellValue(2, 2, new Value.DecimalValue("1.1"));
         checkAssetMap(wb);
 
-        DefaultChart chart = s1.addChart("chart1", new ChartData("Line",
+        DefaultChart chart = s1.addChart("chart1", new ChartData("chart1", "Line",
                 new DynamicValue("\"Chart Title 1\""),
                 new DynamicValue("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!$A$2"),
                                 null,
                                 new DynamicValue("sheet1!table1!$B$2:$C$2")),
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!$A$3"),
                                 null,
                                 new DynamicValue("sheet1!table1!$B$3:$C$3"))
@@ -194,15 +197,15 @@ public class TestAssetManagement extends TestCase {
         chart.addSeries(new DynamicValue("sheet1!table1!$A$4"), null, new DynamicValue("sheet1!table1!$B$4:$C$4"));
         checkAssetMap(wb);
 
-        s1.addChart("chart2", new ChartData("Line",
+        s1.addChart("chart2", new ChartData("chart2","Line",
                 new DynamicValue("\"Chart Title 2\""),
                 new DynamicValue("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!$A$2"),
                                 new DynamicValue("sheet1!table1!$B$2:$C$2"),
                                 null),
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!$A$3"),
                                 new DynamicValue("sheet1!table1!$B$3:$C$3"),
                                 null)
@@ -210,15 +213,15 @@ public class TestAssetManagement extends TestCase {
         checkAssetMap(wb);
 
         // test update chart
-        s1.updateChart("chart2", new ChartData("Line",
+        s1.updateChart("chart2", new ChartData("chart2", "Line",
                 new DynamicValue("\"Chart New Title 2\""),
                 new DynamicValue("sheet1!table1!$B$1:$D$1"),
                 Arrays.asList(
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!$A$2"),
                                 new DynamicValue("sheet1!table1!$B$2:$D$2"),
                                 null),
-                        new ChartData.Series(
+                        new ChartData.SeriesImpl(
                                 new DynamicValue("sheet1!table1!$A$3"),
                                 new DynamicValue("sheet1!table1!$B$3:$D$3"),
                                 null)
@@ -251,7 +254,7 @@ public class TestAssetManagement extends TestCase {
 
     void checkAssetMap(Map<Long, DefaultAssetManager.AssetReference> assetMap,
                        Set<Long> pendingAssetIds, DefaultSheet sheet) {
-        for (NamedAsset asset : sheet) {
+        for (SheetAsset asset : sheet) {
             if (asset == null) {
                 continue;
             }
@@ -278,16 +281,16 @@ public class TestAssetManagement extends TestCase {
                 continue;
             }
             assertEquals(table, row.getTable());
-            assertTrue(pendingAssetIds.remove(row.getAssetId()));
-            assertEquals(1, assetMap.get(row.getAssetId()).referenceCount.get());
+            assertTrue(pendingAssetIds.remove(((DefaultRow) row).getAssetId()));
+            assertEquals(1, assetMap.get(((DefaultRow) row).getAssetId()).referenceCount.get());
             checkAssetMap(assetMap, pendingAssetIds, row);
         }
 
         TableAutomaton automaton = table.getAutomaton();
         if (automaton != null) {
             assertEquals(table, ((AssetNode) automaton).getParent());
-            assertTrue(pendingAssetIds.remove(automaton.getAssetId()));
-            assertEquals(1, assetMap.get(automaton.getAssetId()).referenceCount.get());
+            assertTrue(pendingAssetIds.remove(((AssetNode) automaton).getAssetId()));
+            assertEquals(1, assetMap.get(((AssetNode) automaton).getAssetId()).referenceCount.get());
             checkAssetMap(assetMap, pendingAssetIds, automaton);
         }
     }
@@ -299,8 +302,8 @@ public class TestAssetManagement extends TestCase {
                 continue;
             }
             assertEquals(row, cell.getRow());
-            assertTrue(pendingAssetIds.remove(cell.getAssetId()));
-            assertEquals(1, assetMap.get(cell.getAssetId()).referenceCount.get());
+            assertTrue(pendingAssetIds.remove(((DefaultCell)cell).getAssetId()));
+            assertEquals(1, assetMap.get(((DefaultCell)cell).getAssetId()).referenceCount.get());
         }
     }
 

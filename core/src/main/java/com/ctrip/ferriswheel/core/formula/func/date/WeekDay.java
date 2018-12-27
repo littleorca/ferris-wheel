@@ -4,7 +4,7 @@ import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.func.Function;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.util.Calendar;
 

@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.action;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Action;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 public abstract class CellAction extends TableAction implements Action {
     private int rowIndex;

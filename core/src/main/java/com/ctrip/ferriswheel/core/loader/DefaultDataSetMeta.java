@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.loader;
 
-import com.ctrip.ferriswheel.core.intf.DataSet;
+import com.ctrip.ferriswheel.api.query.DataSet;
 
 public class DefaultDataSetMeta implements DataSet.SetMeta {
     private final boolean hasRowMeta;

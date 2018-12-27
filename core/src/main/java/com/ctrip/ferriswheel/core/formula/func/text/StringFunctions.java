@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.formula.func.text;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.func.Function;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 public abstract class StringFunctions implements Function {
     /**
@@ -33,7 +33,7 @@ public abstract class StringFunctions implements Function {
             int start = startNum.intValue();
             int num = numChars.intValue();
             if (start < 1 || num < 0) {
-                context.pushOperand(Value.err(ErrorCode.ILLEGAL_VALUE));
+                context.pushOperand(Value.err(ErrorCodes.ILLEGAL_VALUE));
                 return;
             }
             if (start > str.length() || num == 0) {

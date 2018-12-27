@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.loader;
 
-import com.ctrip.ferriswheel.core.intf.DataSet;
-import com.ctrip.ferriswheel.core.intf.Variant;
+import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.util.Iterator;
 import java.util.List;

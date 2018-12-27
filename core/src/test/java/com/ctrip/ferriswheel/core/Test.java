@@ -4,8 +4,8 @@ import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Table;
-import com.ctrip.ferriswheel.core.intf.Workbook;
+import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.Workbook;
 import com.ctrip.ferriswheel.core.util.ChartConsultantHelper;
 
 import java.net.MalformedURLException;

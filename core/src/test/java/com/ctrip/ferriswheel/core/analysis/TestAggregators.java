@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.core.analysis;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.AggregateType;
-import com.ctrip.ferriswheel.core.intf.Aggregator;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.api.table.AggregateType;
+import com.ctrip.ferriswheel.api.table.Aggregator;
 import junit.framework.TestCase;
 
 public class TestAggregators extends TestCase {
@@ -41,7 +41,7 @@ public class TestAggregators extends TestCase {
         Aggregator agg = Aggregators.create(AggregateType.AVERAGE);
         assertTrue(agg instanceof Aggregators.AverageAggregator);
         assertTrue(AggregateType.AVERAGE.equals(agg.getType()));
-        assertEquals(Value.err(ErrorCode.DIV_0), agg.getResult());
+        assertEquals(Value.err(ErrorCodes.DIV_0), agg.getResult());
         agg.feed(Value.dec(10));
         assertEquals(Value.dec(10), agg.getResult());
         agg.feed(Value.dec(15));
@@ -128,7 +128,7 @@ public class TestAggregators extends TestCase {
         assertTrue(AggregateType.STANDARD_DEVIATION.equals(agg.getType()));
         assertEquals(Value.BLANK, agg.getResult());
         agg.feed(Value.dec(2));
-        assertEquals(Value.err(ErrorCode.DIV_0), agg.getResult());
+        assertEquals(Value.err(ErrorCodes.DIV_0), agg.getResult());
         agg.feed(Value.dec(3));
         assertEquals(0.707106781, agg.getResult().decimalValue().doubleValue(), 0.000000001);
         agg.feed(Value.dec(5));
@@ -148,7 +148,7 @@ public class TestAggregators extends TestCase {
         assertTrue(AggregateType.VARIANCE.equals(agg.getType()));
         assertEquals(Value.BLANK, agg.getResult());
         agg.feed(Value.dec(2));
-        assertEquals(Value.err(ErrorCode.DIV_0), agg.getResult());
+        assertEquals(Value.err(ErrorCodes.DIV_0), agg.getResult());
         agg.feed(Value.dec(3));
         assertEquals(0.5, agg.getResult().decimalValue().doubleValue(), 0.000000001);
         agg.feed(Value.dec(5));

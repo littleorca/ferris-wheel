@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.formula.func.date;
 
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import com.ctrip.ferriswheel.core.formula.FakeEvalContext;
-import com.ctrip.ferriswheel.core.intf.Variant;
-import com.ctrip.ferriswheel.core.intf.VariantType;
+import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.variant.VariantType;
 import junit.framework.TestCase;
 
 import java.util.Calendar;
@@ -47,7 +47,7 @@ public class TestDateParser extends TestCase {
         dv.evaluate(null, context);
         ret = context.getOperands().pop();
         assertEquals(VariantType.ERROR, ret.valueType());
-        assertEquals(ErrorCode.ILLEGAL_VALUE, ret.errorValue());
+        assertEquals(ErrorCodes.ILLEGAL_VALUE, ret.errorValue());
     }
 
     public void testTimeValue() {
@@ -86,6 +86,6 @@ public class TestDateParser extends TestCase {
         tv.evaluate(null, context);
         ret = context.getOperands().pop();
         assertEquals(VariantType.ERROR, ret.valueType());
-        assertEquals(ErrorCode.ILLEGAL_VALUE, ret.errorValue());
+        assertEquals(ErrorCodes.ILLEGAL_VALUE, ret.errorValue());
     }
 }

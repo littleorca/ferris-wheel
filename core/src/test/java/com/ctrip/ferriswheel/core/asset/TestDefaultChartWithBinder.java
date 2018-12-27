@@ -3,12 +3,11 @@ package com.ctrip.ferriswheel.core.asset;
 import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
 import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.intf.Environment;
-import com.ctrip.ferriswheel.core.intf.Orientation;
-import com.ctrip.ferriswheel.core.intf.Placement;
-import com.ctrip.ferriswheel.core.view.Layout;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.view.Orientation;
+import com.ctrip.ferriswheel.api.view.Placement;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -39,19 +38,19 @@ public class TestDefaultChartWithBinder extends TestCase {
         DefaultTable t1 = table;
 
         DefaultChart c1 = s1.addChart("c1", new ChartData(
-                "Line",
+                "c1", "Line",
                 new DynamicValue(Value.str("Chart 1")),
                 new DynamicValue("t1!B1:C1"),
                 Arrays.asList(
-                        new ChartData.Series(new DynamicValue("t1!A2"),
+                        new ChartData.SeriesImpl(new DynamicValue("t1!A2"),
                                 null,
                                 new DynamicValue("t1!B2:C2")),
-                        new ChartData.Series(new DynamicValue("t1!A3"),
+                        new ChartData.SeriesImpl(new DynamicValue("t1!A3"),
                                 null,
                                 new DynamicValue("t1!B3:C3"))
                 ),
-                new Layout(),
-                new ChartData.Binder(
+                new LayoutImpl(),
+                new ChartData.BinderImpl(
                         new DynamicValue("t1!A:C"),
                         Orientation.HORIZONTAL,
                         Placement.TOP,
@@ -63,12 +62,12 @@ public class TestDefaultChartWithBinder extends TestCase {
         ));
 
         DefaultChart c2 = s1.addChart("c2", new ChartData(
-                "Line",
+                "c2", "Line",
                 new DynamicValue(Value.str("Chart 2")),
                 new DynamicValue(Value.BLANK),
                 Arrays.asList(),
-                new Layout(),
-                new ChartData.Binder(
+                new LayoutImpl(),
+                new ChartData.BinderImpl(
                         new DynamicValue("t1!A:C"),
                         Orientation.VERTICAL,
                         Placement.LEFT,
@@ -138,19 +137,19 @@ public class TestDefaultChartWithBinder extends TestCase {
         DefaultTable t1 = table;
 
         DefaultChart c1 = s1.addChart("c1", new ChartData(
-                "Line",
+                "c1","Line",
                 new DynamicValue(Value.str("Chart 1")),
                 new DynamicValue("t1!B1:C1"),
                 Arrays.asList(
-                        new ChartData.Series(new DynamicValue("t1!A2"),
+                        new ChartData.SeriesImpl(new DynamicValue("t1!A2"),
                                 null,
                                 new DynamicValue("t1!B2:C2")),
-                        new ChartData.Series(new DynamicValue("t1!A3"),
+                        new ChartData.SeriesImpl(new DynamicValue("t1!A3"),
                                 null,
                                 new DynamicValue("t1!B3:C3"))
                 ),
-                new Layout(),
-                new ChartData.Binder(
+                new LayoutImpl(),
+                new ChartData.BinderImpl(
                         new DynamicValue("t1!1:3"),
                         Orientation.HORIZONTAL,
                         Placement.TOP,
@@ -162,12 +161,12 @@ public class TestDefaultChartWithBinder extends TestCase {
         ));
 
         DefaultChart c2 = s1.addChart("c2", new ChartData(
-                "Line",
+                "c2","Line",
                 new DynamicValue(Value.str("Chart 2")),
                 new DynamicValue(Value.BLANK),
                 Arrays.asList(),
-                new Layout(),
-                new ChartData.Binder(
+                new LayoutImpl(),
+                new ChartData.BinderImpl(
                         new DynamicValue("t1!1:3"),
                         Orientation.VERTICAL,
                         Placement.LEFT,

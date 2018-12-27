@@ -1,15 +1,20 @@
 package com.ctrip.ferriswheel.proto.util;
 
+import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.chart.*;
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.query.QueryTemplate;
+import com.ctrip.ferriswheel.api.table.*;
+import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.api.variant.*;
+import com.ctrip.ferriswheel.api.view.*;
 import com.ctrip.ferriswheel.core.asset.DefaultPivotAutomaton;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.formula.ErrorCode;
-import com.ctrip.ferriswheel.core.intf.*;
-import com.ctrip.ferriswheel.core.util.SparseArray;
-import com.ctrip.ferriswheel.core.view.Layout;
-import com.ctrip.ferriswheel.proto.v1.Grid;
-import com.ctrip.ferriswheel.proto.v1.PivotAutomaton;
+import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.core.util.TreeSparseArray;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import com.google.protobuf.Timestamp;
 
 import java.math.BigDecimal;
@@ -45,7 +50,7 @@ public class PbHelper {
                 .setName(sheet.getName())
                 .setLayout(pb(sheet.getLayout()));
 
-        for (NamedAsset asset : sheet) {
+        for (SheetAsset asset : sheet) {
             if (asset instanceof Table) {
                 builder.addAssets(pb((Table) asset));
             } else if (asset instanceof Chart) {
@@ -61,7 +66,7 @@ public class PbHelper {
 
     static Sheet bean(Sheet sheet, com.ctrip.ferriswheel.proto.v1.Sheet sheetProto) {
         if (sheetProto.hasLayout()) {
-            fillBeanFromProto(sheet.getLayout(), sheetProto.getLayout());
+            fillBeanFromProto((LayoutImpl) sheet.getLayout(), sheetProto.getLayout());
         }
         for (int i = 0; i < sheetProto.getAssetsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.SheetAsset asset = sheetProto.getAssets(i);
@@ -87,15 +92,15 @@ public class PbHelper {
     public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(String tableName, TableData tableData) {
         com.ctrip.ferriswheel.proto.v1.Table.Builder builder = com.ctrip.ferriswheel.proto.v1.Table.newBuilder();
         builder.setName(tableName);
-        for (RowData row : tableData.getRows().values()) {
+        for (DryRowData row : tableData.getRows().values()) {
             builder.addRows(pb(row));
         }
-        if (tableData.getAutomatonInfo() != null) {
+        if (tableData.getAutomatonSolution() != null) {
             com.ctrip.ferriswheel.proto.v1.TableAutomaton.Builder auto = com.ctrip.ferriswheel.proto.v1.TableAutomaton.newBuilder();
-            if (tableData.getAutomatonInfo() instanceof TableAutomatonInfo.QueryAutomatonInfo) {
-                auto.setQueryAutomaton(pb((TableAutomatonInfo.QueryAutomatonInfo) tableData.getAutomatonInfo()));
-            } else if (tableData.getAutomatonInfo() instanceof TableAutomatonInfo.PivotAutomatonInfo) {
-                auto.setPivotAutomaton(pb((TableAutomatonInfo.PivotAutomatonInfo) tableData.getAutomatonInfo()));
+            if (tableData.getAutomatonSolution() instanceof TableAutomatonInfo.QueryAutomatonInfo) {
+                auto.setQueryAutomaton(pb((TableAutomatonInfo.QueryAutomatonInfo) tableData.getAutomatonSolution()));
+            } else if (tableData.getAutomatonSolution() instanceof TableAutomatonInfo.PivotAutomatonInfo) {
+                auto.setPivotAutomaton(pb((TableAutomatonInfo.PivotAutomatonInfo) tableData.getAutomatonSolution()));
             } else {
                 throw new RuntimeException();
             }
@@ -107,7 +112,7 @@ public class PbHelper {
 
     public static TableData bean(com.ctrip.ferriswheel.proto.v1.Table proto) {
         TableData table = new TableData();
-        SparseArray<RowData> rows = new SparseArray<>();
+        TreeSparseArray<DryRowData> rows = new TreeSparseArray<>();
         for (int i = 0; i < proto.getRowsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Row rowProto = proto.getRows(i);
             rows.set(rowProto.getRowIndex(), bean(rowProto));
@@ -117,22 +122,22 @@ public class PbHelper {
             com.ctrip.ferriswheel.proto.v1.TableAutomaton automatonProto = proto.getAutomaton();
             if (automatonProto.getAutomatonCase() != com.ctrip.ferriswheel.proto.v1.TableAutomaton.AutomatonCase.AUTOMATON_NOT_SET) {
                 TableAutomatonInfo automaton = bean(automatonProto);
-                table.setAutomatonInfo(automaton);
+                table.setAutomatonSolution(automaton);
             }
         }
         if (proto.hasLayout()) {
             if (table.getLayout() == null) {
-                table.setLayout(new Layout());
+                table.setLayout(new LayoutImpl());
             }
-            fillBeanFromProto(table.getLayout(), proto.getLayout());
+            fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
         }
         return table;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Row pb(RowData bean) {
+    public static com.ctrip.ferriswheel.proto.v1.Row pb(DryRowData bean) {
         com.ctrip.ferriswheel.proto.v1.Row.Builder builder = com.ctrip.ferriswheel.proto.v1.Row.newBuilder();
         builder.setRowIndex(bean.getIndex());
-        for (CellData cell : bean.getCells().values()) {
+        for (DryCellData cell : bean.getCells().values()) {
             builder.addCells(pb(cell));
         }
         return builder.build();
@@ -141,7 +146,7 @@ public class PbHelper {
     public static RowData bean(com.ctrip.ferriswheel.proto.v1.Row proto) {
         RowData bean = new RowData();
         bean.setIndex(proto.getRowIndex());
-        SparseArray<CellData> cells = new SparseArray<>();
+        TreeSparseArray<DryCellData> cells = new TreeSparseArray<>();
         for (int i = 0; i < proto.getCellsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Cell c = proto.getCells(i);
             cells.set(c.getColumnIndex(), bean(c));
@@ -150,7 +155,7 @@ public class PbHelper {
         return bean;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Cell pb(CellData bean) {
+    public static com.ctrip.ferriswheel.proto.v1.Cell pb(DryCellData bean) {
         return com.ctrip.ferriswheel.proto.v1.Cell.newBuilder()
                 .setColumnIndex(bean.getIndex())
                 .setValue(pb(bean.getValue()))
@@ -200,7 +205,7 @@ public class PbHelper {
             table.automate(automaton);
         }
         if (proto.hasLayout()) {
-            fillBeanFromProto(table.getLayout(), proto.getLayout());
+            fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
         }
         return table;
     }
@@ -247,7 +252,7 @@ public class PbHelper {
         }
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.QueryAutomaton pb(TableAutomatonInfo.QueryAutomatonInfo automatonInfo) {
+    public static com.ctrip.ferriswheel.proto.v1.QueryAutomaton pb(QuerySolution automatonInfo) {
         com.ctrip.ferriswheel.proto.v1.QueryAutomaton.Builder builder = com.ctrip.ferriswheel.proto.v1.QueryAutomaton.newBuilder()
                 .setTemplate(pb(automatonInfo.getTemplate()));
         if (automatonInfo.getParameters() != null) {
@@ -273,18 +278,18 @@ public class PbHelper {
         return new TableAutomatonInfo.QueryAutomatonInfo(template, parameters, query);
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.QueryTemplate pb(TableAutomatonInfo.QueryTemplateInfo templateInfo) {
+    public static com.ctrip.ferriswheel.proto.v1.QueryTemplate pb(QueryTemplate templateInfo) {
         com.ctrip.ferriswheel.proto.v1.QueryTemplate.Builder builder = com.ctrip.ferriswheel.proto.v1.QueryTemplate.newBuilder();
         if (templateInfo.getScheme() != null) {
             builder.setScheme(templateInfo.getScheme());
         }
-        for (Map.Entry<String, DynamicVariant> entry : templateInfo.getBuiltinParams().entrySet()) {
+        for (Map.Entry<String, DynamicVariant> entry : templateInfo.getAllBuiltinParams().entrySet()) {
             DynamicVariant param = entry.getValue();
             builder.addBuiltinParams(com.ctrip.ferriswheel.proto.v1.NamedValue.newBuilder()
                     .setName(entry.getKey())
                     .setValue(pb(param)));
         }
-        for (Map.Entry<String, VariantRule> entry : templateInfo.getUserParamRules().entrySet()) {
+        for (Map.Entry<String, VariantRule> entry : templateInfo.getAllUserParamRules().entrySet()) {
             VariantRule rule = entry.getValue();
             com.ctrip.ferriswheel.proto.v1.ParamRule.Builder ruleBuilder = com.ctrip.ferriswheel.proto.v1.ParamRule.newBuilder()
                     .setName(entry.getKey())
@@ -315,13 +320,13 @@ public class PbHelper {
         return new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams, userParamRules);
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.DataQuery pb(TableAutomatonInfo.QueryInfo queryInfo) {
+    public static com.ctrip.ferriswheel.proto.v1.DataQuery pb(DataQuery queryInfo) {
         com.ctrip.ferriswheel.proto.v1.DataQuery.Builder builder = com.ctrip.ferriswheel.proto.v1.DataQuery.newBuilder();
         if (queryInfo.getScheme() != null) {
             builder.setScheme(queryInfo.getScheme());
         }
-        if (queryInfo.getParameters() != null) {
-            for (Map.Entry<String, Variant> entry : queryInfo.getParameters().entrySet()) {
+        if (queryInfo.getAllParams() != null) {
+            for (Map.Entry<String, Variant> entry : queryInfo.getAllParams().entrySet()) {
                 builder.addParams(com.ctrip.ferriswheel.proto.v1.NamedValue.newBuilder()
                         .setName(entry.getKey()).setValue(pb(entry.getValue())));
             }
@@ -337,8 +342,8 @@ public class PbHelper {
         return new TableAutomatonInfo.QueryInfo(queryProto.getScheme(), parameters);
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.PivotAutomaton pb(TableAutomatonInfo.PivotAutomatonInfo pivot) {
-        PivotAutomaton.Builder pb = PivotAutomaton.newBuilder()
+    public static com.ctrip.ferriswheel.proto.v1.PivotAutomaton pb(PivotSolution pivot) {
+        com.ctrip.ferriswheel.proto.v1.PivotAutomaton.Builder pb = com.ctrip.ferriswheel.proto.v1.PivotAutomaton.newBuilder()
                 .setData(pb(pivot.getData()));
         if (pivot.getFilters() != null) {
             for (PivotFilter filter : pivot.getFilters()) {
@@ -388,8 +393,8 @@ public class PbHelper {
                 .build();
     }
 
-    public static PivotFilter bean(com.ctrip.ferriswheel.proto.v1.PivotFilter pb) {
-        return new PivotFilter(); // TODO
+    public static PivotFilterImpl bean(com.ctrip.ferriswheel.proto.v1.PivotFilter pb) {
+        return new PivotFilterImpl(); // TODO
     }
 
     public static com.ctrip.ferriswheel.proto.v1.PivotField pb(PivotField bean) {
@@ -398,8 +403,8 @@ public class PbHelper {
                 .build();
     }
 
-    public static PivotField bean(com.ctrip.ferriswheel.proto.v1.PivotField pb) {
-        return new PivotField(pb.getField());
+    public static PivotFieldImpl bean(com.ctrip.ferriswheel.proto.v1.PivotField pb) {
+        return new PivotFieldImpl(pb.getField());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.PivotValue pb(PivotValue bean) {
@@ -410,8 +415,8 @@ public class PbHelper {
                 .build();
     }
 
-    public static PivotValue bean(com.ctrip.ferriswheel.proto.v1.PivotValue pb) {
-        return new PivotValue(pb.getField(), bean(pb.getAggregateType()), pb.getLabel());
+    public static PivotValueImpl bean(com.ctrip.ferriswheel.proto.v1.PivotValue pb) {
+        return new PivotValueImpl(pb.getField(), bean(pb.getAggregateType()), pb.getLabel());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.AggregateType pb(AggregateType bean) {
@@ -631,7 +636,8 @@ public class PbHelper {
         }
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.ErrorCode pb(ErrorCode errorCode) {
+    public static com.ctrip.ferriswheel.proto.v1.ErrorCode pb(ErrorCode error) {
+        ErrorCodes errorCode = (ErrorCodes) error;
         switch (errorCode) {
             case OK:
                 return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_OK;
@@ -648,20 +654,20 @@ public class PbHelper {
         }
     }
 
-    public static ErrorCode bean(com.ctrip.ferriswheel.proto.v1.ErrorCode errorCodeProto) {
+    public static ErrorCodes bean(com.ctrip.ferriswheel.proto.v1.ErrorCode errorCodeProto) {
         switch (errorCodeProto) {
             case EC_UNSET:
                 return null;
             case EC_OK:
-                return ErrorCode.OK;
+                return ErrorCodes.OK;
             case EC_UNKNOWN:
-                return ErrorCode.UNKNOWN;
+                return ErrorCodes.UNKNOWN;
             case EC_ILLEGAL_REF:
-                return ErrorCode.ILLEGAL_REF;
+                return ErrorCodes.ILLEGAL_REF;
             case EC_ILLEGAL_VALUE:
-                return ErrorCode.ILLEGAL_VALUE;
+                return ErrorCodes.ILLEGAL_VALUE;
             case EC_DIV_0:
-                return ErrorCode.DIV_0;
+                return ErrorCodes.DIV_0;
             case UNRECOGNIZED:
             default:
                 throw new RuntimeException("Invalid error code(pb): " + errorCodeProto);
@@ -680,7 +686,7 @@ public class PbHelper {
         }
         builder.setLayout(pb(chart.getLayout()));
         if (chart.getBinder() != null) {
-            builder.setBinder(pb(new ChartData.Binder(chart.getBinder())));
+            builder.setBinder(pb(new ChartData.BinderImpl(chart.getBinder())));
         }
         if (chart.getxAxis() != null) {
             builder.setXAxis(pb(chart.getxAxis()));
@@ -703,7 +709,7 @@ public class PbHelper {
         if (pbChart.hasCategories()) {
             chart.setCategories(toDynamicValue(pbChart.getCategories()));
         }
-        List<ChartData.Series> seriesList = new ArrayList<>(pbChart.getSeriesCount());
+        List<DataSeries> seriesList = new ArrayList<>(pbChart.getSeriesCount());
         for (int i = 0; i < pbChart.getSeriesCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Series seriesProto = pbChart.getSeries(i);
             seriesList.add(bean(seriesProto));
@@ -711,7 +717,7 @@ public class PbHelper {
         chart.setSeriesList(seriesList);
         if (pbChart.hasLayout()) {
             if (chart.getLayout() == null) {
-                chart.setLayout(new Layout());
+                chart.setLayout(new LayoutImpl());
             }
             fillBeanFromProto(chart.getLayout(), pbChart.getLayout());
         }
@@ -744,8 +750,8 @@ public class PbHelper {
         return builder.build();
     }
 
-    static ChartData.Series bean(com.ctrip.ferriswheel.proto.v1.Series seriesProto) {
-        ChartData.Series series = new ChartData.Series();
+    static ChartData.SeriesImpl bean(com.ctrip.ferriswheel.proto.v1.Series seriesProto) {
+        ChartData.SeriesImpl series = new ChartData.SeriesImpl();
         if (seriesProto.hasName()) {
             series.setName(toDynamicValue(seriesProto.getName()));
         }
@@ -758,7 +764,7 @@ public class PbHelper {
         return series;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Chart pb(String chartName, ChartData chartData) {
+    public static com.ctrip.ferriswheel.proto.v1.Chart pb(String chartName, Chart chartData) {
         com.ctrip.ferriswheel.proto.v1.Chart.Builder builder = com.ctrip.ferriswheel.proto.v1.Chart.newBuilder()
                 .setName(chartName)
                 .setType(chartData.getType())
@@ -766,7 +772,7 @@ public class PbHelper {
         if (chartData.getCategories() != null) {
             builder.setCategories(pb(chartData.getCategories()));
         }
-        for (ChartData.Series series : chartData.getSeriesList()) {
+        for (DataSeries series : chartData.getSeriesList()) {
             builder.addSeries(pb(series));
         }
         if (chartData.getLayout() != null) {
@@ -787,21 +793,7 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Series pb(ChartData.Series series) {
-        com.ctrip.ferriswheel.proto.v1.Series.Builder builder = com.ctrip.ferriswheel.proto.v1.Series.newBuilder();
-        if (series.getName() != null) {
-            builder.setName(pb(series.getName()));
-        }
-        if (series.getxValues() != null) {
-            builder.setXValues(pb(series.getxValues()));
-        }
-        if (series.getyValues() != null) {
-            builder.setYValues(pb(series.getyValues()));
-        }
-        return builder.build();
-    }
-
-    public static com.ctrip.ferriswheel.proto.v1.ChartBinder pb(ChartData.Binder binder) {
+    public static com.ctrip.ferriswheel.proto.v1.ChartBinder pb(ChartBinder binder) {
         return com.ctrip.ferriswheel.proto.v1.ChartBinder.newBuilder()
                 .setData(pb(binder.getData()))
                 .setOrientation(pb(binder.getOrientation()))
@@ -810,8 +802,8 @@ public class PbHelper {
                 .build();
     }
 
-    public static ChartData.Binder bean(com.ctrip.ferriswheel.proto.v1.ChartBinder pbChartBinder) {
-        return new ChartData.Binder(toDynamicValue(pbChartBinder.getData()),
+    public static ChartData.BinderImpl bean(com.ctrip.ferriswheel.proto.v1.ChartBinder pbChartBinder) {
+        return new ChartData.BinderImpl(toDynamicValue(pbChartBinder.getData()),
                 bean(pbChartBinder.getOrientation()),
                 bean(pbChartBinder.getCategoriesPlacement()),
                 bean(pbChartBinder.getSeriesNamePlacement()));
@@ -841,8 +833,8 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static Axis bean(com.ctrip.ferriswheel.proto.v1.Axis pb) {
-        Axis bean = new Axis();
+    public static AxisImpl bean(com.ctrip.ferriswheel.proto.v1.Axis pb) {
+        AxisImpl bean = new AxisImpl();
         if (!pb.getTitle().isEmpty()) {
             bean.setTitle(pb.getTitle());
         }
@@ -945,8 +937,8 @@ public class PbHelper {
                 .build();
     }
 
-    public static Interval bean(com.ctrip.ferriswheel.proto.v1.Interval pb) {
-        return new Interval(pb.getFrom(), pb.getTo());
+    public static IntervalImpl bean(com.ctrip.ferriswheel.proto.v1.Interval pb) {
+        return new IntervalImpl(pb.getFrom(), pb.getTo());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.AxisBand pb(AxisBand bean) {
@@ -963,8 +955,8 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static AxisBand bean(com.ctrip.ferriswheel.proto.v1.AxisBand pb) {
-        AxisBand bean = new AxisBand();
+    public static AxisBandImpl bean(com.ctrip.ferriswheel.proto.v1.AxisBand pb) {
+        AxisBandImpl bean = new AxisBandImpl();
         if (!pb.getLabel().isEmpty()) {
             bean.setLabel(pb.getLabel());
         }
@@ -1014,8 +1006,8 @@ public class PbHelper {
                 .build();
     }
 
-    public static Color bean(com.ctrip.ferriswheel.proto.v1.Color pb) {
-        return new Color(pb.getRed(), pb.getGreen(), pb.getBlue(), pb.getAlpha());
+    public static ColorImpl bean(com.ctrip.ferriswheel.proto.v1.Color pb) {
+        return new ColorImpl(pb.getRed(), pb.getGreen(), pb.getBlue(), pb.getAlpha());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(Text text) {
@@ -1041,8 +1033,8 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static Layout bean(com.ctrip.ferriswheel.proto.v1.Layout proto) {
-        return new Layout(
+    public static LayoutImpl bean(com.ctrip.ferriswheel.proto.v1.Layout proto) {
+        return new LayoutImpl(
                 bean(proto.getDisplay()),
                 proto.getWidth(),
                 proto.getHeight(),
@@ -1052,12 +1044,12 @@ public class PbHelper {
         );
     }
 
-    public static void fillBeanFromProto(Layout bean, com.ctrip.ferriswheel.proto.v1.Layout proto) {
+    public static void fillBeanFromProto(LayoutImpl bean, com.ctrip.ferriswheel.proto.v1.Layout proto) {
         bean.copy(bean(proto));
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Grid pb(Layout.Grid bean) {
-        Grid.Builder builder = Grid.newBuilder()
+    public static com.ctrip.ferriswheel.proto.v1.Grid pb(Grid bean) {
+        com.ctrip.ferriswheel.proto.v1.Grid.Builder builder = com.ctrip.ferriswheel.proto.v1.Grid.newBuilder()
                 .setColumns(bean.getColumns())
                 .setRows(bean.getRows());
         if (bean.getColumn() != null) {
@@ -1069,8 +1061,8 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static Layout.Grid bean(com.ctrip.ferriswheel.proto.v1.Grid pb) {
-        Layout.Grid bean = new Layout.Grid(
+    public static LayoutImpl.GridImpl bean(com.ctrip.ferriswheel.proto.v1.Grid pb) {
+        LayoutImpl.GridImpl bean = new LayoutImpl.GridImpl(
                 pb.getColumns(),
                 pb.getRows(),
                 pb.hasColumn() ? bean(pb.getColumn()) : null,
@@ -1079,18 +1071,18 @@ public class PbHelper {
         return bean;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Span pb(Layout.Span bean) {
+    public static com.ctrip.ferriswheel.proto.v1.Span pb(Span bean) {
         return com.ctrip.ferriswheel.proto.v1.Span.newBuilder()
                 .setStart(bean.getStart())
                 .setEnd(bean.getEnd())
                 .build();
     }
 
-    public static Layout.Span bean(com.ctrip.ferriswheel.proto.v1.Span pb) {
-        return new Layout.Span(pb.getStart(), pb.getEnd());
+    public static LayoutImpl.SpanImpl bean(com.ctrip.ferriswheel.proto.v1.Span pb) {
+        return new LayoutImpl.SpanImpl(pb.getStart(), pb.getEnd());
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Text pb(String name, TextData bean) {
+    public static com.ctrip.ferriswheel.proto.v1.Text pb(String name, Text bean) {
         com.ctrip.ferriswheel.proto.v1.Text.Builder builder = com.ctrip.ferriswheel.proto.v1.Text.newBuilder()
                 .setName(name)
                 .setContent(pb(bean.getContent()));
@@ -1101,7 +1093,7 @@ public class PbHelper {
     }
 
     public static TextData bean(com.ctrip.ferriswheel.proto.v1.Text proto) {
-        return new TextData(toDynamicValue(proto.getContent()),
+        return new TextData(proto.getName(), toDynamicValue(proto.getContent()),
                 proto.hasLayout() ? bean(proto.getLayout()) : null);
     }
 
