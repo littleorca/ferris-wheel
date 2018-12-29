@@ -16,7 +16,7 @@ import com.ctrip.ferriswheel.api.table.TableAutomaton;
 import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.TextData;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.bean.VersionImpl;
@@ -396,7 +396,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         DefaultTable table = cell.getRow().getTable();
         evaluator.setCurrentTable(table);
         Variant value = evaluator.evaluate(cell.getFormulaElements());
-        if (!value.equals(cell.getValue())) {
+        if (!value.equals(cell.getData())) {
             CellAction.RefreshCellValue action = new CellAction.RefreshCellValue(
                     table.getSheet().getName(),
                     table.getName(),
@@ -415,7 +415,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         evaluator.setCurrentSheet(sheet);
         evaluator.setCurrentTable(null);
         Variant value = evaluator.evaluate(property.getFormulaElements());
-        if (!value.equals(property.getValue())) {
+        if (!value.equals(property.getData())) {
             UpdateChart action = new UpdateChart(sheet.getName(), chart.getName(), null);
             listenerChain.publicly(action, () -> {
                 property.setValue(value);
@@ -433,7 +433,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         evaluator.setCurrentSheet(table.getSheet());
         evaluator.setCurrentTable(table);
         Variant value = evaluator.evaluate(param.getFormulaElements());
-        if (!value.equals(param.getValue())) {
+        if (!value.equals(param.getData())) {
             param.setValue(value); // TODO notify this action
         }
     }
@@ -446,12 +446,12 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         evaluator.setCurrentSheet(sheet);
         evaluator.setCurrentTable(null);
         Variant value = evaluator.evaluate(node.getFormulaElements());
-        if (!value.equals(node.getValue())) {
+        if (!value.equals(node.getData())) {
             UpdateText action = new UpdateText(sheet.getName(), text.getName(), null);
             listenerChain.publicly(action, () -> {
                 node.setValue(value);
                 action.setTextData(new TextData(text.getName(),
-                        new DynamicValue(node.getFormulaString(), Value.from(node.getValue())),
+                        new DynamicVariantImpl(node.getFormulaString(), Value.from(node.getData())),
                         text.getLayout()));
             });
         }
@@ -643,7 +643,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             if (asset == null || !(asset instanceof Cell)) {
                 return Value.err(ErrorCodes.ILLEGAL_REF);
             }
-            return ((DefaultCell) asset).getValue();
+            return ((DefaultCell) asset).getData();
         }
 
         DefaultCell cell = null;
@@ -660,7 +660,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         if (cell == null) {
             return Value.err(ErrorCodes.ILLEGAL_REF); // cell not found
         }
-        return cell.getValue();
+        return cell.getData();
     }
 
     @Override
@@ -976,14 +976,14 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             }
             if (elem instanceof CellReferenceElement) {
                 CellRef cellRef = ((CellReferenceElement) elem).getCellRef();
-                modified |= fixCellRef(cellRef);
+                modified |= fixCellRef(cellRef, table.getAutomaton() != null);
 
             } else if (elem instanceof RangeReferenceElement) {
                 RangeRef rangeRef = ((RangeReferenceElement) elem).getRangeRef();
                 CellRef upperLeftRef = rangeRef.getUpperLeft();
                 CellRef lowerRightRef = rangeRef.getLowerRight();
-                modified |= fixCellRef(upperLeftRef);
-                modified |= fixCellRef(lowerRightRef);
+                modified |= fixCellRef(upperLeftRef, table.getAutomaton() != null);
+                modified |= fixCellRef(lowerRightRef, table.getAutomaton() != null);
 
                 if (!upperLeftRef.isValid() && !lowerRightRef.isValid()) {
                     // invalid range reference
@@ -1073,15 +1073,15 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
 
         } else if (node.getParent() instanceof Text) {
             DefaultText text = (DefaultText) node.getParent();
-            text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
+            text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicVariantImpl(newFormula), null));
 
         } else if (node.getParent() instanceof DefaultQueryAutomaton) {
-            node.setDynamicVariant(new DynamicValue(newFormula));
+            node.setDynamicVariant(new DynamicVariantImpl(newFormula));
             DefaultQueryAutomaton auto = (DefaultQueryAutomaton) node.getParent();
             auto.getTable().automate(auto.getQueryAutomatonInfo());
 
         } else if (node.getParent() instanceof DefaultPivotAutomaton) {
-            node.setDynamicVariant(new DynamicValue(newFormula));
+            node.setDynamicVariant(new DynamicVariantImpl(newFormula));
             DefaultPivotAutomaton auto = (DefaultPivotAutomaton) node.getParent();
             auto.getTable().automate(auto.getPivotAutomatonInfo());
 
@@ -1106,15 +1106,18 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
      * use this method to keep the row/column index up to date.
      *
      * @param cellRef
+     * @param stubborn Determine if reference should be kept untouched even it is invalid.
      * @return true if reference has been modified, false otherwise.
      */
-    private boolean fixCellRef(CellRef cellRef) {
+    private boolean fixCellRef(CellRef cellRef, boolean stubborn) {
         if (!cellRef.isValid()) {
             return false;
         }
         DefaultCell referredCell = getCellByAssetId(cellRef.getCellId());
         if (referredCell == null) {
-            cellRef.setValid(false);
+            if (!stubborn) {
+                cellRef.setValid(false);
+            }
             return true;
         }
 

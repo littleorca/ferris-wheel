@@ -71,8 +71,8 @@ public class TestPbHelper extends TestCase {
         assertEquals(2, t.getRows(1).getRowIndex());
 
         Map<String, DynamicVariant> builtinParams = new LinkedHashMap<>();
-        builtinParams.put("Greeting", new DynamicValue("\"hello world\""));
-        builtinParams.put("Goodbye", new DynamicValue("\"bye!\""));
+        builtinParams.put("Greeting", new DynamicVariantImpl("\"hello world\""));
+        builtinParams.put("Goodbye", new DynamicVariantImpl("\"bye!\""));
         Map<String, VariantRule> userParamRules = new HashMap<>();
         userParamRules.put("Name",
                 new ValueRule(VariantType.STRING,
@@ -109,12 +109,12 @@ public class TestPbHelper extends TestCase {
         table1.setCellValue(0, 2, Value.dec(3));
         Chart chart1 = sheet1.addChart("chart1",
                 new ChartData("chart1", "Line",
-                        new DynamicValue("\"Chart 1 (Line)\""),
+                        new DynamicVariantImpl("\"Chart 1 (Line)\""),
                         null,
                         Arrays.asList(new ChartData.SeriesImpl(
-                                new DynamicValue("table1!A1"),
+                                new DynamicVariantImpl("table1!A1"),
                                 null,
-                                new DynamicValue("table1!B1:C1")))));
+                                new DynamicVariantImpl("table1!B1:C1")))));
         com.ctrip.ferriswheel.proto.v1.SheetAsset asset = PbHelper.pb(chart1);
         assertEquals(com.ctrip.ferriswheel.proto.v1.SheetAsset.AssetCase.CHART, asset.getAssetCase());
         com.ctrip.ferriswheel.proto.v1.Chart c1 = asset.getChart();
@@ -191,7 +191,7 @@ public class TestPbHelper extends TestCase {
         assertEquals(com.ctrip.ferriswheel.proto.v1.UnionValue.ValueCase.STRING, v.getValueCase());
         assertEquals("hello", v.getString());
 
-        DynamicValue dv = new DynamicValue("2^10");
+        DynamicVariantImpl dv = new DynamicVariantImpl("2^10");
         v = PbHelper.pb(dv);
         assertEquals("2^10", v.getFormulaString());
         assertEquals(com.ctrip.ferriswheel.proto.v1.UnionValue.ValueCase.VALUE_NOT_SET, v.getValueCase());
@@ -230,7 +230,7 @@ public class TestPbHelper extends TestCase {
         Table t2 = s1.addTable("t2");
 
         Map<String, DynamicVariant> builtinParams = new HashMap<>();
-        builtinParams.put("Greeting", new DynamicValue("\"hello world\""));
+        builtinParams.put("Greeting", new DynamicVariantImpl("\"hello world\""));
         Map<String, VariantRule> userParamRules = new HashMap<>();
         userParamRules.put("Name",
                 new ValueRule(VariantType.STRING,
@@ -251,17 +251,17 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 2, Value.dec(22));
         t1.setCellFormula(2, 3, "t0!B1");
         s1.addChart("c1", new ChartData("c1","Line",
-                new DynamicValue("\"Line Chart 1\""),
-                new DynamicValue("t1!B1:D1"),
+                new DynamicVariantImpl("\"Line Chart 1\""),
+                new DynamicVariantImpl("t1!B1:D1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("t1!A2"),
+                                new DynamicVariantImpl("t1!A2"),
                                 null,
-                                new DynamicValue("t1!B2:D2")),
+                                new DynamicVariantImpl("t1!B2:D2")),
                         new ChartData.SeriesImpl(
-                                new DynamicValue("t1!A3"),
+                                new DynamicVariantImpl("t1!A3"),
                                 null,
-                                new DynamicValue("t1!B3:D3"))
+                                new DynamicVariantImpl("t1!B3:D3"))
                 )));
         t2.setCellValue(0, 0, Value.dec(2));
 
@@ -280,13 +280,13 @@ public class TestPbHelper extends TestCase {
 
         assertEquals(1, t0.getRowCount());
         assertEquals(2, t0.getColumnCount());
-        assertEquals(13, t0.getCell(0, 0).intValue());
-        assertEquals(23, t0.getCell(0, 1).intValue());
+        assertEquals(13, t0.getCell(0, 0).getData().intValue());
+        assertEquals(23, t0.getCell(0, 1).getData().intValue());
         DefaultQueryAutomaton auto = (DefaultQueryAutomaton) t0.getAutomaton();
         TableAutomatonInfo.QueryTemplateInfo template = auto.getQueryAutomatonInfo().getTemplate();
         assertEquals(scheme, template.getScheme());
         assertEquals(1, template.getAllBuiltinParams().size());
-        DynamicValue param = (DynamicValue) template.getAllBuiltinParams().get("Greeting");
+        DynamicVariantImpl param = (DynamicVariantImpl) template.getAllBuiltinParams().get("Greeting");
         assertEquals("\"hello world\"", param.getFormulaString());
         assertEquals(1, template.getAllUserParamRules().size());
         VariantRule rule = template.getAllUserParamRules().get("Name");
@@ -298,25 +298,25 @@ public class TestPbHelper extends TestCase {
 
         assertEquals(3, t1.getRowCount());
         assertEquals(4, t1.getColumnCount());
-        assertEquals(4, t1.getCell(0, 0).intValue());
-        assertEquals("t2!A1^2", t1.getCell(0, 0).getFormulaString());
-        assertEquals("foo", t1.getCell(0, 1).strValue());
-        assertEquals("bar", t1.getCell(0, 2).strValue());
-        assertEquals("foobar", t1.getCell(0, 3).strValue());
-        assertEquals("A", t1.getCell(1, 0).strValue());
-        assertEquals(11, t1.getCell(1, 1).intValue());
-        assertEquals(12, t1.getCell(1, 2).intValue());
-        assertEquals(13, t1.getCell(1, 3).intValue());
-        assertEquals("t0!A1", t1.getCell(1, 3).getFormulaString());
-        assertEquals("B", t1.getCell(2, 0).strValue());
-        assertEquals(21, t1.getCell(2, 1).intValue());
-        assertEquals(22, t1.getCell(2, 2).intValue());
-        assertEquals(23, t1.getCell(2, 3).intValue());
-        assertEquals("t0!B1", t1.getCell(2, 3).getFormulaString());
+        assertEquals(4, t1.getCell(0, 0).getData().intValue());
+        assertEquals("t2!A1^2", t1.getCell(0, 0).getData().getFormulaString());
+        assertEquals("foo", t1.getCell(0, 1).getData().strValue());
+        assertEquals("bar", t1.getCell(0, 2).getData().strValue());
+        assertEquals("foobar", t1.getCell(0, 3).getData().strValue());
+        assertEquals("A", t1.getCell(1, 0).getData().strValue());
+        assertEquals(11, t1.getCell(1, 1).getData().intValue());
+        assertEquals(12, t1.getCell(1, 2).getData().intValue());
+        assertEquals(13, t1.getCell(1, 3).getData().intValue());
+        assertEquals("t0!A1", t1.getCell(1, 3).getData().getFormulaString());
+        assertEquals("B", t1.getCell(2, 0).getData().strValue());
+        assertEquals(21, t1.getCell(2, 1).getData().intValue());
+        assertEquals(22, t1.getCell(2, 2).getData().intValue());
+        assertEquals(23, t1.getCell(2, 3).getData().intValue());
+        assertEquals("t0!B1", t1.getCell(2, 3).getData().getFormulaString());
 
         assertEquals(1, t2.getRowCount());
         assertEquals(1, t2.getColumnCount());
-        assertEquals(2, t2.getCell(0, 0).intValue());
+        assertEquals(2, t2.getCell(0, 0).getData().intValue());
 
         assertEquals("c1", c1.getName());
         assertEquals("Line", c1.getType());
@@ -356,12 +356,12 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 2, Value.dec(22));
 
         s1.addChart("chart1", new ChartData("chart1", "Line",
-                new DynamicValue("\"Hello Line Chart1\""),
-                new DynamicValue("table1!B1:C1"),
+                new DynamicVariantImpl("\"Hello Line Chart1\""),
+                new DynamicVariantImpl("table1!B1:C1"),
                 Arrays.asList(new ChartData.SeriesImpl(
-                        new DynamicValue("table1!A2"),
+                        new DynamicVariantImpl("table1!A2"),
                         null,
-                        new DynamicValue("table1!B2:C2")))));
+                        new DynamicVariantImpl("table1!B2:C2")))));
 
 //        String json = JsonFormat.printer().print(SpreadsheetProtoHelper.pb(wb));
 //        System.out.println(json);

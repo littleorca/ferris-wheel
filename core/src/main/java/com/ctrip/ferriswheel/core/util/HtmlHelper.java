@@ -99,10 +99,10 @@ public class HtmlHelper {
                 String info = "";
                 Cell cell = columnIndex < row.size() ? row.getCell(columnIndex) : null;
                 if (cell != null) {
-                    type = cell.valueType().toString();
-                    value = escapeHtml(cell.strValue());
-                    if (cell.isFormula()) {
-                        info = cell.getFormulaString();
+                    type = cell.getData().valueType().toString();
+                    value = escapeHtml(cell.getData().strValue());
+                    if (cell.getData().isFormula()) {
+                        info = cell.getData().getFormulaString();
                     }
                 }
                 html.append("<td class=\"")

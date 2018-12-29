@@ -25,21 +25,31 @@
 
 package com.ctrip.ferriswheel.api.table;
 
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-
-import java.util.List;
+import com.ctrip.ferriswheel.api.view.Displayable;
 
 /**
  * @author liuhaifeng
  */
-public interface PivotSolution extends AutomateSolution {
-    DynamicVariant getData();
+public interface TableData extends Iterable<Row>, Displayable {
+    /**
+     * Get row count.
+     *
+     * @return
+     */
+    int getRowCount();
 
-    List<PivotFilter> getFilters();
+    /**
+     * Get row by index.
+     *
+     * @param rowIndex
+     * @return
+     */
+    Row getRow(int rowIndex);
 
-    List<PivotField> getRows();
-
-    List<PivotField> getColumns();
-
-    List<PivotValue> getValues();
+    /**
+     * Get automate configuration.
+     *
+     * @return Automate configuration.
+     */
+    AutomateConfiguration getAutomateConfiguration();
 }

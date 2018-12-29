@@ -25,13 +25,8 @@
 
 package com.ctrip.ferriswheel.api.table;
 
-import com.ctrip.ferriswheel.api.SparseArray;
-
 /**
  * @author liuhaifeng
  */
-public interface DryRowData {
-    int getIndex();
-
-    SparseArray<DryCellData> getCells();
+public interface AutomateConfiguration {
 }

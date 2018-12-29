@@ -4,6 +4,8 @@ import com.ctrip.ferriswheel.api.action.Action;
 import com.ctrip.ferriswheel.api.table.*;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.util.References;
@@ -66,7 +68,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
             if (cell.isFormula()) {
                 cell.setFormula(null);
             }
-            Variant oldValue = cell.getValue();
+            // Old value may be useless and resource consumption
+            // Think about remove the return value?
+            Variant oldValue = new DynamicVariantImpl(cell.getData());
             cell.setValue(value);
             int newRowSize = cell.getRow().size();
             if (newRowSize > getColumnCount()) {
@@ -443,7 +447,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     @Override
-    public void automate(AutomateSolution solution) {
+    public void automate(AutomateConfiguration solution) {
         handleAction(new AutomateTable(getSheet().getName(), getName(), solution));
     }
 
@@ -461,21 +465,21 @@ public class DefaultTable extends SheetAssetNode implements Table {
         });
     }
 
-    private TableAutomaton createAndRegisterAutomaton(AutomateSolution solution) {
+    private TableAutomaton createAndRegisterAutomaton(AutomateConfiguration solution) {
         if (this.automaton != null) {
             unbindChild((AssetNode) this.automaton);
         }
 
-        if (solution instanceof QuerySolution) {
+        if (solution instanceof QueryConfiguration) {
             DefaultQueryAutomaton queryAutomaton = new DefaultQueryAutomaton(getAssetManager(),
-                    (QuerySolution) solution);
+                    (QueryConfiguration) solution);
             bindChild(queryAutomaton);
             this.automaton = queryAutomaton;
             return queryAutomaton;
 
-        } else if (solution instanceof PivotSolution) {
+        } else if (solution instanceof PivotConfiguration) {
             DefaultPivotAutomaton pivotAutomaton = new DefaultPivotAutomaton(getAssetManager(),
-                    (PivotSolution) solution);
+                    (PivotConfiguration) solution);
             bindChild(pivotAutomaton);
             this.automaton = pivotAutomaton;
             return pivotAutomaton;
@@ -489,6 +493,11 @@ public class DefaultTable extends SheetAssetNode implements Table {
     @Override
     public TableAutomaton getAutomaton() {
         return automaton;
+    }
+
+    @Override
+    public AutomateConfiguration getAutomateConfiguration() {
+        return TableAutomatonInfo.fromAutomaton(automaton);
     }
 
     private DefaultRow setRow(int index, DefaultRow row) {

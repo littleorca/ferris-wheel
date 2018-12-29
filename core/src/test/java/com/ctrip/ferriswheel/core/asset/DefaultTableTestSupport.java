@@ -31,9 +31,9 @@ public abstract class DefaultTableTestSupport extends TestCase {
             for (int c = 0; c < row.length; c++) {
                 Integer n = row[c];
                 if (n == null) {
-                    assertTrue(table.getCell(r, c).isBlank());
+                    assertTrue(table.getCell(r, c).getData().isBlank());
                 } else {
-                    assertEquals((int) n, table.getCell(r, c).intValue());
+                    assertEquals((int) n, table.getCell(r, c).getData().intValue());
                 }
             }
         }

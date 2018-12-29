@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.ValueRule;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.bean.Value;
@@ -21,7 +21,7 @@ public class TestDefaultQueryTemplate extends TestCase {
 
         TableAutomatonInfo.QueryTemplateInfo query = new TableAutomatonInfo.QueryTemplateInfo();
         query.setScheme("test");
-        query.addBuiltinParam("b1", new DynamicValue(Value.str("test1")));
+        query.addBuiltinParam("b1", new DynamicVariantImpl(Value.str("test1")));
         query.addUserParamRule("b1", new ValueRule());
 
         DefaultQueryTemplate template = new DefaultQueryTemplate(assetManager, query);
@@ -46,8 +46,8 @@ public class TestDefaultQueryTemplate extends TestCase {
         TableAutomatonInfo.QueryTemplateInfo querySolution = new TableAutomatonInfo.QueryTemplateInfo();
 
         querySolution.setScheme("test");
-        querySolution.addBuiltinParam("p1", new DynamicValue("NOW()"));
-        querySolution.addBuiltinParam("p2", new DynamicValue(Value.dec(2)));
+        querySolution.addBuiltinParam("p1", new DynamicVariantImpl("NOW()"));
+        querySolution.addBuiltinParam("p2", new DynamicVariantImpl(Value.dec(2)));
 
         querySolution.addUserParamRule("p2", new ValueRule()
                 .type(VariantType.DECIMAL)

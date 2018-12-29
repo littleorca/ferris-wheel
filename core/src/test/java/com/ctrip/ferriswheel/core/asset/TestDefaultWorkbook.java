@@ -5,7 +5,7 @@ import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.api.variant.VariantType;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.Value;
@@ -151,7 +151,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(36, table.getCell(0, 3).intValue());
         assertEquals("A2+B2", table.getCell(0, 4).getFormulaString());
 
-        Variant value = table.getCell(0, 4).getValue();
+        Variant value = table.getCell(0, 4).getData();
         assertEquals(VariantType.DECIMAL, value.valueType());
         assertEquals(BigDecimal.ZERO, value.decimalValue());
     }
@@ -174,9 +174,9 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals("#REF!+#REF!", table.getCell(0, 4).getFormulaString());
         assertEquals("SUM(#REF!)", table.getCell(1, 3).getFormulaString());
 
-        Variant value = table.getCell(0, 4).getValue();
+        Variant value = table.getCell(0, 4).getData();
         assertFalse(value != null && value.isValid());
-        value = table.getCell(1, 3).getValue();
+        value = table.getCell(1, 3).getData();
         assertFalse(value != null && value.isValid());
 
         table.removeRows(0, 1);
@@ -190,17 +190,17 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultTable table = (DefaultTable) sheet.getTable("table1");
         List<DataSeries> series = Arrays.asList(
                 new ChartData.SeriesImpl(
-                        new DynamicValue("table1!$A2"),
+                        new DynamicVariantImpl("table1!$A2"),
                         null,
-                        new DynamicValue("table1!$B$2:$C$2")),
+                        new DynamicVariantImpl("table1!$B$2:$C$2")),
                 new ChartData.SeriesImpl(
-                        new DynamicValue("table1!$A3"),
+                        new DynamicVariantImpl("table1!$A3"),
                         null,
-                        new DynamicValue("table1!$B$3:$C$3"))
+                        new DynamicVariantImpl("table1!$B$3:$C$3"))
         );
         sheet.addChart("c1", new ChartData("c1", "Line",
-                new DynamicValue("\"hello world\""),
-                new DynamicValue("table1!$B$1:$C$1"),
+                new DynamicVariantImpl("\"hello world\""),
+                new DynamicVariantImpl("table1!$B$1:$C$1"),
                 series));
         table.removeRows(0, 3);
 
@@ -269,7 +269,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(63, table.getCell(0, 1).intValue());
         assertEquals("A2+#REF!", table.getCell(1, 1).getFormulaString());
 
-        Variant value = table.getCell(1, 1).getValue();
+        Variant value = table.getCell(1, 1).getData();
         assertFalse(value != null && value.isValid());
     }
 
@@ -279,17 +279,17 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultTable table = (DefaultTable) sheet.getTable("table1");
         List<DataSeries> series = Arrays.asList(
                 new ChartData.SeriesImpl(
-                        new DynamicValue("table1!$A2"),
+                        new DynamicVariantImpl("table1!$A2"),
                         null,
-                        new DynamicValue("table1!$B$2:$C$2")),
+                        new DynamicVariantImpl("table1!$B$2:$C$2")),
                 new ChartData.SeriesImpl(
-                        new DynamicValue("table1!$A3"),
+                        new DynamicVariantImpl("table1!$A3"),
                         null,
-                        new DynamicValue("table1!$B$3:$C$3"))
+                        new DynamicVariantImpl("table1!$B$3:$C$3"))
         );
         sheet.addChart("c1", new ChartData("c1", "Line",
-                new DynamicValue("\"hello world\""),
-                new DynamicValue("table1!$B$1:$C$1"),
+                new DynamicVariantImpl("\"hello world\""),
+                new DynamicVariantImpl("table1!$B$1:$C$1"),
                 series));
         table.removeColumns(0, 3);
 
@@ -314,41 +314,41 @@ public class TestDefaultWorkbook extends TestCase {
         table2.setCellValue(2, 2, new Value.DecimalValue(3000));
 
         sheet1.addChart("chart1-1", new ChartData("chart1-1", "Line",
-                new DynamicValue("\"Chart 1-1\""),
-                new DynamicValue("table1!B1:C1"),
+                new DynamicVariantImpl("\"Chart 1-1\""),
+                new DynamicVariantImpl("table1!B1:C1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("table1!A2"),
+                                new DynamicVariantImpl("table1!A2"),
                                 null,
-                                new DynamicValue("table1!B2:C2"))
+                                new DynamicVariantImpl("table1!B2:C2"))
                 )));
         sheet1.addChart("chart1-2", new ChartData("chart1-2", "Line",
-                new DynamicValue("\"Chart 1-2\""),
-                new DynamicValue("sheet2!table2!B2:C2"),
+                new DynamicVariantImpl("\"Chart 1-2\""),
+                new DynamicVariantImpl("sheet2!table2!B2:C2"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet2!table2!A3"),
+                                new DynamicVariantImpl("sheet2!table2!A3"),
                                 null,
-                                new DynamicValue("sheet2!table2!B3:C3"))
+                                new DynamicVariantImpl("sheet2!table2!B3:C3"))
                 )));
 
         sheet2.addChart("chart2-1", new ChartData("chart2-1", "Line",
-                new DynamicValue("\"Chart 2-1\""),
-                new DynamicValue("sheet1!table1!B1:C1"),
+                new DynamicVariantImpl("\"Chart 2-1\""),
+                new DynamicVariantImpl("sheet1!table1!B1:C1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!A2"),
+                                new DynamicVariantImpl("sheet1!table1!A2"),
                                 null,
-                                new DynamicValue("sheet1!table1!B2:C2"))
+                                new DynamicVariantImpl("sheet1!table1!B2:C2"))
                 )));
         sheet2.addChart("chart2-2", new ChartData("chart2-1", "Line",
-                new DynamicValue("\"Chart 2-2\""),
-                new DynamicValue("table2!B2:C2"),
+                new DynamicVariantImpl("\"Chart 2-2\""),
+                new DynamicVariantImpl("table2!B2:C2"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("table2!A3"),
+                                new DynamicVariantImpl("table2!A3"),
                                 null,
-                                new DynamicValue("table2!B3:C3"))
+                                new DynamicVariantImpl("table2!B3:C3"))
                 )));
 
         workbook.renameSheet("sheet1", "s1");
@@ -453,12 +453,12 @@ public class TestDefaultWorkbook extends TestCase {
         Table t1 = s1.getTable("table1");
         assertEquals(1, t1.getRowCount());
         assertEquals(1, t1.getColumnCount());
-        assertEquals(64, t1.getCell(0, 0).intValue());
-        assertEquals("table2!A1^2", t1.getCell(0, 0).getFormulaString());
+        assertEquals(64, t1.getCell(0, 0).getData().intValue());
+        assertEquals("table2!A1^2", t1.getCell(0, 0).getData().getFormulaString());
         Table t2 = s1.getTable("table2");
         assertEquals(1, t2.getRowCount());
         assertEquals(1, t2.getColumnCount());
-        assertEquals(8, t2.getCell(0, 0).intValue());
+        assertEquals(8, t2.getCell(0, 0).getData().intValue());
     }
 
     private DefaultWorkbook createWorkbookWithTable33() {

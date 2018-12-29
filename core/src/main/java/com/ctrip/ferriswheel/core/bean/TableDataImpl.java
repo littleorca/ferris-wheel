@@ -25,50 +25,60 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.api.table.AutomateConfiguration;
+import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.api.table.TableData;
 import com.ctrip.ferriswheel.api.view.Layout;
-import com.ctrip.ferriswheel.core.view.LayoutImpl;
+import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Iterator;
 
-public class TextData implements Text, Serializable {
-    private String name;
-    private DynamicVariantImpl content;
+public class TableDataImpl implements TableData, Serializable {
+    private TreeSparseArray<Row> rows;
+    private AutomateConfiguration automatonInfo;
     private Layout layout;
 
-    public TextData() {
+    public TreeSparseArray<Row> getRows() {
+        return rows;
     }
 
-    public TextData(String name, DynamicVariantImpl content, LayoutImpl layout) {
-        this.name = name;
-        this.content = content;
-        this.layout = layout;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setRows(TreeSparseArray<Row> rows) {
+        this.rows = rows;
     }
 
     @Override
-    public DynamicVariantImpl getContent() {
-        return content;
-    }
-
-    public void setContent(DynamicVariantImpl content) {
-        this.content = content;
+    public int getRowCount() {
+        return rows == null ? 0 : rows.size();
     }
 
     @Override
+    public Row getRow(int rowIndex) {
+        return rows.get(rowIndex);
+    }
+
+    public AutomateConfiguration getAutomateConfiguration() {
+        return automatonInfo;
+    }
+
+    public void setAutomatonSolution(AutomateConfiguration automatonInfo) {
+        this.automatonInfo = automatonInfo;
+    }
+
     public Layout getLayout() {
         return layout;
     }
 
     public void setLayout(Layout layout) {
         this.layout = layout;
+    }
+
+    @Override
+    public Iterator<Row> iterator() {
+        if (rows == null) {
+            return Collections.emptyIterator();
+        }
+        return Collections.unmodifiableCollection(rows.values()).iterator();
     }
 }

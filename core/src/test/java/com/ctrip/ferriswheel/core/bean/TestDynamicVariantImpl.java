@@ -3,7 +3,7 @@ package com.ctrip.ferriswheel.core.bean;
 import com.ctrip.ferriswheel.core.formula.FormulaParserException;
 import junit.framework.TestCase;
 
-public class TestDynamicValue extends TestCase {
+public class TestDynamicVariantImpl extends TestCase {
     public void testIllegalFormula() {
 //        try {
 //            new DynamicValue((String) null);
@@ -16,12 +16,12 @@ public class TestDynamicValue extends TestCase {
 //        } catch (IllegalArgumentException e) {
 //        }
         try {
-            new DynamicValue("");
+            new DynamicVariantImpl("");
             fail();
         } catch (FormulaParserException e) {
         }
         try {
-            new DynamicValue("some malformed formula");
+            new DynamicVariantImpl("some malformed formula");
             fail();
         } catch (FormulaParserException e) {
         }

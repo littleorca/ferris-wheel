@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.ProviderManager;
 import com.ctrip.ferriswheel.api.query.DataProvider;
 import com.ctrip.ferriswheel.api.query.DataQuery;
 import com.ctrip.ferriswheel.api.query.DataSet;
 import com.ctrip.ferriswheel.api.table.QueryAutomaton;
-import com.ctrip.ferriswheel.api.table.QuerySolution;
+import com.ctrip.ferriswheel.api.table.QueryConfiguration;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.action.ExecuteQuery;
 import com.ctrip.ferriswheel.core.bean.DefaultDataQuery;
@@ -24,7 +24,7 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
     private transient Map<String, Variant> parameters;
     private transient DataQuery query;
 
-    DefaultQueryAutomaton(AssetManager assetManager, QuerySolution solution) {
+    DefaultQueryAutomaton(AssetManager assetManager, QueryConfiguration solution) {
         super(assetManager);
         this.template = new DefaultQueryTemplate(assetManager, solution.getTemplate());
         this.parameters = solution.getParameters() == null ? Collections.emptyMap() : new LinkedHashMap<>(solution.getParameters());
@@ -113,8 +113,12 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
                 new TableAutomatonInfo.QueryInfo(query));
     }
 
-    DefaultQueryTemplate getTemplate() {
+    public DefaultQueryTemplate getTemplate() {
         return template;
     }
 
+    @Override
+    public Map<String, Variant> getParameters() {
+        return Collections.unmodifiableMap(parameters);
+    }
 }

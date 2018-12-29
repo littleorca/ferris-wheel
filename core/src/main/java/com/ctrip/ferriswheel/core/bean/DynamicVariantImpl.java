@@ -25,31 +25,31 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 import com.ctrip.ferriswheel.api.variant.ErrorCode;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.core.formula.Formula;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class DynamicValue implements DynamicVariant {
+public class DynamicVariantImpl implements DynamicVariant {
     private Formula formula;
-    private Variant value;
+    private Variant variant;
 
-    public DynamicValue() {
+    public DynamicVariantImpl() {
         this(null, Value.BLANK);
     }
 
-    public DynamicValue(String formulaString) {
+    public DynamicVariantImpl(String formulaString) {
         this(formulaString, null);
     }
 
-    public DynamicValue(Value value) {
-        this(null, value);
+    public DynamicVariantImpl(Value variant) {
+        this(null, variant);
     }
 
     /**
@@ -57,138 +57,138 @@ public class DynamicValue implements DynamicVariant {
      *
      * @param variable
      */
-    public DynamicValue(DynamicVariant variable) {
+    public DynamicVariantImpl(DynamicVariant variable) {
         this(
                 (variable == null || variable.getFormulaString() == null) ?
                         null : variable.getFormulaString(),
 
-                (variable != null && variable instanceof DynamicValue) ?
-                        Value.from(((DynamicValue) variable).getValue()) : Value.from(variable)
+                (variable != null && variable instanceof DynamicVariantImpl) ?
+                        Value.from(((DynamicVariantImpl) variable).getVariant()) : Value.from(variable)
         );
     }
 
-    public DynamicValue(String formulaString, Value value) {
+    public DynamicVariantImpl(String formulaString, Value variant) {
         if (formulaString != null) {
             Formula formula = new Formula(formulaString);
             checkFormula(formula);
             this.formula = formula;
         }
-        this.value = (value == null) ? Value.BLANK : value;
+        this.variant = (variant == null) ? Value.BLANK : variant;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DynamicValue that = (DynamicValue) o;
+        DynamicVariantImpl that = (DynamicVariantImpl) o;
         return Objects.equals(formula, that.formula) &&
-                Objects.equals(value, that.value);
+                Objects.equals(variant, that.variant);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(formula, value);
+        return Objects.hash(formula, variant);
     }
 
     @Override
     public VariantType valueType() {
         refreshIfNeeded();
-        return value.valueType();
+        return variant.valueType();
     }
 
     @Override
     public boolean isValid() {
-        return value != null && value.isValid();
+        return variant != null && variant.isValid();
     }
 
     @Override
     public boolean isBlank() {
         refreshIfNeeded();
-        return value.isBlank();
+        return variant.isBlank();
     }
 
     @Override
     public ErrorCode errorValue() {
         refreshIfNeeded();
-        return value.errorValue();
+        return variant.errorValue();
     }
 
     @Override
     public int intValue() {
         refreshIfNeeded();
-        return value.intValue();
+        return variant.intValue();
     }
 
     @Override
     public long longValue() {
         refreshIfNeeded();
-        return value.longValue();
+        return variant.longValue();
     }
 
     @Override
     public float floatValue() {
         refreshIfNeeded();
-        return value.floatValue();
+        return variant.floatValue();
     }
 
     @Override
     public double doubleValue() {
         refreshIfNeeded();
-        return value.doubleValue();
+        return variant.doubleValue();
     }
 
     @Override
     public BigDecimal decimalValue() {
         refreshIfNeeded();
-        return value.decimalValue();
+        return variant.decimalValue();
     }
 
     @Override
     public boolean booleanValue() {
         refreshIfNeeded();
-        return value.booleanValue();
+        return variant.booleanValue();
     }
 
     @Override
     public Date dateValue() {
         refreshIfNeeded();
-        return value.dateValue();
+        return variant.dateValue();
     }
 
     @Override
     public String strValue() {
         refreshIfNeeded();
-        return value.strValue();
+        return variant.strValue();
     }
 
     @Override
     public List<Variant> listValue() {
         refreshIfNeeded();
-        return value.listValue();
+        return variant.listValue();
     }
 
     @Override
     public int itemCount() {
         refreshIfNeeded();
-        return value.itemCount();
+        return variant.itemCount();
     }
 
     @Override
     public Variant item(int i) {
         refreshIfNeeded();
-        return value.item(i);
+        return variant.item(i);
     }
 
     @Override
     public int columnCount() {
         refreshIfNeeded();
-        return value.columnCount();
+        return variant.columnCount();
     }
 
     @Override
     public int rowCount() {
         refreshIfNeeded();
-        return value.rowCount();
+        return variant.rowCount();
     }
 
     @Override
@@ -216,7 +216,7 @@ public class DynamicValue implements DynamicVariant {
     @Override
     public int compareTo(Variant o) {
         refreshIfNeeded();
-        return value.compareTo(o);
+        return variant.compareTo(o);
     }
 
 
@@ -228,11 +228,11 @@ public class DynamicValue implements DynamicVariant {
         this.formula = formula;
     }
 
-    public Variant getValue() {
-        return value;
+    public Variant getVariant() {
+        return variant;
     }
 
-    public void setValue(Variant value) {
-        this.value = (value == null) ? Value.BLANK : value;
+    public void setVariant(Variant variant) {
+        this.variant = (variant == null) ? Value.BLANK : variant;
     }
 }

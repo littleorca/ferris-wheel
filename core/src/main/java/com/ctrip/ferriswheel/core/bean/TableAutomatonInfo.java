@@ -25,12 +25,14 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 import com.ctrip.ferriswheel.api.query.DataQuery;
 import com.ctrip.ferriswheel.api.query.QueryTemplate;
 import com.ctrip.ferriswheel.api.table.*;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.api.variant.VariantRule;
+import com.ctrip.ferriswheel.core.asset.DefaultPivotAutomaton;
+import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -39,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO review class names.
-public abstract class TableAutomatonInfo implements AutomateSolution, Serializable {
+public abstract class TableAutomatonInfo implements AutomateConfiguration, Serializable {
 
     /**
      * Forbid user from extending this class.
@@ -47,7 +49,17 @@ public abstract class TableAutomatonInfo implements AutomateSolution, Serializab
     private TableAutomatonInfo() {
     }
 
-    public static class QueryAutomatonInfo extends TableAutomatonInfo implements QuerySolution {
+    public static AutomateConfiguration fromAutomaton(TableAutomaton automaton) {
+        if (automaton instanceof DefaultQueryAutomaton) {
+            return ((DefaultQueryAutomaton) automaton).getQueryAutomatonInfo();
+        } else if (automaton instanceof DefaultPivotAutomaton) {
+            return ((DefaultPivotAutomaton) automaton).getPivotAutomatonInfo();
+        } else {
+            throw new RuntimeException("Unsupported automaton type.");
+        }
+    }
+
+    public static class QueryAutomatonInfo extends TableAutomatonInfo implements QueryConfiguration {
         private QueryTemplateInfo template;
         private Map<String, Variant> parameters;
         private QueryInfo query;
@@ -107,7 +119,7 @@ public abstract class TableAutomatonInfo implements AutomateSolution, Serializab
         }
 
         public QueryTemplateInfo addBuiltinParam(String name, Value value) {
-            return addBuiltinParam(name, new DynamicValue(value));
+            return addBuiltinParam(name, new DynamicVariantImpl(value));
         }
 
         public QueryTemplateInfo addBuiltinParam(String name, DynamicVariant dynamicValue) {
@@ -220,7 +232,7 @@ public abstract class TableAutomatonInfo implements AutomateSolution, Serializab
         }
     }
 
-    public static class PivotAutomatonInfo extends TableAutomatonInfo implements PivotSolution {
+    public static class PivotAutomatonInfo extends TableAutomatonInfo implements PivotConfiguration {
         private DynamicVariant data;
         private List<PivotFilter> filters;
         private List<PivotField> rows;

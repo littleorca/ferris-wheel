@@ -6,7 +6,7 @@ import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.TableData;
+import com.ctrip.ferriswheel.core.bean.TableDataImpl;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
@@ -23,7 +23,7 @@ public class TestFormulaEvaluator extends TestCase {
 
     public void testEvaluator() {
         Workbook book = new FilingClerk(environment).createWorkbook("test-workbook");
-        Table table = book.addSheet("sheet1").addTable("test", new TableData());
+        Table table = book.addSheet("sheet1").addTable("test", new TableDataImpl());
         ResolverMock resolver = new ResolverMock(book);
         FormulaEvaluator evaluator = new FormulaEvaluator(resolver);
 
@@ -93,7 +93,7 @@ public class TestFormulaEvaluator extends TestCase {
             Table table = cellRef.getTableName() == null ?
                     context.getCurrentTable() : sheet.getTable(cellRef.getTableName());
 
-            return table.getCell(cellRef.getRowIndex(), cellRef.getColumnIndex());
+            return table.getCell(cellRef.getRowIndex(), cellRef.getColumnIndex()).getData();
         }
 
         @Override

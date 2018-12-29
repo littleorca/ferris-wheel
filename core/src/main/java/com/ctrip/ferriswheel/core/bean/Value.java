@@ -327,8 +327,8 @@ public abstract class Value implements Variant {
 
     protected abstract Serializable rawValue();
 
-    public DynamicValue dynamic() {
-        return new DynamicValue(this);
+    public DynamicVariantImpl dynamic() {
+        return new DynamicVariantImpl(this);
     }
 
 

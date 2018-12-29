@@ -1,24 +1,24 @@
 package com.ctrip.ferriswheel.core.action;
 
 import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.table.AutomateSolution;
+import com.ctrip.ferriswheel.api.table.AutomateConfiguration;
 
 public class AutomateTable extends TableAction implements Action {
-    AutomateSolution solution;
+    AutomateConfiguration solution;
 
     public AutomateTable() {
     }
 
-    public AutomateTable(String sheetName, String tableName, AutomateSolution solution) {
+    public AutomateTable(String sheetName, String tableName, AutomateConfiguration solution) {
         super(sheetName, tableName);
         this.solution = solution;
     }
 
-    public AutomateSolution getSolution() {
+    public AutomateConfiguration getSolution() {
         return solution;
     }
 
-    public void setSolution(AutomateSolution solution) {
+    public void setSolution(AutomateConfiguration solution) {
         this.solution = solution;
     }
 }

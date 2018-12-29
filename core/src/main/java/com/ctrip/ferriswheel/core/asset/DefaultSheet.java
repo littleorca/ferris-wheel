@@ -7,9 +7,9 @@ import com.ctrip.ferriswheel.api.action.ActionNotifier;
 import com.ctrip.ferriswheel.api.chart.Chart;
 import com.ctrip.ferriswheel.api.chart.ChartBinder;
 import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.table.DryCellData;
-import com.ctrip.ferriswheel.api.table.DryRowData;
-import com.ctrip.ferriswheel.api.table.DryTableData;
+import com.ctrip.ferriswheel.api.table.Cell;
+import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.api.table.TableData;
 import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.api.view.Display;
 import com.ctrip.ferriswheel.api.view.Displayable;
@@ -17,8 +17,8 @@ import com.ctrip.ferriswheel.api.view.Grid;
 import com.ctrip.ferriswheel.api.view.Layout;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.AxisImpl;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
-import com.ctrip.ferriswheel.core.bean.TableData;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.core.bean.TableDataImpl;
 import com.ctrip.ferriswheel.core.bean.TextData;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
@@ -138,11 +138,11 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
 
     @Override
     public DefaultTable addTable(String name) {
-        return addTable(name, new TableData());
+        return addTable(name, new TableDataImpl());
     }
 
     @Override
-    public DefaultTable addTable(String name, DryTableData tableData) {
+    public DefaultTable addTable(String name, TableData tableData) {
         return handleAction(new AddTable(getName(), name, tableData));
     }
 
@@ -158,23 +158,19 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             assets.add(table);
 
             notifier.privately(() -> {
-                DryTableData td = addTable.getTableData();
-                if (td.getRows() != null) {
-                    for (DryRowData rd : td.getRows().values()) {
-                        if (rd.getCells() != null) {
-                            for (DryCellData cd : rd.getCells().values()) {
-                                if (cd.getValue().isFormula()) {
-                                    table.setCellFormula(rd.getIndex(), cd.getIndex(), cd.getValue().getFormulaString());
-                                } else {
-                                    table.setCellValue(rd.getIndex(), cd.getIndex(), cd.getValue());
-                                }
-                            }
+                TableData td = addTable.getTableData();
+                for (Row rd : td) {
+                    for (Cell cd : rd) {
+                        if (cd.getData().isFormula()) {
+                            table.setCellFormula(rd.getRowIndex(), cd.getColumnIndex(), cd.getData().getFormulaString());
+                        } else {
+                            table.setCellValue(rd.getRowIndex(), cd.getColumnIndex(), cd.getData());
                         }
                     }
                 }
 
-                if (td.getAutomatonSolution() != null) {
-                    table.automate(td.getAutomatonSolution());
+                if (td.getAutomateConfiguration() != null) {
+                    table.automate(td.getAutomateConfiguration());
                 }
 
                 // TODO use user specified layout?
@@ -182,9 +178,12 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
 
             layoutNewAsset(table);
             if (addTable.getTableData() == null) {
-                addTable.setTableData(new TableData());
+                addTable.setTableData(new TableDataImpl());
             }
-            addTable.getTableData().setLayout(new LayoutImpl(table.getLayout()));
+            // TODO review the class cast op
+            if (addTable.getTableData() instanceof TableDataImpl) {
+                ((TableDataImpl) addTable.getTableData()).setLayout(new LayoutImpl(table.getLayout()));
+            }
             return table;
         });
     }
@@ -347,12 +346,12 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     void fillTextData(DefaultText text, Text data) {
-        DynamicValue dv = (DynamicValue) data.getContent();
+        DynamicVariantImpl dv = (DynamicVariantImpl) data.getContent();
         if (dv.isFormula()) {
             text.getContent().setFormula(dv.getFormula());
         } else {
             text.getContent().setFormula(null);
-            text.getContent().setValue(dv.getValue());
+            text.getContent().setValue(dv.getVariant());
         }
         if (data.getLayout() != null) {
             text.getLayout().copy(data.getLayout());

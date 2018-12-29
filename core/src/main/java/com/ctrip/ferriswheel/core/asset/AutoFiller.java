@@ -140,8 +140,8 @@ public class AutoFiller {
         final int colIncr = nCols > 0 ? 1 : nCols < 0 ? -1 : 0;
 
         FormulaElement[] formulaElements = null;
-        if (cell != null && cell.isFormula()) {
-            formulaElements = FormulaParser.parse(cell.getFormulaString());
+        if (cell != null && cell.getData().isFormula()) {
+            formulaElements = FormulaParser.parse(cell.getData().getFormulaString());
         }
 
         for (int rowIndex = Math.min(startRow, endRow);
@@ -172,8 +172,7 @@ public class AutoFiller {
 
                 } else {
                     table.setCellFormula(rowIndex, colIndex, null);
-                    table.setCellValue(rowIndex, colIndex, cell == null ? null :
-                            cell instanceof DefaultCell ? ((DefaultCell) cell).getValue() : cell);
+                    table.setCellValue(rowIndex, colIndex, cell == null ? null : cell.getData());
                 }
             }
         }

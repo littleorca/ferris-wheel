@@ -152,7 +152,7 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
 
     public TableAutomatonInfo.QueryTemplateInfo getQueryTemplateInfo() {
         Map<String, DynamicVariant> params = new LinkedHashMap<>(builtinParams.size());
-        builtinParams.forEach((name, param) -> params.put(name, new DynamicValue(param)));
+        builtinParams.forEach((name, param) -> params.put(name, new DynamicVariantImpl(param)));
         Map<String, VariantRule> rules = new LinkedHashMap<>(userParamRules.size());
         userParamRules.forEach((name, rule) -> rules.put(name, new ValueRule(rule)));
         return new TableAutomatonInfo.QueryTemplateInfo(scheme, params, rules);

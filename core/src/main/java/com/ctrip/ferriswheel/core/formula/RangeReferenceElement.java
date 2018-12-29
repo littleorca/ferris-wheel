@@ -38,7 +38,7 @@ public class RangeReferenceElement extends ReferenceElement {
         List<Variant> valueList = new LinkedList<>();
         for (int row = top; row <= bottom; row++) {
             for (int col = left; col <= right; col++) {
-                valueList.add(Value.from(table.getCell(row, col)));
+                valueList.add(Value.from(table.getCell(row, col).getData()));
             }
         }
         context.pushOperand(new Value.ListValue(valueList, right - left + 1));

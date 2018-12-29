@@ -4,7 +4,7 @@ import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 import com.ctrip.ferriswheel.api.variant.ErrorCode;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.api.variant.VariantType;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
@@ -14,47 +14,47 @@ import java.util.Date;
 import java.util.List;
 
 public class ValueNode extends AssetNode implements VariantNode {
-    private DynamicValue variable;
+    private DynamicVariantImpl data;
 //    private transient boolean dirty;
 
     ValueNode(AssetManager assetManager, Value value, String formulaString) {
         super(assetManager);
-        this.variable = new DynamicValue(formulaString, value);
+        this.data = new DynamicVariantImpl(formulaString, value);
     }
 
-    ValueNode(AssetManager assetManager, DynamicVariant variable) {
+    ValueNode(AssetManager assetManager, DynamicVariant data) {
         super(assetManager);
-        this.variable = new DynamicValue(variable);
+        this.data = new DynamicVariantImpl(data);
     }
 
     public boolean isFormula() {
-        return variable.isFormula();
+        return data.isFormula();
     }
 
-    public Variant getValue() {
-        return variable.getValue();
+    public DynamicVariantImpl getData() {
+        return data;
     }
 
     protected void setValue(Variant value) {
-        this.variable.setValue(value);
+        this.data.setVariant(value);
         updateSequenceNumber();
     }
 
     public String getFormulaString() {
-        return variable.getFormulaString();
+        return data.getFormulaString();
     }
 
     protected Formula getFormula() {
-        return variable.getFormula();
+        return data.getFormula();
     }
 
     protected void setFormula(Formula formula) {
-        this.variable.setFormula(formula);
+        this.data.setFormula(formula);
         updateSequenceNumber();
     }
 
     protected void setDynamicVariant(DynamicVariant variable) {
-        this.variable = new DynamicValue(variable);
+        this.data = new DynamicVariantImpl(variable);
         updateSequenceNumber();
     }
 
@@ -77,91 +77,91 @@ public class ValueNode extends AssetNode implements VariantNode {
 
     @Override
     public VariantType valueType() {
-        return variable.valueType();
+        return data.valueType();
     }
 
     @Override
     public boolean isValid() {
-        return variable.isValid();
+        return data.isValid();
     }
 
     @Override
     public boolean isBlank() {
-        return variable.isBlank();
+        return data.isBlank();
     }
 
     @Override
     public ErrorCode errorValue() {
-        return variable.errorValue();
+        return data.errorValue();
     }
 
     @Override
     public int intValue() {
-        return variable.intValue();
+        return data.intValue();
     }
 
     @Override
     public long longValue() {
-        return variable.longValue();
+        return data.longValue();
     }
 
     @Override
     public float floatValue() {
-        return variable.floatValue();
+        return data.floatValue();
     }
 
     @Override
     public double doubleValue() {
-        return variable.doubleValue();
+        return data.doubleValue();
     }
 
     @Override
     public BigDecimal decimalValue() {
-        return variable.decimalValue();
+        return data.decimalValue();
     }
 
     @Override
     public boolean booleanValue() {
-        return variable.booleanValue();
+        return data.booleanValue();
     }
 
     @Override
     public Date dateValue() {
-        return variable.dateValue();
+        return data.dateValue();
     }
 
     @Override
     public String strValue() {
-        return variable.strValue();
+        return data.strValue();
     }
 
     @Override
     public List<Variant> listValue() {
-        return variable.listValue();
+        return data.listValue();
     }
 
     @Override
     public int itemCount() {
-        return variable.itemCount();
+        return data.itemCount();
     }
 
     @Override
     public Variant item(int i) {
-        return variable.item(i);
+        return data.item(i);
     }
 
     @Override
     public int columnCount() {
-        return variable.columnCount();
+        return data.columnCount();
     }
 
     @Override
     public int rowCount() {
-        return variable.rowCount();
+        return data.rowCount();
     }
 
     @Override
     public int compareTo(Variant o) {
-        return variable.compareTo(o);
+        return data.compareTo(o);
     }
 }

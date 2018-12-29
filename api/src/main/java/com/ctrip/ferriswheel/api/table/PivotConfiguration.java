@@ -23,42 +23,23 @@
  *
  */
 
-package com.ctrip.ferriswheel.core.bean;
+package com.ctrip.ferriswheel.api.table;
 
-import com.ctrip.ferriswheel.api.table.AutomateSolution;
-import com.ctrip.ferriswheel.api.table.DryRowData;
-import com.ctrip.ferriswheel.api.table.DryTableData;
-import com.ctrip.ferriswheel.api.view.Layout;
-import com.ctrip.ferriswheel.core.util.TreeSparseArray;
+import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class TableData implements DryTableData, Serializable {
-    private TreeSparseArray<DryRowData> rows;
-    private AutomateSolution automatonInfo;
-    private Layout layout;
+/**
+ * @author liuhaifeng
+ */
+public interface PivotConfiguration extends AutomateConfiguration {
+    DynamicVariant getData();
 
-    public TreeSparseArray<DryRowData> getRows() {
-        return rows;
-    }
+    List<PivotFilter> getFilters();
 
-    public void setRows(TreeSparseArray<DryRowData> rows) {
-        this.rows = rows;
-    }
+    List<PivotField> getRows();
 
-    public AutomateSolution getAutomatonSolution() {
-        return automatonInfo;
-    }
+    List<PivotField> getColumns();
 
-    public void setAutomatonSolution(AutomateSolution automatonInfo) {
-        this.automatonInfo = automatonInfo;
-    }
-
-    public Layout getLayout() {
-        return layout;
-    }
-
-    public void setLayout(Layout layout) {
-        this.layout = layout;
-    }
+    List<PivotValue> getValues();
 }

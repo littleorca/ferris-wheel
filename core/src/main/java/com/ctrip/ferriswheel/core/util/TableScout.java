@@ -19,9 +19,9 @@ public class TableScout {
                 if (cell == null) {
                     continue;
                 }
-                if (cell.valueType() == VariantType.DECIMAL
-                        || cell.valueType() == VariantType.BLANK
-                        || cell.valueType() == VariantType.ERROR) {
+                if (cell.getData().valueType() == VariantType.DECIMAL
+                        || cell.getData().valueType() == VariantType.BLANK
+                        || cell.getData().valueType() == VariantType.ERROR) {
                     continue;
                 }
                 return false;
@@ -31,13 +31,13 @@ public class TableScout {
     }
 
     public static boolean isDecimalCompatible(Cell cell) {
-        if (cell == null || cell.valueType() == VariantType.BLANK) {
+        if (cell == null || cell.getData().valueType() == VariantType.BLANK) {
             return true;
         }
-        if (cell.valueType() == VariantType.ERROR) {
+        if (cell.getData().valueType() == VariantType.ERROR) {
             return true;
         }
-        if (cell.valueType() == VariantType.DECIMAL) {
+        if (cell.getData().valueType() == VariantType.DECIMAL) {
             return true;
         }
         return false;

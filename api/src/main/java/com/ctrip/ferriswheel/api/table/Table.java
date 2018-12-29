@@ -28,7 +28,6 @@ package com.ctrip.ferriswheel.api.table;
 import com.ctrip.ferriswheel.api.Sheet;
 import com.ctrip.ferriswheel.api.SheetAsset;
 import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.view.Displayable;
 
 /**
  * Holds data grid and provides manipulating interface.
@@ -36,8 +35,7 @@ import com.ctrip.ferriswheel.api.view.Displayable;
  * @see Row
  * @see Cell
  */
-public interface Table extends SheetAsset, Iterable<Row>, Displayable {
-
+public interface Table extends SheetAsset, TableData {
     /**
      * Get max supported rows.
      *
@@ -58,21 +56,6 @@ public interface Table extends SheetAsset, Iterable<Row>, Displayable {
      * @return
      */
     Sheet getSheet();
-
-    /**
-     * Get row count.
-     *
-     * @return
-     */
-    int getRowCount();
-
-    /**
-     * Get row by index.
-     *
-     * @param rowIndex
-     * @return
-     */
-    Row getRow(int rowIndex);
 
     /**
      * Get column count.
@@ -283,7 +266,7 @@ public interface Table extends SheetAsset, Iterable<Row>, Displayable {
      *
      * @param solution
      */
-    void automate(AutomateSolution solution);
+    void automate(AutomateConfiguration solution);
 
     /**
      * Get table automaton.

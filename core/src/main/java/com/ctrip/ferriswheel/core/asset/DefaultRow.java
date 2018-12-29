@@ -93,7 +93,7 @@ public class DefaultRow extends AssetNode implements Row {
     public int size() {
         for (int i = cells.size() - 1; i >= 0; i--) {
             Cell cell = cells.get(i);
-            if (cell != null && (!cell.isBlank() || cell.isFormula())) {
+            if (cell != null && (!cell.getData().isBlank() || cell.getData().isFormula())) {
                 return i + 1;
             }
         }
@@ -117,7 +117,7 @@ public class DefaultRow extends AssetNode implements Row {
         sb.append(String.format(" %4d |", getRowIndex() + 1));
         for (int col = 0; col < cells.size(); col++) {
             DefaultCell cell = cells.get(col);
-            String value = cell == null ? "" : cell.getValue() == null ? "" : cell.getValue().strValue();
+            String value = cell == null ? "" : cell.getData() == null ? "" : cell.getData().strValue();
             sb.append(String.format(" %-8s \t|", value));
         }
         sb.delete(sb.length() - 2, sb.length()).append("\n");

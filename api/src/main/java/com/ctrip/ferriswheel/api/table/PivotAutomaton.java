@@ -25,13 +25,8 @@
 
 package com.ctrip.ferriswheel.api.table;
 
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-
 /**
  * @author liuhaifeng
  */
-public interface DryCellData {
-    int getIndex();
-
-    DynamicVariant getValue();
+public interface PivotAutomaton extends TableAutomaton, PivotConfiguration {
 }

@@ -145,7 +145,7 @@ public class TestAssetManagement extends TestCase {
 
         TableAutomatonInfo.QueryTemplateInfo queryTemplateInfo = new TableAutomatonInfo.QueryTemplateInfo();
         queryTemplateInfo.setScheme("test");
-        queryTemplateInfo.addBuiltinParam("p1", new DynamicValue("NOW()"));
+        queryTemplateInfo.addBuiltinParam("p1", new DynamicVariantImpl("NOW()"));
         try {
             table.automate(new TableAutomatonInfo.QueryAutomatonInfo(queryTemplateInfo, null, null));
         } catch (RuntimeException e) {
@@ -180,50 +180,50 @@ public class TestAssetManagement extends TestCase {
         checkAssetMap(wb);
 
         DefaultChart chart = s1.addChart("chart1", new ChartData("chart1", "Line",
-                new DynamicValue("\"Chart Title 1\""),
-                new DynamicValue("sheet1!table1!$B$1:$C$1"),
+                new DynamicVariantImpl("\"Chart Title 1\""),
+                new DynamicVariantImpl("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!$A$2"),
+                                new DynamicVariantImpl("sheet1!table1!$A$2"),
                                 null,
-                                new DynamicValue("sheet1!table1!$B$2:$C$2")),
+                                new DynamicVariantImpl("sheet1!table1!$B$2:$C$2")),
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!$A$3"),
+                                new DynamicVariantImpl("sheet1!table1!$A$3"),
                                 null,
-                                new DynamicValue("sheet1!table1!$B$3:$C$3"))
+                                new DynamicVariantImpl("sheet1!table1!$B$3:$C$3"))
                 )));
         checkAssetMap(wb);
 
-        chart.addSeries(new DynamicValue("sheet1!table1!$A$4"), null, new DynamicValue("sheet1!table1!$B$4:$C$4"));
+        chart.addSeries(new DynamicVariantImpl("sheet1!table1!$A$4"), null, new DynamicVariantImpl("sheet1!table1!$B$4:$C$4"));
         checkAssetMap(wb);
 
         s1.addChart("chart2", new ChartData("chart2","Line",
-                new DynamicValue("\"Chart Title 2\""),
-                new DynamicValue("sheet1!table1!$B$1:$C$1"),
+                new DynamicVariantImpl("\"Chart Title 2\""),
+                new DynamicVariantImpl("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!$A$2"),
-                                new DynamicValue("sheet1!table1!$B$2:$C$2"),
+                                new DynamicVariantImpl("sheet1!table1!$A$2"),
+                                new DynamicVariantImpl("sheet1!table1!$B$2:$C$2"),
                                 null),
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!$A$3"),
-                                new DynamicValue("sheet1!table1!$B$3:$C$3"),
+                                new DynamicVariantImpl("sheet1!table1!$A$3"),
+                                new DynamicVariantImpl("sheet1!table1!$B$3:$C$3"),
                                 null)
                 )));
         checkAssetMap(wb);
 
         // test update chart
         s1.updateChart("chart2", new ChartData("chart2", "Line",
-                new DynamicValue("\"Chart New Title 2\""),
-                new DynamicValue("sheet1!table1!$B$1:$D$1"),
+                new DynamicVariantImpl("\"Chart New Title 2\""),
+                new DynamicVariantImpl("sheet1!table1!$B$1:$D$1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!$A$2"),
-                                new DynamicValue("sheet1!table1!$B$2:$D$2"),
+                                new DynamicVariantImpl("sheet1!table1!$A$2"),
+                                new DynamicVariantImpl("sheet1!table1!$B$2:$D$2"),
                                 null),
                         new ChartData.SeriesImpl(
-                                new DynamicValue("sheet1!table1!$A$3"),
-                                new DynamicValue("sheet1!table1!$B$3:$D$3"),
+                                new DynamicVariantImpl("sheet1!table1!$A$3"),
+                                new DynamicVariantImpl("sheet1!table1!$B$3:$D$3"),
                                 null)
                 )));
         checkAssetMap(wb);

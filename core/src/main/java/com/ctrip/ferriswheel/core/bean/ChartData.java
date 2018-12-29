@@ -40,8 +40,8 @@ import java.util.List;
 public class ChartData implements Chart, Serializable {
     private String name;
     private String type;
-    private DynamicValue title;
-    private DynamicValue categories;
+    private DynamicVariantImpl title;
+    private DynamicVariantImpl categories;
     private List<DataSeries> seriesList = new ArrayList<>();
     private LayoutImpl layout;
     private BinderImpl binder;
@@ -55,8 +55,8 @@ public class ChartData implements Chart, Serializable {
     public ChartData(Chart chart) {
         this.name = chart.getName();
         this.type = chart.getType();
-        this.title = new DynamicValue(chart.getTitle());
-        this.categories = new DynamicValue(chart.getCategories());
+        this.title = new DynamicVariantImpl(chart.getTitle());
+        this.categories = new DynamicVariantImpl(chart.getCategories());
         this.seriesList = new ArrayList<>(chart.getSeriesCount());
         for (int i = 0; i < chart.getSeriesCount(); i++) {
             this.seriesList.add(new SeriesImpl(chart.getSeries(i)));
@@ -78,16 +78,16 @@ public class ChartData implements Chart, Serializable {
 
     public ChartData(String name,
                      String type,
-                     DynamicValue title,
-                     DynamicValue categories,
+                     DynamicVariantImpl title,
+                     DynamicVariantImpl categories,
                      List<DataSeries> seriesList) {
         this(name, type, title, categories, seriesList, null, null, null, null, null);
     }
 
     public ChartData(String name,
                      String type,
-                     DynamicValue title,
-                     DynamicValue categories,
+                     DynamicVariantImpl title,
+                     DynamicVariantImpl categories,
                      List<DataSeries> seriesList,
                      LayoutImpl layout,
                      BinderImpl binder,
@@ -125,20 +125,20 @@ public class ChartData implements Chart, Serializable {
     }
 
     @Override
-    public DynamicValue getTitle() {
+    public DynamicVariantImpl getTitle() {
         return title;
     }
 
-    public void setTitle(DynamicValue title) {
+    public void setTitle(DynamicVariantImpl title) {
         this.title = title;
     }
 
     @Override
-    public DynamicValue getCategories() {
+    public DynamicVariantImpl getCategories() {
         return categories;
     }
 
-    public void setCategories(DynamicValue categories) {
+    public void setCategories(DynamicVariantImpl categories) {
         this.categories = categories;
     }
 
@@ -210,61 +210,61 @@ public class ChartData implements Chart, Serializable {
     }
 
     public static class SeriesImpl implements DataSeries, Serializable {
-        private DynamicValue name;
-        private DynamicValue xValues;
-        private DynamicValue yValues;
+        private DynamicVariantImpl name;
+        private DynamicVariantImpl xValues;
+        private DynamicVariantImpl yValues;
 
         public SeriesImpl() {
         }
 
         public SeriesImpl(DataSeries series) {
             if (series.getName() != null) {
-                this.name = new DynamicValue(series.getName());
+                this.name = new DynamicVariantImpl(series.getName());
             }
             if (series.getxValues() != null) {
-                this.xValues = new DynamicValue(series.getxValues());
+                this.xValues = new DynamicVariantImpl(series.getxValues());
             }
             if (series.getyValues() != null) {
-                this.yValues = new DynamicValue(series.getyValues());
+                this.yValues = new DynamicVariantImpl(series.getyValues());
             }
         }
 
-        public SeriesImpl(DynamicValue name, DynamicValue xValues, DynamicValue yValues) {
+        public SeriesImpl(DynamicVariantImpl name, DynamicVariantImpl xValues, DynamicVariantImpl yValues) {
             this.name = name;
             this.xValues = xValues;
             this.yValues = yValues;
         }
 
         @Override
-        public DynamicValue getName() {
+        public DynamicVariantImpl getName() {
             return name;
         }
 
         public void setName(DynamicVariant name) {
-            this.name = name instanceof DynamicValue ? (DynamicValue) name : new DynamicValue(name);
+            this.name = name instanceof DynamicVariantImpl ? (DynamicVariantImpl) name : new DynamicVariantImpl(name);
         }
 
         @Override
-        public DynamicValue getxValues() {
+        public DynamicVariantImpl getxValues() {
             return xValues;
         }
 
         public void setxValues(DynamicVariant xValues) {
-            this.xValues = xValues instanceof DynamicValue ? (DynamicValue) xValues : new DynamicValue(xValues);
+            this.xValues = xValues instanceof DynamicVariantImpl ? (DynamicVariantImpl) xValues : new DynamicVariantImpl(xValues);
         }
 
         @Override
-        public DynamicValue getyValues() {
+        public DynamicVariantImpl getyValues() {
             return yValues;
         }
 
         public void setyValues(DynamicVariant yValues) {
-            this.yValues = yValues instanceof DynamicValue ? (DynamicValue) yValues : new DynamicValue(yValues);
+            this.yValues = yValues instanceof DynamicVariantImpl ? (DynamicVariantImpl) yValues : new DynamicVariantImpl(yValues);
         }
     }
 
     public static class BinderImpl implements ChartBinder, Serializable {
-        private DynamicValue data;
+        private DynamicVariantImpl data;
         private Orientation orientation;
         private Placement categoriesPlacement;
         private Placement seriesNamePlacement;
@@ -273,13 +273,13 @@ public class ChartData implements Chart, Serializable {
         }
 
         public BinderImpl(ChartBinder chartBinder) {
-            this(new DynamicValue(chartBinder.getData()),
+            this(new DynamicVariantImpl(chartBinder.getData()),
                     chartBinder.getOrientation(),
                     chartBinder.getCategoriesPlacement(),
                     chartBinder.getSeriesNamePlacement());
         }
 
-        public BinderImpl(DynamicValue data,
+        public BinderImpl(DynamicVariantImpl data,
                           Orientation orientation,
                           Placement categoriesPlacement,
                           Placement seriesNamePlacement) {
@@ -290,11 +290,11 @@ public class ChartData implements Chart, Serializable {
         }
 
         @Override
-        public DynamicValue getData() {
+        public DynamicVariantImpl getData() {
             return data;
         }
 
-        public void setData(DynamicValue data) {
+        public void setData(DynamicVariantImpl data) {
             this.data = data;
         }
 

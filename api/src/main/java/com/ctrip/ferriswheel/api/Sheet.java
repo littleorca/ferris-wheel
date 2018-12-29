@@ -26,7 +26,7 @@
 package com.ctrip.ferriswheel.api;
 
 import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.table.DryTableData;
+import com.ctrip.ferriswheel.api.table.TableData;
 import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.api.view.Displayable;
@@ -56,7 +56,7 @@ public interface Sheet extends Displayable, Iterable<SheetAsset> {
 
     Table addTable(String name);
 
-    Table addTable(String name, DryTableData tableData);
+    Table addTable(String name, TableData tableData);
 
     /**
      * Get chart by name.

@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.proto.util;
 
-import com.ctrip.ferriswheel.api.table.DryRowData;
+import com.ctrip.ferriswheel.api.table.Row;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.api.action.Action;
@@ -51,19 +51,17 @@ public class PbActionHelper {
         Table.Builder tableBuilder = Table.newBuilder()
                 .setName(bean.getTableName());
         if (bean.getTableData() != null) {
-            if (bean.getTableData().getRows() != null) {
-                for (DryRowData row : bean.getTableData().getRows().values()) {
-                    tableBuilder.addRows(PbHelper.pb(row));
-                }
+            for (Row row : bean.getTableData()) {
+                tableBuilder.addRows(PbHelper.pb(row));
             }
-            if (bean.getTableData().getAutomatonSolution() != null) {
-                if (bean.getTableData().getAutomatonSolution() instanceof TableAutomatonInfo.QueryAutomatonInfo) {
+            if (bean.getTableData().getAutomateConfiguration() != null) {
+                if (bean.getTableData().getAutomateConfiguration() instanceof TableAutomatonInfo.QueryAutomatonInfo) {
                     TableAutomaton.Builder auto = TableAutomaton.newBuilder();
-                    auto.setQueryAutomaton(PbHelper.pb((TableAutomatonInfo.QueryAutomatonInfo) bean.getTableData().getAutomatonSolution()));
+                    auto.setQueryAutomaton(PbHelper.pb((TableAutomatonInfo.QueryAutomatonInfo) bean.getTableData().getAutomateConfiguration()));
                     tableBuilder.setAutomaton(auto);
-                } else if (bean.getTableData().getAutomatonSolution() instanceof TableAutomatonInfo.PivotAutomatonInfo) {
+                } else if (bean.getTableData().getAutomateConfiguration() instanceof TableAutomatonInfo.PivotAutomatonInfo) {
                     TableAutomaton.Builder auto = TableAutomaton.newBuilder();
-                    auto.setPivotAutomaton(PbHelper.pb((TableAutomatonInfo.PivotAutomatonInfo) bean.getTableData().getAutomatonSolution()));
+                    auto.setPivotAutomaton(PbHelper.pb((TableAutomatonInfo.PivotAutomatonInfo) bean.getTableData().getAutomateConfiguration()));
                     tableBuilder.setAutomaton(auto);
                 }
             }

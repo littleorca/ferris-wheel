@@ -65,6 +65,6 @@ public class DateDif implements Function {
         Variant start = context.popOperand();
 
         Calendar cal = Calendar.getInstance();
-        // TODO
+        // TODO incomplete
     }
 }

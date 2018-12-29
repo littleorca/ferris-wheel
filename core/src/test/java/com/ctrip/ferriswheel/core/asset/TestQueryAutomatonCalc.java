@@ -6,7 +6,7 @@ import com.ctrip.ferriswheel.api.query.DataQuery;
 import com.ctrip.ferriswheel.api.query.DataSet;
 import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 import com.ctrip.ferriswheel.api.variant.VariantRule;
-import com.ctrip.ferriswheel.core.bean.DynamicValue;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.bean.Value;
@@ -41,7 +41,7 @@ public class TestQueryAutomatonCalc extends TestCase {
         HashMap<String, DynamicVariant> builtinParams = new HashMap<>();
 
         builtinParams.put("p1", Value.str("this is parameter 1").dynamic());
-        builtinParams.put("p2", new DynamicValue("normal!A1"));
+        builtinParams.put("p2", new DynamicVariantImpl("normal!A1"));
 
         Map<String, VariantRule> userParamRules = Collections.emptyMap();
 

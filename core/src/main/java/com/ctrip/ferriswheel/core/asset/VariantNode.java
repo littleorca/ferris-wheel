@@ -40,7 +40,7 @@ public interface VariantNode extends DynamicVariant, Asset {
      *
      * @return
      */
-    Variant getValue();
+    Variant getData();
 
     /**
      * Determine whether this node is a formula node or not.

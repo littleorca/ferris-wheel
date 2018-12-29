@@ -1,12 +1,7 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.table.PivotField;
-import com.ctrip.ferriswheel.api.table.PivotFilter;
-import com.ctrip.ferriswheel.api.table.PivotValue;
-import com.ctrip.ferriswheel.api.table.AggregateType;
 import com.ctrip.ferriswheel.api.query.DataSet;
-import com.ctrip.ferriswheel.api.table.PivotSolution;
-import com.ctrip.ferriswheel.api.table.TableAutomaton;
+import com.ctrip.ferriswheel.api.table.*;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.core.analysis.DimensionalAggregator;
 import com.ctrip.ferriswheel.core.bean.*;
@@ -18,15 +13,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class DefaultPivotAutomaton extends AbstractTableAutomaton implements TableAutomaton {
+public class DefaultPivotAutomaton extends AbstractTableAutomaton implements PivotAutomaton {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultPivotAutomaton.class);
     private final ValueNode data;
-    private List<?> filters; // TODO
+    private List<PivotFilter> filters; // TODO
     private List<FieldMeta> rows;
     private List<FieldMeta> columns;
     private List<ValueMeta> values;
 
-    DefaultPivotAutomaton(AssetManager assetManager, PivotSolution pivot) {
+    DefaultPivotAutomaton(AssetManager assetManager, PivotConfiguration pivot) {
         super(assetManager);
 
         this.data = new ValueNode(getAssetManager(), Value.BLANK, null);
@@ -46,7 +41,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         }
     }
 
-    private void updatePivot(PivotSolution pivot) {
+    private void updatePivot(PivotConfiguration pivot) {
         if (pivot.getData() == null || pivot.getRows() == null || pivot.getValues() == null) {
             throw new IllegalArgumentException("Missing at least one of the required fields: [data, rows, values].");
         }
@@ -256,15 +251,15 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
             DimensionalAggregator.Record record = aggregator.newRecord();
             for (FieldMeta field : columns) {
                 DefaultCell cell = table.getCell(rowIndex, field.getColumnIndex());
-                record.dim(field.getField(), cell.getValue());
+                record.dim(field.getField(), cell.getData());
             }
             for (FieldMeta field : rows) {
                 DefaultCell cell = table.getCell(rowIndex, field.getColumnIndex());
-                record.dim(field.getField(), cell.getValue());
+                record.dim(field.getField(), cell.getData());
             }
             for (int i = 0; i < values.size(); i++) {
                 DefaultCell cell = table.getCell(rowIndex, values.get(i).getColumnIndex());
-                record.val(i, cell.getValue());
+                record.val(i, cell.getData());
             }
             record.commit();
         }
@@ -325,27 +320,27 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Tab
         }
 
         return new TableAutomatonInfo.PivotAutomatonInfo(
-                new DynamicValue(data.getFormulaString()), filterList, rowList, columnList, valueList);
+                new DynamicVariantImpl(data.getFormulaString()), filterList, rowList, columnList, valueList);
     }
 
-    ValueNode getData() {
+    public ValueNode getData() {
         return data;
     }
 
-    List<?> getFilters() {
+    public List<PivotFilter> getFilters() {
         return filters;
     }
 
-    List<FieldMeta> getRows() {
-        return rows;
+    public List<PivotField> getRows() {
+        return Collections.unmodifiableList(rows);
     }
 
-    List<FieldMeta> getColumns() {
-        return columns;
+    public List<PivotField> getColumns() {
+        return Collections.unmodifiableList(columns);
     }
 
-    List<ValueMeta> getValues() {
-        return values;
+    public List<PivotValue> getValues() {
+        return Collections.unmodifiableList(values);
     }
 
     class FieldMeta extends PivotFieldImpl {

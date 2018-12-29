@@ -74,7 +74,7 @@ public abstract class AbstractTableAutomaton extends AssetNode implements TableA
 
     protected void refreshCellValue(DefaultTable table, int rowIndex, int columnIndex, Value newValue) {
         DefaultCell cell = table.getCell(rowIndex, columnIndex);
-        if (!newValue.equals(cell.getValue())) {
+        if (!newValue.equals(cell.getData())) {
             cell.setValue(newValue);
         }
     }

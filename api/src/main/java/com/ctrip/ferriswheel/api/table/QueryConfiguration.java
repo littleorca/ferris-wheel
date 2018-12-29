@@ -25,8 +25,19 @@
 
 package com.ctrip.ferriswheel.api.table;
 
+import com.ctrip.ferriswheel.api.query.DataQuery;
+import com.ctrip.ferriswheel.api.query.QueryTemplate;
+import com.ctrip.ferriswheel.api.variant.Variant;
+
+import java.util.Map;
+
 /**
  * @author liuhaifeng
  */
-public interface AutomateSolution {
+public interface QueryConfiguration extends AutomateConfiguration {
+    QueryTemplate getTemplate();
+
+    Map<String, Variant> getParameters();
+
+    DataQuery getQuery();
 }

@@ -25,8 +25,6 @@
 
 package com.ctrip.ferriswheel.api.variant;
 
-import com.ctrip.ferriswheel.api.variant.Variant;
-
 /**
  * Dynamic variant extends {@link Variant} with adding a formula string.
  * If a dynamic variant has specified a formula, the final value will be

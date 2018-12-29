@@ -30,7 +30,7 @@ import com.ctrip.ferriswheel.api.variant.Variant;
 
 import java.util.Map;
 
-public interface QueryAutomaton extends TableAutomaton {
+public interface QueryAutomaton extends TableAutomaton, QueryConfiguration {
 
     /**
      * Query with specified user parameters.

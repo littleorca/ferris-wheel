@@ -34,13 +34,15 @@ import com.ctrip.ferriswheel.api.variant.DynamicVariant;
  * @see Table
  * @see Row
  */
-public interface Cell extends DynamicVariant {
+public interface Cell {
 
     Row getRow();
 
     int getRowIndex();
 
     int getColumnIndex();
+
+    DynamicVariant getData();
 
     boolean isFillUp();
 
