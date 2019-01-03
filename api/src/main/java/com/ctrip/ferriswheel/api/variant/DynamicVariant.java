@@ -35,6 +35,7 @@ package com.ctrip.ferriswheel.api.variant;
 public interface DynamicVariant extends Variant {
 
     /**
+     * TODO review this method: if it is dynamic variant, it surely should has formula.
      * Determine if this dynamic variant is a formula.
      *
      * @return

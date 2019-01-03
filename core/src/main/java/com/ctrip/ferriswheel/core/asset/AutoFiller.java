@@ -85,14 +85,16 @@ public class AutoFiller {
                                        int colIndex,
                                        int neighborRowDelta,
                                        int neighborColDelta) {
-        Cell cell = table.getCell(rowIndex + neighborRowDelta, colIndex + neighborColDelta);
+        int originRowIndex = rowIndex + neighborRowDelta;
+        int originColIndex = colIndex + neighborColDelta;
+        Cell cell = table.getCell(originRowIndex, originColIndex);
         if (cell == null) {
             return false;
         }
         if (!canFill(cell, -neighborRowDelta, -neighborColDelta)) {
             return false;
         }
-        doFill(table, cell.getRowIndex(), cell.getColumnIndex(), -neighborRowDelta, -neighborColDelta);
+        doFill(table, originRowIndex, originColIndex, -neighborRowDelta, -neighborColDelta);
         return true;
     }
 

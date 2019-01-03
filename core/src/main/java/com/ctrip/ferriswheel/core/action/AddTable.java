@@ -1,16 +1,16 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.table.TableData;
 import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.api.table.Table;
 
 public final class AddTable extends SheetAction implements Action {
     private String tableName;
-    private TableData tableData;
+    private Table tableData;
 
     public AddTable() {
     }
 
-    public AddTable(String sheetName, String tableName, TableData tableData) {
+    public AddTable(String sheetName, String tableName, Table tableData) {
         super(sheetName);
         this.tableName = tableName;
         this.tableData = tableData;
@@ -33,11 +33,11 @@ public final class AddTable extends SheetAction implements Action {
         this.tableName = tableName;
     }
 
-    public TableData getTableData() {
+    public Table getTableData() {
         return tableData;
     }
 
-    public void setTableData(TableData tableData) {
+    public void setTableData(Table tableData) {
         this.tableData = tableData;
     }
 }

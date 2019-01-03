@@ -97,7 +97,7 @@ public class HtmlHelper {
                 String type = Value.BlankValue.class.getSimpleName();
                 String value = "";
                 String info = "";
-                Cell cell = columnIndex < row.size() ? row.getCell(columnIndex) : null;
+                Cell cell = columnIndex < row.getCellCount() ? row.getCell(columnIndex) : null;
                 if (cell != null) {
                     type = cell.getData().valueType().toString();
                     value = escapeHtml(cell.getData().strValue());

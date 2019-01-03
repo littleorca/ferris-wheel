@@ -22,7 +22,6 @@ public class DefaultCell extends ValueNode implements Cell {
         super(assetManager, value, formulaString);
     }
 
-    @Override
     public DefaultRow getRow() {
         return (DefaultRow) getParent();
     }
@@ -31,12 +30,10 @@ public class DefaultCell extends ValueNode implements Cell {
         setParent(row);
     }
 
-    @Override
     public int getRowIndex() {
         return getRow().getRowIndex();
     }
 
-    @Override
     public int getColumnIndex() {
         return columnIndex;
     }

@@ -1,6 +1,9 @@
 package com.ctrip.ferriswheel.proto.util;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.api.Workbook;
 import com.ctrip.ferriswheel.api.chart.*;
 import com.ctrip.ferriswheel.api.query.DataQuery;
 import com.ctrip.ferriswheel.api.query.QueryTemplate;
@@ -72,14 +75,14 @@ public class PbHelper {
             com.ctrip.ferriswheel.proto.v1.SheetAsset asset = sheetProto.getAssets(i);
             switch (asset.getAssetCase()) {
                 case TABLE:
-                    Table table = sheet.addTable(asset.getTable().getName());
+                    Table table = sheet.addAsset(Table.class, asset.getTable().getName());
                     bean(table, asset.getTable());
                     break;
                 case CHART:
-                    sheet.addChart(asset.getChart().getName(), bean(asset.getChart()));
+                    sheet.addAsset(Chart.class, bean(asset.getChart()));
                     break;
                 case TEXT:
-                    sheet.addText(asset.getText().getName(), bean(asset.getText()));
+                    sheet.addAsset(Text.class, bean(asset.getText()));
                     break;
                 case ASSET_NOT_SET:
                 default:
@@ -92,8 +95,8 @@ public class PbHelper {
     public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(String tableName, TableDataImpl tableData) {
         com.ctrip.ferriswheel.proto.v1.Table.Builder builder = com.ctrip.ferriswheel.proto.v1.Table.newBuilder();
         builder.setName(tableName);
-        for (Row row : tableData.getRows().values()) {
-            builder.addRows(pb(row));
+        for (Map.Entry<Integer, Row> rowEntry : tableData) {
+            builder.addRows(pb(rowEntry.getValue(), rowEntry.getKey()));
         }
         if (tableData.getAutomateConfiguration() != null) {
             com.ctrip.ferriswheel.proto.v1.TableAutomaton.Builder auto = com.ctrip.ferriswheel.proto.v1.TableAutomaton.newBuilder();
@@ -122,7 +125,7 @@ public class PbHelper {
             com.ctrip.ferriswheel.proto.v1.TableAutomaton automatonProto = proto.getAutomaton();
             if (automatonProto.getAutomatonCase() != com.ctrip.ferriswheel.proto.v1.TableAutomaton.AutomatonCase.AUTOMATON_NOT_SET) {
                 TableAutomatonInfo automaton = bean(automatonProto);
-                table.setAutomatonSolution(automaton);
+                table.setAutomateConfiguration(automaton);
             }
         }
         if (proto.hasLayout()) {
@@ -136,7 +139,7 @@ public class PbHelper {
 
     public static RowData bean(com.ctrip.ferriswheel.proto.v1.Row proto) {
         RowData bean = new RowData();
-        bean.setRowIndex(proto.getRowIndex());
+        // bean.setRowIndex(proto.getRowIndex());
         TreeSparseArray<Cell> cells = new TreeSparseArray<>();
         for (int i = 0; i < proto.getCellsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Cell c = proto.getCells(i);
@@ -146,16 +149,16 @@ public class PbHelper {
         return bean;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Cell pb(Cell bean) {
+    public static com.ctrip.ferriswheel.proto.v1.Cell pb(Cell bean, int columnIndex) {
         return com.ctrip.ferriswheel.proto.v1.Cell.newBuilder()
-                .setColumnIndex(bean.getColumnIndex())
+                .setColumnIndex(columnIndex)
                 .setValue(pb(bean.getData()))
                 .build();
     }
 
     public static CellData bean(com.ctrip.ferriswheel.proto.v1.Cell proto) {
         CellData bean = new CellData();
-        bean.setColumnIndex(proto.getColumnIndex());
+        // bean.setColumnIndex(proto.getColumnIndex());
         bean.setData(toDynamicValue(proto.getValue()));
         return bean;
     }
@@ -163,8 +166,8 @@ public class PbHelper {
     public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(Table bean) {
         com.ctrip.ferriswheel.proto.v1.Table.Builder builder = com.ctrip.ferriswheel.proto.v1.Table.newBuilder();
         builder.setName(bean.getName());
-        for (Row row : bean) {
-            builder.addRows(pb(row));
+        for (Map.Entry<Integer, Row> rowEntry : bean) {
+            builder.addRows(pb(rowEntry.getValue(), rowEntry.getKey()));
         }
         if (bean.getAutomaton() != null) {
             builder.setAutomaton(pb(bean.getAutomaton()));
@@ -201,11 +204,11 @@ public class PbHelper {
         return table;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.Row pb(Row row) {
+    public static com.ctrip.ferriswheel.proto.v1.Row pb(Row row, int index) {
         com.ctrip.ferriswheel.proto.v1.Row.Builder builder = com.ctrip.ferriswheel.proto.v1.Row.newBuilder();
-        builder.setRowIndex(row.getRowIndex());
-        for (Cell cell : row) {
-            builder.addCells(pb(cell));
+        builder.setRowIndex(index);
+        for (Map.Entry<Integer, Cell> cellEntry : row) {
+            builder.addCells(pb(cellEntry.getValue(), cellEntry.getKey()));
         }
         return builder.build();
     }
@@ -686,6 +689,7 @@ public class PbHelper {
 
     public static ChartData bean(com.ctrip.ferriswheel.proto.v1.Chart pbChart) {
         ChartData chart = new ChartData();
+        chart.setName(pbChart.getName());
         chart.setType(pbChart.getType());
         if (pbChart.hasTitle()) {
             chart.setTitle(toDynamicValue(pbChart.getTitle()));

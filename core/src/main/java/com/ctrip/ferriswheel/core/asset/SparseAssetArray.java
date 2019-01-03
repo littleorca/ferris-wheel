@@ -5,7 +5,7 @@ import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 import java.util.Iterator;
 import java.util.Map;
 
-class SparseAssetArray<E extends AssetNode> implements Iterable<E> {
+class SparseAssetArray<E extends AssetNode> implements Iterable<Map.Entry<Integer, E>> {
     private final AssetNode owner;
     private TreeSparseArray<E> sparseArray = new TreeSparseArray<>();
 
@@ -56,15 +56,15 @@ class SparseAssetArray<E extends AssetNode> implements Iterable<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public Iterator<Map.Entry<Integer, E>> iterator() {
         return new SafeIterator(sparseArray.iterator());
     }
 
-    public Iterator<E> iterator(Integer start, Integer end) {
+    public Iterator<Map.Entry<Integer, E>> iterator(Integer start, Integer end) {
         return new SafeIterator(sparseArray.iterator(start, end));
     }
 
-    class SafeIterator implements Iterator<E> {
+    class SafeIterator implements Iterator<Map.Entry<Integer, E>> {
         private final Iterator<Map.Entry<Integer, E>> delegate;
         private Map.Entry<Integer, E> current;
 
@@ -78,9 +78,9 @@ class SparseAssetArray<E extends AssetNode> implements Iterable<E> {
         }
 
         @Override
-        public E next() {
+        public Map.Entry<Integer, E> next() {
             current = delegate.next();
-            return current == null ? null : current.getValue();
+            return current == null ? null : current;
         }
 
         @Override

@@ -63,7 +63,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
         checkForUpdate(rowIndex, columnIndex);
 
         return publicly(setCellValue, () -> {
-            int oldRowSize = getOrCreateRow(rowIndex).size();
+            int oldRowSize = getOrCreateRow(rowIndex).getCellCount();
             DefaultCell cell = getOrCreateCell(rowIndex, columnIndex);
             if (cell.isFormula()) {
                 cell.setFormula(null);
@@ -72,7 +72,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             // Think about remove the return value?
             Variant oldValue = new DynamicVariantImpl(cell.getData());
             cell.setValue(value);
-            int newRowSize = cell.getRow().size();
+            int newRowSize = cell.getRow().getCellCount();
             if (newRowSize > getColumnCount()) {
                 setColumnCount(newRowSize);
             } else if (oldRowSize == getColumnCount() && newRowSize < getColumnCount()) {
@@ -105,12 +105,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
         checkForUpdate(rowIndex, columnIndex);
 
         return publicly(setCellFormula, () -> {
-            int oldRowSize = getOrCreateRow(rowIndex).size();
+            int oldRowSize = getOrCreateRow(rowIndex).getCellCount();
             DefaultCell cell = getOrCreateCell(rowIndex, columnIndex);
             Formula oldFormula = cell.getFormula();
             cell.setFormula(formula == null ? null : new Formula(formula));
             cell.setValue(Value.BLANK); // wipe old value
-            int newRowSize = cell.getRow().size();
+            int newRowSize = cell.getRow().getCellCount();
             if (newRowSize > getColumnCount()) {
                 setColumnCount(newRowSize);
             } else if (oldRowSize == getColumnCount() && newRowSize < getColumnCount()) {
@@ -290,7 +290,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             for (int i = rowIndex; i < rowIndex + nRows; i++) {
                 DefaultRow row = getRow(i);
                 if (row != null) {
-                    if (!needFixColumnCount && row.size() == getColumnCount()) {
+                    if (!needFixColumnCount && row.getCellCount() == getColumnCount()) {
                         needFixColumnCount = true;
                     }
                     row.erase();
@@ -454,11 +454,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
     void handleAction(AutomateTable automateTable) {
         publicly(automateTable, () -> {
             createAndRegisterAutomaton(automateTable.getSolution());
-            for (DefaultRow row : rows) {
+            for (Map.Entry<Integer, DefaultRow> rowEntry : rows) {
+                DefaultRow row = rowEntry.getValue();
                 row.setEphemeral(true);
-                for (Cell cell : row) {
-                    ((DefaultCell) cell).setEphemeral(true);
-                    ((DefaultCell) cell).getDependents().forEach(d -> d.addDependency(this));
+                for (Map.Entry<Integer, Cell> cellEntry : row) {
+                    ((DefaultCell) cellEntry.getValue()).setEphemeral(true);
+                    ((DefaultCell) cellEntry.getValue()).getDependents().forEach(d -> d.addDependency(this));
                 }
             }
             getWorkbook().onTableAutomated(this);
@@ -504,7 +505,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
         DefaultRow oldRow = removeRow(index);
         row.setRowIndex(index);
         rows.set(index, row);
-        if (row.size() > getColumnCount()) {
+        if (row.getCellCount() > getColumnCount()) {
             setColumnCount(rows.size());
         }
         return oldRow;
@@ -513,7 +514,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     private DefaultRow removeRow(int rowIndex) {
         DefaultRow row = rows.remove(rowIndex);
         if (row != null) {
-            if (row.size() == getColumnCount()) {
+            if (row.getCellCount() == getColumnCount()) {
                 fixColumnCount();
             }
         }
@@ -548,11 +549,11 @@ public class DefaultTable extends SheetAssetNode implements Table {
 
     protected void fixColumnCount() {
         int maxColumnCount = 0;
-        Iterator<DefaultRow> it = rows.iterator();
+        Iterator<Map.Entry<Integer, DefaultRow>> it = rows.iterator();
         while (it.hasNext()) {
-            DefaultRow row = it.next();
-            if (maxColumnCount < row.size()) {
-                maxColumnCount = row.size();
+            DefaultRow row = it.next().getValue();
+            if (maxColumnCount < row.getCellCount()) {
+                maxColumnCount = row.getCellCount();
             }
         }
         setColumnCount(maxColumnCount);
@@ -623,17 +624,16 @@ public class DefaultTable extends SheetAssetNode implements Table {
         this.readOnly = readOnly;
     }
 
-    @Override
+    //    @Override
     public int getMaxRowLimit() {
         return MAX_ROWS;
     }
 
-    @Override
+    //    @Override
     public int getMaxColumnLimit() {
         return MAX_COLUMNS;
     }
 
-    @Override
     public DefaultSheet getSheet() {
         return (DefaultSheet) getParent();
     }
@@ -643,7 +643,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     @Override
-    public Iterator<Row> iterator() {
+    public Iterator<Map.Entry<Integer, Row>> iterator() {
         return new UnmodifiableIterator(rows.iterator());
     }
 

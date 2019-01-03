@@ -1,15 +1,11 @@
 package com.ctrip.ferriswheel.core.bean;
 
 import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Row;
 import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 
 import java.io.Serializable;
 
 public class CellData implements Cell, Serializable {
-    private Row row;
-    private int rowIndex;
-    private int columnIndex;
     private DynamicVariant data;
     private boolean fillLeft;
     private boolean fillUp;
@@ -19,37 +15,12 @@ public class CellData implements Cell, Serializable {
     public CellData() {
     }
 
-    public CellData(int rowIndex, int columnIndex, DynamicVariant data) {
-        this.rowIndex = rowIndex;
-        this.columnIndex = columnIndex;
+    public CellData(DynamicVariant data) {
         this.data = data;
     }
 
-    @Override
-    public Row getRow() {
-        return row;
-    }
-
-    public void setRow(Row row) {
-        this.row = row;
-    }
-
-    @Override
-    public int getRowIndex() {
-        return rowIndex;
-    }
-
-    public void setRowIndex(int rowIndex) {
-        this.rowIndex = rowIndex;
-    }
-
-    @Override
-    public int getColumnIndex() {
-        return columnIndex;
-    }
-
-    public void setColumnIndex(int columnIndex) {
-        this.columnIndex = columnIndex;
+    public void erase() {
+        setData(new DynamicVariantImpl(Value.BLANK));
     }
 
     @Override

@@ -96,7 +96,7 @@ public class GraphHelper {
             if (asset instanceof Table) {
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(((Table) asset).getSheet().getName()) +
+                        EscapeHelper.escape(((DefaultTable) asset).getSheet().getName()) +
                         "!" +
                         EscapeHelper.escape(((Table) asset).getName());
             }
@@ -104,7 +104,7 @@ public class GraphHelper {
                 Table table = ((AbstractTableAutomaton) asset).getTable();
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(table.getSheet().getName()) +
+                        EscapeHelper.escape(((DefaultTable)table).getSheet().getName()) +
                         "!" +
                         EscapeHelper.escape(table.getName()) +
                         "@" +

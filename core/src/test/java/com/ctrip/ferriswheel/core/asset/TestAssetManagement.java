@@ -2,8 +2,10 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.api.Environment;
 import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.api.chart.Chart;
 import com.ctrip.ferriswheel.api.table.Cell;
 import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.table.TableAutomaton;
 import com.ctrip.ferriswheel.core.bean.*;
 import junit.framework.TestCase;
@@ -54,10 +56,10 @@ public class TestAssetManagement extends TestCase {
         DefaultSheet sheet = wb.addSheet("sheet1");
         checkAssetMap(wb);
 
-        sheet.addTable("table1");
+        sheet.addAsset(Table.class, "table1");
         checkAssetMap(wb);
 
-        sheet.addTable("table0");
+        sheet.addAsset(Table.class, "table0");
         checkAssetMap(wb);
 
         sheet.renameAsset("table0", "table2");
@@ -74,7 +76,7 @@ public class TestAssetManagement extends TestCase {
 
     public void testTableAndRows() {
         DefaultWorkbook wb = new DefaultWorkbook(environment);
-        DefaultTable table = wb.addSheet("sheet1").addTable("table1");
+        DefaultTable table = (DefaultTable) wb.addSheet("sheet1").addAsset(Table.class, "table1");
         checkAssetMap(wb);
 
         // the following ops are not really effective
@@ -140,7 +142,7 @@ public class TestAssetManagement extends TestCase {
 
     public void testTableAndQueryAutomaton() {
         DefaultWorkbook wb = new DefaultWorkbook(environment);
-        DefaultTable table = wb.addSheet("sheet1").addTable("table1");
+        DefaultTable table = (DefaultTable) wb.addSheet("sheet1").addAsset(Table.class, "table1");
         checkAssetMap(wb);
 
         TableAutomatonInfo.QueryTemplateInfo queryTemplateInfo = new TableAutomatonInfo.QueryTemplateInfo();
@@ -160,7 +162,7 @@ public class TestAssetManagement extends TestCase {
         DefaultSheet s1 = wb.addSheet("sheet1");
         checkAssetMap(wb);
 
-        DefaultTable t1 = s1.addTable("table1");
+        DefaultTable t1 = (DefaultTable) s1.addAsset(Table.class, "table1");
 
         t1.setCellValue(0, 1, new Value.StrValue("foo"));
         checkAssetMap(wb);
@@ -179,7 +181,7 @@ public class TestAssetManagement extends TestCase {
         t1.setCellValue(2, 2, new Value.DecimalValue("1.1"));
         checkAssetMap(wb);
 
-        DefaultChart chart = s1.addChart("chart1", new ChartData("chart1", "Line",
+        DefaultChart chart = (DefaultChart) s1.addAsset(Chart.class, new ChartData("chart1", "Line",
                 new DynamicVariantImpl("\"Chart Title 1\""),
                 new DynamicVariantImpl("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
@@ -197,7 +199,7 @@ public class TestAssetManagement extends TestCase {
         chart.addSeries(new DynamicVariantImpl("sheet1!table1!$A$4"), null, new DynamicVariantImpl("sheet1!table1!$B$4:$C$4"));
         checkAssetMap(wb);
 
-        s1.addChart("chart2", new ChartData("chart2","Line",
+        s1.addAsset(Chart.class, new ChartData("chart2", "Line",
                 new DynamicVariantImpl("\"Chart Title 2\""),
                 new DynamicVariantImpl("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
@@ -276,13 +278,11 @@ public class TestAssetManagement extends TestCase {
 
     void checkAssetMap(Map<Long, DefaultAssetManager.AssetReference> assetMap,
                        Set<Long> pendingAssetIds, DefaultTable table) {
-        for (Row row : table) {
-            if (row == null) {
-                continue;
-            }
+        for (Map.Entry<Integer, Row> rowEntry : table) {
+            DefaultRow row = (DefaultRow) rowEntry.getValue();
             assertEquals(table, row.getTable());
-            assertTrue(pendingAssetIds.remove(((DefaultRow) row).getAssetId()));
-            assertEquals(1, assetMap.get(((DefaultRow) row).getAssetId()).referenceCount.get());
+            assertTrue(pendingAssetIds.remove(row.getAssetId()));
+            assertEquals(1, assetMap.get(row.getAssetId()).referenceCount.get());
             checkAssetMap(assetMap, pendingAssetIds, row);
         }
 
@@ -297,13 +297,11 @@ public class TestAssetManagement extends TestCase {
 
     void checkAssetMap(Map<Long, DefaultAssetManager.AssetReference> assetMap,
                        Set<Long> pendingAssetIds, Row row) {
-        for (Cell cell : row) {
-            if (cell == null) {
-                continue;
-            }
-            assertEquals(row, cell.getRow());
-            assertTrue(pendingAssetIds.remove(((DefaultCell)cell).getAssetId()));
-            assertEquals(1, assetMap.get(((DefaultCell)cell).getAssetId()).referenceCount.get());
+        for (Map.Entry<Integer, Cell> cellEntry : row) {
+            Cell cell = cellEntry.getValue();
+            assertEquals(row, ((DefaultCell) cell).getRow());
+            assertTrue(pendingAssetIds.remove(((DefaultCell) cell).getAssetId()));
+            assertEquals(1, assetMap.get(((DefaultCell) cell).getAssetId()).referenceCount.get());
         }
     }
 

@@ -1,5 +1,6 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.formula.ErrorCodes;
@@ -18,10 +19,10 @@ public class TestPivotAutomaton extends TestCase {
     @Override
     protected void setUp() throws Exception {
         environment = new DefaultEnvironment.Builder().build();
-        workbook = (DefaultWorkbook) new FilingClerk(environment).createWorkbook("test");
+        workbook = new FilingClerk(environment).createWorkbook("test");
         DefaultSheet s1 = workbook.addSheet("s1");
-        normalTable = s1.addTable("normal");
-        autoTable = s1.addTable("auto");
+        normalTable = (DefaultTable) s1.addAsset(Table.class, "normal");
+        autoTable = (DefaultTable) s1.addAsset(Table.class, "auto");
     }
 
     public void testSimpleCase() {

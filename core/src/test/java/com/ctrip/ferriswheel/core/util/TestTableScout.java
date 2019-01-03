@@ -21,7 +21,7 @@ public class TestTableScout extends TestCase {
     }
 
     public void testIllegalArgument() {
-        Table table = workbook.addSheet("sheet1").addTable("table1");
+        Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         try {
             TableScout.isDecimalCompatible(null, 0, 0, 0, 0);
             fail();
@@ -66,7 +66,7 @@ public class TestTableScout extends TestCase {
     }
 
     public void testIsDecimalCompatibleCell() {
-        Table table = workbook.addSheet("sheet1").addTable("table1");
+        Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         initTable33WithLables(table);
         table.eraseCell(1, 2);
         table.setCellValue(2, 1, Value.err(ErrorCodes.DIV_0));
@@ -77,7 +77,7 @@ public class TestTableScout extends TestCase {
     }
 
     public void testIsDecimalCompatibleCells() {
-        Table table = workbook.addSheet("sheet1").addTable("table1");
+        Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         initTable33WithLables(table);
         table.eraseCell(1, 2);
         table.setCellValue(2, 1, Value.err(ErrorCodes.DIV_0));
@@ -86,7 +86,7 @@ public class TestTableScout extends TestCase {
     }
 
     public void testGetBiggestDecimalRectangleFromBottomRight() {
-        Table table = workbook.addSheet("sheet1").addTable("table1");
+        Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         initTable33WithLables(table);
 
         Rectangle rc = TableScout.getBiggestDecimalRectangleFromBottomRight(table, 0, 0, 3, 3);

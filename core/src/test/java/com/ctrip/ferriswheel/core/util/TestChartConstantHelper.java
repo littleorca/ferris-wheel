@@ -21,7 +21,7 @@ public class TestChartConstantHelper extends TestCase {
     }
 
     public void testGetSuggestedChartModel() {
-        Table table = workbook.addSheet("sheet1").addTable("table1");
+        Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         initTable33WithLables(table);
         ChartData chart = ChartConsultantHelper.getSuggestedChartModel(table, 0, 0, 3, 3);
         assertEquals("sheet1!table1!$B$1:$D$1", chart.getCategories().getFormulaString());

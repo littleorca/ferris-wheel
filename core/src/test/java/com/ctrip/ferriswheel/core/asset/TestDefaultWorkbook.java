@@ -1,13 +1,15 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.chart.Chart;
 import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.api.variant.VariantType;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.ErrorCodes;
 import junit.framework.TestCase;
@@ -26,7 +28,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testSimpleCase() {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
-        DefaultTable table = workbook.addSheet("sheet1").addTable("table1");
+        DefaultTable table = (DefaultTable) workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         table.setCellValue(0, 0, new Value.DecimalValue(1));
         table.setCellValue(0, 1, new Value.DecimalValue(2));
         table.setCellFormula(0, 2, "A1+B1");
@@ -36,7 +38,7 @@ public class TestDefaultWorkbook extends TestCase {
         table.setCellFormula(2, 2, "C1+C2");
 
         assertEquals(1, workbook.getSheetCount());
-        table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        table = workbook.getSheet(0).getAsset("table1");
         assertEquals(3, table.getRowCount());
         assertEquals(3, table.getColumnCount());
         assertEquals(1, table.getCell(0, 0).intValue());
@@ -52,7 +54,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testFillDownCells() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
 
         table.setCellFormula(0, 2, "SUM(A1:B1)");
         table.setCellFormula(0, 3, "A1*B1");
@@ -82,7 +84,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testFillRightCells() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
 
         table.setCellFormula(3, 0, "SUM(A1:A3)");
         table.setCellFormula(4, 0, "A1/A2");
@@ -110,7 +112,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testCalculationAfterInsertRows() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(1, 3, "SUM(A2:C2)");
         table.setCellFormula(2, 3, "B3+C3");
@@ -137,7 +139,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testCalculationAfterEraseRows() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(0, 4, "A2+B2");
         System.out.println(table);
@@ -158,7 +160,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testCalculationAfterRemoveRows() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(0, 4, "A2+B2");
         table.setCellFormula(3, 3, "SUM(A2:B2)"); // this row will shift up after remove rows
@@ -186,8 +188,8 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testRemoveRowsWithChartDependOnIt() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultSheet sheet = (DefaultSheet) workbook.getSheet(0);
-        DefaultTable table = (DefaultTable) sheet.getTable("table1");
+        DefaultSheet sheet = workbook.getSheet(0);
+        DefaultTable table = sheet.getAsset("table1");
         List<DataSeries> series = Arrays.asList(
                 new ChartData.SeriesImpl(
                         new DynamicVariantImpl("table1!$A2"),
@@ -198,7 +200,7 @@ public class TestDefaultWorkbook extends TestCase {
                         null,
                         new DynamicVariantImpl("table1!$B$3:$C$3"))
         );
-        sheet.addChart("c1", new ChartData("c1", "Line",
+        sheet.addAsset(Chart.class, new ChartData("c1", "Line",
                 new DynamicVariantImpl("\"hello world\""),
                 new DynamicVariantImpl("table1!$B$1:$C$1"),
                 series));
@@ -210,7 +212,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testCalculationAfterInsertCols() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(1, 3, "SUM(B2:C2)");
         table.setCellFormula(2, 3, "B3+C3");
@@ -237,7 +239,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testCalculationAfterEraseCols() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(1, 3, "A2+B2");
         System.out.println(table);
@@ -255,7 +257,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testCalculationAfterRemoveCols() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultTable table = (DefaultTable) workbook.getSheet(0).getTable("table1");
+        DefaultTable table = workbook.getSheet(0).getAsset("table1");
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(1, 3, "A2+B2");
         System.out.println(table);
@@ -275,8 +277,8 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testRemoveColumnsWithChartDependOnIt() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultSheet sheet = (DefaultSheet) workbook.getSheet(0);
-        DefaultTable table = (DefaultTable) sheet.getTable("table1");
+        DefaultSheet sheet = workbook.getSheet(0);
+        DefaultTable table = sheet.getAsset("table1");
         List<DataSeries> series = Arrays.asList(
                 new ChartData.SeriesImpl(
                         new DynamicVariantImpl("table1!$A2"),
@@ -287,7 +289,7 @@ public class TestDefaultWorkbook extends TestCase {
                         null,
                         new DynamicVariantImpl("table1!$B$3:$C$3"))
         );
-        sheet.addChart("c1", new ChartData("c1", "Line",
+        sheet.addAsset(Chart.class, new ChartData("c1", "Line",
                 new DynamicVariantImpl("\"hello world\""),
                 new DynamicVariantImpl("table1!$B$1:$C$1"),
                 series));
@@ -299,10 +301,10 @@ public class TestDefaultWorkbook extends TestCase {
 
     public void testRenameSheetNameAndTableName() {
         DefaultWorkbook workbook = createWorkbookWithTable33();
-        DefaultSheet sheet1 = (DefaultSheet) workbook.getSheet(0);
-        DefaultSheet sheet2 = (DefaultSheet) workbook.addSheet("sheet2");
-        DefaultTable table1 = sheet1.getTable("table1");
-        DefaultTable table2 = sheet2.addTable("table2");
+        DefaultSheet sheet1 = workbook.getSheet(0);
+        DefaultSheet sheet2 = workbook.addSheet("sheet2");
+        DefaultTable table1 = sheet1.getAsset("table1");
+        DefaultTable table2 = (DefaultTable) sheet2.addAsset(Table.class, "table2");
         table1.setCellFormula(0, 3, "SUM(A1:C3)");
         table1.setCellFormula(1, 3, "sheet2!table2!A1*3");
         table2.setCellFormula(0, 0, "SUM(sheet1!table1!A1:C3)");
@@ -313,7 +315,7 @@ public class TestDefaultWorkbook extends TestCase {
         table2.setCellValue(2, 1, new Value.DecimalValue(2000));
         table2.setCellValue(2, 2, new Value.DecimalValue(3000));
 
-        sheet1.addChart("chart1-1", new ChartData("chart1-1", "Line",
+        sheet1.addAsset(Chart.class, new ChartData("chart1-1", "Line",
                 new DynamicVariantImpl("\"Chart 1-1\""),
                 new DynamicVariantImpl("table1!B1:C1"),
                 Arrays.asList(
@@ -322,7 +324,7 @@ public class TestDefaultWorkbook extends TestCase {
                                 null,
                                 new DynamicVariantImpl("table1!B2:C2"))
                 )));
-        sheet1.addChart("chart1-2", new ChartData("chart1-2", "Line",
+        sheet1.addAsset(Chart.class, new ChartData("chart1-2", "Line",
                 new DynamicVariantImpl("\"Chart 1-2\""),
                 new DynamicVariantImpl("sheet2!table2!B2:C2"),
                 Arrays.asList(
@@ -332,7 +334,7 @@ public class TestDefaultWorkbook extends TestCase {
                                 new DynamicVariantImpl("sheet2!table2!B3:C3"))
                 )));
 
-        sheet2.addChart("chart2-1", new ChartData("chart2-1", "Line",
+        sheet2.addAsset(Chart.class, new ChartData("chart2-1", "Line",
                 new DynamicVariantImpl("\"Chart 2-1\""),
                 new DynamicVariantImpl("sheet1!table1!B1:C1"),
                 Arrays.asList(
@@ -341,7 +343,7 @@ public class TestDefaultWorkbook extends TestCase {
                                 null,
                                 new DynamicVariantImpl("sheet1!table1!B2:C2"))
                 )));
-        sheet2.addChart("chart2-2", new ChartData("chart2-1", "Line",
+        sheet2.addAsset(Chart.class, new ChartData("chart2-2", "Line",
                 new DynamicVariantImpl("\"Chart 2-2\""),
                 new DynamicVariantImpl("table2!B2:C2"),
                 Arrays.asList(
@@ -364,7 +366,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals("A1*2", table2.getCell(0, 1).getFormulaString());
         assertEquals(396, table2.getCell(0, 1).intValue());
 
-        DefaultChart chart = sheet1.getChart("chart1-1");
+        DefaultChart chart = sheet1.getAsset("chart1-1");
         assertEquals("Line", chart.getType());
         assertEquals("\"Chart 1-1\"", chart.getTitle().getFormulaString());
         assertEquals("Chart 1-1", chart.getTitle().strValue());
@@ -382,7 +384,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(22, series.getyValues().item(0).intValue());
         assertEquals(23, series.getyValues().item(1).intValue());
 
-        chart = sheet1.getChart("chart1-2");
+        chart = sheet1.getAsset("chart1-2");
         assertEquals("Line", chart.getType());
         assertEquals("\"Chart 1-2\"", chart.getTitle().getFormulaString());
         assertEquals("Chart 1-2", chart.getTitle().strValue());
@@ -400,7 +402,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(2000, series.getyValues().item(0).intValue());
         assertEquals(3000, series.getyValues().item(1).intValue());
 
-        chart = sheet2.getChart("chart2-1");
+        chart = sheet2.getAsset("chart2-1");
         assertEquals("Line", chart.getType());
         assertEquals("\"Chart 2-1\"", chart.getTitle().getFormulaString());
         assertEquals("Chart 2-1", chart.getTitle().strValue());
@@ -418,7 +420,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(22, series.getyValues().item(0).intValue());
         assertEquals(23, series.getyValues().item(1).intValue());
 
-        chart = sheet2.getChart("chart2-2");
+        chart = sheet2.getAsset("chart2-2");
         assertEquals("Line", chart.getType());
         assertEquals("\"Chart 2-2\"", chart.getTitle().getFormulaString());
         assertEquals("Chart 2-2", chart.getTitle().strValue());
@@ -441,21 +443,21 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
         workbook.batch((wb) -> {
             Sheet s1 = wb.addSheet("sheet1");
-            Table t1 = s1.addTable("table1");
+            Table t1 = s1.addAsset(Table.class, "table1");
             // refer to table2 which not exists yet.
             t1.setCellFormula(0, 0, "table2!A1^2");
-            Table t2 = s1.addTable("table2");
+            Table t2 = s1.addAsset(Table.class, "table2");
             t2.setCellValue(0, 0, Value.dec(8));
         }, true);
         assertEquals(1, workbook.getSheetCount());
         Sheet s1 = workbook.getSheet(0);
         assertEquals(2, s1.getAssetCount());
-        Table t1 = s1.getTable("table1");
+        Table t1 = s1.getAsset("table1");
         assertEquals(1, t1.getRowCount());
         assertEquals(1, t1.getColumnCount());
         assertEquals(64, t1.getCell(0, 0).getData().intValue());
         assertEquals("table2!A1^2", t1.getCell(0, 0).getData().getFormulaString());
-        Table t2 = s1.getTable("table2");
+        Table t2 = s1.getAsset("table2");
         assertEquals(1, t2.getRowCount());
         assertEquals(1, t2.getColumnCount());
         assertEquals(8, t2.getCell(0, 0).getData().intValue());
@@ -463,7 +465,7 @@ public class TestDefaultWorkbook extends TestCase {
 
     private DefaultWorkbook createWorkbookWithTable33() {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
-        DefaultTable table = workbook.addSheet("sheet1").addTable("table1");
+        DefaultTable table = (DefaultTable) workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         table.setCellValue(0, 0, new Value.DecimalValue(11));
         table.setCellValue(0, 1, new Value.DecimalValue(12));
         table.setCellValue(0, 2, new Value.DecimalValue(13));

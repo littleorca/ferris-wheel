@@ -9,17 +9,14 @@ import com.ctrip.ferriswheel.api.chart.ChartBinder;
 import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.api.table.Cell;
 import com.ctrip.ferriswheel.api.table.Row;
-import com.ctrip.ferriswheel.api.table.TableData;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.api.view.Display;
 import com.ctrip.ferriswheel.api.view.Displayable;
 import com.ctrip.ferriswheel.api.view.Grid;
 import com.ctrip.ferriswheel.api.view.Layout;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.core.bean.AxisImpl;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
-import com.ctrip.ferriswheel.core.bean.TableDataImpl;
-import com.ctrip.ferriswheel.core.bean.TextData;
+import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
@@ -50,33 +47,66 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public SheetAssetNode getAsset(int index) {
-        return assets.get(index);
+    public <T extends SheetAsset> T addAsset(Class<T> clazz, String name) {
+        if (Table.class.isAssignableFrom(clazz)) {
+            TableDataImpl table = new TableDataImpl();
+            table.setName(name);
+            return (T) addTable(table);
+        } else if (Chart.class.isAssignableFrom(clazz)) {
+            ChartData chart = new ChartData();
+            chart.setName(name);
+            return (T) addChart(chart);
+        } else if (Text.class.isAssignableFrom(clazz)) {
+            TextData text = new TextData();
+            text.setName(name);
+            return (T) addText(text);
+        }
+        return null;
     }
 
     @Override
-    public SheetAssetNode getAsset(String name) {
-        return assets.get(name);
+    public <T extends SheetAsset> T addAsset(Class<T> clazz, T asset) {
+        if (!clazz.isInterface()) {
+            throw new IllegalArgumentException();
+        }
+        if (Table.class.equals(clazz)) {
+            return (T) addTable((Table) asset);
+        } else if (Chart.class.equals(clazz)) {
+            return (T) addChart((Chart) asset);
+        } else if (Text.class.equals(clazz)) {
+            return (T) addText((Text) asset);
+        }
+        return null;
     }
 
     @Override
-    public SheetAssetNode removeAsset(int index) {
+    public <T extends SheetAsset> T getAsset(int index) {
+        return (T) assets.get(index);
+    }
+
+    @Override
+    public <T extends SheetAsset> T getAsset(String name) {
+        return (T) assets.get(name);
+    }
+
+    @Override
+    public <T extends SheetAsset> T removeAsset(int index) {
         return doRemoveAsset(getAsset(index));
     }
 
     @Override
-    public SheetAssetNode removeAsset(String name) {
+    public <T extends SheetAsset> T removeAsset(String name) {
         return doRemoveAsset(getAsset(name));
     }
 
-    private SheetAssetNode doRemoveAsset(NamedAsset asset) {
+    private <T extends SheetAsset> T doRemoveAsset(NamedAsset asset) {
         if (asset == null) {
             return null;
         }
         return handleAction(new RemoveAsset(getName(), asset.getName()));
     }
 
-    SheetAssetNode handleAction(RemoveAsset removeAsset) {
+    <T extends SheetAsset> T handleAction(RemoveAsset removeAsset) {
         SheetAssetNode asset = getAsset(removeAsset.getAssetName());
         if (asset == null) {
             return null;
@@ -87,7 +117,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
                 DefaultTable table = (DefaultTable) asset;
                 getWorkbook().onTableRemoved(table);
             }
-            return asset;
+            return (T) asset;
         });
     }
 
@@ -131,19 +161,8 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         getWorkbook().refreshIfNeeded();
     }
 
-    @Override
-    public DefaultTable getTable(String name) {
-        return (DefaultTable) getAsset(name);
-    }
-
-    @Override
-    public DefaultTable addTable(String name) {
-        return addTable(name, new TableDataImpl());
-    }
-
-    @Override
-    public DefaultTable addTable(String name, TableData tableData) {
-        return handleAction(new AddTable(getName(), name, tableData));
+    protected DefaultTable addTable(Table tableData) {
+        return handleAction(new AddTable(getName(), tableData.getName(), tableData));
     }
 
     DefaultTable handleAction(AddTable addTable) {
@@ -158,13 +177,16 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             assets.add(table);
 
             notifier.privately(() -> {
-                TableData td = addTable.getTableData();
-                for (Row rd : td) {
-                    for (Cell cd : rd) {
+                Table td = addTable.getTableData();
+                for (int rowIndex = 0; rowIndex < td.getRowCount(); rowIndex++) {
+                    Row row = td.getRow(rowIndex);
+                    // TODO skip empty rows/cells.
+                    for (int colIndex = 0; colIndex < row.getCellCount(); colIndex++) {
+                        Cell cd = row.getCell(colIndex);
                         if (cd.getData().isFormula()) {
-                            table.setCellFormula(rd.getRowIndex(), cd.getColumnIndex(), cd.getData().getFormulaString());
+                            table.setCellFormula(rowIndex, colIndex, cd.getData().getFormulaString());
                         } else {
-                            table.setCellValue(rd.getRowIndex(), cd.getColumnIndex(), cd.getData());
+                            table.setCellValue(rowIndex, colIndex, cd.getData());
                         }
                     }
                 }
@@ -192,14 +214,8 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         return new DefaultTable(name, getAssetManager());
     }
 
-    @Override
-    public DefaultChart getChart(String name) {
-        return (DefaultChart) assets.get(name);
-    }
-
-    @Override
-    public DefaultChart addChart(String name, Chart chartData) {
-        return handleAction(new AddChart(getName(), name, chartData));
+    protected DefaultChart addChart(Chart chart) {
+        return handleAction(new AddChart(getName(), chart.getName(), chart));
     }
 
     DefaultChart handleAction(AddChart addChart) {
@@ -222,12 +238,13 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
+    @Deprecated // move to chart itself?
     public DefaultChart updateChart(String name, Chart chartData) {
         return handleAction(new UpdateChart(getName(), name, chartData));
     }
 
     DefaultChart handleAction(UpdateChart updateChart) {
-        DefaultChart chart = getChart(updateChart.getChartName());
+        DefaultChart chart = getAsset(updateChart.getChartName());
         Chart chartData = updateChart.getChartData();
         if (chart == null || chartData == null) {
             throw new IllegalArgumentException();
@@ -289,14 +306,8 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         return binder.getData().isFormula();
     }
 
-    @Override
-    public DefaultText getText(String name) {
-        return (DefaultText) getAsset(name);
-    }
-
-    @Override
-    public DefaultText addText(String name, Text textData) {
-        return handleAction(new AddText(getName(), name, textData));
+    protected DefaultText addText(Text text) {
+        return handleAction(new AddText(getName(), text.getName(), text));
     }
 
     DefaultText handleAction(AddText addText) {
@@ -325,12 +336,13 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
+    @Deprecated
     public DefaultText updateText(String name, Text textData) {
         return handleAction(new UpdateText(getName(), name, textData));
     }
 
     DefaultText handleAction(UpdateText updateText) {
-        DefaultText text = getText(updateText.getTextName());
+        DefaultText text = getAsset(updateText.getTextName());
         Text textData = updateText.getTextData();
         if (text == null || textData == null) {
             throw new IllegalArgumentException();

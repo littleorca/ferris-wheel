@@ -1,16 +1,18 @@
 package com.ctrip.ferriswheel.core.formula;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.Workbook;
 import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.core.ref.CellRef;
+import com.ctrip.ferriswheel.core.asset.DefaultTable;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.TableDataImpl;
 import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
+import com.ctrip.ferriswheel.core.ref.CellRef;
 import junit.framework.TestCase;
 
 public class TestFormulaEvaluator extends TestCase {
@@ -23,7 +25,7 @@ public class TestFormulaEvaluator extends TestCase {
 
     public void testEvaluator() {
         Workbook book = new FilingClerk(environment).createWorkbook("test-workbook");
-        Table table = book.addSheet("sheet1").addTable("test", new TableDataImpl());
+        Table table = book.addSheet("sheet1").addAsset(Table.class, "test");
         ResolverMock resolver = new ResolverMock(book);
         FormulaEvaluator evaluator = new FormulaEvaluator(resolver);
 
@@ -49,7 +51,7 @@ public class TestFormulaEvaluator extends TestCase {
         System.out.println(value);
 
         elements = FormulaParser.parse("test!A1*test!B1");
-        evaluator.setCurrentSheet(table.getSheet());
+        evaluator.setCurrentSheet(((DefaultTable) table).getSheet());
         evaluator.setCurrentTable(null);
         value = evaluator.evaluate(elements);
         System.out.println(value);
@@ -91,7 +93,7 @@ public class TestFormulaEvaluator extends TestCase {
             Sheet sheet = cellRef.getSheetName() == null ?
                     context.getCurrentSheet() : workbook.getSheet(cellRef.getSheetName());
             Table table = cellRef.getTableName() == null ?
-                    context.getCurrentTable() : sheet.getTable(cellRef.getTableName());
+                    context.getCurrentTable() : sheet.getAsset(cellRef.getTableName());
 
             return table.getCell(cellRef.getRowIndex(), cellRef.getColumnIndex()).getData();
         }
@@ -105,7 +107,7 @@ public class TestFormulaEvaluator extends TestCase {
             if (sheet == null) {
                 return null;
             }
-            return sheet.getTable(tableName);
+            return sheet.getAsset(tableName);
         }
 
     }

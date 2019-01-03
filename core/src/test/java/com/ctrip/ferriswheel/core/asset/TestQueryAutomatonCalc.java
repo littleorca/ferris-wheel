@@ -4,6 +4,7 @@ import com.ctrip.ferriswheel.api.*;
 import com.ctrip.ferriswheel.api.query.DataProvider;
 import com.ctrip.ferriswheel.api.query.DataQuery;
 import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.variant.DynamicVariant;
 import com.ctrip.ferriswheel.api.variant.VariantRule;
 import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
@@ -31,10 +32,10 @@ public class TestQueryAutomatonCalc extends TestCase {
         DefaultProviderManager pm = new DefaultProviderManager();
         pm.register(provider);
         environment = new DefaultEnvironment.Builder().setProviderManager(pm).build();
-        workbook = (DefaultWorkbook) new FilingClerk(environment).createWorkbook("test");
+        workbook = new FilingClerk(environment).createWorkbook("test");
         DefaultSheet s1 = workbook.addSheet("s1");
-        normalTable = s1.addTable("normal");
-        autoTable = s1.addTable("auto");
+        normalTable = (DefaultTable) s1.addAsset(Table.class, "normal");
+        autoTable = (DefaultTable) s1.addAsset(Table.class, "auto");
     }
 
     public void testCalcThroughQueryAutomaton() {

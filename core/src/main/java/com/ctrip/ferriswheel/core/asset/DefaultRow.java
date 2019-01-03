@@ -5,6 +5,7 @@ import com.ctrip.ferriswheel.api.table.Row;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 
 import java.util.Iterator;
+import java.util.Map;
 
 public class DefaultRow extends AssetNode implements Row {
     private int rowIndex;
@@ -66,7 +67,6 @@ public class DefaultRow extends AssetNode implements Row {
         return oldCell;
     }
 
-    @Override
     public DefaultTable getTable() {
         return (DefaultTable) getParent();
     }
@@ -75,7 +75,6 @@ public class DefaultRow extends AssetNode implements Row {
         setParent(sheet);
     }
 
-    @Override
     public int getRowIndex() {
         return rowIndex;
     }
@@ -86,11 +85,11 @@ public class DefaultRow extends AssetNode implements Row {
 
     @Override
     public boolean isBlank() {
-        return size() == 0;
+        return getCellCount() == 0;
     }
 
     @Override
-    public int size() {
+    public int getCellCount() {
         for (int i = cells.size() - 1; i >= 0; i--) {
             Cell cell = cells.get(i);
             if (cell != null && (!cell.getData().isBlank() || cell.getData().isFormula())) {
@@ -101,8 +100,8 @@ public class DefaultRow extends AssetNode implements Row {
     }
 
     @Override
-    public Iterator<Cell> iterator() {
-        return new UnmodifiableIterator(cells.iterator());
+    public Iterator<Map.Entry<Integer, Cell>> iterator() {
+        return new UnmodifiableIterator<>(cells.iterator());
     }
 
     @Override
@@ -132,9 +131,9 @@ public class DefaultRow extends AssetNode implements Row {
     }
 
     void erase() {
-        Iterator<DefaultCell> it = cells.iterator();
+        Iterator<Map.Entry<Integer, DefaultCell>> it = cells.iterator();
         while (it.hasNext()) {
-            DefaultCell cell = it.next();
+            DefaultCell cell = it.next().getValue();
             cell.erase();
         }
     }

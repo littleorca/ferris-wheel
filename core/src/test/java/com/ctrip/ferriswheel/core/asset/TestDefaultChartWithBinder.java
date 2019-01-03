@@ -1,12 +1,14 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
-import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.view.Orientation;
 import com.ctrip.ferriswheel.api.view.Placement;
+import com.ctrip.ferriswheel.core.bean.ChartData;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.core.bean.Value;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import junit.framework.TestCase;
 
@@ -18,10 +20,10 @@ public class TestDefaultChartWithBinder extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        environment=new DefaultEnvironment.Builder().build();
+        environment = new DefaultEnvironment.Builder().build();
         DefaultWorkbook wb = new DefaultWorkbook(environment);
         DefaultSheet s1 = wb.addSheet("s1");
-        table = s1.addTable("t1");
+        table = (DefaultTable) s1.addAsset(Table.class, "t1");
         table.setCellValue(0, 1, Value.str("foo"));
         table.setCellValue(0, 2, Value.str("bar"));
         table.setCellValue(1, 0, Value.str("alpha"));
@@ -37,7 +39,7 @@ public class TestDefaultChartWithBinder extends TestCase {
         DefaultSheet s1 = table.getSheet();
         DefaultTable t1 = table;
 
-        DefaultChart c1 = s1.addChart("c1", new ChartData(
+        DefaultChart c1 = (DefaultChart) s1.addAsset(Chart.class, new ChartData(
                 "c1", "Line",
                 new DynamicVariantImpl(Value.str("Chart 1")),
                 new DynamicVariantImpl("t1!B1:C1"),
@@ -61,7 +63,7 @@ public class TestDefaultChartWithBinder extends TestCase {
                 null
         ));
 
-        DefaultChart c2 = s1.addChart("c2", new ChartData(
+        DefaultChart c2 = (DefaultChart) s1.addAsset(Chart.class, new ChartData(
                 "c2", "Line",
                 new DynamicVariantImpl(Value.str("Chart 2")),
                 new DynamicVariantImpl(Value.BLANK),
@@ -136,8 +138,8 @@ public class TestDefaultChartWithBinder extends TestCase {
         DefaultSheet s1 = table.getSheet();
         DefaultTable t1 = table;
 
-        DefaultChart c1 = s1.addChart("c1", new ChartData(
-                "c1","Line",
+        DefaultChart c1 = (DefaultChart) s1.addAsset(Chart.class, new ChartData(
+                "c1", "Line",
                 new DynamicVariantImpl(Value.str("Chart 1")),
                 new DynamicVariantImpl("t1!B1:C1"),
                 Arrays.asList(
@@ -160,8 +162,8 @@ public class TestDefaultChartWithBinder extends TestCase {
                 null
         ));
 
-        DefaultChart c2 = s1.addChart("c2", new ChartData(
-                "c2","Line",
+        DefaultChart c2 = (DefaultChart) s1.addAsset(Chart.class, new ChartData(
+                "c2", "Line",
                 new DynamicVariantImpl(Value.str("Chart 2")),
                 new DynamicVariantImpl(Value.BLANK),
                 Arrays.asList(),

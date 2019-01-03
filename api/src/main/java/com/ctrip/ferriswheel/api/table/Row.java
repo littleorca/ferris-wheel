@@ -25,6 +25,8 @@
 
 package com.ctrip.ferriswheel.api.table;
 
+import java.util.Map;
+
 /**
  * Holds cells and provides methods for getting them.
  * To manipulate a row, please refer to {@link Table}.
@@ -32,20 +34,14 @@ package com.ctrip.ferriswheel.api.table;
  * @see Table
  * @see Cell
  */
-public interface Row extends Iterable<Cell> {
+public interface Row extends Iterable<Map.Entry<Integer, Cell>> {
     /**
-     * Get sheet that this row belongs to.
+     * Get cell count. Uninitialized cells before the last initialized cell will be count in.
+     * In another word, cell count equals to last initialized cell index plus one.
      *
      * @return
      */
-    Table getTable();
-
-    /**
-     * Get this row's index in the sheet.
-     *
-     * @return
-     */
-    int getRowIndex();
+    int getCellCount();
 
     /**
      * Get cell by index.
@@ -61,12 +57,4 @@ public interface Row extends Iterable<Cell> {
      * @return
      */
     boolean isBlank();
-
-    /**
-     * Get row size. Uninitialized cells before the last initialized cell will be count in.
-     * In another word, row size equals to last initialized cell index plus one.
-     *
-     * @return
-     */
-    int size();
 }

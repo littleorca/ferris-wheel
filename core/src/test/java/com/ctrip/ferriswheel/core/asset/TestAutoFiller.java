@@ -1,5 +1,6 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.Value;
 import junit.framework.TestCase;
@@ -9,7 +10,7 @@ public class TestAutoFiller extends TestCase {
     private AutoFiller autoFiller = new AutoFiller(workbook);
 
     public void testAutoFillDown() {
-        DefaultTable table = (DefaultTable) workbook.addSheet("test").addTable("test");
+        DefaultTable table = (DefaultTable) workbook.addSheet("test").addAsset(Table.class, "test");
         table.setCellValue(0, 0, new Value.DecimalValue(1));
         table.setCellValue(1, 0, new Value.DecimalValue(2));
         table.setCellValue(2, 0, new Value.DecimalValue(3));
@@ -46,7 +47,7 @@ public class TestAutoFiller extends TestCase {
     }
 
     public void testFillUp() {
-        DefaultTable table = (DefaultTable) workbook.addSheet("test").addTable("test");
+        DefaultTable table = (DefaultTable) workbook.addSheet("test").addAsset(Table.class, "test");
 
         table.setCellValue(0, 1, new Value.DecimalValue(1));
         table.setCellValue(1, 1, new Value.DecimalValue(3));

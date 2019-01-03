@@ -105,7 +105,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
 
         DefaultSheet sourceSheet = rangeRef.sheetName() == null ?
                 getTable().getSheet() : getTable().getWorkbook().getSheet(rangeRef.sheetName());
-        DefaultTable sourceTable = sourceSheet.getTable(rangeRef.tableName());
+        DefaultTable sourceTable = sourceSheet.getAsset(rangeRef.tableName());
         final int left = rangeRef.getLeft() >= 0 ? rangeRef.getLeft() : 0;
         final int top = rangeRef.getTop() >= 0 ? rangeRef.getTop() : 0;
         final int right = rangeRef.getRight() >= 0 ? rangeRef.getRight() : sourceTable.getColumnCount() - 1;

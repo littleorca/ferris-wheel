@@ -23,7 +23,7 @@
  *
  */
 
-package com.ctrip.ferriswheel.api;
+package com.ctrip.ferriswheel.api.util;
 
 import java.util.Collection;
 

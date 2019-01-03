@@ -26,8 +26,6 @@
 package com.ctrip.ferriswheel.api;
 
 import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.table.TableData;
-import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.api.view.Displayable;
 import com.ctrip.ferriswheel.api.view.Layout;
@@ -36,65 +34,127 @@ import com.ctrip.ferriswheel.api.view.Layout;
  * Sheet holds tables and charts, it is a layout container.
  */
 public interface Sheet extends Displayable, Iterable<SheetAsset> {
+    /**
+     * Get sheet name.
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     * Get workbook to which the represented sheet belongs to.
+     *
+     * @return
+     */
     Workbook getWorkbook();
 
+    /**
+     * Get asset count.
+     *
+     * @return
+     */
     int getAssetCount();
 
-    SheetAsset getAsset(int index);
+    /**
+     * Add asset.
+     *
+     * @param clazz Class object that represents an interface which extends
+     *              {@link SheetAsset}, the class object decides what kind of
+     *              asset will be added.
+     * @param name  Asset name.
+     * @param <T>   Subclass of {@link SheetAsset} which represents an specific
+     *              asset, should be an interface.
+     * @return New asset object.
+     */
+    <T extends SheetAsset> T addAsset(Class<T> clazz, String name);
 
-    SheetAsset getAsset(String name);
+    /**
+     * Add asset.
+     *
+     * @param clazz Class object that represents an interface which extends
+     *              {@link SheetAsset}, the class object decides what kind of
+     *              asset will be added.
+     * @param asset Asset object with initial data.
+     * @param <T>   Subclass of {@link SheetAsset} which represents an specific
+     *              asset, and should be an interface.
+     * @return New asset object.
+     */
+    <T extends SheetAsset> T addAsset(Class<T> clazz, T asset);
 
-    SheetAsset removeAsset(int index);
+    /**
+     * Get asset by index.
+     *
+     * @param index Index of the target asset.
+     * @param <T>   Subclass of {@link SheetAsset} which represents an specific
+     *              asset.
+     * @return Asset object.
+     */
+    <T extends SheetAsset> T getAsset(int index);
 
-    SheetAsset removeAsset(String name);
+    /**
+     * Get asset by name.
+     *
+     * @param name Name of the target asset.
+     * @param <T>  Subclass of {@link SheetAsset} which represents an specific
+     *             asset.
+     * @return Asset object.
+     */
+    <T extends SheetAsset> T getAsset(String name);
 
+    /**
+     * Remove asset by index.
+     *
+     * @param index Index of the target asset.
+     * @param <T>   Subclass of {@link SheetAsset} which represents an specific
+     *              asset.
+     * @return Removed asset object.
+     */
+    <T extends SheetAsset> T removeAsset(int index);
+
+
+    /**
+     * Remove asset by name.
+     *
+     * @param name Name of the target asset.
+     * @param <T>  Subclass of {@link SheetAsset} which represents an specific
+     *             asset.
+     * @return Removed asset object.
+     */
+    <T extends SheetAsset> T removeAsset(String name);
+
+    /**
+     * Rename asset.
+     *
+     * @param oldName Old asset name.
+     * @param newName New asset name.
+     */
     void renameAsset(String oldName, String newName);
 
-    Table getTable(String name);
-
-    Table addTable(String name);
-
-    Table addTable(String name, TableData tableData);
-
     /**
-     * Get chart by name.
-     *
-     * @param name
-     * @return
-     */
-    Chart getChart(String name);
-
-    /**
-     * Add new chart.
+     * TODO move it to Chart implementation.
      *
      * @param name
      * @param chartData
      * @return
      */
-    Chart addChart(String name, Chart chartData);
-
-    /**
-     * Update chart with the specified name.
-     *
-     * @param name
-     * @param chartData
-     * @return
-     */
+    @Deprecated
     Chart updateChart(String name, Chart chartData);
 
-    Text getText(String name);
-
-    Text addText(String name, Text textData);
-
+    /**
+     * TODO move it to Text implementation.
+     *
+     * @param name
+     * @param textData
+     * @return
+     */
+    @Deprecated
     Text updateText(String name, Text textData);
 
     /**
-     * Set displayable asset's layout.
+     * Layout asset by name.
      *
-     * @param assetName
-     * @param layout
+     * @param assetName Name of the target asset.
+     * @param layout    Layout data.
      */
     void layoutAsset(String assetName, Layout layout);
 }

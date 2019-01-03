@@ -25,9 +25,11 @@
 
 package com.ctrip.ferriswheel.api.table;
 
-import com.ctrip.ferriswheel.api.Sheet;
 import com.ctrip.ferriswheel.api.SheetAsset;
 import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.api.view.Displayable;
+
+import java.util.Map;
 
 /**
  * Holds data grid and provides manipulating interface.
@@ -35,27 +37,21 @@ import com.ctrip.ferriswheel.api.variant.Variant;
  * @see Row
  * @see Cell
  */
-public interface Table extends SheetAsset, TableData {
+public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, SheetAsset {
     /**
-     * Get max supported rows.
+     * Get row count.
      *
      * @return
      */
-    int getMaxRowLimit();
+    int getRowCount();
 
     /**
-     * Get max supported columns.
+     * Get row by index.
      *
+     * @param rowIndex
      * @return
      */
-    int getMaxColumnLimit();
-
-    /**
-     * Get sheet which this table belongs to.
-     *
-     * @return
-     */
-    Sheet getSheet();
+    Row getRow(int rowIndex);
 
     /**
      * Get column count.
@@ -274,4 +270,13 @@ public interface Table extends SheetAsset, TableData {
      * @return correlated table automaton, or null if this table is not automated.
      */
     TableAutomaton getAutomaton();
+
+
+    /**
+     * Get automate configuration.
+     *
+     * @return Automate configuration.
+     */
+    AutomateConfiguration getAutomateConfiguration();
+
 }

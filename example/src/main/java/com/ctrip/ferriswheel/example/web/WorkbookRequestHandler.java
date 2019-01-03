@@ -1,11 +1,15 @@
 package com.ctrip.ferriswheel.example.web;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.Workbook;
 import com.ctrip.ferriswheel.api.action.Action;
 import com.ctrip.ferriswheel.api.chart.Chart;
 import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.api.text.Text;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
+import com.ctrip.ferriswheel.core.asset.DefaultTable;
 import com.ctrip.ferriswheel.core.asset.ReviseCollector;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
@@ -224,13 +228,13 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
                 if (action instanceof AddChart) {
                     AddChart addChart = (AddChart) action;
                     Sheet s = context.getWorkbook().getSheet(addChart.getSheetName());
-                    Chart c = s.getChart(addChart.getChartName());
+                    Chart c = s.getAsset(addChart.getChartName());
                     addChart.setChartData(new ChartData(c));
 
                 } else if (action instanceof UpdateChart) {
                     UpdateChart updateChart = (UpdateChart) action;
                     Sheet s = context.getWorkbook().getSheet(updateChart.getSheetName());
-                    Chart c = s.getChart(updateChart.getChartName());
+                    Chart c = s.getAsset(updateChart.getChartName());
                     updateChart.setChartData(new ChartData(c));
                 }
             }
@@ -244,7 +248,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.AddChart addChart = action.getAddChart();
-            workbook.getSheet(addChart.getSheetName()).addChart(addChart.getChart().getName(),
+            workbook.getSheet(addChart.getSheetName()).addAsset(Chart.class,
                     PbHelper.bean(addChart.getChart()));
         }
     }
@@ -263,7 +267,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.AddTable addTable = action.getAddTable();
-            workbook.getSheet(addTable.getSheetName()).addTable(addTable.getTable().getName(), PbHelper.bean(addTable.getTable()));
+            workbook.getSheet(addTable.getSheetName()).addAsset(Table.class, PbHelper.bean(addTable.getTable()));
         }
     }
 
@@ -273,7 +277,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.AutomateTable automateTable = action.getAutomateTable();
             Table table = workbook.getSheet(automateTable.getSheetName())
-                    .getTable(automateTable.getTableName());
+                    .getAsset(automateTable.getTableName());
             com.ctrip.ferriswheel.proto.v1.TableAutomaton automaton = automateTable.getAutomaton();
             switch (automaton.getAutomatonCase()) {
                 case QUERY_AUTOMATON:
@@ -295,8 +299,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.SetCellValue setCellValue = action.getSetCellValue();
-            workbook.getSheet(setCellValue.getSheetName())
-                    .getTable(setCellValue.getTableName())
+            ((DefaultTable) workbook.getSheet(setCellValue.getSheetName())
+                    .getAsset(setCellValue.getTableName()))
                     .setCellValue(setCellValue.getRowIndex(),
                             setCellValue.getColumnIndex(),
                             PbHelper.toDynamicValue(setCellValue.getValue()));
@@ -308,8 +312,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.SetCellFormula setCellFormula = action.getSetCellFormula();
-            workbook.getSheet(setCellFormula.getSheetName())
-                    .getTable(setCellFormula.getTableName())
+            ((DefaultTable) workbook.getSheet(setCellFormula.getSheetName())
+                    .getAsset(setCellFormula.getTableName()))
                     .setCellFormula(setCellFormula.getRowIndex(),
                             setCellFormula.getColumnIndex(),
                             setCellFormula.getFormulaString());
@@ -343,7 +347,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
             com.ctrip.ferriswheel.proto.v1.ChartConsult ccProto = action.getChartConsult();
             ChartConsult cc = PbActionHelper.bean(ccProto);
             Sheet sheet = workbook.getSheet(cc.getSheetName());
-            Table table = sheet.getTable(cc.getTableName());
+            Table table = sheet.getAsset(cc.getTableName());
             ChartData c = ChartConsultantHelper.getSuggestedChartModel(table,
                     cc.getLeft(),
                     cc.getTop(),
@@ -374,8 +378,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.EraseColumns eraseColumns = action.getEraseColumns();
-            workbook.getSheet(eraseColumns.getSheetName())
-                    .getTable(eraseColumns.getTableName())
+            ((DefaultTable) workbook.getSheet(eraseColumns.getSheetName())
+                    .getAsset(eraseColumns.getTableName()))
                     .eraseColumns(eraseColumns.getColumnIndex(), eraseColumns.getNColumns());
         }
     }
@@ -385,8 +389,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.EraseRows eraseRows = action.getEraseRows();
-            workbook.getSheet(eraseRows.getSheetName())
-                    .getTable(eraseRows.getTableName())
+            ((DefaultTable) workbook.getSheet(eraseRows.getSheetName())
+                    .getAsset(eraseRows.getTableName()))
                     .eraseRows(eraseRows.getRowIndex(), eraseRows.getNRows());
         }
     }
@@ -396,8 +400,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillUp fillUp = action.getFillUp();
-            workbook.getSheet(fillUp.getSheetName())
-                    .getTable(fillUp.getTableName())
+            ((DefaultTable) workbook.getSheet(fillUp.getSheetName())
+                    .getAsset(fillUp.getTableName()))
                     .fillUp(fillUp.getRowIndex(),
                             fillUp.getFirstColumn(),
                             fillUp.getLastColumn(),
@@ -410,8 +414,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillRight fillRight = action.getFillRight();
-            workbook.getSheet(fillRight.getSheetName())
-                    .getTable(fillRight.getTableName())
+            ((DefaultTable) workbook.getSheet(fillRight.getSheetName())
+                    .getAsset(fillRight.getTableName()))
                     .fillRight(fillRight.getColumnIndex(),
                             fillRight.getFirstRow(),
                             fillRight.getLastRow(),
@@ -424,8 +428,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillDown fillDown = action.getFillDown();
-            workbook.getSheet(fillDown.getSheetName())
-                    .getTable(fillDown.getTableName())
+            ((DefaultTable) workbook.getSheet(fillDown.getSheetName())
+                    .getAsset(fillDown.getTableName()))
                     .fillDown(fillDown.getRowIndex(),
                             fillDown.getFirstColumn(),
                             fillDown.getLastColumn(),
@@ -438,8 +442,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillLeft fillLeft = action.getFillLeft();
-            workbook.getSheet(fillLeft.getSheetName())
-                    .getTable(fillLeft.getTableName())
+            ((DefaultTable) workbook.getSheet(fillLeft.getSheetName())
+                    .getAsset(fillLeft.getTableName()))
                     .fillLeft(fillLeft.getColumnIndex(),
                             fillLeft.getFirstRow(),
                             fillLeft.getLastRow(),
@@ -452,8 +456,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.InsertColumns insertColumns = action.getInsertColumns();
-            workbook.getSheet(insertColumns.getSheetName())
-                    .getTable(insertColumns.getTableName())
+            ((DefaultTable) workbook.getSheet(insertColumns.getSheetName())
+                    .getAsset(insertColumns.getTableName()))
                     .insertColumns(insertColumns.getColumnIndex(), insertColumns.getNColumns());
         }
     }
@@ -463,8 +467,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.InsertRows insertRows = action.getInsertRows();
-            workbook.getSheet(insertRows.getSheetName())
-                    .getTable(insertRows.getTableName())
+            ((DefaultTable) workbook.getSheet(insertRows.getSheetName())
+                    .getAsset(insertRows.getTableName()))
                     .insertRows(insertRows.getRowIndex(), insertRows.getNRows());
         }
     }
@@ -493,8 +497,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.RemoveColumns removeColumns = action.getRemoveColumns();
-            workbook.getSheet(removeColumns.getSheetName())
-                    .getTable(removeColumns.getTableName())
+            ((DefaultTable) workbook.getSheet(removeColumns.getSheetName())
+                    .getAsset(removeColumns.getTableName()))
                     .removeColumns(removeColumns.getColumnIndex(), removeColumns.getNColumns());
         }
     }
@@ -504,8 +508,8 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.RemoveRows removeRows = action.getRemoveRows();
-            workbook.getSheet(removeRows.getSheetName())
-                    .getTable(removeRows.getTableName())
+            ((DefaultTable) workbook.getSheet(removeRows.getSheetName())
+                    .getAsset(removeRows.getTableName()))
                     .removeRows(removeRows.getRowIndex(), removeRows.getNRows());
         }
     }
@@ -551,7 +555,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.UpdateAutomaton updateAutomaton = action.getUpdateAutomaton();
-            Table table = workbook.getSheet(updateAutomaton.getSheetName()).getTable(updateAutomaton.getTableName());
+            Table table = workbook.getSheet(updateAutomaton.getSheetName()).getAsset(updateAutomaton.getTableName());
             com.ctrip.ferriswheel.proto.v1.TableAutomaton automaton = updateAutomaton.getAutomaton();
             switch (automaton.getAutomatonCase()) {
                 case QUERY_AUTOMATON:
@@ -673,7 +677,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             AddText addText = PbActionHelper.bean(action.getAddText());
             Sheet sheet = workbook.getSheet(addText.getSheetName());
-            sheet.addText(addText.getTextName(), addText.getTextData());
+            sheet.addAsset(Text.class, addText.getTextData());
         }
     }
 
@@ -692,7 +696,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             ExecuteQuery execQuery = PbActionHelper.bean(action.getExecuteQuery());
             Sheet sheet = workbook.getSheet(execQuery.getSheetName());
-            Table table = sheet.getTable(execQuery.getTableName());
+            Table table = sheet.getAsset(execQuery.getTableName());
             DefaultQueryAutomaton auto = (DefaultQueryAutomaton) table.getAutomaton();
             auto.handleAction(execQuery);
         }

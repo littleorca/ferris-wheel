@@ -14,7 +14,7 @@ public class TestDefaultWorkbookWithReviseCollector extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        environment=new DefaultEnvironment.Builder().build();
+        environment = new DefaultEnvironment.Builder().build();
     }
 
     public void test() {
@@ -22,7 +22,7 @@ public class TestDefaultWorkbookWithReviseCollector extends TestCase {
         Workbook workbook = new DefaultWorkbook(environment);
         workbook.addListener(revListener);
         Sheet sheet1 = workbook.addSheet("sheet1");
-        Table table1 = sheet1.addTable("table1");
+        Table table1 = sheet1.addAsset(Table.class, "table1");
         table1.setCellValue(0, 0, new Value.DecimalValue(1024));
         table1.setCellFormula(0, 1, "A1*2");
         System.out.println(workbook);

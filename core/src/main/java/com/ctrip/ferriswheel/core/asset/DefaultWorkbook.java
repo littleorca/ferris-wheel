@@ -227,9 +227,9 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             }
 
         } else {
-            for (Row row : table) {
-                for (Cell cell : row) {
-                    onValueNodeUpdate(table, (DefaultCell) cell);
+            for (Map.Entry<Integer, Row> rowEntry : table) {
+                for (Map.Entry<Integer, Cell> cellEntry : rowEntry.getValue()) {
+                    onValueNodeUpdate(table, (DefaultCell) cellEntry.getValue());
                 }
             }
         }
@@ -530,7 +530,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             return currentTable;
         }
         DefaultSheet sheet = getReferredSheet(ref, currentSheet);
-        return sheet == null ? null : sheet.getTable(ref.getTableName());
+        return sheet == null ? null : sheet.getAsset(ref.getTableName());
     }
 
     DefaultCell getReferredCell(CellRef ref, DefaultTable currentTable) {
@@ -672,7 +672,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         if (sheet == null) {
             return null; // or throw new RuntimeException();
         }
-        return sheet.getTable(tableName);
+        return sheet.getAsset(tableName);
     }
 
     //// ------------------------------------------------------------------------------------

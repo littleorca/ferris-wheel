@@ -200,7 +200,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         if (sheet == null) {
             throw new RuntimeException("Failed to get referred sheet.");
         }
-        DefaultTable table = sheet.getTable(rangeRef.tableName());
+        DefaultTable table = sheet.getAsset(rangeRef.tableName());
         if (table == null) {
             clearData();
             getSheet().publicly(new UpdateChart(getSheet().getName(),

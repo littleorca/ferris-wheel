@@ -51,8 +51,8 @@ public class PbActionHelper {
         Table.Builder tableBuilder = Table.newBuilder()
                 .setName(bean.getTableName());
         if (bean.getTableData() != null) {
-            for (Row row : bean.getTableData()) {
-                tableBuilder.addRows(PbHelper.pb(row));
+            for (Map.Entry<Integer, Row> rowEntry : bean.getTableData()) {
+                tableBuilder.addRows(PbHelper.pb(rowEntry.getValue(), rowEntry.getKey()));
             }
             if (bean.getTableData().getAutomateConfiguration() != null) {
                 if (bean.getTableData().getAutomateConfiguration() instanceof TableAutomatonInfo.QueryAutomatonInfo) {

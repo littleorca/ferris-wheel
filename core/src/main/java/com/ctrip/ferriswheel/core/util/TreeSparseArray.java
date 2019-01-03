@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.api.SparseArray;
+import com.ctrip.ferriswheel.api.util.SparseArray;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -28,6 +28,15 @@ public class TreeSparseArray<E> implements SparseArray<E>, Serializable {
 
     public E get(int index) {
         return holder.get(index);
+    }
+
+    public E move(int from, int to) {
+        E element = holder.remove(from);
+        if (element == null) {
+            return holder.remove(to);
+        } else {
+            return set(to, element);
+        }
     }
 
     public E remove(int index) {

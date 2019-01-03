@@ -1,13 +1,14 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.api.chart.Chart;
 import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.api.query.DataProvider;
 import com.ctrip.ferriswheel.api.query.DataQuery;
 import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.variant.Variant;
 import com.ctrip.ferriswheel.api.variant.VariantType;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.loader.DefaultColumnMeta;
@@ -31,7 +32,7 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
     public void testSetAndGet() {
         DefaultWorkbook wb = new DefaultWorkbook(environment);
-        DefaultTable table = wb.addSheet("s1").addTable("t1");
+        DefaultTable table = (DefaultTable) wb.addSheet("s1").addAsset(Table.class, "t1");
 
         // empty
         assertEquals(0, table.getRowCount());
@@ -359,12 +360,12 @@ public class TestDefaultTable extends DefaultTableTestSupport {
                 null,
                 new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
 
-        ChartData chartSettings = new ChartData("foobar", "Line",
+        ChartData chartSettings = new ChartData("testChart", "Line",
                 new DynamicVariantImpl("\"Hello Line Chart!\""),
                 new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
                 seriesList);
 
-        DefaultChart chart = table.getSheet().addChart("testChart", chartSettings);
+        DefaultChart chart = (DefaultChart) table.getSheet().addAsset(Chart.class, chartSettings);
 
         assertEquals("Line", chart.getType());
         assertEquals("testChart", chart.getName());
@@ -413,7 +414,7 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         table.insertRows(2, 1);
         table.insertColumns(3, 1);
 
-        chart = table.getSheet().getChart("testChart");
+        chart = table.getSheet().getAsset("testChart");
 
         assertEquals("Line", chart.getType());
         assertEquals("testChart", chart.getName());
@@ -486,21 +487,21 @@ public class TestDefaultTable extends DefaultTableTestSupport {
                 null,
                 new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
 
-        ChartData chartSettings = new ChartData("foobar","Line",
+        ChartData chartSettings = new ChartData("testChart", "Line",
                 new DynamicVariantImpl("\"Hello Line Chart!\""),
                 new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
                 seriesList);
 
-        DefaultChart chart = table.getSheet().addChart("testChart", chartSettings);
+        DefaultChart chart = (DefaultChart) table.getSheet().addAsset(Chart.class, chartSettings);
 
         // update
-        ((ChartData.SeriesImpl)seriesList.get(0)).setyValues(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$C$2"));
-        ((ChartData.SeriesImpl)seriesList.get(1)).setyValues(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$C$3"));
+        ((ChartData.SeriesImpl) seriesList.get(0)).setyValues(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$C$2"));
+        ((ChartData.SeriesImpl) seriesList.get(1)).setyValues(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$C$3"));
         seriesList.remove(2);
         seriesList.add(new ChartData.SeriesImpl(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
                 new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$C$4")));
-        table.getSheet().updateChart("testChart", new ChartData("testChart","Line",
+        table.getSheet().updateChart("testChart", new ChartData("testChart", "Line",
                 new DynamicVariantImpl("\"Hello New Line Chart!\""),
                 new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$C$1"),
                 seriesList
@@ -555,7 +556,7 @@ public class TestDefaultTable extends DefaultTableTestSupport {
     public void testAutomateWithQuery() {
         DefaultWorkbook workbook = new FilingClerk(environment).createWorkbook("test-workbook");
         DefaultSheet sheet = workbook.addSheet("sheet1");
-        DefaultTable table = sheet.addTable("table1");
+        DefaultTable table = (DefaultTable) sheet.addAsset(Table.class, "table1");
 
         TableAutomatonInfo.QueryTemplateInfo template = new TableAutomatonInfo.QueryTemplateInfo();
         template.setScheme(FAKE_QUERY_SCHEME);

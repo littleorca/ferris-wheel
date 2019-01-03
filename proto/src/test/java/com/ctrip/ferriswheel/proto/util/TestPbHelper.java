@@ -1,10 +1,11 @@
 package com.ctrip.ferriswheel.proto.util;
 
-import com.ctrip.ferriswheel.api.*;
+import com.ctrip.ferriswheel.api.Sheet;
+import com.ctrip.ferriswheel.api.Workbook;
 import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.api.query.DataProvider;
 import com.ctrip.ferriswheel.api.query.DataQuery;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
 import com.ctrip.ferriswheel.api.query.DataSet;
 import com.ctrip.ferriswheel.api.table.Table;
 import com.ctrip.ferriswheel.api.variant.DynamicVariant;
@@ -58,7 +59,7 @@ public class TestPbHelper extends TestCase {
                 .setProviderManager(pm)
                 .build();
 
-        Table table = new FilingClerk(env).createWorkbook("test-workbook").addSheet("sheet1").addTable("table1");
+        Table table = new FilingClerk(env).createWorkbook("test-workbook").addSheet("sheet1").addAsset(Table.class, "table1");
         table.setCellFormula(0, 0, "2^10");
         table.setCellFormula(2, 0, "A1*4");
         com.ctrip.ferriswheel.proto.v1.SheetAsset asset = PbHelper.pb(table);
@@ -103,11 +104,11 @@ public class TestPbHelper extends TestCase {
     public void testChartAndSeriesToProto() {
         Sheet sheet1 = new FilingClerk(new DefaultEnvironment.Builder().build())
                 .createWorkbook("test-workbook").addSheet("sheet1");
-        Table table1 = sheet1.addTable("table1");
+        Table table1 = sheet1.addAsset(Table.class, "table1");
         table1.setCellValue(0, 0, Value.str("foobar"));
         table1.setCellValue(0, 1, Value.dec(2));
         table1.setCellValue(0, 2, Value.dec(3));
-        Chart chart1 = sheet1.addChart("chart1",
+        Chart chart1 = sheet1.addAsset(Chart.class,
                 new ChartData("chart1", "Line",
                         new DynamicVariantImpl("\"Chart 1 (Line)\""),
                         null,
@@ -135,10 +136,10 @@ public class TestPbHelper extends TestCase {
 
     public void testRowToProto() {
         Table table = new FilingClerk(new DefaultEnvironment.Builder().build())
-                .createWorkbook("test-workbook").addSheet("sheet1").addTable("table1");
+                .createWorkbook("test-workbook").addSheet("sheet1").addAsset(Table.class, "table1");
         table.setCellFormula(2, 0, "2^10");
         table.setCellFormula(2, 2, "A3*4");
-        com.ctrip.ferriswheel.proto.v1.Row row = PbHelper.pb(table.getRow(2));
+        com.ctrip.ferriswheel.proto.v1.Row row = PbHelper.pb(table.getRow(2), 2);
         assertEquals(2, row.getRowIndex());
         assertEquals(2, row.getCellsCount());
         assertEquals(0, row.getCells(0).getColumnIndex());
@@ -149,9 +150,9 @@ public class TestPbHelper extends TestCase {
 
     public void testCellToProto() {
         Table table = new FilingClerk(new DefaultEnvironment.Builder().build())
-                .createWorkbook("test-workbook").addSheet("sheet1").addTable("table1");
+                .createWorkbook("test-workbook").addSheet("sheet1").addAsset(Table.class, "table1");
         table.setCellFormula(2, 2, "2^10");
-        com.ctrip.ferriswheel.proto.v1.Cell cell = PbHelper.pb(table.getCell(2, 2));
+        com.ctrip.ferriswheel.proto.v1.Cell cell = PbHelper.pb(table.getCell(2, 2), 2);
         assertEquals(2, cell.getColumnIndex());
         com.ctrip.ferriswheel.proto.v1.UnionValue v = cell.getValue();
         assertEquals("2^10", v.getFormulaString());
@@ -225,9 +226,9 @@ public class TestPbHelper extends TestCase {
 
         Workbook wb = new FilingClerk(env).createWorkbook("test-workbook");
         Sheet s1 = wb.addSheet("s1");
-        Table t0 = s1.addTable("t0");
-        Table t1 = s1.addTable("t1");
-        Table t2 = s1.addTable("t2");
+        Table t0 = s1.addAsset(Table.class, "t0");
+        Table t1 = s1.addAsset(Table.class, "t1");
+        Table t2 = s1.addAsset(Table.class, "t2");
 
         Map<String, DynamicVariant> builtinParams = new HashMap<>();
         builtinParams.put("Greeting", new DynamicVariantImpl("\"hello world\""));
@@ -250,7 +251,7 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 1, Value.dec(21));
         t1.setCellValue(2, 2, Value.dec(22));
         t1.setCellFormula(2, 3, "t0!B1");
-        s1.addChart("c1", new ChartData("c1","Line",
+        s1.addAsset(Chart.class, new ChartData("c1", "Line",
                 new DynamicVariantImpl("\"Line Chart 1\""),
                 new DynamicVariantImpl("t1!B1:D1"),
                 Arrays.asList(
@@ -273,10 +274,10 @@ public class TestPbHelper extends TestCase {
         s1 = wb.getSheet(0);
         assertEquals("s1", s1.getName());
         assertEquals(4, s1.getAssetCount());
-        t0 = s1.getTable("t0");
-        t1 = s1.getTable("t1");
-        t2 = s1.getTable("t2");
-        Chart c1 = s1.getChart("c1");
+        t0 = s1.getAsset("t0");
+        t1 = s1.getAsset("t1");
+        t2 = s1.getAsset("t2");
+        Chart c1 = s1.getAsset("c1");
 
         assertEquals(1, t0.getRowCount());
         assertEquals(2, t0.getColumnCount());
@@ -345,7 +346,7 @@ public class TestPbHelper extends TestCase {
     public void testJSON() throws InvalidProtocolBufferException {
         Workbook wb = new FilingClerk(new DefaultEnvironment.Builder().build()).createWorkbook("test-workbook");
         Sheet s1 = wb.addSheet("sheet1");
-        Table t1 = s1.addTable("table1");
+        Table t1 = s1.addAsset(Table.class, "table1");
         t1.setCellValue(0, 1, Value.str("foo"));
         t1.setCellValue(0, 2, Value.str("bar"));
         t1.setCellValue(1, 0, Value.str("a"));
@@ -355,7 +356,7 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 1, Value.dec(21));
         t1.setCellValue(2, 2, Value.dec(22));
 
-        s1.addChart("chart1", new ChartData("chart1", "Line",
+        s1.addAsset(Chart.class, new ChartData("chart1", "Line",
                 new DynamicVariantImpl("\"Hello Line Chart1\""),
                 new DynamicVariantImpl("table1!B1:C1"),
                 Arrays.asList(new ChartData.SeriesImpl(
