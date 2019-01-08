@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.analysis;
 
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.api.table.AggregateType;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import junit.framework.TestCase;
 
 import java.util.HashMap;

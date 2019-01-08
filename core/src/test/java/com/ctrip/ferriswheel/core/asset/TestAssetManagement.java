@@ -1,12 +1,14 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.SheetAsset;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Row;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.table.TableAutomaton;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.table.TableAutomaton;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.bean.*;
 import junit.framework.TestCase;
 

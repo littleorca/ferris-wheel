@@ -1,22 +1,27 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Sheet;
-import com.ctrip.ferriswheel.api.SheetAsset;
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.action.ActionNotifier;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.chart.ChartBinder;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Row;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.text.Text;
-import com.ctrip.ferriswheel.api.view.Display;
-import com.ctrip.ferriswheel.api.view.Displayable;
-import com.ctrip.ferriswheel.api.view.Grid;
-import com.ctrip.ferriswheel.api.view.Layout;
+import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.action.ActionNotifier;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.chart.ChartBinder;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.text.Text;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.view.Display;
+import com.ctrip.ferriswheel.common.view.Displayable;
+import com.ctrip.ferriswheel.common.view.Grid;
+import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.core.bean.*;
+import com.ctrip.ferriswheel.core.bean.AxisImpl;
+import com.ctrip.ferriswheel.core.bean.ChartData;
+import com.ctrip.ferriswheel.core.bean.TableDataImpl;
+import com.ctrip.ferriswheel.core.bean.TextData;
+import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
@@ -360,7 +365,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     void fillTextData(DefaultText text, Text data) {
         DynamicVariantImpl dv = (DynamicVariantImpl) data.getContent();
         if (dv.isFormula()) {
-            text.getContent().setFormula(dv.getFormula());
+            text.getContent().setFormula(new Formula(dv.getFormulaString()));
         } else {
             text.getContent().setFormula(null);
             text.getContent().setValue(dv.getVariant());

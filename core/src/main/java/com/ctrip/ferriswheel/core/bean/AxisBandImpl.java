@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.chart.AxisBand;
+import com.ctrip.ferriswheel.common.chart.AxisBand;
 
 import java.io.Serializable;
 

@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.Workbook;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.Workbook;
 
 public abstract class BaseAction implements Action {
     BaseAction() {

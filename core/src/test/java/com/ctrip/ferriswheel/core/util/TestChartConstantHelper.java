@@ -1,13 +1,13 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.Workbook;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.Workbook;
 import junit.framework.TestCase;
 
 public class TestChartConstantHelper extends TestCase {

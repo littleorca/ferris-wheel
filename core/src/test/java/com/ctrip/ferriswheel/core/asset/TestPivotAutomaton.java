@@ -1,11 +1,12 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.formula.ErrorCodes;
-import com.ctrip.ferriswheel.api.table.AggregateType;
-import com.ctrip.ferriswheel.api.Environment;
+import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
+import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.Environment;
 import junit.framework.TestCase;
 
 import java.util.Arrays;

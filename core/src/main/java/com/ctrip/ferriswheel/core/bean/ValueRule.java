@@ -25,9 +25,9 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.variant.VariantRule;
-import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.VariantRule;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

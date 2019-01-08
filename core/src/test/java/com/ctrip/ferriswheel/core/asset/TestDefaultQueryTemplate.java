@@ -1,13 +1,13 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.ValueRule;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.api.query.DataQuery;
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.variant.VariantRule;
-import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.VariantRule;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 import junit.framework.TestCase;
 
 import java.util.HashMap;

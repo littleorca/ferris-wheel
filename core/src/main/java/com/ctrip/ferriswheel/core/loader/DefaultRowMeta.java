@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.loader;
 
-import com.ctrip.ferriswheel.api.query.DataSet;
+import com.ctrip.ferriswheel.common.query.DataSet;
 
 public class DefaultRowMeta implements DataSet.RowMeta {
     private final String name;

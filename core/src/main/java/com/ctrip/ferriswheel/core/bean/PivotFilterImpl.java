@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.table.PivotFilter;
+import com.ctrip.ferriswheel.common.table.PivotFilter;
 
 import java.io.Serializable;
 

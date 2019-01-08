@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.ProviderManager;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.ProviderManager;
 
 public class DefaultEnvironment implements Environment {
     public static class Builder {

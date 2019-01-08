@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import junit.framework.TestCase;
 
 public class TestAutoFiller extends TestCase {

@@ -1,12 +1,12 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.ProviderManager;
-import com.ctrip.ferriswheel.api.query.DataProvider;
-import com.ctrip.ferriswheel.api.query.DataQuery;
-import com.ctrip.ferriswheel.api.query.DataSet;
-import com.ctrip.ferriswheel.api.table.QueryAutomaton;
-import com.ctrip.ferriswheel.api.table.QueryConfiguration;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.ProviderManager;
+import com.ctrip.ferriswheel.common.query.DataProvider;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.table.QueryAutomaton;
+import com.ctrip.ferriswheel.common.table.QueryConfiguration;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.ExecuteQuery;
 import com.ctrip.ferriswheel.core.bean.DefaultDataQuery;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;

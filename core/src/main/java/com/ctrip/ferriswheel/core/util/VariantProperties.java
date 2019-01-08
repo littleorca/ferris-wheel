@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
 
 import java.util.Date;
 import java.util.LinkedHashMap;

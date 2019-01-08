@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.proto.util;
 
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.proto.v1.UnionValue;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;

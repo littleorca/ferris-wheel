@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.SheetAsset;
+import com.ctrip.ferriswheel.common.SheetAsset;
 
 abstract class SheetAssetNode extends NamedAssetNode implements SheetAsset, NamedAsset {
     public SheetAssetNode(String name, AssetManager assetManager) {

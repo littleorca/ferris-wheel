@@ -1,14 +1,16 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.query.DataProvider;
-import com.ctrip.ferriswheel.api.query.DataQuery;
-import com.ctrip.ferriswheel.api.query.DataSet;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.query.DataProvider;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.loader.DefaultColumnMeta;

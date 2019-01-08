@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.view.Layout;
+import com.ctrip.ferriswheel.common.view.Layout;
 
 public class LayoutAsset extends SheetAction {
     private String assetName;

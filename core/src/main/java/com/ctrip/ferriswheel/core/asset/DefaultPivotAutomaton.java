@@ -1,8 +1,10 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.query.DataSet;
-import com.ctrip.ferriswheel.api.table.*;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.table.*;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.analysis.DimensionalAggregator;
 import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;

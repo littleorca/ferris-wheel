@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.table.AutomateConfiguration;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
 
 public class AutomateTable extends TableAction implements Action {
     AutomateConfiguration solution;

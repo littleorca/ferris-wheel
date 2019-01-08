@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.core.action.UpdateChart;
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.action.ActionListener;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.action.ActionListener;
 
 import java.util.*;
 

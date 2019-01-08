@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.table.Table;
 
 /**
  * This action is only used to push table data after table has refreshed all data.

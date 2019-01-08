@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.proto.util;
 
-import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.proto.v1.Table;
 import com.ctrip.ferriswheel.proto.v1.TableAutomaton;
 

@@ -1,17 +1,17 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.Sheet;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.core.formula.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
 import junit.framework.TestCase;
 
 import java.math.BigDecimal;

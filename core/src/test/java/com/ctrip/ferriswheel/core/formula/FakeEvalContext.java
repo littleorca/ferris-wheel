@@ -2,9 +2,9 @@ package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.api.Sheet;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.Variant;
 
 import java.util.Stack;
 

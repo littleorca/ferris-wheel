@@ -1,13 +1,13 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.view.Orientation;
-import com.ctrip.ferriswheel.api.view.Placement;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.view.Orientation;
+import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
@@ -17,7 +17,7 @@ import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import com.ctrip.ferriswheel.core.bean.AxisImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
 
 import java.util.ArrayList;

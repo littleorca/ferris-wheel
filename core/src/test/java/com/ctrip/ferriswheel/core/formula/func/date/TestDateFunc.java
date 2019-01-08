@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.core.formula.func.date;
 
 import com.ctrip.ferriswheel.core.formula.FakeEvalContext;
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 import junit.framework.TestCase;
 
 import java.util.Calendar;

@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.action.Action;
+import com.ctrip.ferriswheel.common.action.Action;
 
 public abstract class FillCells extends TableAction implements Action {
 

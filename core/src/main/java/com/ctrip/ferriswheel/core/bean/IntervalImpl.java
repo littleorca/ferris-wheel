@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.chart.Interval;
+import com.ctrip.ferriswheel.common.chart.Interval;
 
 import java.io.Serializable;
 

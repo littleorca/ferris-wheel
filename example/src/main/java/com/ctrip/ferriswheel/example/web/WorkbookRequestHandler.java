@@ -1,12 +1,12 @@
 package com.ctrip.ferriswheel.example.web;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.Sheet;
-import com.ctrip.ferriswheel.api.Workbook;
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.text.Text;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.DefaultTable;

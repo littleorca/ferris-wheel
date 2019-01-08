@@ -1,16 +1,16 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.*;
-import com.ctrip.ferriswheel.api.query.DataProvider;
-import com.ctrip.ferriswheel.api.query.DataQuery;
-import com.ctrip.ferriswheel.api.query.DataSet;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-import com.ctrip.ferriswheel.api.variant.VariantRule;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.*;
+import com.ctrip.ferriswheel.common.query.DataProvider;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.VariantRule;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import junit.framework.TestCase;

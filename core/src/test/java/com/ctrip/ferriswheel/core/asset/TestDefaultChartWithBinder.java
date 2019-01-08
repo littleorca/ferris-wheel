@@ -1,14 +1,14 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.view.Orientation;
-import com.ctrip.ferriswheel.api.view.Placement;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.view.Orientation;
+import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import junit.framework.TestCase;
 

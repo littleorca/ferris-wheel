@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.*;
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.*;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import junit.framework.TestCase;
 
 import java.util.List;

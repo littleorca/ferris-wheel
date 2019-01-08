@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.chart.Chart;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.chart.Chart;
 
 public final class AddChart extends SheetAction implements Action {
     private String chartName;

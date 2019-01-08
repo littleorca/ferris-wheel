@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.chart.ChartBinder;
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-import com.ctrip.ferriswheel.api.view.Orientation;
-import com.ctrip.ferriswheel.api.view.Placement;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.chart.ChartBinder;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.view.Orientation;
+import com.ctrip.ferriswheel.common.view.Placement;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 
 public class DefaultChartBinder extends AssetNode implements ChartBinder {
     private final ValueNode data;

@@ -1,13 +1,13 @@
 package com.ctrip.ferriswheel.core;
 
-import com.ctrip.ferriswheel.api.Workbook;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.DefaultTable;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.util.ChartConsultantHelper;
 
 import java.net.MalformedURLException;

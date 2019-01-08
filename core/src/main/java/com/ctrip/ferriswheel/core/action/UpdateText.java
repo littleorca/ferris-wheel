@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.text.Text;
 
 public class UpdateText extends TextAction implements Action {
     private Text textData;

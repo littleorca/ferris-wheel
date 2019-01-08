@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Environment;
-import com.ctrip.ferriswheel.api.Workbook;
+import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.Workbook;
 
 import java.util.function.Consumer;
 

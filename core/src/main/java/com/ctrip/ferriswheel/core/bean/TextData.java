@@ -25,8 +25,9 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.text.Text;
-import com.ctrip.ferriswheel.api.view.Layout;
+import com.ctrip.ferriswheel.common.text.Text;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
 import java.io.Serializable;

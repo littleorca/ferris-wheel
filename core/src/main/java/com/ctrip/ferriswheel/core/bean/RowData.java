@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Row;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 
 import java.io.Serializable;

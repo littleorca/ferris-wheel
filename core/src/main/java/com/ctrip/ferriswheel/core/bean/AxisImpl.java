@@ -25,10 +25,10 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.chart.Axis;
-import com.ctrip.ferriswheel.api.view.Placement;
-import com.ctrip.ferriswheel.api.chart.Stacking;
-import com.ctrip.ferriswheel.api.chart.AxisBand;
+import com.ctrip.ferriswheel.common.chart.Axis;
+import com.ctrip.ferriswheel.common.view.Placement;
+import com.ctrip.ferriswheel.common.chart.Stacking;
+import com.ctrip.ferriswheel.common.chart.AxisBand;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.Workbook;
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.FormulaParser;
 import com.ctrip.ferriswheel.core.util.AreaPatternAnalyzer;

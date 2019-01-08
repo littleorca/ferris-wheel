@@ -25,12 +25,13 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.chart.ChartBinder;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.view.Orientation;
-import com.ctrip.ferriswheel.api.view.Placement;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.chart.ChartBinder;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.view.Orientation;
+import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
 import java.io.Serializable;

@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.chart.DataSeries;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
 
 class DefaultDataSeries extends AssetNode implements DataSeries {
     private ValueNode name;

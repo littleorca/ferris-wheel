@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.view.Color;
+import com.ctrip.ferriswheel.common.view.Color;
 
 import java.io.Serializable;
 import java.util.regex.Pattern;

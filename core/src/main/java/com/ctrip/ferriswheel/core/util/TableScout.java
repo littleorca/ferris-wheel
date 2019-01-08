@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Table;
-import com.ctrip.ferriswheel.api.variant.VariantType;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 import com.ctrip.ferriswheel.core.view.Rectangle;
 
 public class TableScout {

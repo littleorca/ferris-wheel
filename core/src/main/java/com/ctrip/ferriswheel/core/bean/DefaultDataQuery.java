@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.query.DataQuery;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.util.VariantProperties;
 
 import java.util.Collections;

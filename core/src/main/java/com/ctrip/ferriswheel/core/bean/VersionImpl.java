@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.Version;
+import com.ctrip.ferriswheel.common.Version;
 
 import java.io.Serializable;
 

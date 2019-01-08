@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-import com.ctrip.ferriswheel.api.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.Variant;
 
 /**
  * Variant node holds variant and optionally a formula.

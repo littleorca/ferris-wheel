@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.action.ActionContext;
-import com.ctrip.ferriswheel.api.action.ActionContextManager;
+import com.ctrip.ferriswheel.common.action.ActionContext;
+import com.ctrip.ferriswheel.common.action.ActionContextManager;
 
 import java.util.Stack;
 import java.util.concurrent.Callable;

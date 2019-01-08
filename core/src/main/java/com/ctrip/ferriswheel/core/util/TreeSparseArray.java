@@ -1,7 +1,5 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.api.util.SparseArray;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;

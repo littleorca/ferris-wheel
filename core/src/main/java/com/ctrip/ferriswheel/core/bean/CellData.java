@@ -1,7 +1,9 @@
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 
 import java.io.Serializable;
 

@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.api.action.ActionContext;
+import com.ctrip.ferriswheel.common.action.ActionContext;
 
 /**
  * @author liuhaifeng

@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
-import com.ctrip.ferriswheel.core.bean.Value;
-import com.ctrip.ferriswheel.api.text.Text;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.text.Text;
 import com.ctrip.ferriswheel.core.view.TextLayout;
 
 public class DefaultText extends SheetAssetNode implements Text {

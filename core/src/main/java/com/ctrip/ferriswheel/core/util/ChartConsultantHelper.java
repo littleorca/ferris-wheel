@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.DefaultCell;
 import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.bean.DynamicVariantImpl;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import com.ctrip.ferriswheel.core.view.Rectangle;

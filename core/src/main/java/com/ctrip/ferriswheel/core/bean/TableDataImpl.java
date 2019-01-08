@@ -25,11 +25,12 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.api.Sheet;
-import com.ctrip.ferriswheel.api.table.*;
-import com.ctrip.ferriswheel.api.variant.DynamicVariant;
-import com.ctrip.ferriswheel.api.variant.Variant;
-import com.ctrip.ferriswheel.api.view.Layout;
+import com.ctrip.ferriswheel.common.table.*;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 

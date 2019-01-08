@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.action;
 
-import com.ctrip.ferriswheel.api.action.Action;
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.action.Action;
+import com.ctrip.ferriswheel.common.table.Table;
 
 public final class AddTable extends SheetAction implements Action {
     private String tableName;

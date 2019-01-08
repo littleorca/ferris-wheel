@@ -1,15 +1,15 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.api.Sheet;
-import com.ctrip.ferriswheel.api.SheetAsset;
-import com.ctrip.ferriswheel.api.chart.Chart;
-import com.ctrip.ferriswheel.api.chart.DataSeries;
-import com.ctrip.ferriswheel.api.table.Cell;
-import com.ctrip.ferriswheel.api.table.Row;
-import com.ctrip.ferriswheel.api.table.Table;
+import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.chart.Chart;
+import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.DefaultSheet;
 import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
-import com.ctrip.ferriswheel.core.bean.Value;
+import com.ctrip.ferriswheel.common.variant.impl.Value;
 
 import java.util.Arrays;
 import java.util.List;

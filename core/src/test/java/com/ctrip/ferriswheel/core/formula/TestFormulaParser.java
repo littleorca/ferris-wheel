@@ -210,4 +210,18 @@ public class TestFormulaParser extends TestCase {
         assertNull(r.getRangeRef().tableName());
         assertNull(r.getRangeRef().sheetName());
     }
+
+    public void testParseIllegalFormula() {
+        try {
+            FormulaParser.parse("");
+            fail();
+        } catch (FormulaParserException e) {
+        }
+        try {
+            FormulaParser.parse("some malformed formula");
+            fail();
+        } catch (FormulaParserException e) {
+        }
+
+    }
 }

@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.view;
 
-import com.ctrip.ferriswheel.api.view.*;
+import com.ctrip.ferriswheel.common.view.*;
 
 public class LayoutImpl implements Layout {
     private Display display;

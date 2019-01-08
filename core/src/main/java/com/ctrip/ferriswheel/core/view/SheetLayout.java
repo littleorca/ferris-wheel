@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.view;
 
-import com.ctrip.ferriswheel.api.view.Display;
-import com.ctrip.ferriswheel.api.view.Layout;
-import com.ctrip.ferriswheel.api.view.Placement;
+import com.ctrip.ferriswheel.common.view.Display;
+import com.ctrip.ferriswheel.common.view.Layout;
+import com.ctrip.ferriswheel.common.view.Placement;
 
 public class SheetLayout extends LayoutImpl {
     private static final int DEFAULT_WIDTH = 1200;
