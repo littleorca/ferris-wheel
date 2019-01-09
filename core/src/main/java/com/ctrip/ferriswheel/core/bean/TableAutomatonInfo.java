@@ -25,12 +25,11 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
+import com.ctrip.ferriswheel.common.automaton.*;
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
-import com.ctrip.ferriswheel.common.table.*;
+import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
 import com.ctrip.ferriswheel.common.variant.*;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.asset.DefaultPivotAutomaton;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 
@@ -49,7 +48,7 @@ public abstract class TableAutomatonInfo implements AutomateConfiguration, Seria
     private TableAutomatonInfo() {
     }
 
-    public static AutomateConfiguration fromAutomaton(TableAutomaton automaton) {
+    public static AutomateConfiguration fromAutomaton(Automaton automaton) {
         if (automaton instanceof DefaultQueryAutomaton) {
             return ((DefaultQueryAutomaton) automaton).getQueryAutomatonInfo();
         } else if (automaton instanceof DefaultPivotAutomaton) {
@@ -119,7 +118,7 @@ public abstract class TableAutomatonInfo implements AutomateConfiguration, Seria
         }
 
         public QueryTemplateInfo addBuiltinParam(String name, Value value) {
-            return addBuiltinParam(name, new DynamicVariantImpl(value));
+            return addBuiltinParam(name, new DynamicValue(value));
         }
 
         public QueryTemplateInfo addBuiltinParam(String name, DynamicVariant dynamicValue) {

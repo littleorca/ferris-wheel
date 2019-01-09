@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.quarks.token;
 
-import com.ctrip.ferriswheel.quarks.util.Trie;
 import com.ctrip.ferriswheel.quarks.LexContext;
 import com.ctrip.ferriswheel.quarks.StringDecoder;
 import com.ctrip.ferriswheel.quarks.Token;
 import com.ctrip.ferriswheel.quarks.Tokenizer;
 import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
+import com.ctrip.ferriswheel.quarks.util.Trie;
 
 import java.io.*;
 

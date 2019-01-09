@@ -603,7 +603,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
             Workbook workbook;
             try {
                 workbook = loadExampleWorkbook();
-                workbook.refresh();
+                // workbook.refresh(); // TODO is this necessary?
             } catch (InvalidProtocolBufferException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {

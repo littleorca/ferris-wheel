@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.quarks.syntax.lr;
 
-import java.util.List;
-
 import com.ctrip.ferriswheel.quarks.Symbol;
 import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
 import com.ctrip.ferriswheel.quarks.syntax.lr.Closure.Item;
+
+import java.util.List;
 
 public interface ParsingTable {
     enum Action {

@@ -1,27 +1,31 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.query.DataSet;
-import com.ctrip.ferriswheel.common.table.*;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.automaton.*;
+import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.analysis.DimensionalAggregator;
-import com.ctrip.ferriswheel.core.bean.*;
+import com.ctrip.ferriswheel.core.bean.PivotFieldImpl;
+import com.ctrip.ferriswheel.core.bean.PivotValueImpl;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
-import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class DefaultPivotAutomaton extends AbstractTableAutomaton implements PivotAutomaton {
+public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAutomaton {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultPivotAutomaton.class);
     private final ValueNode data;
     private List<PivotFilter> filters; // TODO
     private List<FieldMeta> rows;
     private List<FieldMeta> columns;
     private List<ValueMeta> values;
+    private DataSet dataSet;
 
     DefaultPivotAutomaton(AssetManager assetManager, PivotConfiguration pivot) {
         super(assetManager);
@@ -39,7 +43,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
         } catch (RuntimeException e) {
             LOG.warn("Failed to update pivot table.", e);
             // TODO mark error
-            clearTable();
+            // TODO clearTable();
         }
     }
 
@@ -93,15 +97,15 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
         // TODO remove this debugging code.
         LOG.info("Executing pivot automaton with forceUpdate=" + forceUpdate);
         try {
-            doExecute();
+            this.dataSet = doExecute();
+            setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
         } catch (RuntimeException e) {
             LOG.warn("Failed to execute pivot automaton.", e);
             // TODO mark error.
-            clearTable();
         }
     }
 
-    protected void doExecute() {
+    protected DataSet doExecute() {
         RangeReferenceElement rangeElement = (RangeReferenceElement) data.getFormulaElements()[0];
         RangeRef rangeRef = rangeElement.getRangeRef();
 
@@ -118,14 +122,19 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
         if (left <= right && top < bottom) {
             dataSet = analyse(sourceTable, left, top, right, bottom);
         } else {
-            dataSet = DataSetBuilder.emptyDataSet();
+            dataSet = ListDataSet.Builder.emptyDataSet();
         }
 
-        // fill table
-        DefaultTable table = getTable();
-        fillTable(table, dataSet);
-        setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
-        getTable().getWorkbook().onAutomatonExecuted(getTable());
+        return dataSet;
+    }
+
+    @Override
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
+    DefaultTable getTable() {
+        return (DefaultTable) getParent();
     }
 
     private DataSet analyse(final DefaultTable table,
@@ -150,14 +159,13 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
 
         // prepare data set
 
-        DataSetBuilder dataSetBuilder = new DataSetBuilder()
-                .setColumnCount(rows.size() + allColumnDimensions.size() * values.size())
-                .setHasRowMeta(false);
+        ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder()
+                .setColumnCount(rows.size() + allColumnDimensions.size() * values.size());
 
         // add headers
 
         for (int i = 0; i < columns.size(); i++) {
-            DataSetBuilder.DataSetRecordBuilder recordBuilder = dataSetBuilder.newRecord();
+            ListDataSet.Builder.DataSetRecordBuilder recordBuilder = dataSetBuilder.newRecord();
             int fieldOffset = rows.size();
             for (Dimension[] columnDimensions : allColumnDimensions) {
                 for (ValueMeta ignored : values) {
@@ -167,7 +175,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
             recordBuilder.commit();
         }
         if (values.size() > 1) {
-            DataSetBuilder.DataSetRecordBuilder valueNameRow = dataSetBuilder.newRecord();
+            ListDataSet.Builder.DataSetRecordBuilder valueNameRow = dataSetBuilder.newRecord();
             int fieldOffset = rows.size();
             for (int i = 0; i < allColumnDimensions.size(); i++) {
                 for (ValueMeta valueMeta : values) {
@@ -180,7 +188,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
         // extract data
 
         for (Dimension[] rowDimensions : allRowDimensions) {
-            DataSetBuilder.DataSetRecordBuilder recordBuilder = dataSetBuilder.newRecord();
+            ListDataSet.Builder.DataSetRecordBuilder recordBuilder = dataSetBuilder.newRecord();
             int fieldIdx = 0;
             Map<String, Variant> rowDimMap = new HashMap<>();
             for (Dimension rowDimension : rowDimensions) {
@@ -322,7 +330,7 @@ public class DefaultPivotAutomaton extends AbstractTableAutomaton implements Piv
         }
 
         return new TableAutomatonInfo.PivotAutomatonInfo(
-                new DynamicVariantImpl(data.getFormulaString()), filterList, rowList, columnList, valueList);
+                new DynamicValue(data.getFormulaString()), filterList, rowList, columnList, valueList);
     }
 
     public ValueNode getData() {

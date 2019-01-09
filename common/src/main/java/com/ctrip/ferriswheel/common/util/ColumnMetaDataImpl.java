@@ -23,8 +23,26 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common.util;
 
-public interface PivotField {
-    String getField();
+import com.ctrip.ferriswheel.common.variant.VariantType;
+
+public class ColumnMetaDataImpl implements ColumnMetaData {
+    private final String name;
+    private final VariantType type;
+
+    public ColumnMetaDataImpl(String name, VariantType type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public VariantType getType() {
+        return type;
+    }
 }

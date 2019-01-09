@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.formula.func.text;
 
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.func.Function;
-import com.ctrip.ferriswheel.common.variant.Variant;
 
 public abstract class StringFunctions implements Function {
     /**

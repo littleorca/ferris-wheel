@@ -23,31 +23,34 @@
  *
  */
 
-package com.ctrip.ferriswheel.core.bean;
+package com.ctrip.ferriswheel.common.util;
 
-import com.ctrip.ferriswheel.common.automaton.PivotField;
+public class DataSetMetaDataImpl implements DataSetMetaData {
+    private final int columnCount;
+    private final ColumnMetaData[] columnMetaDataArray;
 
-import java.io.Serializable;
-
-public class PivotFieldImpl implements PivotField, Serializable {
-    private String field;
-
-    public PivotFieldImpl() {
+    public DataSetMetaDataImpl(ColumnMetaData[] columnMetas) {
+        this.columnCount = columnMetas.length;
+        this.columnMetaDataArray = columnMetas;
     }
 
-    public PivotFieldImpl(PivotField another) {
-        this(another.getField());
+    public DataSetMetaDataImpl(int columnCount) {
+        this.columnCount = columnCount;
+        this.columnMetaDataArray = null;
     }
 
-    public PivotFieldImpl(String field) {
-        this.field = field;
+    @Override
+    public boolean hasColumnMeta() {
+        return columnMetaDataArray != null;
     }
 
-    public String getField() {
-        return field;
+    @Override
+    public int getColumnCount() {
+        return columnCount;
     }
 
-    public void setField(String field) {
-        this.field = field;
+    @Override
+    public ColumnMetaData getColumnMeta(int index) {
+        return columnMetaDataArray[index];
     }
 }

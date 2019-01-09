@@ -1,10 +1,10 @@
 package com.ctrip.ferriswheel.core.formula;
 
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.core.formula.BinaryElement.*;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.variant.VariantType;
+import com.ctrip.ferriswheel.core.formula.BinaryElement.*;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;

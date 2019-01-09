@@ -1,8 +1,6 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.variant.*;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 
@@ -11,19 +9,19 @@ import java.util.Date;
 import java.util.List;
 
 public class ValueNode extends AssetNode implements VariantNode {
-    private DynamicVariantImpl data;
+    private DynamicValue data;
     private Formula formula;
 //    private transient boolean dirty;
 
     ValueNode(AssetManager assetManager, Value value, String formulaString) {
         super(assetManager);
-        this.data = new DynamicVariantImpl(formulaString, value);
+        this.data = new DynamicValue(formulaString, value);
         this.formula = (formulaString == null || formulaString.isEmpty()) ? null : new Formula(formulaString);
     }
 
     ValueNode(AssetManager assetManager, DynamicVariant data) {
         super(assetManager);
-        this.data = new DynamicVariantImpl(data);
+        this.data = new DynamicValue(data);
         this.formula = data.isFormula() ? new Formula(data.getFormulaString()) : null;
     }
 
@@ -31,7 +29,7 @@ public class ValueNode extends AssetNode implements VariantNode {
         return data.isFormula();
     }
 
-    public DynamicVariantImpl getData() {
+    public DynamicValue getData() {
         return data;
     }
 
@@ -55,7 +53,7 @@ public class ValueNode extends AssetNode implements VariantNode {
     }
 
     protected void setDynamicVariant(DynamicVariant variable) {
-        this.data = new DynamicVariantImpl(variable);
+        this.data = new DynamicValue(variable);
         if (variable != null && variable.isFormula()) {
             this.formula = new Formula(variable.getFormulaString());
         } else {

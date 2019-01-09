@@ -23,31 +23,26 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.variant.impl;
-
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
-import com.ctrip.ferriswheel.common.variant.ErrorCode;
-import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.common.variant.VariantType;
+package com.ctrip.ferriswheel.common.variant;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class DynamicVariantImpl implements DynamicVariant {
+public class DynamicValue implements DynamicVariant {
     private String formulaString;
     private Variant variant;
 
-    public DynamicVariantImpl() {
+    public DynamicValue() {
         this(null, Value.BLANK);
     }
 
-    public DynamicVariantImpl(String formulaString) {
+    public DynamicValue(String formulaString) {
         this(formulaString, null);
     }
 
-    public DynamicVariantImpl(Value variant) {
+    public DynamicValue(Value variant) {
         this(null, variant);
     }
 
@@ -56,17 +51,17 @@ public class DynamicVariantImpl implements DynamicVariant {
      *
      * @param variable
      */
-    public DynamicVariantImpl(DynamicVariant variable) {
+    public DynamicValue(DynamicVariant variable) {
         this(
                 (variable == null || variable.getFormulaString() == null) ?
                         null : variable.getFormulaString(),
 
-                (variable != null && variable instanceof DynamicVariantImpl) ?
-                        Value.from(((DynamicVariantImpl) variable).getVariant()) : Value.from(variable)
+                (variable != null && variable instanceof DynamicValue) ?
+                        Value.from(((DynamicValue) variable).getVariant()) : Value.from(variable)
         );
     }
 
-    public DynamicVariantImpl(String formulaString, Value variant) {
+    public DynamicValue(String formulaString, Value variant) {
         this.formulaString = formulaString;
         this.variant = (variant == null) ? Value.BLANK : variant;
     }
@@ -75,7 +70,7 @@ public class DynamicVariantImpl implements DynamicVariant {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DynamicVariantImpl that = (DynamicVariantImpl) o;
+        DynamicValue that = (DynamicValue) o;
         return Objects.equals(formulaString, that.formulaString) &&
                 Objects.equals(variant, that.variant);
     }

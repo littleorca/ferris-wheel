@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.example.web;
 
-import com.ctrip.ferriswheel.core.asset.ReviseCollector;
 import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.core.asset.ReviseCollector;
 
 public class WorkContext {
     private Workbook workbook;

@@ -25,6 +25,8 @@
 
 package com.ctrip.ferriswheel.common.query;
 
+import com.ctrip.ferriswheel.common.util.DataSet;
+
 import java.io.IOException;
 
 public interface DataProvider {

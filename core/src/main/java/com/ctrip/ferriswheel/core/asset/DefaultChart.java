@@ -2,23 +2,23 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.view.Orientation;
 import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.core.bean.AxisImpl;
+import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.formula.ReferenceElement;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
-import com.ctrip.ferriswheel.core.view.LayoutImpl;
-import com.ctrip.ferriswheel.core.bean.AxisImpl;
-import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
+import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -244,7 +244,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     }
 
     private void clearData() {
-        setCategories(new DynamicVariantImpl(Value.BLANK));
+        setCategories(new DynamicValue(Value.BLANK));
         clearSeries();
     }
 
@@ -279,7 +279,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         }
 
         int rowIdx = -1, columnIdx;
-        DynamicVariantImpl categories = null;
+        DynamicValue categories = null;
 
         if (binder.getCategoriesPlacement() == Placement.TOP) {
             rowIdx = top;
@@ -294,7 +294,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             for (int i = dataStartColumn; i <= dataEndColumn; i++) {
                 ls.add(table.getCell(rowIdx, i).getData());
             }
-            categories = new DynamicVariantImpl(Value.list(ls));
+            categories = new DynamicValue(Value.list(ls));
         }
 
         setCategories(categories);
@@ -302,10 +302,10 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
         for (rowIdx = dataStartRow; rowIdx <= dataEndRow; rowIdx++) {
             columnIdx = -1;
-            DynamicVariantImpl name = null;
-            DynamicVariantImpl xValues = null;
-            DynamicVariantImpl yValues = null;
-            DynamicVariantImpl zValues = null;
+            DynamicValue name = null;
+            DynamicValue xValues = null;
+            DynamicValue yValues = null;
+            DynamicValue zValues = null;
 
             if (binder.getSeriesNamePlacement() == Placement.LEFT) {
                 columnIdx = left;
@@ -314,14 +314,14 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             }
 
             if (columnIdx != -1) {
-                name = new DynamicVariantImpl(Value.from(table.getCell(rowIdx, columnIdx).getData()));
+                name = new DynamicValue(Value.from(table.getCell(rowIdx, columnIdx).getData()));
             }
 
             List<Variant> ls = new ArrayList<>(dataEndColumn - dataStartColumn + 1);
             for (int i = dataStartColumn; i <= dataEndColumn; i++) {
                 ls.add(table.getCell(rowIdx, i).getData());
             }
-            yValues = new DynamicVariantImpl(Value.list(ls));
+            yValues = new DynamicValue(Value.list(ls));
 
             addSeries(name, xValues, yValues);
         }
@@ -358,7 +358,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         }
 
         int rowIdx, columnIdx = -1;
-        DynamicVariantImpl categories = null;
+        DynamicValue categories = null;
 
         if (binder.getCategoriesPlacement() == Placement.LEFT) {
             columnIdx = left;
@@ -373,7 +373,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             for (int i = dataStartRow; i <= dataEndRow; i++) {
                 ls.add(table.getCell(i, columnIdx).getData());
             }
-            categories = new DynamicVariantImpl(Value.list(ls));
+            categories = new DynamicValue(Value.list(ls));
         }
 
         setCategories(categories);
@@ -381,10 +381,10 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
         for (columnIdx = dataStartColumn; columnIdx <= dataEndColumn; columnIdx++) {
             rowIdx = -1;
-            DynamicVariantImpl name = null;
-            DynamicVariantImpl xValues = null;
-            DynamicVariantImpl yValues = null;
-            DynamicVariantImpl zValues = null;
+            DynamicValue name = null;
+            DynamicValue xValues = null;
+            DynamicValue yValues = null;
+            DynamicValue zValues = null;
 
             if (binder.getSeriesNamePlacement() == Placement.TOP) {
                 rowIdx = top;
@@ -393,14 +393,14 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             }
 
             if (rowIdx != -1) {
-                name = new DynamicVariantImpl(Value.from(table.getCell(rowIdx, columnIdx).getData()));
+                name = new DynamicValue(Value.from(table.getCell(rowIdx, columnIdx).getData()));
             }
 
             List<Variant> ls = new ArrayList<>(dataEndRow - dataStartRow + 1);
             for (int i = dataStartRow; i <= dataEndRow; i++) {
                 ls.add(table.getCell(i, columnIdx).getData());
             }
-            yValues = new DynamicVariantImpl(Value.list(ls));
+            yValues = new DynamicValue(Value.list(ls));
 
             addSeries(name, xValues, yValues);
         }

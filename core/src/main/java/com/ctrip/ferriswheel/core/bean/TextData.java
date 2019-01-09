@@ -26,7 +26,7 @@
 package com.ctrip.ferriswheel.core.bean;
 
 import com.ctrip.ferriswheel.common.text.Text;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
@@ -34,13 +34,13 @@ import java.io.Serializable;
 
 public class TextData implements Text, Serializable {
     private String name;
-    private DynamicVariantImpl content;
+    private DynamicValue content;
     private Layout layout;
 
     public TextData() {
     }
 
-    public TextData(String name, DynamicVariantImpl content, LayoutImpl layout) {
+    public TextData(String name, DynamicValue content, LayoutImpl layout) {
         this.name = name;
         this.content = content;
         this.layout = layout;
@@ -56,11 +56,11 @@ public class TextData implements Text, Serializable {
     }
 
     @Override
-    public DynamicVariantImpl getContent() {
+    public DynamicValue getContent() {
         return content;
     }
 
-    public void setContent(DynamicVariantImpl content) {
+    public void setContent(DynamicValue content) {
         this.content = content;
     }
 

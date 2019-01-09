@@ -23,16 +23,38 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common;
 
-/**
- * TODO review this interface
- */
-public interface TableAutomaton {
+import java.io.Serializable;
 
-    void init();
+public final class VersionImpl implements Version, Serializable {
+    private final int majorVersion;
+    private final int minorVersion;
+    private final int buildNumber;
 
-    void execute(boolean forceUpdate);
+    public VersionImpl(VersionImpl another) {
+        this(another.majorVersion, another.minorVersion, another.buildNumber);
+    }
 
-    void destroy();
+    public VersionImpl(int majorVersion, int minorVersion, int buildNumber) {
+        this.majorVersion = majorVersion;
+        this.minorVersion = minorVersion;
+        this.buildNumber = buildNumber;
+    }
+
+    @Override
+    public int getMajorVersion() {
+        return majorVersion;
+    }
+
+    @Override
+    public int getMinorVersion() {
+        return minorVersion;
+    }
+
+    @Override
+    public int getBuildNumber() {
+        return buildNumber;
+    }
+
 }

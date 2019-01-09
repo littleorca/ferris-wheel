@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import junit.framework.TestCase;
 
 public abstract class DefaultTableTestSupport extends TestCase {

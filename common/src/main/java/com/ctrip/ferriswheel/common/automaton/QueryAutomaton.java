@@ -23,7 +23,27 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common.automaton;
 
-public interface PivotFilter {
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.variant.Variant;
+
+import java.util.Map;
+
+public interface QueryAutomaton extends AsynchronousAutomaton, QueryConfiguration {
+
+    /**
+     * Query with specified user parameters.
+     *
+     * @param userParameters
+     */
+    void query(Map<String, Variant> userParameters);
+
+    /**
+     * Get query.
+     *
+     * @return
+     */
+    DataQuery getQuery();
+
 }

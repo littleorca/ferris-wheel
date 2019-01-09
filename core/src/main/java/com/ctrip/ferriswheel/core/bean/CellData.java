@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.core.bean;
 
 import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.DynamicVariant;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Value;
 
 import java.io.Serializable;
 
@@ -22,7 +22,7 @@ public class CellData implements Cell, Serializable {
     }
 
     public void erase() {
-        setData(new DynamicVariantImpl(Value.BLANK));
+        setData(new DynamicValue(Value.BLANK));
     }
 
     @Override

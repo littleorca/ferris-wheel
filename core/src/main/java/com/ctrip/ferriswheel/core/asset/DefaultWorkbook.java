@@ -1,26 +1,23 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.Environment;
-import com.ctrip.ferriswheel.common.Sheet;
-import com.ctrip.ferriswheel.common.SheetAsset;
-import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.*;
 import com.ctrip.ferriswheel.common.action.ActionContextManager;
 import com.ctrip.ferriswheel.common.action.ActionListener;
+import com.ctrip.ferriswheel.common.automaton.AsynchronousAutomaton;
+import com.ctrip.ferriswheel.common.automaton.Automaton;
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.ChartBinder;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.table.TableAutomaton;
 import com.ctrip.ferriswheel.common.text.Text;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.TextData;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.core.bean.VersionImpl;
 import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
@@ -34,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -48,6 +46,10 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     private final Set<Long> evaluableNodes = new HashSet<>();
     private final AutoFiller autoFiller = new AutoFiller(this);
     private final ActionContextManager actionContextManager = new DefaultActionContextManager();
+
+    private static final int WORKER_THREADS_PER_WORKBOOK = 4;
+    private static final long WAIT_PERIOD_IN_MILLI_SECONDS = 5 * 1000L;
+    private static final long REFRESH_TIMEOUT_IN_MILLI_SECONDS = 15 * 60 * 1000L;
 
     DefaultWorkbook(Environment environment) {
         // FIXME workbook name
@@ -216,7 +218,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
 
     private void resolveFormulas(DefaultTable table) {
         if (table.getAutomaton() != null) {
-            TableAutomaton auto = table.getAutomaton();
+            Automaton auto = table.getAutomaton();
             if (auto instanceof DefaultPivotAutomaton) {
                 onValueNodeUpdate(table.getSheet(), ((DefaultPivotAutomaton) auto).getData());
             } else if (auto instanceof DefaultQueryAutomaton) {
@@ -291,51 +293,121 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         LOG.debug("refresh1");
 
         FormulaEvaluator evaluator = new FormulaEvaluator(this);
-        CalcChain calcChain = getCalcChain();
-        Set<Long> pendingNodes = new HashSet<>(evaluableNodes);
+        Set<Long> remainedTasks = new HashSet<>(evaluableNodes); // may includes some nodes not in the graph
+        DirectedAcyclicGraph<Long, Asset> graph = GraphHelper.buildGraph(this);
 
-        for (int i = 0; i < calcChain.size(); i++) {
-            Long id = calcChain.get(i);
-            Asset asset = getAsset(id);
-            if (asset instanceof ValueNode) {
-                ValueNode node = (ValueNode) asset;
-                if (node.isFormula()) {
-                    evaluateNodeFormula(evaluator, node);
+        ExecutorService executor = Executors.newFixedThreadPool(WORKER_THREADS_PER_WORKBOOK);
+        Set<Long> pendingTasks = new HashSet<>();
+
+        try {
+            CompletionService<Long> completionService = new ExecutorCompletionService<>(executor);
+            long start = System.currentTimeMillis();
+
+            while (!graph.isEmpty()) {
+                Set<Long> tasks = graph.collectOutboundEnds();
+                boolean processedAnyTask = false;
+                for (Long id : tasks) {
+                    if (pendingTasks.contains(id)) {
+                        continue;
+                    }
+                    processedAnyTask = true;
+                    AssetNode assetNode = (AssetNode) getAsset(id);
+                    if (evaluateAssetNode(evaluator, assetNode, completionService)) {
+                        graph.removeNode(id);
+                        remainedTasks.remove(id);
+                    } else {
+                        pendingTasks.add(id);
+                    }
                 }
-                pendingNodes.remove(id);
-
-            } else if (asset instanceof DefaultTable) {
-                DefaultTable table = (DefaultTable) asset;
-                if (table.getAutomaton() != null) {
-                    table.getAutomaton().execute(isForceRefresh());
+                try {
+                    if (!processedAnyTask && !pendingTasks.isEmpty()) {
+                        Future<Long> future = completionService.poll(WAIT_PERIOD_IN_MILLI_SECONDS, TimeUnit.MILLISECONDS);
+                        Long id = future.get();
+                        graph.removeNode(id);
+                        remainedTasks.remove(id);
+                        pendingTasks.remove(id);
+                    }
+                    Future<Long> finishedTask;
+                    while ((finishedTask = completionService.poll()) != null) {
+                        Long id = finishedTask.get();
+                        graph.removeNode(id);
+                        remainedTasks.remove(id);
+                        pendingTasks.remove(id);
+                    }
+                } catch (InterruptedException e) {
+                    // TODO e.printStackTrace();
+                } catch (ExecutionException e) {
+                    // TODO e.printStackTrace();
                 }
-                pendingNodes.remove(id);
 
-            } else if (asset instanceof DefaultChart) {
-                DefaultChart chart = (DefaultChart) asset;
-                chart.rebindIfPossible();
-                pendingNodes.remove(id);
+                if (System.currentTimeMillis() - start >= REFRESH_TIMEOUT_IN_MILLI_SECONDS) {
+                    throw new RuntimeException("Refresh procedure timed out.");
+                }
             }
-        }
-        // these are formulas without any dependency
-        for (Long id : pendingNodes) {
-            Asset asset = getAsset(id);
-            if (asset instanceof ValueNode) {
-                ValueNode valueNode = (ValueNode) asset;
-                if (valueNode.isFormula()) {
-                    evaluateNodeFormula(evaluator, valueNode);
-                }
-            } else if (asset instanceof DefaultTable) {
-                DefaultTable table = (DefaultTable) asset;
-                if (table.getAutomaton() != null) {
-                    table.getAutomaton().execute(isForceRefresh());
+
+            // now graph is empty, deal with remainedTasks (nodes that not occurred in the graph)
+            for (Long id : remainedTasks) {
+                if (!evaluateAssetNode(evaluator, (AssetNode) getAsset(id), completionService)) {
+                    pendingTasks.add(id);
                 }
             }
+            while (!pendingTasks.isEmpty()) {
+                try {
+                    Future<Long> future = completionService.poll(WAIT_PERIOD_IN_MILLI_SECONDS, TimeUnit.MILLISECONDS);
+                    pendingTasks.remove(future.get());
+                } catch (InterruptedException e) {
+                    // TODO e.printStackTrace();
+                } catch (ExecutionException e) {
+                    // TODO e.printStackTrace();
+                }
+                if (System.currentTimeMillis() - start >= REFRESH_TIMEOUT_IN_MILLI_SECONDS) {
+                    throw new RuntimeException("Refresh procedure timed out.");
+                }
+            }
+
+        } catch (RuntimeException e) {
+            executor.shutdownNow();
+        } finally {
+            executor.shutdown(); // it's ok to shutdown an executor that already shutdown.
         }
 
 //        if (LOG.isDebugEnabled()) {
 //            LOG.debug(toString());
 //        }
+    }
+
+    private boolean evaluateAssetNode(FormulaEvaluator evaluator,
+                                      AssetNode asset,
+                                      CompletionService<Long> completionService) {
+        if (asset instanceof ValueNode) {
+            ValueNode node = (ValueNode) asset;
+            if (node.isFormula()) {
+                evaluateNodeFormula(evaluator, node);
+            }
+
+        } else if (asset instanceof Automaton) {
+            if (asset instanceof AsynchronousAutomaton) {
+                Future<Long> future = ((AsynchronousAutomaton) asset).execute(isForceRefresh(),
+                        completionService, asset.getAssetId());
+                if (future != null) {
+                    return false;
+                }
+            } else {
+                ((Automaton) asset).execute(isForceRefresh());
+            }
+
+        } else if (asset instanceof DefaultTable) {
+            DefaultTable table = (DefaultTable) asset;
+            if (table.getAutomaton() != null) {
+                table.fillByAutomaton();
+            }
+
+        } else if (asset instanceof DefaultChart) {
+            DefaultChart chart = (DefaultChart) asset;
+            chart.rebindIfPossible();
+        }
+
+        return true;
     }
 
     @Override
@@ -452,7 +524,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             listenerChain.publicly(action, () -> {
                 node.setValue(value);
                 action.setTextData(new TextData(text.getName(),
-                        new DynamicVariantImpl(node.getFormulaString(), Value.from(node.getData())),
+                        new DynamicValue(node.getFormulaString(), Value.from(node.getData())),
                         text.getLayout()));
             });
         }
@@ -1074,15 +1146,15 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
 
         } else if (node.getParent() instanceof Text) {
             DefaultText text = (DefaultText) node.getParent();
-            text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicVariantImpl(newFormula), null));
+            text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
 
         } else if (node.getParent() instanceof DefaultQueryAutomaton) {
-            node.setDynamicVariant(new DynamicVariantImpl(newFormula));
+            node.setDynamicVariant(new DynamicValue(newFormula));
             DefaultQueryAutomaton auto = (DefaultQueryAutomaton) node.getParent();
             auto.getTable().automate(auto.getQueryAutomatonInfo());
 
         } else if (node.getParent() instanceof DefaultPivotAutomaton) {
-            node.setDynamicVariant(new DynamicVariantImpl(newFormula));
+            node.setDynamicVariant(new DynamicValue(newFormula));
             DefaultPivotAutomaton auto = (DefaultPivotAutomaton) node.getParent();
             auto.getTable().automate(auto.getPivotAutomatonInfo());
 
@@ -1181,20 +1253,21 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     void onTableAutomated(DefaultTable table) {
         withoutRefresh(() -> {
             DefaultSheet sheet = table.getSheet();
-            TableAutomaton auto = table.getAutomaton();
+            Automaton auto = table.getAutomaton();
 
             // currently a table can only depends on automaton,
             // when it's automaton changed (including create/update/remove),
             // table dependencies can be cleared and rebuilt.
-            table.clearDependencies();
+            // table.clearDependencies();
 
+            evaluableNodes.add(((AssetNode) auto).getAssetId());
             evaluableNodes.add(table.getAssetId());
 
             if (auto instanceof DefaultQueryAutomaton) {
                 DefaultQueryTemplate template = ((DefaultQueryAutomaton) auto).getTemplate();
                 for (String name : template.getBuiltinParamNames()) {
                     ValueNode param = template.getBuiltinParam(name);
-                    table.addDependency(param);
+                    // table.addDependency(param);
                     // cannot pass table parameter here, which mislead the method to deal
                     // the node as a table cell
                     onValueNodeUpdate(sheet, param);
@@ -1202,7 +1275,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
 
             } else if (auto instanceof DefaultPivotAutomaton) {
                 ValueNode data = ((DefaultPivotAutomaton) auto).getData();
-                table.addDependency(data);
+                // table.addDependency(data);
                 onValueNodeUpdate(sheet, data);
             }
 
@@ -1210,11 +1283,6 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         });
 
         refreshIfNeeded();
-    }
-
-    void onAutomatonExecuted(DefaultTable table) {
-        // TODO This is a TEST
-        // System.out.println(actionContextManager);
     }
 
     void onTextCreated(DefaultText text) {

@@ -1,13 +1,13 @@
 package com.ctrip.ferriswheel.quarks.syntax.lr;
 
-import com.ctrip.ferriswheel.quarks.syntax.ASTNode;
-import com.ctrip.ferriswheel.quarks.syntax.DefaultSyntaxContext;
 import com.ctrip.ferriswheel.quarks.Symbol;
 import com.ctrip.ferriswheel.quarks.SyntaxContext;
 import com.ctrip.ferriswheel.quarks.Token;
 import com.ctrip.ferriswheel.quarks.Tokenizer;
 import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
 import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
+import com.ctrip.ferriswheel.quarks.syntax.ASTNode;
+import com.ctrip.ferriswheel.quarks.syntax.DefaultSyntaxContext;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

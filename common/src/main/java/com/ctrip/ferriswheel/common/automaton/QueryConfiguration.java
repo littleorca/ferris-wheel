@@ -23,23 +23,22 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common.automaton;
 
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.QueryTemplate;
+import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
+import com.ctrip.ferriswheel.common.variant.Variant;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author liuhaifeng
  */
-public interface PivotConfiguration extends AutomateConfiguration {
-    DynamicVariant getData();
+public interface QueryConfiguration extends AutomateConfiguration {
+    QueryTemplate getTemplate();
 
-    List<PivotFilter> getFilters();
+    Map<String, Variant> getParameters();
 
-    List<PivotField> getRows();
-
-    List<PivotField> getColumns();
-
-    List<PivotValue> getValues();
+    DataQuery getQuery();
 }

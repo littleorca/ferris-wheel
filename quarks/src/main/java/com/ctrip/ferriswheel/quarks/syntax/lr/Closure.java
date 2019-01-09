@@ -1,16 +1,10 @@
 package com.ctrip.ferriswheel.quarks.syntax.lr;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.ctrip.ferriswheel.quarks.Symbol;
 
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class Closure implements Serializable {
     private static final long serialVersionUID = 1L;

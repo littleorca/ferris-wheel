@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.quarks;
 
-import java.io.Reader;
-
 import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
+
+import java.io.Reader;
 
 /**
  * Lexical analysis tool.

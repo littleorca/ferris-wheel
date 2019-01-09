@@ -6,10 +6,6 @@ import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
 import com.ctrip.ferriswheel.quarks.syntax.DefaultSyntaxContext;
 import com.ctrip.ferriswheel.quarks.token.DefaultLexContext;
 import com.ctrip.ferriswheel.quarks.token.DefaultTokenizer;
-import com.ctrip.ferriswheel.quarks.LexContext;
-import com.ctrip.ferriswheel.quarks.Symbol;
-import com.ctrip.ferriswheel.quarks.SyntaxContext;
-import com.ctrip.ferriswheel.quarks.Tokenizer;
 
 import java.io.Reader;
 import java.util.LinkedList;

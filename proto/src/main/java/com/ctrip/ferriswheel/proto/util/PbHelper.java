@@ -4,15 +4,16 @@ import com.ctrip.ferriswheel.common.Environment;
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.SheetAsset;
 import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.automaton.*;
 import com.ctrip.ferriswheel.common.chart.*;
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
-import com.ctrip.ferriswheel.common.table.*;
+import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.text.Text;
 import com.ctrip.ferriswheel.common.variant.*;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.common.view.*;
 import com.ctrip.ferriswheel.core.asset.DefaultPivotAutomaton;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
@@ -215,7 +216,7 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.TableAutomaton pb(TableAutomaton automaton) {
+    public static com.ctrip.ferriswheel.proto.v1.TableAutomaton pb(Automaton automaton) {
         com.ctrip.ferriswheel.proto.v1.TableAutomaton.Builder builder = com.ctrip.ferriswheel.proto.v1.TableAutomaton.newBuilder();
         if (automaton instanceof DefaultQueryAutomaton) {
             com.ctrip.ferriswheel.proto.v1.QueryAutomaton queryAutomaton = pb(((DefaultQueryAutomaton) automaton).getQueryAutomatonInfo());
@@ -356,7 +357,7 @@ public class PbHelper {
     }
 
     public static TableAutomatonInfo.PivotAutomatonInfo bean(com.ctrip.ferriswheel.proto.v1.PivotAutomaton pivotSolution) {
-        DynamicVariantImpl data = toDynamicValue(pivotSolution.getData());
+        DynamicValue data = toDynamicValue(pivotSolution.getData());
         List<PivotFilter> filters = new ArrayList<>(pivotSolution.getFiltersCount());
         for (com.ctrip.ferriswheel.proto.v1.PivotFilter f : pivotSolution.getFiltersList()) {
             filters.add(bean(f));
@@ -530,13 +531,13 @@ public class PbHelper {
         return builder.build();
     }
 
-    public static DynamicVariantImpl toDynamicValue(com.ctrip.ferriswheel.proto.v1.UnionValue valueProto) {
+    public static DynamicValue toDynamicValue(com.ctrip.ferriswheel.proto.v1.UnionValue valueProto) {
         String formulaString = valueProto.getFormulaString();
         if (formulaString.isEmpty()) {
             formulaString = null;
         }
         Value value = toValue(valueProto);
-        return new DynamicVariantImpl(formulaString, value);
+        return new DynamicValue(formulaString, value);
     }
 
     public static Value toValue(com.ctrip.ferriswheel.proto.v1.UnionValue valueProto) {

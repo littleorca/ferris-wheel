@@ -11,7 +11,7 @@ import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.text.Text;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.view.Display;
 import com.ctrip.ferriswheel.common.view.Displayable;
 import com.ctrip.ferriswheel.common.view.Grid;
@@ -363,7 +363,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     void fillTextData(DefaultText text, Text data) {
-        DynamicVariantImpl dv = (DynamicVariantImpl) data.getContent();
+        DynamicValue dv = (DynamicValue) data.getContent();
         if (dv.isFormula()) {
             text.getContent().setFormula(new Formula(dv.getFormulaString()));
         } else {

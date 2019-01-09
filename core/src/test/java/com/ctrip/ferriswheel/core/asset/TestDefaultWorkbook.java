@@ -5,13 +5,9 @@ import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.common.variant.VariantType;
+import com.ctrip.ferriswheel.common.variant.*;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
 import junit.framework.TestCase;
 
 import java.math.BigDecimal;
@@ -192,17 +188,17 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultTable table = sheet.getAsset("table1");
         List<DataSeries> series = Arrays.asList(
                 new ChartData.SeriesImpl(
-                        new DynamicVariantImpl("table1!$A2"),
+                        new DynamicValue("table1!$A2"),
                         null,
-                        new DynamicVariantImpl("table1!$B$2:$C$2")),
+                        new DynamicValue("table1!$B$2:$C$2")),
                 new ChartData.SeriesImpl(
-                        new DynamicVariantImpl("table1!$A3"),
+                        new DynamicValue("table1!$A3"),
                         null,
-                        new DynamicVariantImpl("table1!$B$3:$C$3"))
+                        new DynamicValue("table1!$B$3:$C$3"))
         );
         sheet.addAsset(Chart.class, new ChartData("c1", "Line",
-                new DynamicVariantImpl("\"hello world\""),
-                new DynamicVariantImpl("table1!$B$1:$C$1"),
+                new DynamicValue("\"hello world\""),
+                new DynamicValue("table1!$B$1:$C$1"),
                 series));
         table.removeRows(0, 3);
 
@@ -281,17 +277,17 @@ public class TestDefaultWorkbook extends TestCase {
         DefaultTable table = sheet.getAsset("table1");
         List<DataSeries> series = Arrays.asList(
                 new ChartData.SeriesImpl(
-                        new DynamicVariantImpl("table1!$A2"),
+                        new DynamicValue("table1!$A2"),
                         null,
-                        new DynamicVariantImpl("table1!$B$2:$C$2")),
+                        new DynamicValue("table1!$B$2:$C$2")),
                 new ChartData.SeriesImpl(
-                        new DynamicVariantImpl("table1!$A3"),
+                        new DynamicValue("table1!$A3"),
                         null,
-                        new DynamicVariantImpl("table1!$B$3:$C$3"))
+                        new DynamicValue("table1!$B$3:$C$3"))
         );
         sheet.addAsset(Chart.class, new ChartData("c1", "Line",
-                new DynamicVariantImpl("\"hello world\""),
-                new DynamicVariantImpl("table1!$B$1:$C$1"),
+                new DynamicValue("\"hello world\""),
+                new DynamicValue("table1!$B$1:$C$1"),
                 series));
         table.removeColumns(0, 3);
 
@@ -316,41 +312,41 @@ public class TestDefaultWorkbook extends TestCase {
         table2.setCellValue(2, 2, new Value.DecimalValue(3000));
 
         sheet1.addAsset(Chart.class, new ChartData("chart1-1", "Line",
-                new DynamicVariantImpl("\"Chart 1-1\""),
-                new DynamicVariantImpl("table1!B1:C1"),
+                new DynamicValue("\"Chart 1-1\""),
+                new DynamicValue("table1!B1:C1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("table1!A2"),
+                                new DynamicValue("table1!A2"),
                                 null,
-                                new DynamicVariantImpl("table1!B2:C2"))
+                                new DynamicValue("table1!B2:C2"))
                 )));
         sheet1.addAsset(Chart.class, new ChartData("chart1-2", "Line",
-                new DynamicVariantImpl("\"Chart 1-2\""),
-                new DynamicVariantImpl("sheet2!table2!B2:C2"),
+                new DynamicValue("\"Chart 1-2\""),
+                new DynamicValue("sheet2!table2!B2:C2"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet2!table2!A3"),
+                                new DynamicValue("sheet2!table2!A3"),
                                 null,
-                                new DynamicVariantImpl("sheet2!table2!B3:C3"))
+                                new DynamicValue("sheet2!table2!B3:C3"))
                 )));
 
         sheet2.addAsset(Chart.class, new ChartData("chart2-1", "Line",
-                new DynamicVariantImpl("\"Chart 2-1\""),
-                new DynamicVariantImpl("sheet1!table1!B1:C1"),
+                new DynamicValue("\"Chart 2-1\""),
+                new DynamicValue("sheet1!table1!B1:C1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!A2"),
+                                new DynamicValue("sheet1!table1!A2"),
                                 null,
-                                new DynamicVariantImpl("sheet1!table1!B2:C2"))
+                                new DynamicValue("sheet1!table1!B2:C2"))
                 )));
         sheet2.addAsset(Chart.class, new ChartData("chart2-2", "Line",
-                new DynamicVariantImpl("\"Chart 2-2\""),
-                new DynamicVariantImpl("table2!B2:C2"),
+                new DynamicValue("\"Chart 2-2\""),
+                new DynamicValue("table2!B2:C2"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("table2!A3"),
+                                new DynamicValue("table2!A3"),
                                 null,
-                                new DynamicVariantImpl("table2!B3:C3"))
+                                new DynamicValue("table2!B3:C3"))
                 )));
 
         workbook.renameSheet("sheet1", "s1");

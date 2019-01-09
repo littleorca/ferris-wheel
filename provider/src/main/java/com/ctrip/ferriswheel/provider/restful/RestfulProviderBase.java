@@ -27,7 +27,7 @@ package com.ctrip.ferriswheel.provider.restful;
 
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

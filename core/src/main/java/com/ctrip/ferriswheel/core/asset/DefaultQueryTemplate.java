@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.variant.*;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
-import com.ctrip.ferriswheel.core.bean.*;
+import com.ctrip.ferriswheel.common.variant.*;
+import com.ctrip.ferriswheel.core.bean.DefaultDataQuery;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
+import com.ctrip.ferriswheel.core.bean.ValueRule;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -152,7 +152,7 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
 
     public TableAutomatonInfo.QueryTemplateInfo getQueryTemplateInfo() {
         Map<String, DynamicVariant> params = new LinkedHashMap<>(builtinParams.size());
-        builtinParams.forEach((name, param) -> params.put(name, new DynamicVariantImpl(param)));
+        builtinParams.forEach((name, param) -> params.put(name, new DynamicValue(param)));
         Map<String, VariantRule> rules = new LinkedHashMap<>(userParamRules.size());
         userParamRules.forEach((name, rule) -> rules.put(name, new ValueRule(rule)));
         return new TableAutomatonInfo.QueryTemplateInfo(scheme, params, rules);

@@ -23,19 +23,14 @@
  *
  */
 
-package com.ctrip.ferriswheel.provider.util;
+package com.ctrip.ferriswheel.common.automaton;
 
-import com.ctrip.ferriswheel.common.query.DataSet;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.Future;
 
-public class DefaultRowMeta implements DataSet.RowMeta {
-    private final String name;
-
-    public DefaultRowMeta(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
+/**
+ * @author liuhaifeng
+ */
+public interface AsynchronousAutomaton extends Automaton {
+    <V> Future<V> execute(boolean forceUpdate, CompletionService<V> completionService, V result);
 }

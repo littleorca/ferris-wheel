@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.quarks.syntax.lr;
 
 import com.ctrip.ferriswheel.quarks.Symbol;
+import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
+import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
 import com.ctrip.ferriswheel.quarks.syntax.ASTNode;
 import com.ctrip.ferriswheel.quarks.token.DefaultTokenizer;
 import com.ctrip.ferriswheel.quarks.util.ASTUtil;
-import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
-import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
 import junit.framework.TestCase;
 
 import java.io.IOException;

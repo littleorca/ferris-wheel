@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.common.text;
 
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.common.view.Displayable;
 
 public interface Text extends SheetAsset, Displayable {

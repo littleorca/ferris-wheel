@@ -1,14 +1,13 @@
 package com.ctrip.ferriswheel.quarks.syntax.bnf;
 
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.List;
-
 import com.ctrip.ferriswheel.quarks.Symbol;
 import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
 import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
-
 import junit.framework.TestCase;
+
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.List;
 
 public class TestBNFParser extends TestCase {
 

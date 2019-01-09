@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.quarks.syntax.lr;
 
-import java.io.IOException;
-
 import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
 import com.ctrip.ferriswheel.quarks.exception.QuarksSyntaxException;
+
+import java.io.IOException;
 
 public class TestLR1ParsingTableConstructor {
 

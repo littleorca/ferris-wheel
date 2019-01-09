@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.core.analysis;
 
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
 import com.ctrip.ferriswheel.common.table.AggregateType;
 import com.ctrip.ferriswheel.common.table.Aggregator;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.Value;
 import junit.framework.TestCase;
 
 public class TestAggregators extends TestCase {

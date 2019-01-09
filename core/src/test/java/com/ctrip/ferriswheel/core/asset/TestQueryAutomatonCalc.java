@@ -1,17 +1,17 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.*;
+import com.ctrip.ferriswheel.common.Environment;
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.DataSet;
 import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.VariantRule;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import junit.framework.TestCase;
 
@@ -42,7 +42,7 @@ public class TestQueryAutomatonCalc extends TestCase {
         HashMap<String, DynamicVariant> builtinParams = new HashMap<>();
 
         builtinParams.put("p1", Value.str("this is parameter 1").dynamic());
-        builtinParams.put("p2", new DynamicVariantImpl("normal!A1"));
+        builtinParams.put("p2", new DynamicValue("normal!A1"));
 
         Map<String, VariantRule> userParamRules = Collections.emptyMap();
 
@@ -92,9 +92,8 @@ public class TestQueryAutomatonCalc extends TestCase {
             final int rows = query.getParamNames().size() + 1;
             final int cols = 2;
 
-            DataSetBuilder dataSetBuilder = new DataSetBuilder()
-                    .setColumnCount(2)
-                    .setHasRowMeta(false);
+            ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder()
+                    .setColumnCount(2);
             dataSetBuilder.newRecord()
                     .set(0, Value.str("scheme"))
                     .set(1, Value.str(query.getScheme()))

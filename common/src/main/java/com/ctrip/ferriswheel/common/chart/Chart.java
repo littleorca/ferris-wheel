@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.common.chart;
 
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.common.view.Displayable;
 
 import java.util.List;

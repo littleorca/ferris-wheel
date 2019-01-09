@@ -23,10 +23,43 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common.variant;
 
-/**
- * @author liuhaifeng
- */
-public interface PivotAutomaton extends TableAutomaton, PivotConfiguration {
+public enum ErrorCodes implements ErrorCode {
+    OK("OK"),
+    UNKNOWN("UNKNOWN"),
+    ILLEGAL_REF("REF"),
+    ILLEGAL_VALUE("VALUE"),
+    DIV_0("DIV/0");
+
+    public static ErrorCodes valueOf(int code) {
+        if (code < 0 || code >= values().length) {
+            throw new IndexOutOfBoundsException("Invalid code: " + code);
+        }
+        return values()[code];
+    }
+
+    private final String displayName;
+
+    ErrorCodes(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public String toString() {
+        return getFullName();
+    }
+
+    @Override
+    public int getCode() {
+        return ordinal();
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getFullName() {
+        return String.valueOf("#" + displayName + "!");
+    }
 }

@@ -1,12 +1,15 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
-import com.ctrip.ferriswheel.common.table.AggregateType;
 import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.PivotFieldImpl;
+import com.ctrip.ferriswheel.core.bean.PivotValueImpl;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -60,7 +63,7 @@ public class TestPivotAutomaton extends TestCase {
         System.out.println(normalTable);
 
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
-        pivot.setData(new DynamicVariantImpl("normal!A:C"));
+        pivot.setData(new DynamicValue("normal!A:C"));
         pivot.setRows(Arrays.asList(new PivotFieldImpl("a")));
         pivot.setColumns(Arrays.asList(new PivotFieldImpl("b")));
         pivot.setValues(Arrays.asList(new PivotValueImpl("c", AggregateType.SUMMARY, "SUM:c")));
@@ -85,7 +88,7 @@ public class TestPivotAutomaton extends TestCase {
         System.out.println(normalTable);
 
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
-        pivot.setData(new DynamicVariantImpl("normal!A:F"));
+        pivot.setData(new DynamicValue("normal!A:F"));
         pivot.setRows(Arrays.asList(
                 new PivotFieldImpl("f1"),
                 new PivotFieldImpl("f2")

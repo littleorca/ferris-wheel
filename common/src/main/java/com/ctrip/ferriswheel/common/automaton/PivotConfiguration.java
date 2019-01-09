@@ -23,40 +23,24 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.query;
+package com.ctrip.ferriswheel.common.automaton;
 
-import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.common.variant.VariantType;
+import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 
-public interface DataSet {
+import java.util.List;
 
-    SetMeta getSetMeta();
+/**
+ * @author liuhaifeng
+ */
+public interface PivotConfiguration extends AutomateConfiguration {
+    DynamicVariant getData();
 
-    boolean next();
+    List<PivotFilter> getFilters();
 
-    RowMeta getRowMeta();
+    List<PivotField> getRows();
 
-    Variant getColumn(int index);
+    List<PivotField> getColumns();
 
-    Variant getColumn(String name);
-
-    interface SetMeta {
-        boolean hasRowMeta();
-
-        boolean hasColumnMeta();
-
-        int getColumnCount();
-
-        ColumnMeta getColumnMeta(int index);
-    }
-
-    interface ColumnMeta {
-        String getName();
-
-        VariantType getType();
-    }
-
-    interface RowMeta {
-        String getName();
-    }
+    List<PivotValue> getValues();
 }

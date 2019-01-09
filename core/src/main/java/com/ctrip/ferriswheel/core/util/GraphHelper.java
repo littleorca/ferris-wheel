@@ -25,11 +25,11 @@
 
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.common.*;
+import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.automaton.QueryAutomaton;
 import com.ctrip.ferriswheel.common.chart.Chart;
-import com.ctrip.ferriswheel.common.table.Cell;
-import com.ctrip.ferriswheel.common.table.QueryAutomaton;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
+import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.*;
 import com.ctrip.ferriswheel.core.formula.CalcChain;
@@ -100,11 +100,11 @@ public class GraphHelper {
                         "!" +
                         EscapeHelper.escape(((Table) asset).getName());
             }
-            if (asset instanceof AbstractTableAutomaton) {
-                Table table = ((AbstractTableAutomaton) asset).getTable();
+            if (asset instanceof AbstractAutomaton) {
+                Table table = (Table) asset.getParent();
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(((DefaultTable)table).getSheet().getName()) +
+                        EscapeHelper.escape(((DefaultTable) table).getSheet().getName()) +
                         "!" +
                         EscapeHelper.escape(table.getName()) +
                         "@" +

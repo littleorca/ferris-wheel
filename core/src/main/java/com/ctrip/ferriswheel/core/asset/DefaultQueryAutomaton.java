@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.ProviderManager;
+import com.ctrip.ferriswheel.common.automaton.QueryAutomaton;
+import com.ctrip.ferriswheel.common.automaton.QueryConfiguration;
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.DataSet;
-import com.ctrip.ferriswheel.common.table.QueryAutomaton;
-import com.ctrip.ferriswheel.common.table.QueryConfiguration;
+import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.ExecuteQuery;
 import com.ctrip.ferriswheel.core.bean.DefaultDataQuery;
@@ -17,12 +17,16 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class DefaultQueryAutomaton extends AbstractTableAutomaton implements QueryAutomaton {
+public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAutomaton {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultQueryAutomaton.class);
     private final DefaultQueryTemplate template;
     private transient Map<String, Variant> parameters;
     private transient DataQuery query;
+    private transient AtomicReference<DataSet> dataSetReference = new AtomicReference<>();
 
     DefaultQueryAutomaton(AssetManager assetManager, QueryConfiguration solution) {
         super(assetManager);
@@ -55,6 +59,10 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
         });
     }
 
+    DefaultTable getTable() {
+        return (DefaultTable) getParent();
+    }
+
     /**
      * Do not call this method manually. this method exists for workbook
      */
@@ -63,6 +71,15 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
         if (!forceUpdate && query != null &&
                 getLastUpdateSequenceNumber() > template.getLastUpdateSequenceNumber()) {
             return;
+        }
+        doQuery();
+    }
+
+    @Override
+    public <V> Future<V> execute(boolean forceUpdate, CompletionService<V> completionService, V result) {
+        if (!forceUpdate && query != null &&
+                getLastUpdateSequenceNumber() > template.getLastUpdateSequenceNumber()) {
+            return null;
         }
 
         DefaultWorkbook wb = parent(DefaultWorkbook.class);
@@ -81,24 +98,53 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
             }
 
             // execute query
-            DataSet dataSet = provider.execute(query);
 
-            // fill table
-            DefaultTable table = getTable();
-            fillTable(table, dataSet);
-            setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
-            getTable().getWorkbook().onAutomatonExecuted(getTable());
+            return completionService.submit(() -> {
+                try {
+                    dataSetReference.set(provider.execute(query));
+                    setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
+                } catch (IOException e) {
+                    LOG.warn("Failed to execute query.", e);
+                    // TODO mark error
+                    dataSetReference.set(null);
+                }
+            }, result);
+
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to execute query.", e);
+            // TODO mark error
+            return null;
+        }
+    }
+
+    private DataSet doQuery() {
+        DefaultWorkbook wb = parent(DefaultWorkbook.class);
+
+        if (wb.isForceRefresh()) {
+            parameters = Collections.emptyMap();
+        }
+        this.query = template.renderQuery(parameters);
+        ProviderManager pm = wb.getEnvironment().getProviderManager();
+        DataProvider provider = pm.getProvider(query);
+
+        try {
+            if (provider == null) {
+                throw new RuntimeException("Unable to find data provider for query scheme: "
+                        + query.getScheme());
+            }
+
+            // execute query
+            return provider.execute(query);
 
         } catch (IOException e) {
             LOG.warn("Failed to execute query.", e);
             // TODO mark error
-            clearTable();
+            return null;
         } catch (RuntimeException e) {
             LOG.warn("Failed to execute query.", e);
             // TODO mark error
-            clearTable();
+            return null;
         }
-
     }
 
     @Override
@@ -121,4 +167,13 @@ public class DefaultQueryAutomaton extends AbstractTableAutomaton implements Que
     public Map<String, Variant> getParameters() {
         return Collections.unmodifiableMap(parameters);
     }
+
+    public DataSet getDataSet() {
+        if (dataSetReference.get() != null) {
+            return dataSetReference.get();
+        } else {
+            return null;
+        }
+    }
+
 }

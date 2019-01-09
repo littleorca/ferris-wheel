@@ -26,9 +26,9 @@
 package com.ctrip.ferriswheel.core.bean;
 
 import com.ctrip.ferriswheel.common.chart.Axis;
-import com.ctrip.ferriswheel.common.view.Placement;
-import com.ctrip.ferriswheel.common.chart.Stacking;
 import com.ctrip.ferriswheel.common.chart.AxisBand;
+import com.ctrip.ferriswheel.common.chart.Stacking;
+import com.ctrip.ferriswheel.common.view.Placement;
 
 import java.io.Serializable;
 import java.util.ArrayList;

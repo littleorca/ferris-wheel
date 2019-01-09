@@ -23,39 +23,17 @@
  *
  */
 
-package com.ctrip.ferriswheel.provider.util;
+package com.ctrip.ferriswheel.common.automaton;
 
-import com.ctrip.ferriswheel.common.query.DataSet;
-import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.util.DataSet;
 
-import java.io.Serializable;
-import java.util.TreeMap;
+public interface Automaton {
 
-public class DataSetRecord implements Serializable {
-    private DataSet.RowMeta meta;
-    private TreeMap<Integer, Variant> fields = new TreeMap<>();
+    void init();
 
-    public Variant getField(int index) {
-        return fields.get(index);
-    }
+    void execute(boolean forceUpdate);
 
-    public void setField(int index, Variant value) {
-        fields.put(index, value);
-    }
+    DataSet getDataSet();
 
-    public DataSet.RowMeta getMeta() {
-        return meta;
-    }
-
-    public void setMeta(DataSet.RowMeta meta) {
-        this.meta = meta;
-    }
-
-    public TreeMap<Integer, Variant> getFields() {
-        return fields;
-    }
-
-    public void setFields(TreeMap<Integer, Variant> fields) {
-        this.fields = fields;
-    }
+    void destroy();
 }

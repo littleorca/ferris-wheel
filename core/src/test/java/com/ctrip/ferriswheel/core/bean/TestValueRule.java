@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.VariantType;
 import junit.framework.TestCase;
 

@@ -14,6 +14,7 @@ abstract class AssetNode implements Asset {
     private long lastUpdateSequenceNumber = 0; // revision sequence number
     private boolean valid = true;
     private boolean ephemeral = false;
+    private boolean ready = false;
 
     protected AssetNode(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -166,6 +167,14 @@ abstract class AssetNode implements Asset {
         this.ephemeral = ephemeral;
     }
 
+    public boolean isReady() {
+        return ready;
+    }
+
+    void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
     protected AssetManager getAssetManager() {
         return assetManager;
     }
@@ -192,7 +201,7 @@ abstract class AssetNode implements Asset {
         dependency.addDependent(this);
     }
 
-    private void removeDependency(AssetNode dependency) {
+    void removeDependency(AssetNode dependency) {
         if (this.dependencies.remove(dependency)) {
             if (this.dependencies.isEmpty()) {
                 this.dependencies = new HashSet<>();

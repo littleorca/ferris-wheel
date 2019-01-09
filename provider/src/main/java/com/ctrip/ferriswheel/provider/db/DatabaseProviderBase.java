@@ -27,12 +27,12 @@ package com.ctrip.ferriswheel.provider.db;
 
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.util.ColumnMetaDataImpl;
+import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.variant.VariantType;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.provider.util.DataSetBuilder;
-import com.ctrip.ferriswheel.provider.util.DefaultColumnMeta;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -129,19 +129,19 @@ public abstract class DatabaseProviderBase implements DataProvider {
     }
 
     private DataSet resultSetToDataSet(ResultSet rs) throws SQLException {
-        DataSetBuilder dataSetBuilder = new DataSetBuilder();
+        ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder();
         ResultSetMetaData md = rs.getMetaData();
 //        DefaultColumnMeta[] columnMetas = new DefaultColumnMeta[md.getColumnCount()];
         for (int i = 1; i <= md.getColumnCount(); i++) {
             String label = md.getColumnLabel(i);
 //            columnMetas[i - 1] = new DefaultColumnMeta(label, mapType(md.getColumnType(i)));
-            dataSetBuilder.addColumnMeta(new DefaultColumnMeta(label, mapType(md.getColumnType(i))));
+            dataSetBuilder.addColumnMeta(new ColumnMetaDataImpl(label, mapType(md.getColumnType(i))));
         }
 //        DefaultDataSetMeta meta = new DefaultDataSetMeta(false, columnMetas);
 //        List<Variant[]> rows = new ArrayList<>();
         while (rs.next()) {
 //            Variant[] row = new Variant[md.getColumnCount()];
-            DataSetBuilder.DataSetRecordBuilder record = dataSetBuilder.newRecord();
+            ListDataSet.Builder.DataSetRecordBuilder record = dataSetBuilder.newRecord();
             for (int i = 1; i <= md.getColumnCount(); i++) {
 //                row[i - 1] = mapValue(rs, i, mapType(md.getColumnType(i)));
                 record.set(i - 1, mapValue(rs, i, mapType(md.getColumnType(i))));

@@ -23,14 +23,7 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common.automaton;
 
-public interface PivotValue {
-
-    String getField();
-
-    AggregateType getAggregateType();
-
-    String getLabel();
-
+public interface PivotFilter {
 }

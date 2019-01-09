@@ -23,11 +23,7 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.variant.impl;
-
-import com.ctrip.ferriswheel.common.variant.ErrorCode;
-import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.common.variant.VariantType;
+package com.ctrip.ferriswheel.common.variant;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -323,8 +319,8 @@ public abstract class Value implements Variant {
 
     protected abstract Serializable rawValue();
 
-    public DynamicVariantImpl dynamic() {
-        return new DynamicVariantImpl(this);
+    public DynamicValue dynamic() {
+        return new DynamicValue(this);
     }
 
 

@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.quarks.util;
 
-import com.ctrip.ferriswheel.quarks.Token;
 import com.ctrip.ferriswheel.quarks.AbstractSyntaxTree;
 import com.ctrip.ferriswheel.quarks.Symbol;
+import com.ctrip.ferriswheel.quarks.Token;
 
 import java.util.Iterator;
 

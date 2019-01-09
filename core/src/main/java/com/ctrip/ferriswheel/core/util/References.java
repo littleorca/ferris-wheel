@@ -1,6 +1,6 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.core.ref.CellRef;
 import com.ctrip.ferriswheel.core.ref.PositionRef;
 import com.ctrip.ferriswheel.core.ref.RangeRef;

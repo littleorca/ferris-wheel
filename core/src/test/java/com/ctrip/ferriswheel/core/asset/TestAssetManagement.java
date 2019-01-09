@@ -2,14 +2,16 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.Environment;
 import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.automaton.Automaton;
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.table.TableAutomaton;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
-import com.ctrip.ferriswheel.core.bean.*;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.core.bean.ChartData;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -149,7 +151,7 @@ public class TestAssetManagement extends TestCase {
 
         TableAutomatonInfo.QueryTemplateInfo queryTemplateInfo = new TableAutomatonInfo.QueryTemplateInfo();
         queryTemplateInfo.setScheme("test");
-        queryTemplateInfo.addBuiltinParam("p1", new DynamicVariantImpl("NOW()"));
+        queryTemplateInfo.addBuiltinParam("p1", new DynamicValue("NOW()"));
         try {
             table.automate(new TableAutomatonInfo.QueryAutomatonInfo(queryTemplateInfo, null, null));
         } catch (RuntimeException e) {
@@ -184,50 +186,50 @@ public class TestAssetManagement extends TestCase {
         checkAssetMap(wb);
 
         DefaultChart chart = (DefaultChart) s1.addAsset(Chart.class, new ChartData("chart1", "Line",
-                new DynamicVariantImpl("\"Chart Title 1\""),
-                new DynamicVariantImpl("sheet1!table1!$B$1:$C$1"),
+                new DynamicValue("\"Chart Title 1\""),
+                new DynamicValue("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!$A$2"),
+                                new DynamicValue("sheet1!table1!$A$2"),
                                 null,
-                                new DynamicVariantImpl("sheet1!table1!$B$2:$C$2")),
+                                new DynamicValue("sheet1!table1!$B$2:$C$2")),
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!$A$3"),
+                                new DynamicValue("sheet1!table1!$A$3"),
                                 null,
-                                new DynamicVariantImpl("sheet1!table1!$B$3:$C$3"))
+                                new DynamicValue("sheet1!table1!$B$3:$C$3"))
                 )));
         checkAssetMap(wb);
 
-        chart.addSeries(new DynamicVariantImpl("sheet1!table1!$A$4"), null, new DynamicVariantImpl("sheet1!table1!$B$4:$C$4"));
+        chart.addSeries(new DynamicValue("sheet1!table1!$A$4"), null, new DynamicValue("sheet1!table1!$B$4:$C$4"));
         checkAssetMap(wb);
 
         s1.addAsset(Chart.class, new ChartData("chart2", "Line",
-                new DynamicVariantImpl("\"Chart Title 2\""),
-                new DynamicVariantImpl("sheet1!table1!$B$1:$C$1"),
+                new DynamicValue("\"Chart Title 2\""),
+                new DynamicValue("sheet1!table1!$B$1:$C$1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!$A$2"),
-                                new DynamicVariantImpl("sheet1!table1!$B$2:$C$2"),
+                                new DynamicValue("sheet1!table1!$A$2"),
+                                new DynamicValue("sheet1!table1!$B$2:$C$2"),
                                 null),
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!$A$3"),
-                                new DynamicVariantImpl("sheet1!table1!$B$3:$C$3"),
+                                new DynamicValue("sheet1!table1!$A$3"),
+                                new DynamicValue("sheet1!table1!$B$3:$C$3"),
                                 null)
                 )));
         checkAssetMap(wb);
 
         // test update chart
         s1.updateChart("chart2", new ChartData("chart2", "Line",
-                new DynamicVariantImpl("\"Chart New Title 2\""),
-                new DynamicVariantImpl("sheet1!table1!$B$1:$D$1"),
+                new DynamicValue("\"Chart New Title 2\""),
+                new DynamicValue("sheet1!table1!$B$1:$D$1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!$A$2"),
-                                new DynamicVariantImpl("sheet1!table1!$B$2:$D$2"),
+                                new DynamicValue("sheet1!table1!$A$2"),
+                                new DynamicValue("sheet1!table1!$B$2:$D$2"),
                                 null),
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("sheet1!table1!$A$3"),
-                                new DynamicVariantImpl("sheet1!table1!$B$3:$D$3"),
+                                new DynamicValue("sheet1!table1!$A$3"),
+                                new DynamicValue("sheet1!table1!$B$3:$D$3"),
                                 null)
                 )));
         checkAssetMap(wb);
@@ -288,7 +290,7 @@ public class TestAssetManagement extends TestCase {
             checkAssetMap(assetMap, pendingAssetIds, row);
         }
 
-        TableAutomaton automaton = table.getAutomaton();
+        Automaton automaton = table.getAutomaton();
         if (automaton != null) {
             assertEquals(table, ((AssetNode) automaton).getParent());
             assertTrue(pendingAssetIds.remove(((AssetNode) automaton).getAssetId()));
@@ -308,7 +310,7 @@ public class TestAssetManagement extends TestCase {
     }
 
     void checkAssetMap(Map<Long, DefaultAssetManager.AssetReference> assetMap,
-                       Set<Long> pendingAssetIds, TableAutomaton automaton) {
+                       Set<Long> pendingAssetIds, Automaton automaton) {
         if (automaton instanceof DefaultQueryAutomaton) {
             DefaultQueryTemplate template = ((DefaultQueryAutomaton) automaton).getTemplate();
             assertEquals(automaton, template.getParent());

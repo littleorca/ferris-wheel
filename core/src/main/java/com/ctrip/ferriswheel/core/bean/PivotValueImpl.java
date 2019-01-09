@@ -25,8 +25,8 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
+import com.ctrip.ferriswheel.common.automaton.PivotValue;
 import com.ctrip.ferriswheel.common.table.AggregateType;
-import com.ctrip.ferriswheel.common.table.PivotValue;
 
 import java.io.Serializable;
 

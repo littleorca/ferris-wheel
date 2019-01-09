@@ -23,21 +23,10 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
-
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.QueryTemplate;
-import com.ctrip.ferriswheel.common.variant.Variant;
-
-import java.util.Map;
+package com.ctrip.ferriswheel.common.automaton;
 
 /**
  * @author liuhaifeng
  */
-public interface QueryConfiguration extends AutomateConfiguration {
-    QueryTemplate getTemplate();
-
-    Map<String, Variant> getParameters();
-
-    DataQuery getQuery();
+public interface PivotAutomaton extends Automaton, PivotConfiguration {
 }

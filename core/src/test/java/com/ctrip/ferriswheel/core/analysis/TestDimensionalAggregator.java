@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.analysis;
 
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import junit.framework.TestCase;
 

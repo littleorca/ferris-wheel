@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.table.Cell;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Value;
 
 public class DefaultCell extends ValueNode implements Cell {
     private int columnIndex;

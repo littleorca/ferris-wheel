@@ -26,6 +26,7 @@
 package com.ctrip.ferriswheel.common.table;
 
 import com.ctrip.ferriswheel.common.SheetAsset;
+import com.ctrip.ferriswheel.common.automaton.Automaton;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.view.Displayable;
 
@@ -269,7 +270,7 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      *
      * @return correlated table automaton, or null if this table is not automated.
      */
-    TableAutomaton getAutomaton();
+    Automaton getAutomaton();
 
 
     /**

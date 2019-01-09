@@ -6,16 +6,21 @@ import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.DataSet;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.variant.*;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.ErrorCodes;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.VariantRule;
+import com.ctrip.ferriswheel.common.variant.VariantType;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
-import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
+import com.ctrip.ferriswheel.core.bean.ChartData;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
+import com.ctrip.ferriswheel.core.bean.ValueRule;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import com.google.protobuf.InvalidProtocolBufferException;
 import junit.framework.TestCase;
@@ -46,9 +51,8 @@ public class TestPbHelper extends TestCase {
 
             @Override
             public DataSet execute(DataQuery query) throws IOException {
-                return new DataSetBuilder()
+                return new ListDataSet.Builder()
                         .setColumnCount(1)
-                        .setHasRowMeta(false)
                         .newRecord()
                         .set(0, Value.str("hello world"))
                         .commit()
@@ -72,8 +76,8 @@ public class TestPbHelper extends TestCase {
         assertEquals(2, t.getRows(1).getRowIndex());
 
         Map<String, DynamicVariant> builtinParams = new LinkedHashMap<>();
-        builtinParams.put("Greeting", new DynamicVariantImpl("\"hello world\""));
-        builtinParams.put("Goodbye", new DynamicVariantImpl("\"bye!\""));
+        builtinParams.put("Greeting", new DynamicValue("\"hello world\""));
+        builtinParams.put("Goodbye", new DynamicValue("\"bye!\""));
         Map<String, VariantRule> userParamRules = new HashMap<>();
         userParamRules.put("Name",
                 new ValueRule(VariantType.STRING,
@@ -110,12 +114,12 @@ public class TestPbHelper extends TestCase {
         table1.setCellValue(0, 2, Value.dec(3));
         Chart chart1 = sheet1.addAsset(Chart.class,
                 new ChartData("chart1", "Line",
-                        new DynamicVariantImpl("\"Chart 1 (Line)\""),
+                        new DynamicValue("\"Chart 1 (Line)\""),
                         null,
                         Arrays.asList(new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("table1!A1"),
+                                new DynamicValue("table1!A1"),
                                 null,
-                                new DynamicVariantImpl("table1!B1:C1")))));
+                                new DynamicValue("table1!B1:C1")))));
         com.ctrip.ferriswheel.proto.v1.SheetAsset asset = PbHelper.pb(chart1);
         assertEquals(com.ctrip.ferriswheel.proto.v1.SheetAsset.AssetCase.CHART, asset.getAssetCase());
         com.ctrip.ferriswheel.proto.v1.Chart c1 = asset.getChart();
@@ -192,7 +196,7 @@ public class TestPbHelper extends TestCase {
         assertEquals(com.ctrip.ferriswheel.proto.v1.UnionValue.ValueCase.STRING, v.getValueCase());
         assertEquals("hello", v.getString());
 
-        DynamicVariantImpl dv = new DynamicVariantImpl("2^10");
+        DynamicValue dv = new DynamicValue("2^10");
         v = PbHelper.pb(dv);
         assertEquals("2^10", v.getFormulaString());
         assertEquals(com.ctrip.ferriswheel.proto.v1.UnionValue.ValueCase.VALUE_NOT_SET, v.getValueCase());
@@ -211,9 +215,8 @@ public class TestPbHelper extends TestCase {
             @Override
             public DataSet execute(DataQuery query) throws IOException {
                 System.out.println("Filling table by fake provider.");
-                return new DataSetBuilder()
+                return new ListDataSet.Builder()
                         .setColumnCount(2)
-                        .setHasRowMeta(false)
                         .newRecord()
                         .set(0, Value.dec(13))
                         .set(1, Value.dec(23))
@@ -231,7 +234,7 @@ public class TestPbHelper extends TestCase {
         Table t2 = s1.addAsset(Table.class, "t2");
 
         Map<String, DynamicVariant> builtinParams = new HashMap<>();
-        builtinParams.put("Greeting", new DynamicVariantImpl("\"hello world\""));
+        builtinParams.put("Greeting", new DynamicValue("\"hello world\""));
         Map<String, VariantRule> userParamRules = new HashMap<>();
         userParamRules.put("Name",
                 new ValueRule(VariantType.STRING,
@@ -252,17 +255,17 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 2, Value.dec(22));
         t1.setCellFormula(2, 3, "t0!B1");
         s1.addAsset(Chart.class, new ChartData("c1", "Line",
-                new DynamicVariantImpl("\"Line Chart 1\""),
-                new DynamicVariantImpl("t1!B1:D1"),
+                new DynamicValue("\"Line Chart 1\""),
+                new DynamicValue("t1!B1:D1"),
                 Arrays.asList(
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("t1!A2"),
+                                new DynamicValue("t1!A2"),
                                 null,
-                                new DynamicVariantImpl("t1!B2:D2")),
+                                new DynamicValue("t1!B2:D2")),
                         new ChartData.SeriesImpl(
-                                new DynamicVariantImpl("t1!A3"),
+                                new DynamicValue("t1!A3"),
                                 null,
-                                new DynamicVariantImpl("t1!B3:D3"))
+                                new DynamicValue("t1!B3:D3"))
                 )));
         t2.setCellValue(0, 0, Value.dec(2));
 
@@ -287,7 +290,7 @@ public class TestPbHelper extends TestCase {
         TableAutomatonInfo.QueryTemplateInfo template = auto.getQueryAutomatonInfo().getTemplate();
         assertEquals(scheme, template.getScheme());
         assertEquals(1, template.getAllBuiltinParams().size());
-        DynamicVariantImpl param = (DynamicVariantImpl) template.getAllBuiltinParams().get("Greeting");
+        DynamicValue param = (DynamicValue) template.getAllBuiltinParams().get("Greeting");
         assertEquals("\"hello world\"", param.getFormulaString());
         assertEquals(1, template.getAllUserParamRules().size());
         VariantRule rule = template.getAllUserParamRules().get("Name");
@@ -357,12 +360,12 @@ public class TestPbHelper extends TestCase {
         t1.setCellValue(2, 2, Value.dec(22));
 
         s1.addAsset(Chart.class, new ChartData("chart1", "Line",
-                new DynamicVariantImpl("\"Hello Line Chart1\""),
-                new DynamicVariantImpl("table1!B1:C1"),
+                new DynamicValue("\"Hello Line Chart1\""),
+                new DynamicValue("table1!B1:C1"),
                 Arrays.asList(new ChartData.SeriesImpl(
-                        new DynamicVariantImpl("table1!A2"),
+                        new DynamicValue("table1!A2"),
                         null,
-                        new DynamicVariantImpl("table1!B2:C2")))));
+                        new DynamicValue("table1!B2:C2")))));
 
 //        String json = JsonFormat.printer().print(SpreadsheetProtoHelper.pb(wb));
 //        System.out.println(json);

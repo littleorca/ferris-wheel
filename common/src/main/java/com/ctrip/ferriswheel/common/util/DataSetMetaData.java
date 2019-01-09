@@ -23,27 +23,16 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.table;
+package com.ctrip.ferriswheel.common.util;
 
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.variant.Variant;
+/**
+ * @author liuhaifeng
+ */
+public interface DataSetMetaData {
 
-import java.util.Map;
+    boolean hasColumnMeta();
 
-public interface QueryAutomaton extends TableAutomaton, QueryConfiguration {
+    int getColumnCount();
 
-    /**
-     * Query with specified user parameters.
-     *
-     * @param userParameters
-     */
-    void query(Map<String, Variant> userParameters);
-
-    /**
-     * Get query.
-     *
-     * @return
-     */
-    DataQuery getQuery();
-
+    ColumnMetaData getColumnMeta(int index);
 }

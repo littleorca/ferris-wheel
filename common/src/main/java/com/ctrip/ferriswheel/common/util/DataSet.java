@@ -23,44 +23,22 @@
  *
  */
 
-package com.ctrip.ferriswheel.provider.util;
+package com.ctrip.ferriswheel.common.util;
 
-import com.ctrip.ferriswheel.common.query.DataSet;
+import com.ctrip.ferriswheel.common.variant.Variant;
 
-public class DefaultDataSetMeta implements DataSet.SetMeta {
-    private final boolean hasRowMeta;
-    private final int columnCount;
-    private final DataSet.ColumnMeta[] columnMetas;
+public interface DataSet {
 
-    public DefaultDataSetMeta(boolean hasRowMeta, DataSet.ColumnMeta[] columnMetas) {
-        this.hasRowMeta = hasRowMeta;
-        this.columnCount = columnMetas.length;
-        this.columnMetas = columnMetas;
-    }
+    DataSetMetaData getMetaData();
 
-    public DefaultDataSetMeta(boolean hasRowMeta, int columnCount) {
-        this.hasRowMeta = hasRowMeta;
-        this.columnCount = columnCount;
-        this.columnMetas = null;
-    }
+    boolean next();
 
-    @Override
-    public boolean hasRowMeta() {
-        return hasRowMeta;
-    }
+    boolean isReusable();
 
-    @Override
-    public boolean hasColumnMeta() {
-        return columnMetas != null;
-    }
+    void rewind() throws UnsupportedOperationException;
 
-    @Override
-    public int getColumnCount() {
-        return columnCount;
-    }
+    Variant getColumn(int index);
 
-    @Override
-    public DataSet.ColumnMeta getColumnMeta(int index) {
-        return columnMetas[index];
-    }
+    Variant getColumn(String name);
+
 }

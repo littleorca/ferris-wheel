@@ -1,12 +1,20 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.action.Action;
-import com.ctrip.ferriswheel.common.table.*;
+import com.ctrip.ferriswheel.common.automaton.Automaton;
+import com.ctrip.ferriswheel.common.automaton.PivotConfiguration;
+import com.ctrip.ferriswheel.common.automaton.QueryConfiguration;
+import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.util.DataSetMetaData;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.util.References;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
@@ -25,7 +33,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     private int columnCount;
     private boolean readOnly = false;
     private final TableLayout layout = new TableLayout();
-    private TableAutomaton automaton;
+    private Automaton automaton;
     private Map<Range, Set<Long>> rangeToNodes = new HashMap<>();
     private Map<Long, Set<Range>> nodeToRanges = new HashMap<>();
 
@@ -70,7 +78,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             }
             // Old value may be useless and resource consumption
             // Think about remove the return value?
-            Variant oldValue = new DynamicVariantImpl(cell.getData());
+            Variant oldValue = new DynamicValue(cell.getData());
             cell.setValue(value);
             int newRowSize = cell.getRow().getCellCount();
             if (newRowSize > getColumnCount()) {
@@ -466,9 +474,10 @@ public class DefaultTable extends SheetAssetNode implements Table {
         });
     }
 
-    private TableAutomaton createAndRegisterAutomaton(AutomateConfiguration solution) {
+    private Automaton createAndRegisterAutomaton(AutomateConfiguration solution) {
         if (this.automaton != null) {
             unbindChild((AssetNode) this.automaton);
+            this.removeDependency(((AssetNode) this.automaton));
         }
 
         if (solution instanceof QueryConfiguration) {
@@ -476,6 +485,11 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     (QueryConfiguration) solution);
             bindChild(queryAutomaton);
             this.automaton = queryAutomaton;
+            for (String name : queryAutomaton.getTemplate().getBuiltinParamNames()) {
+                ValueNode param = queryAutomaton.getTemplate().getBuiltinParam(name);
+                queryAutomaton.addDependency(param);
+            }
+            this.addDependency(queryAutomaton);
             return queryAutomaton;
 
         } else if (solution instanceof PivotConfiguration) {
@@ -483,6 +497,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     (PivotConfiguration) solution);
             bindChild(pivotAutomaton);
             this.automaton = pivotAutomaton;
+            pivotAutomaton.addDependency(pivotAutomaton.getData());
+            this.addDependency(pivotAutomaton);
             return pivotAutomaton;
 
         } else {
@@ -492,7 +508,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     @Override
-    public TableAutomaton getAutomaton() {
+    public Automaton getAutomaton() {
         return automaton;
     }
 
@@ -807,6 +823,75 @@ public class DefaultTable extends SheetAssetNode implements Table {
         }
         return new Range(getAssetId(), left, top, right, bottom);
     }
+
+    void fillByAutomaton() {
+        setReadOnly(false);
+        try {
+            DataSet dataSet = getAutomaton().getDataSet();
+            if (dataSet != null) {
+                doFillTable(getAutomaton().getDataSet());
+            } else {
+                doClearTable();
+            }
+        } finally {
+            setReadOnly(true);
+            publicly(new ResetTable(getSheet().getName(), this), () -> {
+            });
+        }
+    }
+
+    void doFillTable(DataSet dataSet) {
+        if (dataSet.isReusable()) {
+            dataSet.rewind(); // make sure rewind pointer to the beginning.
+        }
+        DataSetMetaData setMeta = dataSet.getMetaData();
+        int row = 0;
+
+        //table.eraseRows(0, table.getRowCount());
+
+        if (setMeta.hasColumnMeta()) {
+            for (int col = 0; col < setMeta.getColumnCount(); col++) {
+                refreshCellValue(row, col, Value.str(setMeta.getColumnMeta(col).getName()));
+            }
+            row++;
+        }
+        dataSet.rewind();
+        while (dataSet.next()) {
+            for (int col = 0; col < setMeta.getColumnCount(); col++) {
+                Variant value = dataSet.getColumn(col);
+                if (value == null) {
+                    value = Value.BLANK;
+                }
+                refreshCellValue(row, col, Value.from(value));
+            }
+            row++;
+        }
+
+        // trim rows/columns if needed
+        if (getRowCount() > row) {
+            removeRows(row, getRowCount() - row);
+        }
+        if (getColumnCount() > setMeta.getColumnCount()) {
+            removeColumns(setMeta.getColumnCount(),
+                    getColumnCount() - setMeta.getColumnCount());
+        }
+
+        fixColumnCount();
+    }
+
+    void refreshCellValue(int rowIndex, int columnIndex, Value newValue) {
+        DefaultCell cell = getCell(rowIndex, columnIndex);
+        if (!newValue.equals(cell.getData())) {
+            cell.setValue(newValue);
+        }
+    }
+
+    void doClearTable() {
+        if (getRowCount() > 0) {
+            removeRows(0, getRowCount());
+        }
+    }
+
 
     class Range extends Rectangle {
         long tableId;

@@ -1,9 +1,9 @@
 package com.ctrip.ferriswheel.quarks.syntax.bnf;
 
+import com.ctrip.ferriswheel.quarks.Symbol;
+
 import java.io.Serializable;
 import java.util.List;
-
-import com.ctrip.ferriswheel.quarks.Symbol;
 
 public class BNFRule implements Serializable {
     private static final long serialVersionUID = 1L;

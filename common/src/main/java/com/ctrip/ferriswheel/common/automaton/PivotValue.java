@@ -23,45 +23,16 @@
  *
  */
 
-package com.ctrip.ferriswheel.common.variant.impl;
+package com.ctrip.ferriswheel.common.automaton;
 
-import com.ctrip.ferriswheel.common.variant.ErrorCode;
+import com.ctrip.ferriswheel.common.table.AggregateType;
 
-public enum ErrorCodes implements ErrorCode {
-    OK("OK"),
-    UNKNOWN("UNKNOWN"),
-    ILLEGAL_REF("REF"),
-    ILLEGAL_VALUE("VALUE"),
-    DIV_0("DIV/0");
+public interface PivotValue {
 
-    public static ErrorCodes valueOf(int code) {
-        if (code < 0 || code >= values().length) {
-            throw new IndexOutOfBoundsException("Invalid code: " + code);
-        }
-        return values()[code];
-    }
+    String getField();
 
-    private final String displayName;
+    AggregateType getAggregateType();
 
-    ErrorCodes(String displayName) {
-        this.displayName = displayName;
-    }
+    String getLabel();
 
-    @Override
-    public String toString() {
-        return getFullName();
-    }
-
-    @Override
-    public int getCode() {
-        return ordinal();
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getFullName() {
-        return String.valueOf("#" + displayName + "!");
-    }
 }

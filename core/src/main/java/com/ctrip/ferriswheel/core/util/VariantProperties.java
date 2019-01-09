@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 
 import java.util.Date;

@@ -5,17 +5,18 @@ import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.DataSet;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.util.ColumnMetaDataImpl;
+import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.variant.VariantType;
-import com.ctrip.ferriswheel.core.bean.*;
-import com.ctrip.ferriswheel.core.loader.DataSetBuilder;
-import com.ctrip.ferriswheel.core.loader.DefaultColumnMeta;
+import com.ctrip.ferriswheel.core.bean.ChartData;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
-import com.ctrip.ferriswheel.core.loader.DefaultRowMeta;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -350,21 +351,21 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
         List<DataSeries> seriesList = new ArrayList<>(3);
         seriesList.add(new ChartData.SeriesImpl(
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$2"),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$2"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$D$2")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$D$2")));
         seriesList.add(new ChartData.SeriesImpl(
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$3"),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$3"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$D$3")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$D$3")));
         seriesList.add(new ChartData.SeriesImpl(
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
 
         ChartData chartSettings = new ChartData("testChart", "Line",
-                new DynamicVariantImpl("\"Hello Line Chart!\""),
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
+                new DynamicValue("\"Hello Line Chart!\""),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
                 seriesList);
 
         DefaultChart chart = (DefaultChart) table.getSheet().addAsset(Chart.class, chartSettings);
@@ -477,35 +478,35 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
         List<DataSeries> seriesList = new ArrayList<>(3);
         seriesList.add(new ChartData.SeriesImpl(
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$2"),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$2"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$D$2")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$D$2")));
         seriesList.add(new ChartData.SeriesImpl(
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$3"),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$3"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$D$3")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$D$3")));
         seriesList.add(new ChartData.SeriesImpl(
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$D$4")));
 
         ChartData chartSettings = new ChartData("testChart", "Line",
-                new DynamicVariantImpl("\"Hello Line Chart!\""),
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
+                new DynamicValue("\"Hello Line Chart!\""),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$D$1"),
                 seriesList);
 
         DefaultChart chart = (DefaultChart) table.getSheet().addAsset(Chart.class, chartSettings);
 
         // update
-        ((ChartData.SeriesImpl) seriesList.get(0)).setyValues(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$C$2"));
-        ((ChartData.SeriesImpl) seriesList.get(1)).setyValues(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$C$3"));
+        ((ChartData.SeriesImpl) seriesList.get(0)).setyValues(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$2:$C$2"));
+        ((ChartData.SeriesImpl) seriesList.get(1)).setyValues(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$3:$C$3"));
         seriesList.remove(2);
-        seriesList.add(new ChartData.SeriesImpl(new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
+        seriesList.add(new ChartData.SeriesImpl(new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$A$4"),
                 null,
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$C$4")));
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$4:$C$4")));
         table.getSheet().updateChart("testChart", new ChartData("testChart", "Line",
-                new DynamicVariantImpl("\"Hello New Line Chart!\""),
-                new DynamicVariantImpl(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$C$1"),
+                new DynamicValue("\"Hello New Line Chart!\""),
+                new DynamicValue(table.getSheet().getName() + "!" + table.getName() + "!$B$1:$C$1"),
                 seriesList
         ));
 
@@ -566,27 +567,23 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
         assertEquals("table1", table.getName());
         assertEquals(4, table.getRowCount());
-        assertEquals(4, table.getColumnCount());
+        assertEquals(3, table.getColumnCount());
 
-        assertSame(Value.BLANK, table.getCell(0, 0).getData().getVariant());
-        assertEquals("foo", table.getCell(0, 1).strValue());
-        assertEquals("bar", table.getCell(0, 2).strValue());
-        assertEquals("foobar", table.getCell(0, 3).strValue());
+        assertEquals("foo", table.getCell(0, 0).strValue());
+        assertEquals("bar", table.getCell(0, 1).strValue());
+        assertEquals("foobar", table.getCell(0, 2).strValue());
 
-        assertEquals("apple", table.getCell(1, 0).strValue());
-        assertEquals(11, table.getCell(1, 1).intValue());
-        assertEquals(12, table.getCell(1, 2).intValue());
-        assertEquals(13, table.getCell(1, 3).intValue());
+        assertEquals(11, table.getCell(1, 0).intValue());
+        assertEquals(12, table.getCell(1, 1).intValue());
+        assertEquals(13, table.getCell(1, 2).intValue());
 
-        assertEquals("boy", table.getCell(2, 0).strValue());
-        assertEquals(21, table.getCell(2, 1).intValue());
-        assertEquals(22, table.getCell(2, 2).intValue());
-        assertEquals(23, table.getCell(2, 3).intValue());
+        assertEquals(21, table.getCell(2, 0).intValue());
+        assertEquals(22, table.getCell(2, 1).intValue());
+        assertEquals(23, table.getCell(2, 2).intValue());
 
-        assertEquals("cat", table.getCell(3, 0).strValue());
-        assertEquals(31, table.getCell(3, 1).intValue());
-        assertEquals(32, table.getCell(3, 2).intValue());
-        assertEquals(33, table.getCell(3, 3).intValue());
+        assertEquals(31, table.getCell(3, 0).intValue());
+        assertEquals(32, table.getCell(3, 1).intValue());
+        assertEquals(33, table.getCell(3, 2).intValue());
     }
 
     class ProviderMock implements DataProvider {
@@ -600,28 +597,24 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
         @Override
         public DataSet execute(DataQuery query) throws IOException {
-            DataSetBuilder dataSetBuilder = new DataSetBuilder()
-                    .addColumnMeta(new DefaultColumnMeta("foo", VariantType.DECIMAL))
-                    .addColumnMeta(new DefaultColumnMeta("bar", VariantType.DECIMAL))
-                    .addColumnMeta(new DefaultColumnMeta("foobar", VariantType.DECIMAL))
-                    .setHasRowMeta(true);
+            ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder()
+                    .addColumnMeta(new ColumnMetaDataImpl("foo", VariantType.DECIMAL))
+                    .addColumnMeta(new ColumnMetaDataImpl("bar", VariantType.DECIMAL))
+                    .addColumnMeta(new ColumnMetaDataImpl("foobar", VariantType.DECIMAL));
 
             dataSetBuilder.newRecord()
-                    .setMeta(new DefaultRowMeta("apple"))
                     .set(0, Value.dec(11))
                     .set(1, Value.dec(12))
                     .set(2, Value.dec(13))
                     .commit();
 
             dataSetBuilder.newRecord()
-                    .setMeta(new DefaultRowMeta("boy"))
                     .set(0, Value.dec(21))
                     .set(1, Value.dec(22))
                     .set(2, Value.dec(23))
                     .commit();
 
             dataSetBuilder.newRecord()
-                    .setMeta(new DefaultRowMeta("cat"))
                     .set(0, Value.dec(31))
                     .set(1, Value.dec(32))
                     .set(2, Value.dec(33))

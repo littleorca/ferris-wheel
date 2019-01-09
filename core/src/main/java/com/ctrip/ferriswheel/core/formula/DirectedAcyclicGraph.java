@@ -110,10 +110,9 @@ public class DirectedAcyclicGraph<Id, Data> {
         if (node == null) {
             return;
         }
-        if (node.hasInbounds()) {
-            throw new RuntimeException("Node cannot be removed.");
-        }
+        node.clearInbounds();
         node.clearOutbounds();
+        nodes.remove(id);
     }
 
     /**
@@ -194,6 +193,20 @@ public class DirectedAcyclicGraph<Id, Data> {
         return label.replaceAll("\"", "\\\"");
     }
 
+    public Set<Id> collectOutboundEnds() {
+        Set<Id> outboundEnds = new HashSet<>();
+        for (Map.Entry<Id, Node<Id, Data>> entry : nodes.entrySet()) {
+            if (entry.getValue().outbounds.isEmpty()) {
+                outboundEnds.add(entry.getKey());
+            }
+        }
+        return outboundEnds;
+    }
+
+    public boolean isEmpty() {
+        return nodes.isEmpty();
+    }
+
     /**
      * Graph node
      *
@@ -266,6 +279,14 @@ public class DirectedAcyclicGraph<Id, Data> {
             }
             for (Node newDep : nodes) {
                 addOutbound(newDep);
+            }
+        }
+
+        void clearInbounds() {
+            // construct a new set to avoid concurrent modification exception.
+            Set<Node<Id, Data>> nodes = new HashSet<>(inbounds.values());
+            for (Node<Id, Data> node : nodes) {
+                node.removeOutbound(this);
             }
         }
 

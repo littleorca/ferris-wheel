@@ -1,12 +1,12 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
-import com.ctrip.ferriswheel.core.asset.FilingClerk;
-import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
 import com.ctrip.ferriswheel.common.Environment;
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
+import com.ctrip.ferriswheel.core.asset.FilingClerk;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import junit.framework.TestCase;
 
 public class TestHtmlHelper extends TestCase {

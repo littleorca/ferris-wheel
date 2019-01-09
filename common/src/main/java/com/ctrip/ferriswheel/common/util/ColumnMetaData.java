@@ -23,40 +23,15 @@
  *
  */
 
-package com.ctrip.ferriswheel.core.bean;
+package com.ctrip.ferriswheel.common.util;
 
-import com.ctrip.ferriswheel.common.Version;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 
-import java.io.Serializable;
+/**
+ * @author liuhaifeng
+ */
+public interface ColumnMetaData {
+    String getName();
 
-public final class VersionImpl implements Version, Serializable {
-    private final int majorVersion;
-    private final int minorVersion;
-    private final int buildNumber;
-
-    public VersionImpl(VersionImpl another) {
-        this(another.majorVersion, another.minorVersion, another.buildNumber);
-    }
-
-    public VersionImpl(int majorVersion, int minorVersion, int buildNumber) {
-        this.majorVersion = majorVersion;
-        this.minorVersion = minorVersion;
-        this.buildNumber = buildNumber;
-    }
-
-    @Override
-    public int getMajorVersion() {
-        return majorVersion;
-    }
-
-    @Override
-    public int getMinorVersion() {
-        return minorVersion;
-    }
-
-    @Override
-    public int getBuildNumber() {
-        return buildNumber;
-    }
-
+    VariantType getType();
 }

@@ -25,10 +25,14 @@
 
 package com.ctrip.ferriswheel.core.bean;
 
-import com.ctrip.ferriswheel.common.table.*;
+import com.ctrip.ferriswheel.common.automaton.Automaton;
+import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
+import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Row;
+import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.DynamicVariant;
-import com.ctrip.ferriswheel.common.variant.impl.DynamicVariantImpl;
-import com.ctrip.ferriswheel.common.variant.impl.Value;
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.core.util.TreeSparseArray;
@@ -91,12 +95,12 @@ public class TableDataImpl implements Table, Serializable {
     @Override
     public Variant setCellValue(int rowIndex, int columnIndex, Variant value) {
         Cell cell = getOrCreateCell(rowIndex, columnIndex);
-        DynamicVariantImpl oldValue = new DynamicVariantImpl(cell.getData());
+        DynamicValue oldValue = new DynamicValue(cell.getData());
         // TODO review this cast
         if (value instanceof DynamicVariant) {
             ((CellData) cell).setData((DynamicVariant) value);
         } else {
-            ((CellData) cell).setData(new DynamicVariantImpl(Value.from(value)));
+            ((CellData) cell).setData(new DynamicValue(Value.from(value)));
         }
         return oldValue;
     }
@@ -105,7 +109,7 @@ public class TableDataImpl implements Table, Serializable {
     public String setCellFormula(int rowIndex, int columnIndex, String formula) {
         Cell cell = getOrCreateCell(rowIndex, columnIndex);
         String oldFormulaString = cell.getData().getFormulaString();
-        ((CellData) cell).setData(new DynamicVariantImpl(formula));
+        ((CellData) cell).setData(new DynamicValue(formula));
         return oldFormulaString;
     }
 
@@ -182,7 +186,7 @@ public class TableDataImpl implements Table, Serializable {
         Cell cell = getCell(rowIndex, columnIndex);
         if (!cell.getData().isBlank()) {
             // TODO review this cast
-            ((CellData) cell).setData(new DynamicVariantImpl(Value.BLANK));
+            ((CellData) cell).setData(new DynamicValue(Value.BLANK));
         }
     }
 
@@ -210,7 +214,7 @@ public class TableDataImpl implements Table, Serializable {
                     needFixColumnCount = true;
                 }
                 for (Map.Entry<Integer, Cell> cellEntry : row) {
-                    ((CellData) cellEntry.getValue()).setData(new DynamicVariantImpl(Value.BLANK));
+                    ((CellData) cellEntry.getValue()).setData(new DynamicValue(Value.BLANK));
                 }
             }
         }
@@ -329,7 +333,7 @@ public class TableDataImpl implements Table, Serializable {
     }
 
     @Override
-    public TableAutomaton getAutomaton() {
+    public Automaton getAutomaton() {
         return null; // TODO review this
     }
 
