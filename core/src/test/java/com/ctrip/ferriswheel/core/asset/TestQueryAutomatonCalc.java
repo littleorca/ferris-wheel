@@ -92,14 +92,14 @@ public class TestQueryAutomatonCalc extends TestCase {
             final int rows = query.getParamNames().size() + 1;
             final int cols = 2;
 
-            ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder()
+            ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
                     .setColumnCount(2);
-            dataSetBuilder.newRecord()
+            dataSetBuilder.newRecordBuilder()
                     .set(0, Value.str("scheme"))
                     .set(1, Value.str(query.getScheme()))
                     .commit();
             for (String name : query.getParamNames()) {
-                dataSetBuilder.newRecord()
+                dataSetBuilder.newRecordBuilder()
                         .set(0, Value.str(name))
                         .set(1, query.getParam(name))
                         .commit();

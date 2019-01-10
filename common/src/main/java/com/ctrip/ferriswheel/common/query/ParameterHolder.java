@@ -25,21 +25,40 @@
 
 package com.ctrip.ferriswheel.common.query;
 
+import com.ctrip.ferriswheel.common.variant.Variant;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
- * By declares query scheme and holds final query parameters, this class
- * completely represents a query which can be executed by correspond
- * {@link DataProvider}.
- *
- * @see DataProvider
- * @see QueryTemplate
+ * @author liuhaifeng
  */
-public interface DataQuery extends ParameterHolder {
-    /**
-     * Scheme is a string identifies a sort of query.
-     * Typically a scheme requires a correspond {@link DataProvider}.
-     *
-     * @return
-     */
-    String getScheme();
+public interface ParameterHolder {
+    Variant getParam(String name);
+
+    Set<String> getParamNames();
+
+    Map<String, Variant> getAllParams();
+
+    Integer getInteger(String name);
+
+    Long getLong(String name);
+
+    Float getFloat(String name);
+
+    Double getDouble(String name);
+
+    BigDecimal getDecimal(String name);
+
+    Boolean getBoolean(String name);
+
+    Date getDate(String name);
+
+    String getString(String name);
+
+    List<Variant> getList(String name);
 
 }

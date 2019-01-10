@@ -30,15 +30,14 @@
     <parent>
         <groupId>com.ctrip.ferriswheel</groupId>
         <artifactId>ferris-wheel</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2-SNAPSHOT</version>
     </parent>
     <artifactId>quarks</artifactId>
-    <version>0.0.1</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
+            <artifactId>jsr305</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

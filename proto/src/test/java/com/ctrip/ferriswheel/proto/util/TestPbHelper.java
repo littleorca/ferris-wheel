@@ -9,12 +9,7 @@ import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.ListDataSet;
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
-import com.ctrip.ferriswheel.common.variant.VariantRule;
-import com.ctrip.ferriswheel.common.variant.VariantType;
-import com.ctrip.ferriswheel.common.variant.DynamicValue;
-import com.ctrip.ferriswheel.common.variant.ErrorCodes;
-import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.common.variant.*;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.ChartData;
@@ -51,9 +46,9 @@ public class TestPbHelper extends TestCase {
 
             @Override
             public DataSet execute(DataQuery query) throws IOException {
-                return new ListDataSet.Builder()
+                return ListDataSet.newBuilder()
                         .setColumnCount(1)
-                        .newRecord()
+                        .newRecordBuilder()
                         .set(0, Value.str("hello world"))
                         .commit()
                         .build();
@@ -215,9 +210,9 @@ public class TestPbHelper extends TestCase {
             @Override
             public DataSet execute(DataQuery query) throws IOException {
                 System.out.println("Filling table by fake provider.");
-                return new ListDataSet.Builder()
+                return ListDataSet.newBuilder()
                         .setColumnCount(2)
-                        .newRecord()
+                        .newRecordBuilder()
                         .set(0, Value.dec(13))
                         .set(1, Value.dec(23))
                         .commit()

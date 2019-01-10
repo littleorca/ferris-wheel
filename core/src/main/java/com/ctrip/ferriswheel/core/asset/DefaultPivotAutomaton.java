@@ -159,13 +159,13 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 
         // prepare data set
 
-        ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder()
+        ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
                 .setColumnCount(rows.size() + allColumnDimensions.size() * values.size());
 
         // add headers
 
         for (int i = 0; i < columns.size(); i++) {
-            ListDataSet.Builder.DataSetRecordBuilder recordBuilder = dataSetBuilder.newRecord();
+            ListDataSet.RecordBuilder recordBuilder = dataSetBuilder.newRecordBuilder();
             int fieldOffset = rows.size();
             for (Dimension[] columnDimensions : allColumnDimensions) {
                 for (ValueMeta ignored : values) {
@@ -175,7 +175,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
             recordBuilder.commit();
         }
         if (values.size() > 1) {
-            ListDataSet.Builder.DataSetRecordBuilder valueNameRow = dataSetBuilder.newRecord();
+            ListDataSet.RecordBuilder valueNameRow = dataSetBuilder.newRecordBuilder();
             int fieldOffset = rows.size();
             for (int i = 0; i < allColumnDimensions.size(); i++) {
                 for (ValueMeta valueMeta : values) {
@@ -188,7 +188,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         // extract data
 
         for (Dimension[] rowDimensions : allRowDimensions) {
-            ListDataSet.Builder.DataSetRecordBuilder recordBuilder = dataSetBuilder.newRecord();
+            ListDataSet.RecordBuilder recordBuilder = dataSetBuilder.newRecordBuilder();
             int fieldIdx = 0;
             Map<String, Variant> rowDimMap = new HashMap<>();
             for (Dimension rowDimension : rowDimensions) {

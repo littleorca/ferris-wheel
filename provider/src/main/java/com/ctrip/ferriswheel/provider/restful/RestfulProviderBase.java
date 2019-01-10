@@ -74,13 +74,9 @@ public abstract class RestfulProviderBase implements DataProvider {
      * @return
      */
     protected RestfulRequest createRequest(DataQuery query) {
-        Variant urlVar = query.getParam(PARAM_URL);
-        Variant methodVar = query.getParam(PARAM_METHOD);
-        Variant bodyVar = query.getParam(PARAM_BODY);
-
-        String url = urlVar == null ? null : urlVar.strValue();
-        String method = methodVar == null ? null : methodVar.strValue();
-        String body = bodyVar == null ? null : bodyVar.strValue();
+        String url = query.getString(PARAM_URL);
+        String method = query.getString(PARAM_METHOD);
+        String body = query.getString(PARAM_BODY);
 
         if (method == null || method.isEmpty()) {
             method = DEFAULT_METHOD;

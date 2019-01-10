@@ -49,11 +49,7 @@ public abstract class DatabaseProviderBase implements DataProvider {
 
     @Override
     public DataSet execute(DataQuery query) throws IOException {
-        Variant sqlVar = query.getParam(PARAM_SQL);
-        if (sqlVar == null) {
-            throw new IllegalArgumentException("SQL parameter must be specified.");
-        }
-        String sql = sqlVar.strValue();
+        String sql = query.getString(PARAM_SQL);
         if (sql == null || sql.isEmpty()) {
             throw new IllegalArgumentException("SQL is empty.");
         }
@@ -129,19 +125,19 @@ public abstract class DatabaseProviderBase implements DataProvider {
     }
 
     private DataSet resultSetToDataSet(ResultSet rs) throws SQLException {
-        ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder();
+        ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder();
         ResultSetMetaData md = rs.getMetaData();
 //        DefaultColumnMeta[] columnMetas = new DefaultColumnMeta[md.getColumnCount()];
         for (int i = 1; i <= md.getColumnCount(); i++) {
             String label = md.getColumnLabel(i);
 //            columnMetas[i - 1] = new DefaultColumnMeta(label, mapType(md.getColumnType(i)));
-            dataSetBuilder.addColumnMeta(new ColumnMetaDataImpl(label, mapType(md.getColumnType(i))));
+            dataSetBuilder.addColumnMetaData(new ColumnMetaDataImpl(label, mapType(md.getColumnType(i))));
         }
 //        DefaultDataSetMeta meta = new DefaultDataSetMeta(false, columnMetas);
 //        List<Variant[]> rows = new ArrayList<>();
         while (rs.next()) {
 //            Variant[] row = new Variant[md.getColumnCount()];
-            ListDataSet.Builder.DataSetRecordBuilder record = dataSetBuilder.newRecord();
+            ListDataSet.RecordBuilder record = dataSetBuilder.newRecordBuilder();
             for (int i = 1; i <= md.getColumnCount(); i++) {
 //                row[i - 1] = mapValue(rs, i, mapType(md.getColumnType(i)));
                 record.set(i - 1, mapValue(rs, i, mapType(md.getColumnType(i))));

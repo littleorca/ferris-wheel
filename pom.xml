@@ -30,7 +30,7 @@
     <groupId>com.ctrip.ferriswheel</groupId>
     <artifactId>ferris-wheel</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>Ferris Wheel Spreadsheet</name>
     <description>A fantastic spreadsheet framework.</description>
     <url>https://github.com/littleorca/ferris-wheel</url>
@@ -53,7 +53,7 @@
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!-- project -->
         <junit.version>4.12</junit.version>
-        <findbugs-annotations.version>3.0.1</findbugs-annotations.version>
+        <findbugs-jsr305.version>3.0.1</findbugs-jsr305.version>
         <slf4j-api.version>1.7.24</slf4j-api.version>
         <logback.version>1.1.7</logback.version>
         <uuid.version>3.2</uuid.version>
@@ -75,32 +75,32 @@
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-common</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-core</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-provider</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-proto</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-example</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>quarks</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -110,8 +110,8 @@
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
-                <artifactId>annotations</artifactId>
-                <version>${findbugs-annotations.version}</version>
+                <artifactId>jsr305</artifactId>
+                <version>${findbugs-jsr305.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

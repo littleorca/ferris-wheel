@@ -29,9 +29,8 @@ import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.util.VariantProperties;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class DefaultDataQuery extends VariantProperties implements DataQuery {
     private String scheme;
@@ -75,4 +74,59 @@ public class DefaultDataQuery extends VariantProperties implements DataQuery {
     public Map<String, Variant> getAllParams() {
         return Collections.unmodifiableMap(this);
     }
+
+    @Override
+    public Integer getInteger(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.intValue();
+    }
+
+    @Override
+    public Long getLong(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.longValue();
+    }
+
+    @Override
+    public Float getFloat(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.floatValue();
+    }
+
+    @Override
+    public Double getDouble(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.doubleValue();
+    }
+
+    @Override
+    public BigDecimal getDecimal(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.decimalValue();
+    }
+
+    @Override
+    public Boolean getBoolean(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.booleanValue();
+    }
+
+    @Override
+    public Date getDate(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.dateValue();
+    }
+
+    @Override
+    public String getString(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.strValue();
+    }
+
+    @Override
+    public List<Variant> getList(String name) {
+        Variant var = getParam(name);
+        return var == null ? null : var.listValue();
+    }
+
 }

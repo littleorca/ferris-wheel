@@ -597,24 +597,24 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
         @Override
         public DataSet execute(DataQuery query) throws IOException {
-            ListDataSet.Builder dataSetBuilder = new ListDataSet.Builder()
-                    .addColumnMeta(new ColumnMetaDataImpl("foo", VariantType.DECIMAL))
-                    .addColumnMeta(new ColumnMetaDataImpl("bar", VariantType.DECIMAL))
-                    .addColumnMeta(new ColumnMetaDataImpl("foobar", VariantType.DECIMAL));
+            ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
+                    .addColumnMetaData(new ColumnMetaDataImpl("foo", VariantType.DECIMAL))
+                    .addColumnMetaData(new ColumnMetaDataImpl("bar", VariantType.DECIMAL))
+                    .addColumnMetaData(new ColumnMetaDataImpl("foobar", VariantType.DECIMAL));
 
-            dataSetBuilder.newRecord()
+            dataSetBuilder.newRecordBuilder()
                     .set(0, Value.dec(11))
                     .set(1, Value.dec(12))
                     .set(2, Value.dec(13))
                     .commit();
 
-            dataSetBuilder.newRecord()
+            dataSetBuilder.newRecordBuilder()
                     .set(0, Value.dec(21))
                     .set(1, Value.dec(22))
                     .set(2, Value.dec(23))
                     .commit();
 
-            dataSetBuilder.newRecord()
+            dataSetBuilder.newRecordBuilder()
                     .set(0, Value.dec(31))
                     .set(1, Value.dec(32))
                     .set(2, Value.dec(33))

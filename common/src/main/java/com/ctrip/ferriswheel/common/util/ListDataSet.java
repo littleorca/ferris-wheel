@@ -39,6 +39,10 @@ public class ListDataSet implements DataSet {
     private transient Iterator<Record> iterator;
     private transient Record current = null;
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     public ListDataSet() {
         this.setMeta = new DataSetMetaDataImpl(0);
     }
@@ -123,6 +127,45 @@ public class ListDataSet implements DataSet {
         }
     }
 
+    public static class RecordBuilder {
+        private final Builder dataSetBuilder;
+        private Record record = new Record();
+
+        RecordBuilder(Builder dataSetBuilder) {
+            this.dataSetBuilder = dataSetBuilder;
+        }
+
+        public RecordBuilder set(int index, Variant value) {
+            if (record == null) {
+                throw new IllegalStateException("Record has been committed, allows no further ops.");
+            }
+            record.setField(index, value);
+            return this;
+        }
+
+        public RecordBuilder set(Variant... values) {
+            if (record == null) {
+                throw new IllegalStateException("Record has been committed, allows no further ops.");
+            }
+            if (record.getFields() != null && !record.getFields().isEmpty()) {
+                throw new IllegalStateException("Some fields has already been set, this operation conflicts with former operations");
+            }
+            for (int i = 0; i < values.length; i++) {
+                record.setField(i, values[i]);
+            }
+            return this;
+        }
+
+        public Builder commit() {
+            if (record == null) {
+                throw new IllegalStateException("Record has been committed already.");
+            }
+            this.dataSetBuilder.records.add(record);
+            record = null;
+            return this.dataSetBuilder;
+        }
+    }
+
     public static class Builder {
         private int columnCount = 0;
         private List<ColumnMetaData> columnMetas = new ArrayList<>();
@@ -148,7 +191,7 @@ public class ListDataSet implements DataSet {
          *
          * @param columnCount
          * @return
-         * @see #addColumnMeta(ColumnMetaData)
+         * @see #addColumnMetaData(ColumnMetaData)
          */
         public Builder setColumnCount(int columnCount) {
             if (!columnMetas.isEmpty()) {
@@ -164,52 +207,13 @@ public class ListDataSet implements DataSet {
          * @param columnMeta
          * @return
          */
-        public Builder addColumnMeta(ColumnMetaData columnMeta) {
+        public Builder addColumnMetaData(ColumnMetaData columnMeta) {
             this.columnMetas.add(columnMeta);
             return this;
         }
 
-        public DataSetRecordBuilder newRecord() {
-            return new DataSetRecordBuilder(this);
-        }
-
-        public class DataSetRecordBuilder {
-            private final Builder dataSetBuilder;
-            private Record record = new Record();
-
-            DataSetRecordBuilder(Builder dataSetBuilder) {
-                this.dataSetBuilder = dataSetBuilder;
-            }
-
-            public DataSetRecordBuilder set(int index, Variant value) {
-                if (record == null) {
-                    throw new IllegalStateException("Record has been committed, allows no further ops.");
-                }
-                record.setField(index, value);
-                return this;
-            }
-
-            public DataSetRecordBuilder set(Variant... values) {
-                if (record == null) {
-                    throw new IllegalStateException("Record has been committed, allows no further ops.");
-                }
-                if (record.getFields() != null && !record.getFields().isEmpty()) {
-                    throw new IllegalStateException("Some fields has already been set, this operation conflicts with former operations");
-                }
-                for (int i = 0; i < values.length; i++) {
-                    record.setField(i, values[i]);
-                }
-                return this;
-            }
-
-            public Builder commit() {
-                if (record == null) {
-                    throw new IllegalStateException("Record has been committed already.");
-                }
-                this.dataSetBuilder.records.add(record);
-                record = null;
-                return this.dataSetBuilder;
-            }
+        public RecordBuilder newRecordBuilder() {
+            return new RecordBuilder(this);
         }
     }
 }
