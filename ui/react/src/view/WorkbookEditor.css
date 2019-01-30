@@ -185,6 +185,10 @@
 
 /* query table */
 
+.workbook-editor > .editor-body > .sidebar .query-wizard-actions {
+    margin: .25em 0 .5em;
+}
+
 .workbook-editor > .editor-body > .sidebar .query-template-form > * {
     margin-bottom: .5rem;
 }
@@ -207,6 +211,21 @@
 
 .workbook-editor > .editor-body > .sidebar .pivot-form .editable-list .manipulable-list {
     height: 6rem;
+}
+
+/* normal table */
+
+.workbook-editor > .editor-body > .sidebar .alter-table-actions {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.workbook-editor > .editor-body > .sidebar .alter-table-actions button {
+    margin: .25em;
+}
+
+.workbook-editor > .editor-body > .sidebar .alter-table-actions button.danger {
+    color: #900;
 }
 
 /* editor mask */

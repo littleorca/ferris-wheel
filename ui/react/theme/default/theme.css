@@ -87,14 +87,14 @@
     color: #c93;
 }
 
-.workbook-editor .toolbar button[name="add-pivot-table"]::before {
-    content: "\e9ba";
-    color: #a9c;
-}
-
 .workbook-editor .toolbar button[name="add-query-table"]::before {
     content: "\e951";
     color: #675;
+}
+
+.workbook-editor .toolbar button[name="add-pivot-table"]::before {
+    content: "\e9ba";
+    color: #a9c;
 }
 
 .workbook-editor .toolbar button[name="add-line-chart"]::before {

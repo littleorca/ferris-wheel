@@ -11,7 +11,7 @@ const GroupItem = (props: GroupItemProps) => {
     return null;
 };
 
-type GroupItemNode = React.ReactElement<GroupItemProps> | undefined;
+type GroupItemNode = React.ReactElement<GroupItemProps> | undefined | false;
 
 interface GroupViewProps extends React.ClassAttributes<GroupView> {
     children: GroupItemNode | GroupItemNode[],

@@ -163,9 +163,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     void setBinder(DefaultChartBinder binder) {
         if (this.binder != null) {
             unbindChild(this.binder);
-            if (getDependencies() != null) {
-                getDependencies().remove(this.binder.getData().getAssetId());
-            }
+            removeDependency(this.binder.getData());
         }
         this.binder = binder;
         if (this.binder != null) {

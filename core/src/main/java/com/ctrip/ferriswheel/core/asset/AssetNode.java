@@ -11,10 +11,9 @@ abstract class AssetNode implements Asset {
     private Set<AssetNode> dependencies = new HashSet<>();
     private Set<AssetNode> dependents = new HashSet<>();
     private Map<DefaultTable, Set<DefaultTable.Range>> watchedRanges = new HashMap<>();
-    private long lastUpdateSequenceNumber = 0; // revision sequence number
+    private volatile long lastUpdateSequenceNumber = 0; // revision sequence number
     private boolean valid = true;
     private boolean ephemeral = false;
-    private boolean ready = false;
 
     protected AssetNode(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -165,14 +164,6 @@ abstract class AssetNode implements Asset {
 
     protected void setEphemeral(boolean ephemeral) {
         this.ephemeral = ephemeral;
-    }
-
-    public boolean isReady() {
-        return ready;
-    }
-
-    void setReady(boolean ready) {
-        this.ready = ready;
     }
 
     protected AssetManager getAssetManager() {

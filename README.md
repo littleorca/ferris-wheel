@@ -6,7 +6,7 @@ A fantastic spreadsheet framework!
 To run the example
 ------------------
 
-    mvn install && mvn spring-boot:run -pl example
+    mvn install -Dgpg.skip -DskipTests && mvn spring-boot:run -pl example
 
 Then open your browser (Chrome is recommended) and navigate to:
 

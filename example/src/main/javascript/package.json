@@ -3,11 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@littleorca/ferris-wheel": "0.0.1",
+    "@littleorca/ferris-wheel": "0.1.0-alpha.2",
     "moment": "^2.22.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-loading": "^2.0.3",
+    "react-modal": "^3.8.1",
     "react-moment": "^0.7.7",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1"
@@ -21,12 +22,13 @@
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
-    "react-scripts": "1.1.4"
+    "http-proxy-middleware": "^0.19.1",
+    "react-scripts": "2.1.3"
   },
-  "proxy": {
-    "/wsapi": {
-      "target": "ws://127.0.0.1:8080/",
-      "ws": true
-    }
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

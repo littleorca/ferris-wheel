@@ -1,11 +1,11 @@
 import * as React from 'react';
 import WorkbookView from './WorkbookView';
 import {
-    Workbook, Sheet, SheetAsset, Chart, Table, Row, Cell, Text, Values, Layout, TableAutomaton, PivotAutomaton, QueryAutomaton,
+    Workbook, Sheet, SheetAsset, Chart, Table, Row, Cell, Text, Values, Layout, TableAutomaton, PivotAutomaton, QueryAutomaton, QueryTemplate,
     Stacking
 } from '../model';
 import {
-    Toolbar, Group, DropdownButton, Button
+    Toolbar, Group, DropdownButton, Button, ButtonProps
 } from '../ctrl';
 import LayoutForm from '../form/LayoutForm';
 import QueryTemplateForm from '../form/QueryTemplateForm';
@@ -17,13 +17,16 @@ import {
     RemoveAsset, RemoveSheet, AutomateTable, LayoutAsset, UpdateChart,
     AddTable, AddChart, AddText, InsertRows, InsertColumns, RemoveColumns, RemoveRows, WorkbookOperation,
 } from '../action';
+import { Extension, QueryWizard } from 'src/extension';
 import ReactLoading from 'react-loading';
+import ReactModal from 'react-modal';
 import './WorkbookEditor.css';
 
 interface WorkbookEditorProps extends React.ClassAttributes<WorkbookEditor> {
     workbook: Workbook;
     service: Service;
     className?: string;
+    extensions?: Extension[];
 }
 
 interface WorkbookEditorState {
@@ -35,10 +38,13 @@ interface WorkbookEditorState {
     message: string;
     serviceStatus: string;
     showMask: boolean;
+    dialog?: React.ReactNode;
 }
 
 class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditorState> implements ActionHerald {
     private listeners: Set<ActionHandler> = new Set();
+    private queryWizardButtons = new Array<ButtonProps>();
+    private queryWizardMap: Map<string, QueryWizard> = new Map();
 
     constructor(props: WorkbookEditorProps) {
         super(props);
@@ -52,8 +58,11 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.handleRemove = this.handleRemove.bind(this);
 
         this.handleAddTable = this.handleAddTable.bind(this);
-        this.handleAddPivotTable = this.handleAddPivotTable.bind(this);
+        this.handleOpenQueryWizard = this.handleOpenQueryWizard.bind(this);
+        this.handleQueryWizardOk = this.handleQueryWizardOk.bind(this);
+        this.handleQueryWizardCancelled = this.handleQueryWizardCancelled.bind(this);
         this.handleAddQueryTable = this.handleAddQueryTable.bind(this);
+        this.handleAddPivotTable = this.handleAddPivotTable.bind(this);
         this.handleAlterTable = this.handleAlterTable.bind(this);
 
         this.handleAddLineChart = this.handleAddLineChart.bind(this);
@@ -75,6 +84,27 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.onServiceOk = this.onServiceOk.bind(this);
         this.onServiceError = this.onServiceError.bind(this);
         this.preventSubmit = this.preventSubmit.bind(this);
+
+        if(typeof this.props.extensions !== 'undefined') {
+            this.props.extensions.forEach((value, index) => {
+                if (typeof value.queryWizard !== 'undefined') {
+                    const name = 'add-query-table--' + value.queryWizard.name;
+                    this.queryWizardButtons.push({
+                        name,
+                        label: value.queryWizard.title,
+                        tips: value.queryWizard.description,
+                        onClick: this.handleOpenQueryWizard
+                    });
+                    this.queryWizardMap.set(name, value.queryWizard);
+                }
+            });
+        }
+
+        if (this.queryWizardButtons.length > 0) {
+            this.queryWizardButtons.push({
+                name: DropdownButton.SEPARATOR,
+            });
+        }
     }
 
     protected createInitialState(props: WorkbookEditorProps): WorkbookEditorState {
@@ -181,6 +211,46 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.handleAction(addTable.wrapper());
     }
 
+    protected handleOpenQueryWizard(name: string, event: React.MouseEvent<HTMLButtonElement>) {
+        const wizard = this.queryWizardMap.get(name);
+        if (typeof wizard === 'undefined') {
+            throw new Error('Wizard component not found: ' + name); // TODO review
+        }
+        this.setState({
+            dialog: <wizard.component
+                onOk={this.handleQueryWizardOk}
+                onCancel={this.handleQueryWizardCancelled} />
+        });
+    }
+
+    protected handleQueryWizardOk(queryTemplate: QueryTemplate) {
+        this.doAddQueryTable(queryTemplate);
+        this.closeDialog();
+    }
+
+    protected handleQueryWizardCancelled() {
+        this.closeDialog();
+    }
+
+    protected closeDialog() {
+        this.setState({ dialog: undefined });
+    }
+
+    protected handleAddQueryTable() {
+        this.doAddQueryTable();
+    }
+
+    protected doAddQueryTable(queryTemplate?: QueryTemplate) {
+        if (typeof this.state.currentSheet === 'undefined') {
+            throw new Error('Illegal state, current sheet is not defined!');
+        }
+        const tableName = this.newAssetName(this.state.currentSheet, 'table');
+        const queryAutomaton = new QueryAutomaton(queryTemplate);
+        const table = new Table(tableName, [], new TableAutomaton(queryAutomaton));
+        const addTable = new AddTable(this.state.currentSheet.name, table);
+        this.handleAction(addTable.wrapper());
+    }
+
     protected handleAddPivotTable() {
         if (typeof this.state.currentSheet === 'undefined') {
             throw new Error('Illegal state, current sheet is not defined!');
@@ -188,17 +258,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         const tableName = this.newAssetName(this.state.currentSheet, 'table');
         const pivotAutomaton = new PivotAutomaton();
         const table = new Table(tableName, [], new TableAutomaton(undefined, pivotAutomaton));
-        const addTable = new AddTable(this.state.currentSheet.name, table);
-        this.handleAction(addTable.wrapper());
-    }
-
-    protected handleAddQueryTable() {
-        if (typeof this.state.currentSheet === 'undefined') {
-            throw new Error('Illegal state, current sheet is not defined!');
-        }
-        const tableName = this.newAssetName(this.state.currentSheet, 'table');
-        const queryAutomaton = new QueryAutomaton();
-        const table = new Table(tableName, [], new TableAutomaton(queryAutomaton));
         const addTable = new AddTable(this.state.currentSheet.name, table);
         this.handleAction(addTable.wrapper());
     }
@@ -471,14 +530,22 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                             height="8rem" />
                     </div>
                 )}
+                {this.state.dialog && (
+                    <ReactModal
+                        isOpen={true} 
+                        ariaHideApp={false}
+                        style={{
+                            content: { zIndex: 9999 },
+                            overlay: { zIndex: 9999 }
+                        }}>
+                        {this.state.dialog}
+                    </ReactModal>
+                )}
             </div>
         );
     }
 
     protected renderToolbar() {
-        const isTableSelected = typeof this.state.currentAsset !== 'undefined' &&
-            this.state.currentAsset.assetType() === 'table';
-
         return (
             <Toolbar>
                 <Group>
@@ -509,62 +576,23 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         label="表格"
                         tips="新建空白表格"
                         onClick={this.handleAddTable} />
+                    <DropdownButton
+                        primary={{
+                            name: "add-query-table",
+                            label: "查询",
+                            tips: "新建基于查询器的自动化表格"
+                        }}
+                        items={[...this.queryWizardButtons, {
+                            name: "add-query-table-manually",
+                            label: "手工配置查询",
+                            tips: "新建基于手工配置查询器的自动化表格",
+                            onClick: this.handleAddQueryTable
+                        }]} />
                     <Button
                         name="add-pivot-table"
                         label="透视"
                         tips="新建透视表格"
                         onClick={this.handleAddPivotTable} />
-                    <Button
-                        name="add-query-table"
-                        label="查询"
-                        tips="新建基于查询器的自动化表格"
-                        onClick={this.handleAddQueryTable} />
-                    <DropdownButton
-                        primary={{
-                            name: "alter-table",
-                            label: "修改表",
-                            tips: "添加/删除表格行与列",
-                            disabled: !isTableSelected
-                        }}
-                        items={[{
-                            name: "insert-row",
-                            label: "插入行",
-                            tips: "在当前行之前插入新行",
-                            disabled: !isTableSelected,
-                            onClick: this.handleAlterTable
-                        }, {
-                            name: "insert-column",
-                            label: "插入列",
-                            tips: "在当前列之前插入新的列",
-                            disabled: !isTableSelected,
-                            onClick: this.handleAlterTable
-                        }, {
-                            name: "append-row",
-                            label: "追加行",
-                            tips: "在当前行后追加新行",
-                            disabled: !isTableSelected,
-                            onClick: this.handleAlterTable
-                        }, {
-                            name: "append-column",
-                            label: "追加列",
-                            tips: "在当前列后追加新列",
-                            disabled: !isTableSelected,
-                            onClick: this.handleAlterTable
-                        }, {
-                            name: DropdownButton.SEPARATOR
-                        }, {
-                            name: "remove-row",
-                            label: "删除行",
-                            tips: "删除当前行",
-                            disabled: !isTableSelected,
-                            onClick: this.handleAlterTable
-                        }, {
-                            name: "remove-column",
-                            label: "删除列",
-                            tips: "删除当前列",
-                            disabled: !isTableSelected,
-                            onClick: this.handleAlterTable
-                        }]} />
                 </Group>
                 <Group>
                     <DropdownButton
@@ -714,13 +742,19 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
             this.handleAction(layoutAsset.wrapper());
         };
 
+        const isTableSelected = true; // maybe just spare this, as this pane only be renderred when a table is selected.
+
+        const isTableEditable = typeof table.automaton.queryAutomaton === "undefined" &&
+            typeof table.automaton.pivotAutomaton === "undefined";
+
         return (
             <GroupView
                 className="realtime-edit table-option">
-                {table.automaton && table.automaton.queryAutomaton && (
+                {table.automaton.queryAutomaton && (
                     <GroupItem
                         name="query"
                         title="查询模板">
+                        {this.showQueryWizardButtonIfPossible(table.automaton.queryAutomaton.template, handleAutomatonChange)}
                         <form onSubmit={this.preventSubmit}>
                             <QueryTemplateForm
                                 queryTemplate={table.automaton.queryAutomaton.template}
@@ -728,7 +762,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         </form>
                     </GroupItem>
                 )}
-                {table.automaton && table.automaton.pivotAutomaton && (
+                {table.automaton.pivotAutomaton && (
                     <GroupItem
                         name="pivot"
                         title="透视表">
@@ -737,6 +771,58 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                                 pivot={table.automaton.pivotAutomaton}
                                 afterChange={handleAutomatonChange} />
                         </form>
+                    </GroupItem>
+                )}
+                {isTableEditable && (
+                    <GroupItem
+                        name="alter-table"
+                        title="修改表">
+                        <div className="alter-table-actions">
+                            <div>
+                                <Button
+                                    name="insert-row"
+                                    label="插入行"
+                                    tips="在当前行之前插入新行"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAlterTable} />
+                                <Button
+                                    name="insert-column"
+                                    label="插入列"
+                                    tips="在当前列之前插入新的列"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAlterTable} />
+                            </div>
+                            <div>
+                                <Button
+                                    name="append-row"
+                                    label="追加行"
+                                    tips="在当前行后追加新行"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAlterTable} />
+                                <Button
+                                    name="append-column"
+                                    label="追加列"
+                                    tips="在当前列后追加新列"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAlterTable} />
+                            </div>
+                            <div>
+                                <Button
+                                    name="remove-row"
+                                    label="删除行"
+                                    tips="删除当前行"
+                                    disabled={!isTableSelected}
+                                    className="danger"
+                                    onClick={this.handleAlterTable} />
+                                <Button
+                                    name="remove-column"
+                                    label="删除列"
+                                    tips="删除当前列"
+                                    disabled={!isTableSelected}
+                                    className="danger"
+                                    onClick={this.handleAlterTable} />
+                            </div>
+                        </div>
                     </GroupItem>
                 )}
                 <GroupItem
@@ -749,6 +835,48 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                     </form>
                 </GroupItem>
             </GroupView>
+        );
+    }
+
+    protected showQueryWizardButtonIfPossible(queryTemplate: QueryTemplate, handleAutomatonChange: () => void) {
+        if (typeof this.props.extensions === "undefined") {
+            return;
+        }
+        let wizard: QueryWizard | undefined = undefined;
+        for (let i = 0; i < this.props.extensions.length; i++) {
+            const extension = this.props.extensions[i];
+            if (typeof extension.queryWizard === "undefined") {
+                continue;
+            }
+            if (extension.queryWizard.accepts(queryTemplate)) {
+                wizard = extension.queryWizard;
+                break;
+            }
+        }
+        if (wizard === undefined) {
+            return;
+        }
+        const nonNullWizard = wizard;
+        const openWizard = () => {
+            this.setState({
+                dialog: <nonNullWizard.component
+                    initialQueryTemplate={queryTemplate}
+                    onOk={(result) => {
+                        this.closeDialog();
+                        Object.assign(queryTemplate, result);
+                        handleAutomatonChange();
+                    }}
+                    onCancel={this.handleQueryWizardCancelled} />
+            });
+        }
+        return (
+            <div className="query-wizard-actions">
+                <Button
+                    name="open-query-wizard"
+                    label="使用向导编辑"
+                    tips="使用查询器向导编辑该查询"
+                    onClick={openWizard} />
+            </div>
         );
     }
 

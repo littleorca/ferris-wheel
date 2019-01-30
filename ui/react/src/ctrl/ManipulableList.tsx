@@ -4,6 +4,7 @@ import './ManipulableList.css';
 
 interface ManipulableListProps<T> extends React.ClassAttributes<ManipulableList<T>> {
     list: T[];
+    initialSelect?: number;
     className?: string;
     sortHelperClass?: string;
     horizontal?: boolean; // display items horizontally
@@ -63,7 +64,10 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         this.handleClick = this.handleClick.bind(this);
         this.onSortEnd = this.onSortEnd.bind(this);
 
-        const selected = props.list.length > 0 ? 0 : -1;
+        const selected = typeof props.initialSelect !== "undefined"
+            && props.initialSelect >= 0
+            && props.initialSelect < props.list.length ?
+            props.initialSelect : (props.list.length > 0 ? 0 : -1);
         this.state = { selected };
         if (typeof props.onSelect !== 'undefined') {
             props.onSelect(selected === -1 ? null : props.list[selected], selected);

@@ -52,6 +52,7 @@ import WorkbookEditorStories from './view/WorkbookEditor.stories';
 import WorkbookPresenterStories from './view/WorkbookPresenter.stories'
 import WorkbookViewStories from './view/WorkbookView.stories';
 import ExampleStories from './Example.stories';
+import QueryWizardStories from './view/QueryWizard.stories';
 
 // storiesOf('Welcome', module).add('to Storybook', () => <Welcome showApp={linkTo('Button')} />);
 
@@ -199,4 +200,5 @@ storiesOf('View', module)
   .add('TextView', () => <TextViewStories />)
   .add('WorkbookEditor', () => <WorkbookEditorStories />)
   .add('WorkbookPresenter', () => <WorkbookPresenterStories />)
-  .add('WorkbookView', () => <WorkbookViewStories />);
+  .add('WorkbookView', () => <WorkbookViewStories />)
+  .add('QueryWizard', () => <QueryWizardStories />);

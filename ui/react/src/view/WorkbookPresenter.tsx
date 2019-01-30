@@ -4,6 +4,8 @@ import {
     Service, ActionHandler, Action, ActionHerald, EditRequest, EditResponse
 } from '../action';
 import WorkbookView from './WorkbookView';
+import ReactLoading from 'react-loading';
+import './WorkbookPresenter.css';
 
 interface WorkbookPresenterProps extends React.ClassAttributes<WorkbookPresenter> {
     workbook: Workbook;
@@ -11,11 +13,25 @@ interface WorkbookPresenterProps extends React.ClassAttributes<WorkbookPresenter
     className?: string;
 }
 
-class WorkbookPresenter extends React.Component<WorkbookPresenterProps> implements ActionHerald {
+interface WorkbookPresenterState {
+    txId: number;
+    message: string;
+    serviceStatus: string;
+    showMask: boolean;
+}
+
+class WorkbookPresenter extends React.Component<WorkbookPresenterProps, WorkbookPresenterState> implements ActionHerald {
     protected listeners: Set<ActionHandler> = new Set();
 
     constructor(props: WorkbookPresenterProps) {
         super(props);
+
+        this.state = {
+            txId: 0,
+            message: '',
+            serviceStatus: '就绪',
+            showMask: false
+        };
 
         this.handleAction = this.handleAction.bind(this);
         this.onServiceOk = this.onServiceOk.bind(this);
@@ -47,7 +63,8 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps> implemen
         this.setState({
             txId: request.txId,
             message: `服务请求中，txId=${request.txId}…`,
-            serviceStatus: "忙碌…"
+            serviceStatus: "忙碌…",
+            showMask: true,
         });
         this.props.service.call(
             request,
@@ -67,6 +84,7 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps> implemen
         } else {
             // TODO
         }
+        this.setState({ showMask: false });
     }
 
     protected applyChanges(actions: Action[]) {
@@ -78,16 +96,29 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps> implemen
 
     protected onServiceError() {
         // TODO
+        this.setState({ showMask: false });
     }
 
     render() {
         return (
-            <WorkbookView
-                workbook={this.props.workbook}
-                editable={false}
-                className={this.props.className}
-                onAction={this.handleAction}
-                herald={this} />
+            <>
+                <WorkbookView
+                    className={this.props.className}
+                    workbook={this.props.workbook}
+                    editable={false}
+                    onAction={this.handleAction}
+                    herald={this} />
+                {this.state.showMask && (
+                    <div className="loading-mask">
+                        <ReactLoading
+                            className="workbook-loading"
+                            type="spinningBubbles"
+                            color="rgba(153, 153, 153, .9)"
+                            width="8rem"
+                            height="8rem" />
+                    </div>
+                )}
+            </>
         );
     }
 }

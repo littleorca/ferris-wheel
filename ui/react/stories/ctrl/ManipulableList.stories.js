@@ -44,6 +44,38 @@ class ManipulableListStories extends Component {
                         sortable={false}
                         onItemUpdated={this.onItemUpdated} />
                 </div>
+                <div>
+                    <h4>initialSelect 1</h4>
+                    <ManipulableList
+                        list={["hello", "world*", "~!"]}
+                        itemRenderer={itemRenderer}
+                        initialSelect={1}
+                        onItemUpdated={this.onItemUpdated} />
+                </div>
+                <div>
+                    <h4>initialSelect -1</h4>
+                    <ManipulableList
+                        list={["hello", "world", "~!"]}
+                        itemRenderer={itemRenderer}
+                        initialSelect={-1}
+                        onItemUpdated={this.onItemUpdated} />
+                </div>
+                <div>
+                    <h4>initialSelect 999</h4>
+                    <ManipulableList
+                        list={["hello", "world", "~!"]}
+                        itemRenderer={itemRenderer}
+                        initialSelect={999}
+                        onItemUpdated={this.onItemUpdated} />
+                </div>
+                <div>
+                    <h4>initialSelect NaN</h4>
+                    <ManipulableList
+                        list={["hello", "world", "~!"]}
+                        itemRenderer={itemRenderer}
+                        initialSelect={NaN}
+                        onItemUpdated={this.onItemUpdated} />
+                </div>
             </div>
         );
     }

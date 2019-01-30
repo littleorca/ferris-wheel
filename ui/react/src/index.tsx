@@ -1,10 +1,12 @@
 /* actions */
-export * from './action';
+export * from "./action";
 /* controls */
-export * from './ctrl';
+export * from "./ctrl";
 /* forms */
-export * from './form';
+export * from "./form";
 /* models */
-export * from './model';
+export * from "./model";
 /* views */
-export * from './view';
+export * from "./view";
+/* extension */
+export * from "./extension";

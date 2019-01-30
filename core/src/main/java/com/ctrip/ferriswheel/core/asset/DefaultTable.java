@@ -828,11 +828,13 @@ public class DefaultTable extends SheetAssetNode implements Table {
         setReadOnly(false);
         try {
             DataSet dataSet = getAutomaton().getDataSet();
-            if (dataSet != null) {
-                doFillTable(getAutomaton().getDataSet());
-            } else {
-                doClearTable();
-            }
+            getSheet().getNotifier().privately(() -> getWorkbook().withoutRefresh(() -> {
+                if (dataSet != null) {
+                    doFillTable(getAutomaton().getDataSet());
+                } else {
+                    doClearTable();
+                }
+            }));
         } finally {
             setReadOnly(true);
             publicly(new ResetTable(getSheet().getName(), this), () -> {

@@ -104,7 +104,16 @@ public abstract class RestfulProviderBase implements DataProvider {
         }
 
         LOG.info("Executing RESTful request: " + request.getUrl());
+        long start = System.currentTimeMillis();
+        try {
+            return executeRestfulRequestWithoutCache(request);
+        } finally {
+            LOG.info("Execution done within {} milliseconds.", System.currentTimeMillis() - start);
+        }
 
+    }
+
+    protected String executeRestfulRequestWithoutCache(RestfulRequest request) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(request.getUrl()).openConnection();
         conn.setRequestMethod(request.getMethod());
 
@@ -145,7 +154,7 @@ public abstract class RestfulProviderBase implements DataProvider {
             while ((n = reader.read(cbuf)) != -1) {
                 sb.append(cbuf, 0, n);
             }
-            response = sb.toString();
+            String response = sb.toString();
             cacheResponseIfPossible(request, response);
             return response;
         }

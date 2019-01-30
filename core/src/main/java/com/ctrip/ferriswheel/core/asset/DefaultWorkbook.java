@@ -506,7 +506,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         evaluator.setCurrentSheet(table.getSheet());
         evaluator.setCurrentTable(table);
         Variant value = evaluator.evaluate(param.getFormulaElements());
-        if (!value.equals(param.getData())) {
+        if (!value.equals(Value.from(param.getData().getVariant()))) {
             param.setValue(value); // TODO notify this action
         }
     }
