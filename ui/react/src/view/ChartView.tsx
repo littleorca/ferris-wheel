@@ -15,7 +15,7 @@ import {
 } from '../chart/ChartJsAdapter';
 import './ChartView.css';
 import { VariantType } from '../model';
-import { RenameAsset, Action, UpdateChart } from 'src/action';
+import { RenameAsset, Action, UpdateChart } from '../action';
 
 interface ChartData {
     type: string,

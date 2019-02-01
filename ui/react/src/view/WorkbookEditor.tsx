@@ -17,7 +17,7 @@ import {
     RemoveAsset, RemoveSheet, AutomateTable, LayoutAsset, UpdateChart,
     AddTable, AddChart, AddText, InsertRows, InsertColumns, RemoveColumns, RemoveRows, WorkbookOperation,
 } from '../action';
-import { Extension, QueryWizard } from 'src/extension';
+import { Extension, QueryWizard } from '../extension';
 import ReactLoading from 'react-loading';
 import ReactModal from 'react-modal';
 import './WorkbookEditor.css';

@@ -9,11 +9,10 @@ import { toEditableString, fromEditableString } from '../ctrl/UnionValueEdit';
 import EditableText from '../ctrl/EditableText';
 import AutoForm from '../form/AutoForm';
 import {
-    ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue, SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns, InsertColumns
+    ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue, SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns, InsertColumns, ResetTable
 } from '../action';
 import 'handsontable/dist/handsontable.full.css';
 import './TableView.css';
-import ResetTable from 'src/action/ResetTable';
 
 interface TableViewProps extends SharedViewProps<TableView> {
     table: Table;

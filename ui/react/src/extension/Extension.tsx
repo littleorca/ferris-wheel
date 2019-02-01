@@ -1,5 +1,5 @@
 import * as React from "react";
-import { QueryTemplate } from "src/model";
+import { QueryTemplate } from "../model";
 
 interface QueryWizardProps extends React.ClassAttributes<any> {
     initialQueryTemplate?: QueryTemplate;

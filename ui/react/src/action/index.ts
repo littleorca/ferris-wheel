@@ -29,6 +29,7 @@ export { default as RemoveRows } from './RemoveRows';
 export { default as RemoveSheet } from './RemoveSheet';
 export { default as RenameAsset } from './RenameAsset';
 export { default as RenameSheet } from './RenameSheet';
+export { default as ResetTable } from "./ResetTable";
 export { default as SelectAsset } from './SelectAsset';
 export { default as Service } from './Service';
 export { default as SetCellFormula } from './SetCellFormula';
