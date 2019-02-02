@@ -3,13 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@littleorca/ferris-wheel": "0.1.0-alpha.2",
-    "moment": "^2.22.2",
+    "@littleorca/ferris-wheel": "0.1.0-alpha.3",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
-    "react-loading": "^2.0.3",
-    "react-modal": "^3.8.1",
-    "react-moment": "^0.7.7",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1"
   },
