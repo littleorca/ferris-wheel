@@ -1,4 +1,5 @@
 import * as React from 'react';
+import classnames from 'classnames';
 import './Button.css';
 
 interface ButtonProps extends React.ClassAttributes<any> {
@@ -17,9 +18,7 @@ function Button(props: ButtonProps) {
     const label = typeof props.label !== 'undefined' ? props.label : props.name;
     const tips = typeof props.tips !== 'undefined' ? props.tips : label;
 
-    const className = "button" +
-        (typeof props.className !== 'undefined' ?
-            " " + props.className : "");
+    const className = classnames("button", props.className);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         const target = event.currentTarget;

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import NamedValueForm from '../../src/form/NamedValueForm';
-import NamedValue from '../../src/model/NamedValue';
-import Values from '../../src/model/Values';
+import { NamedValueForm, NamedValue, Values } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class NamedValueFormStories extends Component {

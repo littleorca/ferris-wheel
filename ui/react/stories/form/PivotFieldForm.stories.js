@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import PivotFieldForm from '../../src/form/PivotFieldForm';
-import PivotField from '../../src/model/PivotField';
+import { PivotFieldForm } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class PivotFieldFormStories extends Component {

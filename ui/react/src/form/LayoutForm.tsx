@@ -5,6 +5,7 @@ import Placement from '../model/Placement';
 import NumberInput from '../ctrl/NumberInput';
 import IntervalInput from '../ctrl/IntervalInput';
 import Interval from '../model/Interval';
+import classnames from "classnames";
 
 interface LayoutFormProps extends React.ClassAttributes<LayoutForm> {
     layout: Layout;
@@ -90,10 +91,7 @@ class LayoutForm extends React.Component<LayoutFormProps> {
     }
 
     public render() {
-        const className = "layout-form" +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
-
+        const className = classnames("layout-form", this.props.className);
         const layout = this.props.layout;
 
         return (

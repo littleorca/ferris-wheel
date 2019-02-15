@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Interval from '../model/Interval';
 import NumberInput from './NumberInput';
+import classnames from 'classnames';
 import './IntervalInput.css';
 
 interface IntervalInputProps extends React.ClassAttributes<IntervalInput> {
@@ -91,10 +92,10 @@ class IntervalInput extends React.Component<IntervalInputProps, IntervalState> {
 
     public render() {
         const interval = this.props.value;
-        const className = "interval-input " +
-            (this.state.isIntervalValid ? "valid" : "invalid") +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "interval-input",
+            this.state.isIntervalValid ? "valid" : "invalid",
+            this.props.className);
 
         return (
             <span className={className}>

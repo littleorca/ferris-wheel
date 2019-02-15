@@ -1,5 +1,5 @@
 import SheetAction from "./SheetAction";
-import { Table } from "../model";
+import Table from "../model/Table";
 
 class ResetTable extends SheetAction {
     public table: Table;

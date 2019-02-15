@@ -1,5 +1,8 @@
 import * as React from "react";
-import { Axis, Interval, Placement, Stacking } from "../model";
+import Axis from '../model/Axis';
+import Interval from '../model/Interval';
+import Placement from '../model/Placement';
+import Stacking from '../model/Stacking';
 import { ChartRendererProps, ChartData } from "../view/ChartView";
 import * as ChartJS from 'chart.js';
 import {

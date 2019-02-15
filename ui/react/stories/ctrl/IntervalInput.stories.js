@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Interval from '../../src/model/Interval';
-import IntervalInput from '../../src/ctrl/IntervalInput';
+import { Interval, IntervalInput } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class IntervalInputStories extends Component {

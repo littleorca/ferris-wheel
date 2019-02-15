@@ -15,6 +15,10 @@
     font-size: .875rem;
 }
 
+.sheet-tab-sort-helper {
+    font-size: .875rem;
+}
+
 .workbook-view .sheet-tabs .button,
 .sheet-tab-sort-helper.manipulable-item .button {
     border: 0 none;

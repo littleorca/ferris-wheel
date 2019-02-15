@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Series, Values } from '../model';
-import { UnionValueEdit, UnionValueChange } from '../ctrl';
+import Series from '../model/Series';
+import Values from '../model/Values';
+import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
 
 interface SeriesFormProps extends React.ClassAttributes<SeriesForm> {
     series: Series,

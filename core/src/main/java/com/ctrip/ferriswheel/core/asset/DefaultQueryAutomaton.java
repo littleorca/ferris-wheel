@@ -103,7 +103,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
                 try {
                     dataSetReference.set(provider.execute(query));
                     setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     LOG.warn("Failed to execute query.", e);
                     // TODO mark error
                     dataSetReference.set(null);

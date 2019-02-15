@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "build/lib",
+    "outDir": "lib",
     "module": "esnext",
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "es6",
       "dom"
@@ -25,7 +25,7 @@
   },
   "exclude": [
     "node_modules",
-    "build",
+    "lib",
     "scripts",
     "acceptance-tests",
     "webpack",

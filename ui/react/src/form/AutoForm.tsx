@@ -11,6 +11,7 @@ import * as moment from 'moment';
 import DatePicker from 'react-datepicker';
 import UnionValue from '../model/UnionValue';
 import Button from '../ctrl/Button';
+import classnames from "classnames";
 import 'react-datepicker/dist/react-datepicker.css';
 import './AutoForm.css';
 
@@ -88,9 +89,7 @@ class AutoForm extends React.Component<AutoFormProps, AutoFormState> {
     }
 
     public render() {
-        const className = "auto-form" +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames("auto-form", this.props.className);
 
         return (
             <div className={className}>
@@ -154,14 +153,16 @@ function FieldInput(props: FieldInputProps) {
 
     return safeWithLabel ?
         (
-            <label className={"field name-" + props.field.rule.name +
-                " type-" + props.field.rule.type}>
+            <label className={classnames(
+                "field name-" + props.field.rule.name,
+                "type-" + props.field.rule.type)}>
                 <span className="field-name">{props.field.rule.name}</span>
                 {InputNode}
             </label>
         ) : (
-            <div className={"field " + props.field.rule.name +
-                " type-" + props.field.rule.type}>
+            <div className={classnames(
+                "field " + props.field.rule.name,
+                "type-" + props.field.rule.type)}>
                 <span className="field-name">{props.field.rule.name}</span>
                 {InputNode}
             </div>

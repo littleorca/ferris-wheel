@@ -224,18 +224,25 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
 
         private List<Action> drainRevises(WorkContext context) {
             List<Action> actions = context.getCollector().drainRevises();
+            Workbook workbook = context.getWorkbook();
             for (Action action : actions) {
                 if (action instanceof AddChart) {
                     AddChart addChart = (AddChart) action;
-                    Sheet s = context.getWorkbook().getSheet(addChart.getSheetName());
+                    Sheet s = workbook.getSheet(addChart.getSheetName());
                     Chart c = s.getAsset(addChart.getChartName());
-                    addChart.setChartData(new ChartData(c));
+                    addChart.setChartData(c);
 
                 } else if (action instanceof UpdateChart) {
                     UpdateChart updateChart = (UpdateChart) action;
-                    Sheet s = context.getWorkbook().getSheet(updateChart.getSheetName());
+                    Sheet s = workbook.getSheet(updateChart.getSheetName());
                     Chart c = s.getAsset(updateChart.getChartName());
-                    updateChart.setChartData(new ChartData(c));
+                    updateChart.setChartData(c);
+
+                } else if (action instanceof AddTable) {
+                    AddTable addTable = (AddTable) action;
+                    Sheet s = workbook.getSheet(addTable.getSheetName());
+                    Table t = s.getAsset(addTable.getTableName());
+                    addTable.setTableData(t);
                 }
             }
             return actions;

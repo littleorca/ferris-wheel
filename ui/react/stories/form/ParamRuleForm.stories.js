@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import ParamRuleForm from '../../src/form/ParamRuleForm';
-import { ParamRule, VariantType } from '../../src/model';
+import { ParamRuleForm, ParamRule, VariantType } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class ParamRuleFormStories extends Component {

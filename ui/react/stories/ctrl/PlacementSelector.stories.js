@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PlacementSelector, { PlacementItem } from '../../src/ctrl/PlacementSelector';
+import { PlacementSelector, PlacementItem } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class PlacementSelectorStories extends Component {

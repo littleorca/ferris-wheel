@@ -1,7 +1,30 @@
 import React, { Component } from 'react';
-import WorkbookPresenter from '../../src/view/WorkbookPresenter';
-import { Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Workbook, Version, Color, QueryAutomaton, ParamRule } from '../../src/model';
-import { EditResponse, ChangeList } from '../../src/action';
+import {
+    WorkbookPresenter,
+    Text,
+    Chart,
+    Table,
+    Values,
+    Row,
+    Cell,
+    VariantType,
+    Series,
+    Axis,
+    Layout,
+    Binder,
+    Placement,
+    Interval,
+    AxisBand,
+    Sheet,
+    SheetAsset,
+    Workbook,
+    Version,
+    Color,
+    QueryAutomaton,
+    ParamRule,
+    EditResponse,
+    ChangeList
+} from '../../src';
 import { action } from '@storybook/addon-actions';
 
 const text = new Text('test_text', Values.str('hello\n\tworld!'));

@@ -1,25 +1,51 @@
 import * as React from 'react';
 import WorkbookView from './WorkbookView';
-import {
-    Workbook, Sheet, SheetAsset, Chart, Table, Row, Cell, Text, Values, Layout, TableAutomaton, PivotAutomaton, QueryAutomaton, QueryTemplate,
-    Stacking
-} from '../model';
-import {
-    Toolbar, Group, DropdownButton, Button, ButtonProps
-} from '../ctrl';
+import Workbook from '../model/Workbook';
+import Sheet from '../model/Sheet';
+import SheetAsset from '../model/SheetAsset';
+import Chart from '../model/Chart';
+import Table from '../model/Table';
+import Row from '../model/Row';
+import Cell from '../model/Cell';
+import Text from '../model/Text';
+import Values from '../model/Values';
+import Layout from '../model/Layout';
+import TableAutomaton from '../model/TableAutomaton';
+import PivotAutomaton from '../model/PivotAutomaton';
+import QueryAutomaton from '../model/QueryAutomaton';
+import QueryTemplate from '../model/QueryTemplate';
+import Stacking from '../model/Stacking';
+import Toolbar, { Group } from '../ctrl/Toolbar';
+import DropdownButton from '../ctrl/DropdownButton';
+import Button, { ButtonProps } from '../ctrl/Button'; 
 import LayoutForm from '../form/LayoutForm';
 import QueryTemplateForm from '../form/QueryTemplateForm';
 import ChartForm from '../form/ChartForm';
 import PivotForm from '../form/PivotForm';
 import GroupView, { GroupItem } from './GroupView';
-import {
-    Action, ActionHandler, ActionHerald, Service, EditRequest, EditResponse,
-    RemoveAsset, RemoveSheet, AutomateTable, LayoutAsset, UpdateChart,
-    AddTable, AddChart, AddText, InsertRows, InsertColumns, RemoveColumns, RemoveRows, WorkbookOperation,
-} from '../action';
-import { Extension, QueryWizard } from '../extension';
-import ReactLoading from 'react-loading';
-import ReactModal from 'react-modal';
+import Action from '../action/Action';
+import ActionHandler from '../action/ActionHandler';
+import ActionHerald from '../action/ActionHerald';
+import Service from '../action/Service';
+import EditRequest from '../action/EditRequest';
+import EditResponse from '../action/EditResponse';
+import RemoveAsset from '../action/RemoveAsset';
+import RemoveSheet from '../action/RemoveSheet';
+import AutomateTable from '../action/AutomateTable';
+import LayoutAsset from '../action/LayoutAsset';
+import UpdateChart from '../action/UpdateChart';
+import AddTable from '../action/AddTable';
+import AddChart from '../action/AddChart';
+import AddText from '../action/AddText';
+import InsertRows from '../action/InsertRows';
+import InsertColumns from '../action/InsertColumns';
+import RemoveColumns from '../action/RemoveColumns';
+import RemoveRows from '../action/RemoveRows';
+import WorkbookOperation from '../action/WorkbookOperation';
+import Extension, { QueryWizard } from '../extension/Extension';
+import Loading from 'react-loading';
+import * as ReactModal from 'react-modal';
+import classnames from "classnames";
 import './WorkbookEditor.css';
 
 interface WorkbookEditorProps extends React.ClassAttributes<WorkbookEditor> {
@@ -477,9 +503,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
     }
 
     public render() {
-        const className = "workbook-editor" +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames("workbook-editor", this.props.className);
 
         let contextInfo = "工作簿";
         if (typeof this.state.currentSheet !== 'undefined') {
@@ -522,7 +546,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                 </div>
                 {this.state.showMask && (
                     <div className="editor-mask">
-                        <ReactLoading
+                        <Loading
                             className="workbook-loading"
                             type="spinningBubbles"
                             color="rgba(153, 153, 153, .9)"
@@ -535,7 +559,14 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         isOpen={true} 
                         ariaHideApp={false}
                         style={{
-                            content: { zIndex: 9999 },
+                            content: {
+                                top: "50%",
+                                left: "50%",
+                                right: "auto",
+                                bottom: "auto",
+                                marginRight: "-50%",
+                                transform: "translate(-50%, -50%)"
+                            },
                             overlay: { zIndex: 9999 }
                         }}>
                         {this.state.dialog}

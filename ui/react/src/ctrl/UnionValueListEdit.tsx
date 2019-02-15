@@ -4,6 +4,7 @@ import ManipulableList, { ItemRendererProps } from './ManipulableList';
 import Values from '../model/Values';
 import EditableUnionValue from './EditableUnionValue';
 import { VariantType } from '../model/Variant';
+import classnames from "classnames";
 import './UnionValueListEdit.css';
 
 interface UnionValueListEditProps extends React.ClassAttributes<UnionValueListEdit> {
@@ -52,7 +53,7 @@ class UnionValueListEdit extends React.Component<UnionValueListEditProps> {
         if (mlist === null) {
             return;
         }
-        mlist.tryRemoveSelected();
+        mlist.removeSelected();
     }
 
     protected onItemMoved(item: UnionValue, oldIndex: number, newIndex: number) {
@@ -101,10 +102,7 @@ class UnionValueListEdit extends React.Component<UnionValueListEditProps> {
     public render() {
         const list = this.props.list;
 
-        let className = "union-value-list-edit";
-        if (typeof this.props.className !== 'undefined') {
-            className += " " + this.props.className;
-        }
+        const className = classnames("union-value-list-edit", this.props.className);
 
         return (
             <div className={className}>
@@ -113,11 +111,11 @@ class UnionValueListEdit extends React.Component<UnionValueListEditProps> {
                     list={list}
                     itemRenderer={this.itemRenderer}
                     sortable={!this.props.fixedItems}
-                    appendable={!this.props.fixedItems}
+                    addible={!this.props.fixedItems}
                     removable={!this.props.fixedItems}
                     onItemMoved={this.onItemMoved}
                     onItemRemoved={this.onItemRemoved}
-                    onItemAppended={this.onItemAppended}
+                    onItemAdded={this.onItemAppended}
                     onItemUpdated={this.onItemUpdated}
                     createItem={Values.blank} />
                 {this.props.fixedItems || (

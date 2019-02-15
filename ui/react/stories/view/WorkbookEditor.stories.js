@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import WorkbookEditor from '../../src/view/WorkbookEditor';
 import {
-    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Workbook, Version, Color
-} from '../../src/model';
-import { EditResponse, ChangeList } from '../../src/action';
+    WorkbookEditor,
+    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Workbook, Version, Color,
+    EditResponse, ChangeList
+} from '../../src';
 
 
 const text = new Text('test_text', Values.str('hello\n\tworld!'));

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import EditBox, { EditBoxChange } from './EditBox';
+import classnames from 'classnames';
 import './NumberInput.css';
 
 interface NumberInputProps extends React.ClassAttributes<NumberInput> {
@@ -102,10 +103,10 @@ class NumberInput extends React.Component<NumberInputProps, NumberInputState> {
         const strVal = isFinite(this.props.value) ?
             this.props.value.toString() : "";
 
-        const className = "number-input " +
-            (this.state.isValid ? "valid" : "invalid") +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "number-input",
+            this.state.isValid ? "valid" : "invalid",
+            this.props.className);
 
         return (
             <EditBox

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import InlineEditable from '../../src/ctrl/InlineEditable';
-import EditBox from '../../src/ctrl/EditBox';
+import { InlineEditable, EditBox } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class InlineEditableStories extends Component {

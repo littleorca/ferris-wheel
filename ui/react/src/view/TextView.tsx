@@ -3,7 +3,10 @@ import Text from '../model/Text';
 import EditableUnionValue from '../ctrl/EditableUnionValue';
 import SharedViewProps from './SharedViewProps';
 import UnionValue from '../model/UnionValue';
-import { UpdateText, Action, RenameAsset } from '../action';
+import UpdateText from '../action/UpdateText';
+import Action from '../action/Action';
+import RenameAsset from '../action/RenameAsset';
+import classnames from "classnames";
 import './TextView.css';
 
 interface TextViewProps extends SharedViewProps<TextView> {
@@ -65,10 +68,10 @@ class TextView extends React.Component<TextViewProps> {
     public render() {
         const text = this.props.text;
 
-        const className = "text-view" +
-            (this.props.editable ? " editable" : "") +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "text-view",
+            { "editable": this.props.editable },
+            this.props.className);
 
         return (
             <div className={className}>

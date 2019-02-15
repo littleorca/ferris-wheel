@@ -1,4 +1,5 @@
 import * as React from 'react';
+import classnames from 'classnames';
 import './PlacementSelector.css';
 
 enum PlacementItem {
@@ -122,9 +123,9 @@ class PlacementSelector extends React.Component<PlacementSelectorProps, Placemen
     }
 
     protected classNameForState(item: PlacementItem) {
-        return (this.isChecked(item) ? "checked" : "unchecked")
-            + " "
-            + (this.isSelectable(item) ? "enabled" : "disabled")
+        return classnames(
+            this.isChecked(item) ? "checked" : "unchecked",
+            this.isSelectable(item) ? "enabled" : "disabled");
     }
 
     public render() {

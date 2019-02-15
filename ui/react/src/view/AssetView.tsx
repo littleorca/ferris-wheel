@@ -7,6 +7,7 @@ import SharedViewProps from './SharedViewProps';
 import Action from '../action/Action';
 import ActionHandler from '../action/ActionHandler';
 import ActionHerald from '../action/ActionHerald';
+import classnames from "classnames";
 
 interface AssetViewProps extends SharedViewProps<AssetView> {
     asset: SheetAsset;
@@ -91,9 +92,7 @@ class AssetView extends React.Component<AssetViewProps> implements ActionHerald 
     }
 
     public render() {
-        const className = "asset-view" +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames("asset-view", this.props.className);
 
         return (
             <AssetContentView

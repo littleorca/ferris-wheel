@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { Axis, Placement, AxisBand, Interval, Stacking } from '../model';
+import Axis from '../model/Axis';
+import Placement from '../model/Placement';
+import AxisBand from '../model/AxisBand';
+import Interval from '../model/Interval';
+import Stacking from '../model/Stacking';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
 import IntervalInput from '../ctrl/IntervalInput';
 import BandForm from './BandForm';

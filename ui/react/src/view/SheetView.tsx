@@ -13,9 +13,13 @@ import LayoutAsset from '../action/LayoutAsset';
 import Action from '../action/Action';
 import ActionHandler from '../action/ActionHandler';
 import ActionHerald from '../action/ActionHerald';
-import {
-    ChartConsult, AddChart, AddTable, RemoveAsset, AddText, RenameAsset
-} from '../action';
+import ChartConsult from '../action/ChartConsult';
+import AddChart from '../action/AddChart';
+import AddTable from '../action/AddTable';
+import RemoveAsset from '../action/RemoveAsset';
+import AddText from '../action/AddText';
+import RenameAsset from '../action/RenameAsset';
+import classnames from "classnames";
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './SheetView.css';
@@ -287,10 +291,10 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
         const assets = sheet.assets;
         const layout = sheet.layout;
 
-        const className = "sheet-view" +
-            (this.props.editable ? " editable" : "") +
-            (typeof this.props.className !== "undefined" ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "sheet-view",
+            { "editable": this.props.editable },
+            this.props.className);
 
         return (
             <div
@@ -319,9 +323,12 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
                         }
 
                         const isSelected = (this.state.selected === arbitraryAsset);
-                        const assetContainerClassName = "asset-container" +
-                            (this.props.editable ? " editable" : "") +
-                            (isSelected ? " selected" : "");
+                        const assetContainerClassName = classnames(
+                            "asset-container",
+                            {
+                                "editable": this.props.editable,
+                                "selected": isSelected
+                            });
 
                         return (
                             <div

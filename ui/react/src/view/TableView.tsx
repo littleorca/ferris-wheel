@@ -2,15 +2,19 @@ import * as React from 'react';
 import Table from '../model/Table';
 import SharedViewProps from './SharedViewProps';
 import { HotTable } from '@handsontable/react';
-import {
-    UnionValue, VariantType, ErrorCodeNames, NamedValue, Values, QueryAutomaton
-} from '../model';
+import UnionValue from '../model/UnionValue';
+import { VariantType } from '../model/Variant';
+import { ErrorCodeNames } from '../model/Variant';
+import NamedValue from '../model/NamedValue';
+import Values from '../model/Values';
+import QueryAutomaton from '../model/QueryAutomaton';
 import { toEditableString, fromEditableString } from '../ctrl/UnionValueEdit';
 import EditableText from '../ctrl/EditableText';
 import AutoForm from '../form/AutoForm';
 import {
     ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue, SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns, InsertColumns, ResetTable
-} from '../action';
+} from '..';
+import classnames from "classnames";
 import 'handsontable/dist/handsontable.full.css';
 import './TableView.css';
 
@@ -187,7 +191,7 @@ class TableView extends React.Component<TableViewProps>{
             case VariantType.BOOL:
                 return val.booleanValue();
             case VariantType.DATE:
-                return val.dateValue();
+                return val.toString();
             case VariantType.DECIMAL:
                 return val.decimalValue();
             case VariantType.ERROR:
@@ -596,10 +600,10 @@ class TableView extends React.Component<TableViewProps>{
     }
 
     public render() {
-        const className = "table-view" +
-            (this.props.editable ? " editable" : "") +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "table-view",
+            { "editable": this.props.editable },
+            this.props.className);
 
         const data = this.tableData.hotTableData;
         const auto = this.props.table.automaton;

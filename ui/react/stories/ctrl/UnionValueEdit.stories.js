@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import UnionValueEdit from '../../src/ctrl/UnionValueEdit';
-import Values from '../../src/model/Values';
+import { UnionValueEdit, Values } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class UnionValueEditStories extends Component {

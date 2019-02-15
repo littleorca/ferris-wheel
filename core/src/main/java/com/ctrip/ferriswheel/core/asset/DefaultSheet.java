@@ -204,13 +204,6 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             });
 
             layoutNewAsset(table);
-            if (addTable.getTableData() == null) {
-                addTable.setTableData(new TableDataImpl());
-            }
-            // TODO review the class cast op
-            if (addTable.getTableData() instanceof TableDataImpl) {
-                ((TableDataImpl) addTable.getTableData()).setLayout(new LayoutImpl(table.getLayout()));
-            }
             return table;
         });
     }

@@ -13,9 +13,12 @@ import {
     GaugeRenderer,
     DoughnutRenderer
 } from '../chart/ChartJsAdapter';
+import  { VariantType }  from '../model/Variant';
+import RenameAsset from '../action/RenameAsset';
+import Action from '../action/Action';
+import UpdateChart from '../action/UpdateChart';
+import classnames from "classnames";
 import './ChartView.css';
-import { VariantType } from '../model';
-import { RenameAsset, Action, UpdateChart } from '../action';
 
 interface ChartData {
     type: string,
@@ -188,9 +191,10 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
     }
 
     public render() {
-        const className = "chart-view type-" + this.props.chart.type +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");;
+        const className = classnames(
+            "chart-view",
+            "type-" + this.props.chart.type,
+            this.props.className);
 
         const data = this.state.data;
 

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import WorkbookView from '../../src/view/WorkbookView';
-import { Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Workbook, Version, Color } from '../../src/model';
+import {
+    WorkbookView,
+    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Workbook, Version, Color
+} from '../../src';
 
 const text = new Text('test_text', Values.str('hello\n\tworld!'));
 const table = new Table('test_table', []);

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Popover from 'react-popover';
 import Button, { ButtonProps } from './Button';
+import classnames from 'classnames';
 import './DropdownButton.css';
 
 interface DropdownItemProps extends ButtonProps {
@@ -53,12 +54,14 @@ class DropdownButton extends React.Component<DropdownButtonProps, DropdownButton
     }
 
     public render() {
-        const className = "dropdown-button button" +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "dropdown-button",
+            "button",
+            this.props.className);
 
-        const triggerClassName = "dropdown-trigger" +
-            (this.state.isDroppedDown ? " active" : "");
+        const triggerClassName = classnames(
+            "dropdown-trigger",
+            { "active": this.state.isDroppedDown });
 
         return (
             <div
@@ -104,9 +107,7 @@ class DropdownButton extends React.Component<DropdownButtonProps, DropdownButton
     }
 
     protected renderItem(item: DropdownItemProps, index: number) {
-        const className = "dropdown-button-item" +
-            (typeof item.className !== 'undefined' ?
-                " " + item.className : "");
+        const className = classnames("dropdown-button-item", item.className);
 
         const onClick = (name: string, event: React.MouseEvent<HTMLButtonElement>) => {
             this.closeDropdown();

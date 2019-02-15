@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import AssetView from '../../src/view/AssetView';
-import SheetAsset from '../../src/model/SheetAsset';
-import Text from '../../src/model/Text';
-import Values from '../../src/model/Values';
+import { AssetView, SheetAsset, Text, Values } from '../../src';
 
 class AssetViewStories extends Component {
     sheetAsset = new SheetAsset(undefined, undefined,

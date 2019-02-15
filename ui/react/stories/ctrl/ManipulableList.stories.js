@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import ManipulableList from '../../src/ctrl/ManipulableList';
-import InlineEditable from '../../src/ctrl/InlineEditable';
-import EditableText from '../../src/ctrl/EditableText';
-import EditBox from '../../src/ctrl/EditBox';
+import { ManipulableList, InlineEditable, EditableText, EditBox } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class ManipulableListStories extends Component {
@@ -84,6 +81,7 @@ class ManipulableListStories extends Component {
 function createItem() {
     return "new-one";
 }
+
 function InlineEditor(props) {
     const afterChange = (change) => {
         if (change.type === 'commit') {

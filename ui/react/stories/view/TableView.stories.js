@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import TableView from '../../src/view/TableView';
-import { Table, Row, Cell, Values, VariantType, QueryAutomaton, ParamRule } from '../../src/model';
-import { Button } from '../../src/ctrl';
-import { RefreshCellValue, SetCellValue, SetCellFormula } from '../../src/action';
-
+import {
+    TableView, Table, Row, Cell, Values, VariantType, QueryAutomaton, ParamRule,
+    Button,
+    RefreshCellValue, SetCellValue, SetCellFormula
+} from '../../src';
 const table = new Table('test_table', []);
 table.rows.push(new Row(0,
     [

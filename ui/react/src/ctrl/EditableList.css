@@ -13,6 +13,16 @@
     background: #fff;
 }
 
+.editable-list.vertical > .list-container {
+    display: flex;
+    flex-flow: column;
+    justify-content: stretch;
+}
+
+.editable-list.vertical > .list-container .manipulable-list {
+    flex: 1 1;
+}
+
 .editable-list.vertical > .editor-container {
     padding-left: .75rem;
 }

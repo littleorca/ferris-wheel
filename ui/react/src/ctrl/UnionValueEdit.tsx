@@ -4,6 +4,7 @@ import EditBox, { EditBoxChange } from './EditBox';
 import Values from '../model/Values';
 import { VariantType } from '../model/Variant';
 import * as moment from 'moment';
+import classnames from "classnames";
 import './UnionValueEdit.css';
 
 interface UninValueEditProps extends React.ClassAttributes<UnionValueEdit> {
@@ -79,9 +80,7 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
     }
 
     public render() {
-        const className = "union-value-edit" +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames("union-value-edit", this.props.className);
 
         return (
             <EditBox

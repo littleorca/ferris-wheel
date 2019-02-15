@@ -4,6 +4,7 @@ import Orientation from '../model/Orientation';
 import Placement from '../model/Placement';
 import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
 import PlacementSelector, { PlacementItem } from '../ctrl/PlacementSelector';
+import classnames from "classnames";
 
 interface DataBinderFormProps extends React.ClassAttributes<DataBinderForm> {
     binder: Binder,
@@ -134,10 +135,7 @@ class DataBinderForm extends React.Component<DataBinderFormProps> {
         const categoriesPlacementLabel = this.getPlacementLabel(binder.categoriesPlacement);
         const seriesNamePlacementLabel = this.getPlacementLabel(binder.seriesNamePlacement);
 
-        let className = "data-binder-form";
-        if (typeof this.props.className !== 'undefined') {
-            className += " " + this.props.className;
-        }
+        const className = classnames("data-binder-form", this.props.className);
 
         return (
             <div className={className}>

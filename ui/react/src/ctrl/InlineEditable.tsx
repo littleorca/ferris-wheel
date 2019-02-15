@@ -1,4 +1,6 @@
 import * as React from 'react';
+import classnames from 'classnames';
+import "./InlineEditable.css";
 
 interface InlineEditableProps<T> extends React.ClassAttributes<InlineEditable<T>> {
     value: T,
@@ -109,16 +111,12 @@ class InlineEditable<T> extends React.Component<InlineEditableProps<T>, InlineEd
     }
 
     public render() {
-        let className = "inline-editable";
-        if (typeof this.props.className !== 'undefined') {
-            className += " " + this.props.className;
-        }
-
         if (this.state.isEdit) {
-            className += " editing";
-            if (typeof this.props.editClassName !== 'undefined') {
-                className += " " + this.props.editClassName;
-            }
+            const className = classnames(
+                "inline-editable",
+                this.props.className,
+                "editing",
+                this.props.editClassName);
 
             const style = { ...editorStyle };
             if (this.state.width !== 0) {
@@ -138,10 +136,11 @@ class InlineEditable<T> extends React.Component<InlineEditableProps<T>, InlineEd
             );
 
         } else {
-            className += " display";
-            if (typeof this.props.displayClassName !== 'undefined') {
-                className += " " + this.props.displayClassName;
-            }
+            const className = classnames(
+                "inline-editable",
+                this.props.className,
+                "display",
+                this.props.displayClassName);
 
             return (
                 <span

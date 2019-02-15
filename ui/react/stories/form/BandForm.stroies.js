@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import BandForm from '../../src/form/BandForm';
-import AxisBand from '../../src/model/AxisBand';
+import { BandForm, AxisBand } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class BandFormStroies extends Component {

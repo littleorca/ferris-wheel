@@ -17,4 +17,5 @@
 
 .color-input-popover {
     fill: #ccc;
+    z-index: 1;
 }

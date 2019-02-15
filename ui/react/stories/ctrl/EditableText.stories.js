@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import EditableText from '../../src/ctrl/EditableText';
+import { EditableText } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class EditableTextStories extends Component {

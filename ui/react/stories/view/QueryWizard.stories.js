@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import WorkbookEditor from '../../src/view/WorkbookEditor';
 import {
-    Sheet, SheetAsset, Workbook, Version, Values
-} from '../../src/model';
-import { EditResponse, ChangeList } from '../../src/action';
+    WorkbookEditor,
+    Sheet, SheetAsset, Workbook, Version, Values,
+    EditResponse, ChangeList
+} from '../../src';
 
 const sheet = new Sheet();
 sheet.name = 'test_sheet';

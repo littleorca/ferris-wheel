@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import AutoForm from '../../src/form/AutoForm';
-import ParamRule from '../../src/model/ParamRule';
-import { VariantType } from '../../src/model/Variant';
-import Values from '../../src/model/Values';
+import { AutoForm, ParamRule, VariantType, Values } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class AutoFormStories extends Component {

@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { Workbook } from '../model';
-import {
-    Service, ActionHandler, Action, ActionHerald, EditRequest, EditResponse
-} from '../action';
+import Workbook from '../model/Workbook';
+import Service from '../action/Service';
+import ActionHandler from '../action/ActionHandler';
+import Action from '../action/Action';
+import ActionHerald from '../action/ActionHerald';
+import EditRequest from '../action/EditRequest';
+import EditResponse from '../action/EditResponse';
 import WorkbookView from './WorkbookView';
 import ReactLoading from 'react-loading';
 import './WorkbookPresenter.css';

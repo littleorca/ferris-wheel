@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import EditBox from '../../src/ctrl/EditBox';
+import { EditBox } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class EditBoxStories extends Component {

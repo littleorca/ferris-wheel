@@ -514,6 +514,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
 
     @Override
     public AutomateConfiguration getAutomateConfiguration() {
+        if (automaton == null) {
+            return null;
+        }
         return TableAutomatonInfo.fromAutomaton(automaton);
     }
 

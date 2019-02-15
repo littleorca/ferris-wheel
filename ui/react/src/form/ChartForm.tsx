@@ -7,7 +7,8 @@ import EditableList, { EditorProps } from '../ctrl/EditableList';
 import AxisForm from './AxisForm';
 import DataBinderForm from './DataBinderForm';
 import SeriesBinderForm from './SeriesBinderForm';
-import { Axis, Values } from '../model';
+import Axis from '../model/Axis'
+import Values from '../model/Values';
 import './ChartForm.css';
 
 interface ChartFormProps extends React.ClassAttributes<ChartForm> {

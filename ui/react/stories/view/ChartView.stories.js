@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import ChartView from '../../src/view/ChartView';
 import {
+    ChartView,
     Chart, Series, AxisBand, Values, Layout, Binder, Axis, Placement, Interval, Color, Stacking
-} from '../../src/model';
+} from '../../src';
 
 const lineChart = new Chart(
     'c0',

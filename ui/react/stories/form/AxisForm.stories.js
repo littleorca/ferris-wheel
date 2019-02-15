@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import AxisForm from '../../src/form/AxisForm';
-import Axis from '../../src/model/Axis';
+import { AxisForm, Axis } from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class AxisFormStories extends Component {

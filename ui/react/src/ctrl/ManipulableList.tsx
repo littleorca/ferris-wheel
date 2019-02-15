@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { SortableContainer, SortableElement, SortEnd, SortEvent } from 'react-sortable-hoc';
+import classnames from 'classnames';
 import './ManipulableList.css';
 
 interface ManipulableListProps<T> extends React.ClassAttributes<ManipulableList<T>> {
@@ -12,15 +13,15 @@ interface ManipulableListProps<T> extends React.ClassAttributes<ManipulableList<
     selectable?: boolean; // allow one item among the list has selected state
     sortable?: boolean; // items sortable
     removable?: boolean; // items can be removed
-    appendable?: boolean; // new items can be appended
+    addible?: boolean; // new items can be added
     itemRenderer?: React.SFC<ItemRendererProps<T>>;
     onSelect?: (item: T | null, index: number) => void;
     beforeMoveItem?: (item: T, oldIndex: number, newIndex: number) => boolean;
     onItemMoved?: (item: T, oldIndex: number, newIndex: number) => void;
     beforeRemoveItem?: (item: T, index: number) => boolean;
     onItemRemoved?: (item: T, index: number) => void;
-    beforeAppendItem?: (item: T, index: number) => boolean;
-    onItemAppended?: (item: T, index: number) => void;
+    beforeAddItem?: (item: T, index: number) => boolean;
+    onItemAdded?: (item: T, index: number) => void;
     beforeUpdateItem?: (oldItem: T, newItem: T, index: number) => boolean;
     onItemUpdated?: (oldItem: T, newItem: T, index: number) => void;
     getItemKey?: (item: T, index: number) => string;
@@ -39,7 +40,7 @@ interface ManipulableElementProps<T> extends React.ClassAttributes<any> {
 }
 
 interface ManipulableListState<T> {
-    selected: number,
+    selectIndex: number,
 }
 
 class ManipulableList<T> extends React.Component<ManipulableListProps<T>, ManipulableListState<T>> {
@@ -49,7 +50,7 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         selectable: true,
         sortable: true,
         removable: true,
-        appendable: true,
+        addible: true,
     };
 
     protected oListRef: React.RefObject<HTMLOListElement>;
@@ -64,54 +65,59 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         this.handleClick = this.handleClick.bind(this);
         this.onSortEnd = this.onSortEnd.bind(this);
 
-        const selected = typeof props.initialSelect !== "undefined"
+        const selectIndex = typeof props.initialSelect !== "undefined"
             && props.initialSelect >= 0
             && props.initialSelect < props.list.length ?
             props.initialSelect : (props.list.length > 0 ? 0 : -1);
-        this.state = { selected };
+        this.state = { selectIndex: selectIndex };
         if (typeof props.onSelect !== 'undefined') {
-            props.onSelect(selected === -1 ? null : props.list[selected], selected);
+            props.onSelect(selectIndex === -1 ? null : props.list[selectIndex], selectIndex);
         }
     }
 
     public componentDidUpdate(prevProps: ManipulableListProps<T>) {
-        const selected = this.getSelectedIndex();
-        if (selected !== this.state.selected ||
-            this.props.list[selected] !== prevProps.list[selected]) {
-            this.selectItem(selected, false);
+        const selectIndex = this.getSelectIndex();
+        if (selectIndex !== this.state.selectIndex ||
+            this.props.list[selectIndex] !== prevProps.list[selectIndex]) {
+            this.selectItem(selectIndex, false);
         }
     }
 
-    public getSelectedIndex(): number {
-        let selected = this.state.selected;
-        if (selected >= this.props.list.length) {
-            selected = this.props.list.length - 1;
-        } else if (selected < 0 && this.props.list.length > 0) {
-            selected = 0;
+    public getSelectIndex(): number {
+        let selectIndex = this.state.selectIndex;
+        if (selectIndex >= this.props.list.length) {
+            selectIndex = this.props.list.length - 1;
+        } else if (selectIndex < 0 && this.props.list.length > 0) {
+            selectIndex = 0;
         }
-        return selected;
+        return selectIndex;
     }
 
-    public getSelectedItem(): T | null {
-        const selected = this.getSelectedIndex();
-        if (selected === -1) {
+    public getSelectItem(): T | null {
+        const selectIndex = this.getSelectIndex();
+        if (selectIndex === -1) {
             return null;
         }
-        return this.props.list[selected];
+        return this.props.list[selectIndex];
     }
 
-    public addItem(item: T): void {
-        if (!this.props.appendable) {
-            throw new Error('List not appendable.');
+    public addItem(item: T, index: number = -1, select: boolean = true): void {
+        if (!this.props.addible) {
+            throw new Error('List not addible.');
         }
-        if (typeof this.props.beforeAppendItem !== 'undefined' &&
-            !this.props.beforeAppendItem(item, this.props.list.length)) {
+        if (index < 0 || index > this.props.list.length) {
+            index = this.props.list.length;
+        }
+        if (typeof this.props.beforeAddItem !== 'undefined' &&
+            !this.props.beforeAddItem(item, index)) {
             return;
         }
-        this.props.list.push(item);
-        this.selectItem(this.props.list.length - 1);
-        if (typeof this.props.onItemAppended !== 'undefined') {
-            this.props.onItemAppended(item, this.props.list.length - 1);
+        this.props.list.splice(index, 0, item);
+        if (select) {
+            this.selectItem(index);
+        }
+        if (typeof this.props.onItemAdded !== "undefined") {
+            this.props.onItemAdded(item, index);
         }
     }
 
@@ -160,7 +166,7 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
                 break;
             case 'N':
             case 'n':
-                if (this.props.appendable &&
+                if (this.props.addible &&
                     typeof this.props.createItem !== 'undefined' &&
                     (event.ctrlKey || event.metaKey)) {
                     this.addItem(this.props.createItem());
@@ -182,9 +188,13 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         }
     }
 
-    public tryRemoveSelected() {
+    public removeSelected() {
+        this.tryRemoveSelected();
+    }
+
+    protected tryRemoveSelected() {
         const list = this.props.list;
-        const index = this.state.selected;
+        const index = this.state.selectIndex;
         if (index === -1) {
             return;
         }
@@ -194,11 +204,11 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
             return;
         }
         list.splice(index, 1);
-        const selected = (index >= list.length) ? index - 1 : index;
+        const selectIndex = (index >= list.length) ? index - 1 : index;
         if (typeof this.props.onItemRemoved !== 'undefined') {
             this.props.onItemRemoved(item, index);
         }
-        this.selectItem(selected);
+        this.selectItem(selectIndex);
     }
 
     protected trySelectPrevious() {
@@ -206,11 +216,11 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         if (list.length === 0) {
             return;
         }
-        let selected = this.state.selected - 1;
-        if (selected < 0) {
-            selected = list.length - 1;
+        let selectIndex = this.state.selectIndex - 1;
+        if (selectIndex < 0) {
+            selectIndex = list.length - 1;
         }
-        this.selectItem(selected);
+        this.selectItem(selectIndex);
     }
 
     protected trySelectNext() {
@@ -218,20 +228,20 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         if (list.length === 0) {
             return;
         }
-        let selected = this.state.selected + 1;
-        if (selected >= list.length) {
-            selected = 0;
+        let selectIndex = this.state.selectIndex + 1;
+        if (selectIndex >= list.length) {
+            selectIndex = 0;
         }
-        this.selectItem(selected);
+        this.selectItem(selectIndex);
     }
 
     public selectItem(index: number, focus: boolean = true) {
         const list = this.props.list;
         if (index !== -1 && (index < 0 || index >= list.length)) {
-            throw new Error('Selected index is out of range.');
+            throw new Error('Select index is out of range.');
         }
-        this.setState({ selected: index });
-        // TODO scroll selected item into view if needed!
+        this.setState({ selectIndex: index });
+        // TODO scroll select item into view if needed!
         if (focus && this.oListRef.current) {
             this.oListRef.current.focus();
         }
@@ -249,17 +259,18 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
             return;
         }
         const index = parseInt(dataIndex, 10);
-        if (this.state.selected !== index) {
+        if (this.state.selectIndex !== index) {
             this.selectItem(index);
         }
     }
 
     protected SortableItem = SortableElement((props: ManipulableElementProps<T>) => {
         const idx = props.idx;
-        const selected = this.getSelectedIndex();
+        const selectIndex = this.getSelectIndex();
 
-        const className = "manipulable-item" +
-            (idx === selected ? " selected" : "");
+        const className = classnames(
+            "manipulable-item",
+            { "selected": idx === selectIndex });
 
         const updateItem = (value: T) => {
             const list = this.props.list;
@@ -301,10 +312,10 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
     });
 
     protected SortableList = SortableContainer((props: ManipulableListProps<T>) => {
-        const className = "manipulable-list" +
-            (props.horizontal ? " horizontal" : " vertical") +
-            (typeof props.className !== 'undefined' ?
-                " " + props.className : "");
+        const className = classnames(
+            "manipulable-list",
+            props.horizontal ? "horizontal" : "vertical",
+            props.className);
 
         const list = this.props.list;
         return (
@@ -337,32 +348,32 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         const item = list.splice(sort.oldIndex, 1)[0];
         list.splice(sort.newIndex, 0, item);
 
-        let selected = this.state.selected;
-        if (selected === sort.oldIndex) {
-            selected = sort.newIndex;
-        } else if (selected >= sort.newIndex && selected < sort.oldIndex) {
-            selected++;
-        } else if (selected <= sort.newIndex && selected > sort.oldIndex) {
-            selected--;
+        let selectIndex = this.state.selectIndex;
+        if (selectIndex === sort.oldIndex) {
+            selectIndex = sort.newIndex;
+        } else if (selectIndex >= sort.newIndex && selectIndex < sort.oldIndex) {
+            selectIndex++;
+        } else if (selectIndex <= sort.newIndex && selectIndex > sort.oldIndex) {
+            selectIndex--;
         }
 
-        const selectIdxChanged = selected !== this.state.selected;
+        const selectIdxChanged = selectIndex !== this.state.selectIndex;
         if (selectIdxChanged) {
-            this.setState({ selected });
+            this.setState({ selectIndex: selectIndex });
         }
 
         if (typeof this.props.onItemMoved !== 'undefined') {
             this.props.onItemMoved(item, sort.oldIndex, sort.newIndex);
         }
         if (selectIdxChanged && typeof this.props.onSelect !== 'undefined') {
-            this.props.onSelect(this.props.list[selected], selected);
+            this.props.onSelect(this.props.list[selectIndex], selectIndex);
         }
     }
 
     public render() {
-        const helperClass = "manipulable-list-sort-helper" +
-            (typeof this.props.sortHelperClass !== 'undefined' ?
-                " " + this.props.sortHelperClass : "");
+        const helperClass = classnames(
+            "manipulable-list-sort-helper",
+            this.props.sortHelperClass);
 
         return (
             <this.SortableList {...this.props}

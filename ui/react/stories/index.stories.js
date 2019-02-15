@@ -12,7 +12,7 @@ import {
   Select,
   Toolbar,
   Group
-} from '../src/ctrl';
+} from '../src';
 
 import EditableListStories from './ctrl/EditableList.stories';
 import EditableTextStories from './ctrl/EditableText.stories';
@@ -51,24 +51,10 @@ import TextViewStories from './view/TextView.stories';
 import WorkbookEditorStories from './view/WorkbookEditor.stories';
 import WorkbookPresenterStories from './view/WorkbookPresenter.stories'
 import WorkbookViewStories from './view/WorkbookView.stories';
-import ExampleStories from './Example.stories';
 import QueryWizardStories from './view/QueryWizard.stories';
 
-// storiesOf('Welcome', module).add('to Storybook', () => <Welcome showApp={linkTo('Button')} />);
-
-// storiesOf('Button', module)
-//   .add('with text', () => <Button onClick={action('clicked')}>Hello Button</Button>)
-//   .add('with some emoji', () => (
-//     <Button onClick={action('clicked')}>
-//       <span role="img" aria-label="so cool">
-//         😀 😎 👍 💯
-//       </span>
-//     </Button>
-//   ));
-
-storiesOf('Welcome', module)
-  .add('Example', () => <ExampleStories />);
-
+// storiesOf('Welcome', module)
+//   .add('Example', () => <ExampleStories />);
 
 storiesOf('Control', module)
   .add('Button', () =>

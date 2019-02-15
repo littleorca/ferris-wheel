@@ -1,4 +1,5 @@
 import * as React from 'react';
+import classnames from "classnames";
 import './GroupView.css';
 
 interface GroupItemProps extends React.ClassAttributes<any> {
@@ -34,9 +35,10 @@ class GroupView extends React.Component<GroupViewProps, GroupViewState> {
     public render() {
         const mode = typeof this.props.mode !== 'undefined' ?
             this.props.mode : "fold";
-        const className = "group-view " + mode +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "group-view",
+            mode,
+            this.props.className);
 
         const displayStates = this.state.displayStates;
 
@@ -50,11 +52,13 @@ class GroupView extends React.Component<GroupViewProps, GroupViewState> {
                     const item = child as React.ReactElement<GroupItemProps>;
 
                     const isShow = displayStates.get(item.props.name) !== false;
-                    const itemClassName = "group-view-item" +
-                        (isShow ? " active" : " inactive");
+                    const itemClassName = classnames(
+                        "group-view-item",
+                        isShow ? "active" : "inactive");
                     const titleClassName = "group-view-title";
-                    const contentClassName = "group-view-content" +
-                        (isShow ? " show" : " hide");
+                    const contentClassName = classnames(
+                        "group-view-content",
+                        isShow ? "show" : "hide");
 
                     const handleClick = (event: React.MouseEvent) => {
                         displayStates.set(item.props.name, !isShow);

@@ -17,6 +17,7 @@ import RemoveSheet from '../action/RemoveSheet';
 import AddSheet from '../action/AddSheet';
 import TransferAsset from '../action/TransferAsset';
 import Button from '../ctrl/Button';
+import classnames from "classnames";
 import './WorkbookView.css';
 
 interface WorkbookViewProps extends SharedViewProps<WorkbookView> {
@@ -129,7 +130,7 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
         sheets.splice(fromIndex, 1);
         sheets.splice(moveSheet.targetIndex, 0, sheet);
         if (this.tabsRef.current !== null) {
-            const selectedIndex = this.tabsRef.current.getSelectedIndex();
+            const selectedIndex = this.tabsRef.current.getSelectIndex();
             if (selectedIndex === fromIndex) {
                 this.tabsRef.current.selectItem(moveSheet.targetIndex);
             } else if (selectedIndex >= moveSheet.targetIndex &&
@@ -320,10 +321,10 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
     }
 
     public render() {
-        const className = "workbook-view" +
-            (this.props.editable ? " editable" : " presentation") +
-            (typeof this.props.className !== 'undefined' ?
-                " " + this.props.className : "");
+        const className = classnames(
+            "workbook-view",
+            this.props.editable ? "editable" : "presentation",
+            this.props.className);
 
         const sheets = this.props.workbook.sheets;
 
@@ -343,7 +344,7 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
                         sortHelperClass="sheet-tab-sort-helper"
                         horizontal={true}
                         list={sheets}
-                        appendable={false} // disable ManipulableList's default behavior
+                        addible={false} // disable ManipulableList's default behavior
                         sortable={this.props.editable}
                         removable={false} // disable ManipulableList's default behavior
                         getItemLabel={this.getTabItemLabel}

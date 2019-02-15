@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import ColorInput from '../../src/ctrl/ColorInput';
-import Color from '../../src/model/Color';
+import {
+    ColorInput,
+    Color
+} from '../../src';
 import { action } from '@storybook/addon-actions';
 
 class ColorInputStories extends Component {
