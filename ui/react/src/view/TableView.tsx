@@ -44,6 +44,8 @@ class TableView extends React.Component<TableViewProps>{
 
         this.getSelectedRange = this.getSelectedRange.bind(this);
 
+        this.shouldDeselectOnOutsideClick = this.shouldDeselectOnOutsideClick.bind(this);
+
         // this.beforeCut = this.beforeCut.bind(this);
         this.beforePaste = this.beforePaste.bind(this);
 
@@ -261,6 +263,18 @@ class TableView extends React.Component<TableViewProps>{
             }
         }
         return finalRange;
+    }
+
+    protected shouldDeselectOnOutsideClick(e: HTMLElement) {
+        // TODO this is a hack for preventing handsontable from grabbing cursor
+        // unexpectedly. e.g.:
+        // select a cell and then double click the table name to rename the table,
+        // and the input will be captured by the cell instead of name input box.
+        if (e.closest(".workbook-editor .editor-header") !== null ||
+            e.closest(".workbook-editor .sidebar") !== null) {
+            return false;
+        }
+        return true;
     }
 
     // protected beforeCut() {
@@ -646,7 +660,7 @@ class TableView extends React.Component<TableViewProps>{
                         stretchH="all"
                         manualColumnResize={true}
                         manualRowResize={true}
-                        outsideClickDeselects={false}
+                        outsideClickDeselects={this.shouldDeselectOnOutsideClick}
                         fillHandle={{ autoInsertRow: false }}
                         contextMenu={false}
                         copyable={true}

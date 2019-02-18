@@ -560,7 +560,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             row.setCell(columnIndex, cell);
             // cell.addDependency(this); // TODO review if it is needed
             if (getAutomaton() != null) {
-                row.setEphemeral(true);
+                cell.setEphemeral(true);
             }
         }
         return cell;
@@ -833,7 +833,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             DataSet dataSet = getAutomaton().getDataSet();
             getSheet().getNotifier().privately(() -> getWorkbook().withoutRefresh(() -> {
                 if (dataSet != null) {
-                    doFillTable(getAutomaton().getDataSet());
+                    doFillTable(dataSet);
                 } else {
                     doClearTable();
                 }

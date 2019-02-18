@@ -1,19 +1,20 @@
 import * as React from 'react';
 
 export interface EditBoxProps extends React.ClassAttributes<EditBox> {
-    value: string,
-    id?: string,
-    name?: string,
-    placeholder?: string,
-    multiline?: boolean,
-    className?: string,
-    style?: React.CSSProperties,
-    disabled?: boolean,
-    focused?: boolean,
-    afterBeginEdit?: () => void,
-    beforeChange?: (change: EditBoxChange) => boolean,
-    afterChange?: (change: EditBoxChange) => void,
-    afterEndEdit?: () => void,
+    value: string;
+    id?: string;
+    name?: string;
+    placeholder?: string;
+    multiline?: boolean;
+    className?: string;
+    style?: React.CSSProperties;
+    disabled?: boolean;
+    focused?: boolean;
+    selectOnFocus?: boolean;
+    afterBeginEdit?: () => void;
+    beforeChange?: (change: EditBoxChange) => boolean;
+    afterChange?: (change: EditBoxChange) => void;
+    afterEndEdit?: () => void;
 }
 
 export interface EditBoxChange {
@@ -66,6 +67,13 @@ class EditBox extends React.Component<EditBoxProps, EditBoxState> {
     }
 
     protected handleFocus(event: React.FocusEvent) {
+        if (this.props.selectOnFocus) {
+            if (this.props.multiline && this.textareaElement.current) {
+                this.textareaElement.current.select();
+            } else if (!this.props.multiline && this.inputElement.current) {
+                this.inputElement.current.select();
+            }
+        }
         if (typeof this.props.afterBeginEdit !== 'undefined') {
             this.props.afterBeginEdit();
         }

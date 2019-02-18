@@ -49,15 +49,19 @@ function InlineEditor(props) {
         if (change.type === 'commit') {
             props.onSubmit(change.nextValue);
         } else if (change.type === 'rollback') {
-            props.onSubmit(change.originValue);
+            endEdit();
         }
+    }
+    const endEdit = () => {
+        props.onCancel();
     }
     return (
         <EditBox
             {...props}
             value={props.value}
             focused={true}
-            afterChange={afterChange} />
+            afterChange={afterChange}
+            afterEndEdit={endEdit} />
     );
 }
 

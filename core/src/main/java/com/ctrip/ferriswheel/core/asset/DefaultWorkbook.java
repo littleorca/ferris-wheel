@@ -303,6 +303,12 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             CompletionService<Long> completionService = new ExecutorCompletionService<>(executor);
             long start = System.currentTimeMillis();
 
+            /**
+             * The while-loop will break on exception and thus the whole process will be failed.
+             * As one task hang up forever can stop the whole process, this behavior is good to
+             * prevent the whole process from hanging forever. However, this can be improved to
+             * execute as more tasks as possible by checking there dependency relationships.
+             */
             while (!graph.isEmpty()) {
                 Set<Long> tasks = graph.collectOutboundEnds();
                 boolean processedAnyTask = false;
@@ -319,25 +325,21 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                         pendingTasks.add(id);
                     }
                 }
-                try {
-                    if (!processedAnyTask && !pendingTasks.isEmpty()) {
-                        Future<Long> future = completionService.poll(WAIT_PERIOD_IN_MILLI_SECONDS, TimeUnit.MILLISECONDS);
-                        Long id = future.get();
-                        graph.removeNode(id);
-                        remainedTasks.remove(id);
-                        pendingTasks.remove(id);
-                    }
-                    Future<Long> finishedTask;
-                    while ((finishedTask = completionService.poll()) != null) {
-                        Long id = finishedTask.get();
-                        graph.removeNode(id);
-                        remainedTasks.remove(id);
-                        pendingTasks.remove(id);
-                    }
-                } catch (InterruptedException e) {
-                    // TODO e.printStackTrace();
-                } catch (ExecutionException e) {
-                    // TODO e.printStackTrace();
+
+                // check if any pending task has been done.
+                Future<Long> future;
+                if (!processedAnyTask && !pendingTasks.isEmpty()) {
+                    // calculation blocks on pending tasks, so let's poll with waiting
+                    future = completionService.poll(WAIT_PERIOD_IN_MILLI_SECONDS, TimeUnit.MILLISECONDS);
+                } else {
+                    // calculation can be continued despite possible pending tasks, just poll without waiting.
+                    future = completionService.poll();
+                }
+                if (future != null) {
+                    Long id = future.get();
+                    graph.removeNode(id);
+                    remainedTasks.remove(id);
+                    pendingTasks.remove(id);
                 }
 
                 if (System.currentTimeMillis() - start >= REFRESH_TIMEOUT_IN_MILLI_SECONDS) {
@@ -352,20 +354,23 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                 }
             }
             while (!pendingTasks.isEmpty()) {
-                try {
-                    Future<Long> future = completionService.poll(WAIT_PERIOD_IN_MILLI_SECONDS, TimeUnit.MILLISECONDS);
+                Future<Long> future = completionService.poll(WAIT_PERIOD_IN_MILLI_SECONDS, TimeUnit.MILLISECONDS);
+                if (future != null) {
                     pendingTasks.remove(future.get());
-                } catch (InterruptedException e) {
-                    // TODO e.printStackTrace();
-                } catch (ExecutionException e) {
-                    // TODO e.printStackTrace();
                 }
                 if (System.currentTimeMillis() - start >= REFRESH_TIMEOUT_IN_MILLI_SECONDS) {
                     throw new RuntimeException("Refresh procedure timed out.");
                 }
             }
 
+        } catch (InterruptedException e) {
+            LOG.warn("Refresh procedure interrupted.", e);
+            executor.shutdownNow();
+        } catch (ExecutionException e) {
+            LOG.warn("Refresh procedure caught an exception while executing a task.", e);
+            executor.shutdownNow();
         } catch (RuntimeException e) {
+            LOG.warn("Refresh procedure caught an runtime exception.", e);
             executor.shutdownNow();
         } finally {
             executor.shutdown(); // it's ok to shutdown an executor that already shutdown.
@@ -1190,6 +1195,8 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         if (referredCell == null) {
             if (!stubborn) {
                 cellRef.setValid(false);
+            } else {
+                cellRef.setCellId(UNSPECIFIED_ASSET_ID);
             }
             return true;
         }

@@ -72,7 +72,8 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
                 getLastUpdateSequenceNumber() > template.getLastUpdateSequenceNumber()) {
             return;
         }
-        doQuery();
+        DataSet dataSet = doQuery();
+        this.dataSetReference.set(dataSet);
     }
 
     @Override

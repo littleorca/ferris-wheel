@@ -37,9 +37,41 @@ class EditBoxStories extends Component {
     render() {
         return (
             <div>
+                <h3>Single Line</h3>
                 <EditBox
                     id="e-b-id"
                     value={this.text}
+                    placeholder="holder"
+                    beforeChange={this.beforeChange}
+                    afterBeginEdit={this.afterBeginEdit}
+                    afterChange={this.afterChange}
+                    afterEndEdit={this.afterEndEdit} />
+                <h3>Multiple Lines</h3>
+                <EditBox
+                    id="e-b-id-2"
+                    value={this.text}
+                    multiline={true}
+                    placeholder="holder"
+                    beforeChange={this.beforeChange}
+                    afterBeginEdit={this.afterBeginEdit}
+                    afterChange={this.afterChange}
+                    afterEndEdit={this.afterEndEdit} />
+                <h3>Single Line, select on focus</h3>
+                <EditBox
+                    id="e-b-id"
+                    value={this.text}
+                    selectOnFocus={true}
+                    placeholder="holder"
+                    beforeChange={this.beforeChange}
+                    afterBeginEdit={this.afterBeginEdit}
+                    afterChange={this.afterChange}
+                    afterEndEdit={this.afterEndEdit} />
+                <h3>Multiple Lines, select on focus</h3>
+                <EditBox
+                    id="e-b-id-2"
+                    value={this.text}
+                    multiline={true}
+                    selectOnFocus={true}
                     placeholder="holder"
                     beforeChange={this.beforeChange}
                     afterBeginEdit={this.afterBeginEdit}
