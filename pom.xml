@@ -361,7 +361,7 @@
             scm:git:git://github.com/littleorca/ferris-wheel.git
         </connection>
         <developerConnection>
-            scm:git:ssh://git@github.com:littleorca/ferris-wheel.git
+            scm:git:https://github.com/littleorca/ferris-wheel.git
         </developerConnection>
     </scm>
     <distributionManagement>
