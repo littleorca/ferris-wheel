@@ -23,6 +23,7 @@ import QueryTemplateForm from '../form/QueryTemplateForm';
 import ChartForm from '../form/ChartForm';
 import PivotForm from '../form/PivotForm';
 import GroupView, { GroupItem } from './GroupView';
+import FormatFormDialog from './FormatFormDialog';
 import Action from '../action/Action';
 import ActionHandler from '../action/ActionHandler';
 import ActionHerald from '../action/ActionHerald';
@@ -41,8 +42,10 @@ import InsertRows from '../action/InsertRows';
 import InsertColumns from '../action/InsertColumns';
 import RemoveColumns from '../action/RemoveColumns';
 import RemoveRows from '../action/RemoveRows';
+import SetCellsFormat from '../action/SetCellsFormat';
 import WorkbookOperation from '../action/WorkbookOperation';
 import Extension, { QueryWizard } from '../extension/Extension';
+import Dialog from './Dialog';
 import Loading from 'react-loading';
 import * as ReactModal from 'react-modal';
 import classnames from "classnames";
@@ -90,6 +93,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.handleAddQueryTable = this.handleAddQueryTable.bind(this);
         this.handleAddPivotTable = this.handleAddPivotTable.bind(this);
         this.handleAlterTable = this.handleAlterTable.bind(this);
+        this.handleFormatCell = this.handleFormatCell.bind(this);
 
         this.handleAddLineChart = this.handleAddLineChart.bind(this);
         this.handleAddStackedLineChart = this.handleAddStackedLineChart.bind(this);
@@ -242,11 +246,11 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         if (typeof wizard === 'undefined') {
             throw new Error('Wizard component not found: ' + name); // TODO review
         }
-        this.setState({
-            dialog: <wizard.component
+        this.showDialog(
+            <wizard.component
                 onOk={this.handleQueryWizardOk}
                 onCancel={this.handleQueryWizardCancelled} />
-        });
+        );
     }
 
     protected handleQueryWizardOk(queryTemplate: QueryTemplate) {
@@ -256,10 +260,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
 
     protected handleQueryWizardCancelled() {
         this.closeDialog();
-    }
-
-    protected closeDialog() {
-        this.setState({ dialog: undefined });
     }
 
     protected handleAddQueryTable() {
@@ -328,6 +328,30 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         if (action !== null) {
             this.handleAction(action);
         }
+    }
+
+    protected handleFormatCell(format: string) {
+        if (typeof this.state.currentSheet === 'undefined') {
+            return;
+        }
+        const sheet = this.state.currentSheet;
+        if (typeof this.state.currentAsset === 'undefined' ||
+            this.state.currentAsset.assetType() !== 'table') {
+            return;
+        }
+        const table = this.state.currentAsset.specific() as Table;
+        const selection = table.getSelectedRange();
+        if (selection === null) {
+            return;
+        }
+        this.handleAction(new SetCellsFormat(
+            sheet.name,
+            table.name,
+            selection.top,
+            selection.left,
+            selection.bottom - selection.top + 1,
+            selection.right - selection.left + 1,
+            format).wrapper());
     }
 
     protected handleAddLineChart() {
@@ -465,7 +489,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
     }
 
     protected applyChanges(actions: Action[]) {
-        // console.log('applyChanges', actions);
         for (const action of actions) {
             this.listeners.forEach(handler => handler(action));
         }
@@ -854,6 +877,9 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                                     onClick={this.handleAlterTable} />
                             </div>
                         </div>
+                        <div className="alter-table-actions">
+                            {this.showFormatCellButtonIfPossible(this.handleFormatCell)}
+                        </div>
                     </GroupItem>
                 )}
                 <GroupItem
@@ -907,6 +933,62 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                     label="使用向导编辑"
                     tips="使用查询器向导编辑该查询"
                     onClick={openWizard} />
+            </div>
+        );
+    }
+
+    protected showFormatCellButtonIfPossible(submitCallback: (format: string) => void) {
+        // TODO check if cell(s) selected
+        const openFormatForm = () => {
+            // if (typeof this.state.currentSheet === 'undefined') {
+            //     return;
+            // }
+            // const sheet = this.state.currentSheet;
+            let formatSet = new Set<string>();
+            if (typeof this.state.currentAsset !== 'undefined' &&
+                this.state.currentAsset.assetType() === 'table') {
+                const table = this.state.currentAsset.specific() as Table;
+                const selection = table.getSelectedRange();
+                if (selection !== null) {
+                    for (let r = selection.top; r <= selection.bottom; r++) {
+                        for (let c = selection.left; c <= selection.right; c++) {
+                            const cell = selection.cellMatrix[r][c];
+                            if (typeof cell === "undefined") {
+                                continue;
+                            }
+                            formatSet.add(cell.format);
+                        }
+                    }
+                }
+            }
+            const showFormatDialog = (format: string)=> {
+                this.setState({
+                    dialog: <FormatFormDialog
+                        format={format}
+                        onCancel={() => this.closeDialog()}
+                        onOk={format => {
+                            this.closeDialog();
+                            submitCallback(format);
+                        }} />
+                });    
+            }
+            if (formatSet.size > 1) {
+                this.confirm(
+                        "所选区域存在多种格式，是否继续以统一设置新的格式？",
+                        () => {
+                            showFormatDialog("");
+                        });
+            } else {
+                showFormatDialog(formatSet.values().next().value);
+            }
+        }
+        return (
+            <div className="cell-format-actions">
+                <Button
+                    name="format-cell"
+                    label="单元格格式"
+                    tips="设置单元格格式"
+                    onClick={openFormatForm} />
             </div>
         );
     }
@@ -979,6 +1061,38 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         );
     }
 
+    protected confirm(message: string, onOk: () => void, onCancel?: () => void) {
+        const actions = [{
+                name: "format-form-cancel",
+                label: "取消",
+                callback: () => {
+                    this.closeDialog();
+                    if (typeof onCancel !== "undefined") {
+                        onCancel();
+                    }
+                }
+            }, {
+                name: "format-form-ok",
+                label: "确定",
+                callback: () => {
+                    this.closeDialog();
+                    onOk();
+                }
+            }];
+        this.showDialog(
+            <Dialog className="confirm-dialog" actions={actions}>
+                {message}
+            </Dialog>
+        );
+    }
+    
+    protected showDialog(dialog: React.ReactNode) {
+        this.setState({ dialog });
+    }
+
+    protected closeDialog() {
+        this.setState({ dialog: undefined });
+    }
 }
 
 export default WorkbookEditor;

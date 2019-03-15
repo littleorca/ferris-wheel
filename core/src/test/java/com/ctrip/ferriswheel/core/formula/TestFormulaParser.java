@@ -8,6 +8,40 @@ import java.util.Stack;
 import static com.ctrip.ferriswheel.core.formula.BinaryElement.*;
 
 public class TestFormulaParser extends TestCase {
+    public void testSimpleSum() {
+        FormulaElement[] el = FormulaParser.parse("SUM(\"table-1\"!A:B, 'a\" ''b'' c'!A:Z)");
+        assertEquals(3, el.length);
+
+        assertTrue(el[0] instanceof RangeReferenceElement);
+        RangeReferenceElement ref = (RangeReferenceElement) el[0];
+        assertEquals("table-1", ref.getRangeRef().tableName());
+        assertEquals(0, ref.getRangeRef().getLeft());
+        assertEquals(-1, ref.getRangeRef().getTop());
+        assertEquals(1, ref.getRangeRef().getRight());
+        assertEquals(-1, ref.getRangeRef().getBottom());
+        assertEquals(1, ref.getSlices());
+
+        assertTrue(el[1] instanceof RangeReferenceElement);
+        ref = (RangeReferenceElement) el[1];
+        assertEquals("a\" 'b' c", ref.getRangeRef().tableName());
+        assertEquals(0, ref.getRangeRef().getLeft());
+        assertEquals(-1, ref.getRangeRef().getTop());
+        assertEquals(25, ref.getRangeRef().getRight());
+        assertEquals(-1, ref.getRangeRef().getBottom());
+        assertEquals(1, ref.getSlices());
+
+        assertTrue(el[2] instanceof FuncElement);
+        FuncElement fun = (FuncElement) el[2];
+        assertEquals("SUM", fun.getFunction().getName());
+        assertEquals(2, fun.getArgc());
+        assertEquals(3, fun.getSlices());
+    }
+
+    public void testCalculateFieldFormula() {
+        FormulaElement[] el = FormulaParser.parse("foo + 'foo bar'*'比例'");
+        assertEquals(5, el.length);
+        assertTrue(el[0]instanceof ReferenceElement);
+    }
 
     public void testErrorToken() {
         FormulaElement[] elements = FormulaParser.parse("#REF!");

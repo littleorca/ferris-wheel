@@ -45,6 +45,7 @@ const PivotValueEditor = (props: EditorProps<PivotValue>) => {
             <label className="field pivot-value-aggregateType">
                 <select
                     name="aggregateType"
+                    value={pivotValue.aggregateType}
                     onChange={handleChange}>
                     {AggregateTypeList.map((e, i) =>
                         <option

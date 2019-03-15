@@ -54,7 +54,7 @@
 <qualifier> ::= <identifier>
               | <string>
 <local_reference> ::= <range_reference>
-                    | <cell_reference>
+                    | <simple_reference>
 <range_reference> ::= <identifier> ":" <identifier>
                     | <number> ":" <number>
-<cell_reference> ::= <identifier>
+<simple_reference> ::= <identifier>

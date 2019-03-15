@@ -54,8 +54,12 @@ class ChartForm extends React.Component<ChartFormProps, ChartFormState> {
             { name: "Y轴", axis: () => chart.yAxis },
             { name: "Z轴", axis: () => chart.zAxis }
         ];
+        const hasBinder = chart.binder.data.isFormula();
+        const hasData = chart.categories.isFormula() ||
+                        !chart.categories.isBlank() ||
+                        chart.series.length > 0
         return {
-            useBinder: true,
+            useBinder: hasBinder || !hasData,
             namedAxes,
         };
     }
@@ -179,7 +183,9 @@ class ChartForm extends React.Component<ChartFormProps, ChartFormState> {
                     className="axes-option"
                     horizontal={true}
                     list={namedAxes}
-                    fixedItems={true}
+                    sortable={false}
+                    addible={false}
+                    removable={false}
                     getLabel={this.getLabel}
                     editor={AxisEditor}
                     afterChange={this.handleAxesChange} />

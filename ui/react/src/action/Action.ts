@@ -32,6 +32,7 @@ import ExecuteQuery from "./ExecuteQuery";
 import SelectAsset from "./SelectAsset";
 import ActionMeta from "./ActionMeta";
 import ResetTable from "./ResetTable";
+import SetCellsFormat from "./SetCellsFormat";
 
 class Action extends ActionMeta {
     /* actions defined in protobuf */
@@ -70,6 +71,7 @@ class Action extends ActionMeta {
     public updateText?: UpdateText;
     public executeQuery?: ExecuteQuery;
     public resetTable?: ResetTable;
+    public setCellsFormat?: SetCellsFormat;
     /* extra actions for UI only */
     public selectAsset?: SelectAsset;
 
@@ -146,6 +148,8 @@ class Action extends ActionMeta {
             action.executeQuery = ExecuteQuery.deserialize(input.executeQuery);
         } else if (typeof input.resetTable !== 'undefined') {
             action.resetTable = ResetTable.deserialize(input.resetTable);
+        } else if (typeof input.setCellsFormat !== 'undefined') {
+            action.setCellsFormat = SetCellsFormat.deserialize(input.setCellsFormat);
             // } else if (typeof input.selectAsset !== 'undefined') {
             //     action.selectAsset = SelectAsset.deserialize(input.selectAsset);
         } else {
@@ -225,6 +229,8 @@ class Action extends ActionMeta {
             return this.executeQuery;
         } else if (typeof this.resetTable !== 'undefined') {
             return this.resetTable;
+        } else if (typeof this.setCellsFormat !== 'undefined') {
+            return this.setCellsFormat;
         } else if (typeof this.selectAsset !== 'undefined') {
             return this.selectAsset;
         } else {

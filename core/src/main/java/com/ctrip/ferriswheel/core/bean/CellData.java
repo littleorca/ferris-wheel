@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 public class CellData implements Cell, Serializable {
     private DynamicVariant data;
+    private String format;
     private boolean fillLeft;
     private boolean fillUp;
     private boolean fillRight;
@@ -18,7 +19,12 @@ public class CellData implements Cell, Serializable {
     }
 
     public CellData(DynamicVariant data) {
+        this(data, null);
+    }
+
+    public CellData(DynamicVariant data, String format) {
         this.data = data;
+        this.format = format;
     }
 
     public void erase() {
@@ -32,6 +38,15 @@ public class CellData implements Cell, Serializable {
 
     public void setData(DynamicVariant data) {
         this.data = data;
+    }
+
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     @Override

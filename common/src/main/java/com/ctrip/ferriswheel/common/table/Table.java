@@ -173,6 +173,7 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      * @param columnIndex
      * @param fillUp
      */
+    @Deprecated
     void setCellFillUp(int rowIndex, int columnIndex, boolean fillUp);
 
     /**
@@ -182,6 +183,7 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      * @param columnIndex
      * @param fillDown
      */
+    @Deprecated
     void setCellFillDown(int rowIndex, int columnIndex, boolean fillDown);
 
     /**
@@ -191,6 +193,7 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      * @param columnIndex
      * @param fillLeft
      */
+    @Deprecated
     void setCellFillLeft(int rowIndex, int columnIndex, boolean fillLeft);
 
     /**
@@ -200,7 +203,19 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      * @param columnIndex
      * @param fillRight
      */
+    @Deprecated
     void setCellFillRight(int rowIndex, int columnIndex, boolean fillRight);
+
+    /**
+     * Set cells' format.
+     *
+     * @param rowIndex
+     * @param columnIndex
+     * @param nRows
+     * @param nColumns
+     * @param format
+     */
+    void setCellsFormat(int rowIndex, int columnIndex, int nRows, int nColumns, String format);
 
     /**
      * Erase cell without remove cell object.

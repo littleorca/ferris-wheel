@@ -50,6 +50,7 @@ message Row {
 message Cell {
     int32 column_index = 1;
     UnionValue value = 2;
+    string format = 3;
 }
 
 message UnionValue {
@@ -134,9 +135,10 @@ enum AggregateType {
     AT_PRODUCT = 6;
     AT_DECIMAL_ONLY_COUNT = 7;
     AT_STANDARD_DEVIATION = 8;
-    AT_GLOBAL_STANDARD_DEVIATION = 9;
+    AT_STANDARD_DEVIATION_POPULATION = 9;
     AT_VARIANCE = 10;
-    AT_GLOBAL_VARIANCE = 11;
+    AT_VARIANCE_POPULATION = 11;
+    AT_CUSTOM = 12;
 }
 
 message NamedValue {

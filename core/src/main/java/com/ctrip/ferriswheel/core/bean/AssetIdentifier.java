@@ -57,7 +57,7 @@ public class AssetIdentifier implements Serializable {
 
         } else {
             start = pos;
-            if (pos < pathname.length() && pathname.charAt(pos) == '"') {
+            if (pos < pathname.length() && pathname.charAt(pos) == '\'') {
                 pos = parseEscapedFragment(pathname, pos);
                 if (pos < 0) {
                     throw new IllegalArgumentException();
@@ -79,7 +79,7 @@ public class AssetIdentifier implements Serializable {
         StringBuilder sb = new StringBuilder();
         int end;
         try {
-            end = EscapeHelper.unescape(pathname, pos, sb);
+            end = EscapeHelper.unescapeName(pathname, pos, sb);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -171,7 +171,7 @@ public class AssetIdentifier implements Serializable {
 
         @Override
         String serialize() {
-            return EscapeHelper.escape(name);
+            return EscapeHelper.escapeNameIfNeeded(name);
         }
 
         public String getName() {

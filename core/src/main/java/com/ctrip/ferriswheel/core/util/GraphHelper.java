@@ -96,26 +96,26 @@ public class GraphHelper {
             if (asset instanceof Table) {
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(((DefaultTable) asset).getSheet().getName()) +
+                        EscapeHelper.escapeNameIfNeeded(((DefaultTable) asset).getSheet().getName()) +
                         "!" +
-                        EscapeHelper.escape(((Table) asset).getName());
+                        EscapeHelper.escapeNameIfNeeded(((Table) asset).getName());
             }
             if (asset instanceof AbstractAutomaton) {
                 Table table = (Table) asset.getParent();
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(((DefaultTable) table).getSheet().getName()) +
+                        EscapeHelper.escapeNameIfNeeded(((DefaultTable) table).getSheet().getName()) +
                         "!" +
-                        EscapeHelper.escape(table.getName()) +
+                        EscapeHelper.escapeNameIfNeeded(table.getName()) +
                         "@" +
                         asset.getClass().getSimpleName();
             }
             if (asset instanceof Chart) {
                 return id +
                         "\\n" +
-                        EscapeHelper.escape(((DefaultChart) asset).getSheet().getName()) +
+                        EscapeHelper.escapeNameIfNeeded(((DefaultChart) asset).getSheet().getName()) +
                         "#" +
-                        EscapeHelper.escape(((Chart) asset).getName());
+                        EscapeHelper.escapeNameIfNeeded(((Chart) asset).getName());
             }
             StringBuilder sb = new StringBuilder();
             while (asset != null && !(asset instanceof Workbook)) {

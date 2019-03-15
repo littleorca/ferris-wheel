@@ -4,11 +4,11 @@ import com.ctrip.ferriswheel.common.Environment;
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.SheetAsset;
 import com.ctrip.ferriswheel.common.Workbook;
+import com.ctrip.ferriswheel.common.aggregate.AggregateType;
 import com.ctrip.ferriswheel.common.automaton.*;
 import com.ctrip.ferriswheel.common.chart.*;
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
-import com.ctrip.ferriswheel.common.table.AggregateType;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
@@ -153,16 +153,20 @@ public class PbHelper {
     }
 
     public static com.ctrip.ferriswheel.proto.v1.Cell pb(Cell bean, int columnIndex) {
-        return com.ctrip.ferriswheel.proto.v1.Cell.newBuilder()
+        com.ctrip.ferriswheel.proto.v1.Cell.Builder builder = com.ctrip.ferriswheel.proto.v1.Cell.newBuilder()
                 .setColumnIndex(columnIndex)
-                .setValue(pb(bean.getData()))
-                .build();
+                .setValue(pb(bean.getData()));
+        if (bean.getFormat() != null) {
+            builder.setFormat(bean.getFormat());
+        }
+        return builder.build();
     }
 
     public static CellData bean(com.ctrip.ferriswheel.proto.v1.Cell proto) {
         CellData bean = new CellData();
         // bean.setColumnIndex(proto.getColumnIndex());
         bean.setData(toDynamicValue(proto.getValue()));
+        bean.setFormat(proto.getFormat());
         return bean;
     }
 
@@ -430,12 +434,14 @@ public class PbHelper {
                 return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_DECIMAL_ONLY_COUNT;
             case STANDARD_DEVIATION:
                 return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_STANDARD_DEVIATION;
-            case GLOBAL_STANDARD_DEVIATION:
-                return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_GLOBAL_STANDARD_DEVIATION;
+            case STANDARD_DEVIATION_POPULATION:
+                return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_STANDARD_DEVIATION_POPULATION;
             case VARIANCE:
                 return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_VARIANCE;
-            case GLOBAL_VARIANCE:
-                return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_GLOBAL_VARIANCE;
+            case VARIANCE_POPULATION:
+                return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_VARIANCE_POPULATION;
+            case CUSTOM:
+                return com.ctrip.ferriswheel.proto.v1.AggregateType.AT_CUSTOM;
             default:
                 return com.ctrip.ferriswheel.proto.v1.AggregateType.UNRECOGNIZED;
         }
@@ -461,12 +467,14 @@ public class PbHelper {
                 return AggregateType.DECIMAL_ONLY_COUNT;
             case AT_STANDARD_DEVIATION:
                 return AggregateType.STANDARD_DEVIATION;
-            case AT_GLOBAL_STANDARD_DEVIATION:
-                return AggregateType.GLOBAL_STANDARD_DEVIATION;
+            case AT_STANDARD_DEVIATION_POPULATION:
+                return AggregateType.STANDARD_DEVIATION_POPULATION;
             case AT_VARIANCE:
                 return AggregateType.VARIANCE;
-            case AT_GLOBAL_VARIANCE:
-                return AggregateType.GLOBAL_VARIANCE;
+            case AT_VARIANCE_POPULATION:
+                return AggregateType.VARIANCE_POPULATION;
+            case AT_CUSTOM:
+                return AggregateType.CUSTOM;
             case UNRECOGNIZED:
             default:
                 throw new IllegalArgumentException();

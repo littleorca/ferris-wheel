@@ -21,9 +21,9 @@ public class TestAssetIdentifier extends TestCase {
         assertEquals(21, ((AssetIdentifier.GridLocator) ap.getLocators().get(1)).getRowIndex());
         assertEquals(22, ((AssetIdentifier.GridLocator) ap.getLocators().get(1)).getColumnIndex());
 
-        ap = new AssetIdentifier("\"工作\t\\\"表\\\"1\"!\"表\n格 2\"![1][2]");
+        ap = new AssetIdentifier("'工作\t''表''1'!'表\n格 2'![1][2]");
         assertEquals(3, ap.getLocators().size());
-        assertEquals("工作\t\"表\"1", ((AssetIdentifier.NameLocator) ap.getLocators().get(0)).getName());
+        assertEquals("工作\t'表'1", ((AssetIdentifier.NameLocator) ap.getLocators().get(0)).getName());
         assertEquals("表\n格 2", ((AssetIdentifier.NameLocator) ap.getLocators().get(1)).getName());
         assertEquals(1, ((AssetIdentifier.GridLocator) ap.getLocators().get(2)).getRowIndex());
         assertEquals(2, ((AssetIdentifier.GridLocator) ap.getLocators().get(2)).getColumnIndex());

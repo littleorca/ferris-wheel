@@ -2,9 +2,9 @@ import * as React from 'react';
 import Table from '../model/Table';
 import SharedViewProps from './SharedViewProps';
 import { HotTable } from '@handsontable/react';
-import UnionValue from '../model/UnionValue';
+import { GridSettings } from 'handsontable';
 import { VariantType } from '../model/Variant';
-import { ErrorCodeNames } from '../model/Variant';
+import UnionValue from '../model/UnionValue';
 import NamedValue from '../model/NamedValue';
 import Values from '../model/Values';
 import QueryAutomaton from '../model/QueryAutomaton';
@@ -12,7 +12,9 @@ import { toEditableString, fromEditableString } from '../ctrl/UnionValueEdit';
 import EditableText from '../ctrl/EditableText';
 import AutoForm from '../form/AutoForm';
 import {
-    ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue, SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns, InsertColumns, ResetTable
+    ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue,
+    SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns,
+    InsertColumns, ResetTable, SetCellsFormat, Cell, Formatter
 } from '..';
 import classnames from "classnames";
 import 'handsontable/dist/handsontable.full.css';
@@ -29,7 +31,7 @@ type Primitive = string | number | boolean | Date;
 interface TableData {
     rows: number;
     columns: number;
-    variantMatrix: UnionValue[][];
+    cellMatrix: Cell[][];
     hotTableData: Primitive[][];
 }
 
@@ -44,6 +46,7 @@ class TableView extends React.Component<TableViewProps>{
 
         this.getSelectedRange = this.getSelectedRange.bind(this);
 
+        this.getCellProperties = this.getCellProperties.bind(this);
         this.shouldDeselectOnOutsideClick = this.shouldDeselectOnOutsideClick.bind(this);
 
         // this.beforeCut = this.beforeCut.bind(this);
@@ -126,7 +129,7 @@ class TableView extends React.Component<TableViewProps>{
 
         let maxRowIdx = -1;
         let maxColIdx = -1;
-        const variantMatrix: UnionValue[][] = [];
+        const cellMatrix: Cell[][] = [];
         const hotTableData: Primitive[][] = [];
 
         const rows = table.rows;
@@ -135,15 +138,14 @@ class TableView extends React.Component<TableViewProps>{
                 maxRowIdx = row.rowIndex;
             }
             const cells = row.cells;
-            const matrixRow: UnionValue[] = variantMatrix[row.rowIndex] = [];
+            const matrixRow: Cell[] = cellMatrix[row.rowIndex] = [];
             const htRow: Primitive[] = hotTableData[row.rowIndex] = [];
             for (const cell of cells) {
                 if (maxColIdx < cell.columnIndex) {
                     maxColIdx = cell.columnIndex;
                 }
-                const value = cell.value;
-                matrixRow[cell.columnIndex] = value;
-                htRow[cell.columnIndex] = toEditableString(value);
+                matrixRow[cell.columnIndex] = cell;
+                htRow[cell.columnIndex] = toEditableString(cell.value);
             }
         }
 
@@ -167,60 +169,59 @@ class TableView extends React.Component<TableViewProps>{
         return table['__table_data__'] = {
             rows: maxRowIdx + 1,
             columns: maxColIdx + 1,
-            variantMatrix,
+            cellMatrix,
             hotTableData
         };
     }
 
+    protected getCell(row: number, column: number): Cell | undefined {
+        const matrixRow = this.tableData.cellMatrix[row];
+        if (matrixRow === undefined) {
+            return undefined;
+        }
+        return matrixRow[column];
+    }
 
     protected getCellValue(row: number, column: number) {
-        const matrixRow = this.tableData.variantMatrix[row];
-        if (matrixRow === undefined) {
+        const cell = this.getCell(row, column);
+        if (cell === undefined) {
             return Values.blank();
         }
-        const val = matrixRow[column];
-        if (val === undefined) {
-            return Values.blank();
-        }
-        return val;
+        return cell.value;
     }
 
-    protected getPlainCellValue(row: number, column: number) {
-        const val = this.getCellValue(row, column);
-        switch (val.valueType()) {
-            case VariantType.BLANK:
-                return '';
-            case VariantType.BOOL:
-                return val.booleanValue();
-            case VariantType.DATE:
-                return val.toString();
-            case VariantType.DECIMAL:
-                return val.decimalValue();
-            case VariantType.ERROR:
-                return ErrorCodeNames[val.errorValue()];
-            case VariantType.LIST:
-                throw new Error('Table cell cannot hold list value.');
-            case VariantType.STRING:
-                return val.strValue();
-            default:
-                throw new Error('Invalid variant type: '
-                    + val.valueType());
+    protected getCellValueForDisplay(row: number, column: number) {
+        const cell = this.getCell(row, column);
+        if (typeof cell === "undefined") {
+            return '';
+        } else {
+            return Formatter.format(cell.value, cell.format);
         }
     }
 
-    protected setCellValue(row: number, column: number, value: UnionValue) {
-        let matrixRow = this.tableData.variantMatrix[row];
+    protected setCell(row: number, column: number, cell: Cell) {
+        let matrixRow = this.tableData.cellMatrix[row];
         if (matrixRow === undefined) {
-            matrixRow = this.tableData.variantMatrix[row] = [];
+            matrixRow = this.tableData.cellMatrix[row] = [];
         }
-        matrixRow[column] = value;
-
+        matrixRow[column] = cell;
         if (row >= this.tableData.rows) {
             this.tableData.rows = row + 1;
         }
         if (column >= this.tableData.columns) {
             this.tableData.columns = column + 1;
         }
+    }
+
+    protected setCellValue(row: number, column: number, value: UnionValue) {
+        let cell = this.getCell(row, column);
+        if (typeof cell !== "undefined") {
+            cell.value = value;
+            return;
+        }
+
+        cell = new Cell(column, value);
+        this.setCell(row, column, cell);
 
         // TODO action callback
     }
@@ -242,6 +243,7 @@ class TableView extends React.Component<TableViewProps>{
                 top: range.getTopLeftCorner().row,
                 right: range.getBottomRightCorner().col,
                 bottom: range.getBottomRightCorner().row,
+                cellMatrix: this.tableData.cellMatrix,
             };
 
             if (finalRange === null) {
@@ -265,13 +267,25 @@ class TableView extends React.Component<TableViewProps>{
         return finalRange;
     }
 
+    protected getCellProperties(row?: number, col?: number, prop?: object): GridSettings {
+        const cellProperties = {};
+        if (typeof row === "number" && typeof col === "number") {
+            const value = this.getCellValue(row, col);
+            if (value.valueType() === VariantType.DECIMAL) {
+                cellProperties["className"] = "htRight";
+            }
+        }
+        return cellProperties;
+    }
+
     protected shouldDeselectOnOutsideClick(e: HTMLElement) {
-        // TODO this is a hack for preventing handsontable from grabbing cursor
+        // FIXME this is a hack for preventing handsontable from grabbing cursor
         // unexpectedly. e.g.:
         // select a cell and then double click the table name to rename the table,
         // and the input will be captured by the cell instead of name input box.
         if (e.closest(".workbook-editor .editor-header") !== null ||
-            e.closest(".workbook-editor .sidebar") !== null) {
+            e.closest(".workbook-editor .sidebar") !== null ||
+            e.closest(".dialog") !== null) {
             return false;
         }
         return true;
@@ -292,7 +306,7 @@ class TableView extends React.Component<TableViewProps>{
     protected afterCreateRow(index: number, amount: number) {
         // console.log('afterCreateRow', index, amount);
         // alter table matrix
-        const matrix = this.tableData.variantMatrix;
+        const matrix = this.tableData.cellMatrix;
         const tail = matrix.splice(index);
         for (let i = 0; i < tail.length; i++) {
             if (tail[i] !== undefined) {
@@ -315,7 +329,7 @@ class TableView extends React.Component<TableViewProps>{
     protected afterRemoveRow(index: number, amount: number) {
         // console.log('afterRemoveRow', index, amount);
         // alter table matrix
-        const matrix = this.tableData.variantMatrix;
+        const matrix = this.tableData.cellMatrix;
         matrix.splice(index, amount);
         if (index + amount < this.tableData.rows) {
             this.tableData.rows -= amount;
@@ -342,7 +356,7 @@ class TableView extends React.Component<TableViewProps>{
     protected afterCreateCol(index: number, amount: number) {
         // console.log('afterCreateCol', index, amount);
         // alter table matrix
-        const matrix = this.tableData.variantMatrix;
+        const matrix = this.tableData.cellMatrix;
         for (const row of matrix) {
             if (row === undefined) { // is that possible?
                 continue;
@@ -370,7 +384,7 @@ class TableView extends React.Component<TableViewProps>{
     protected afterRemoveCol(index: number, amount: number) {
         // console.log('afterRemoveCol', index, amount);
         // alter table matrix
-        const matrix = this.tableData.variantMatrix;
+        const matrix = this.tableData.cellMatrix;
         for (const row of matrix) {
             if (row === undefined) { // is that possible?
                 continue;
@@ -442,7 +456,7 @@ class TableView extends React.Component<TableViewProps>{
 
     protected modifyData(row: number, column: number, valueHolder: any, ioMode: string) {
         if (ioMode === 'get') {
-            valueHolder.value = this.getPlainCellValue(row, column);
+            valueHolder.value = this.getCellValueForDisplay(row, column);
         } else if (ioMode === 'set') {
             const value = fromEditableString(valueHolder.value);
             valueHolder.value = toEditableString(value);
@@ -491,6 +505,8 @@ class TableView extends React.Component<TableViewProps>{
             this.applyRemoveColumns(action.removeColumns);
         } else if (typeof action.resetTable !== 'undefined') {
             this.applyResetTable(action.resetTable);
+        } else if (typeof action.setCellsFormat !== 'undefined') {
+            this.applySetCellsFormat(action.setCellsFormat);
         } else {
             throw new Error('Unrecognized table action: ' + action);
         }
@@ -595,6 +611,25 @@ class TableView extends React.Component<TableViewProps>{
         this.forceUpdate();
     }
 
+    protected applySetCellsFormat(setCellsFormat: SetCellsFormat) {
+        const left = setCellsFormat.columnIndex;
+        const top = setCellsFormat.rowIndex;
+        const right = left + setCellsFormat.nColumns - 1;
+        const bottom = top + setCellsFormat.nRows - 1;
+        const format = setCellsFormat.format;
+        for (let r = top; r <= bottom; r++) {
+            for (let c = left; c <= right; c++) {
+                let cell = this.getCell(r, c);
+                if (typeof cell !== "undefined") {
+                    cell.format = format;
+                } else {
+                    cell = new Cell(c, Values.blank(), format);
+                    this.setCell(r, c, cell);
+                }
+            }
+        }
+    }
+
     protected mergeParams(out: NamedValue[], queryAutomaton: QueryAutomaton) {
         const paramMap = new Map<string, NamedValue>();
         if (typeof queryAutomaton.template !== 'undefined' &&
@@ -652,6 +687,7 @@ class TableView extends React.Component<TableViewProps>{
                     <HotTable
                         ref={this.hotTableRef}
                         data={data}
+                        cells={this.getCellProperties}
                         readOnly={readOnly}
                         colHeaders={true}
                         rowHeaders={true}

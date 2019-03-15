@@ -166,7 +166,7 @@
             },
             "binder": {
               "data": {
-                "formulaString": "category!A1:B1"
+                "formulaString": "category!A2:B2"
               },
               "orientation": "ORIENT_VERTICAL",
               "categoriesPlacement": "PLCMT_LEFT",
@@ -307,7 +307,7 @@
             },
             "binder": {
               "data": {
-                "formulaString": "category!A2:B2"
+                "formulaString": "category!A3:B3"
               },
               "orientation": "ORIENT_VERTICAL",
               "categoriesPlacement": "PLCMT_LEFT",
@@ -858,7 +858,7 @@
               },
               "orientation": "ORIENT_VERTICAL",
               "categoriesPlacement": "PLCMT_LEFT",
-              "seriesNamePlacement": "PLCMT_UNSET"
+              "seriesNamePlacement": "PLCMT_TOP"
             },
             "xAxis": {
               "title": "",

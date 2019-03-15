@@ -182,7 +182,7 @@ public class TestReferences extends TestCase {
         // relative reference will be shifted
         assertEquals("hello!world!AAB101", References.toFormula(new CellRef("hello", "world",
                 99, false, 702, false, -1), 1, 1));
-        assertEquals("\"你好\"!\"世界\"!$AAA$100", References.toFormula(new CellRef("你好", "世界",
+        assertEquals("'你好'!'世界'!$AAA$100", References.toFormula(new CellRef("你好", "世界",
                 99, true, 702, true, -1), 1, 1));
 
         try {
@@ -212,11 +212,13 @@ public class TestReferences extends TestCase {
                 0, 0, 25, 8, -1, -1)));
         assertEquals("foobar!$A$1:$Z$9", References.toFormula(new RangeRef(null, "foobar",
                 0, 0, 25, 8, -1, -1)));
-        assertEquals("\"你好\"!\"世界\"!$A$1:$Z$9", References.toFormula(new RangeRef("你好", "世界",
+        assertEquals("'你好'!'世界'!$A$1:$Z$9", References.toFormula(new RangeRef("你好", "世界",
                 0, 0, 25, 8, -1, -1)));
         assertEquals("$A:$Z", References.toFormula(new RangeRef(null, null,
                 0, -1, 25, -1, -1, -1)));
         assertEquals("$1:$9", References.toFormula(new RangeRef(null, null,
+                -1, 0, -1, 8, -1, -1)));
+        assertEquals("'\"你\"好'!'''世界''!'!$1:$9", References.toFormula(new RangeRef("\"你\"好", "'世界'!",
                 -1, 0, -1, 8, -1, -1)));
 
         try {

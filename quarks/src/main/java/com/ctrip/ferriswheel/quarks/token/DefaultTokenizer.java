@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.quarks.token;
 
 import com.ctrip.ferriswheel.quarks.LexContext;
-import com.ctrip.ferriswheel.quarks.StringDecoder;
 import com.ctrip.ferriswheel.quarks.Token;
+import com.ctrip.ferriswheel.quarks.TokenDecoder;
 import com.ctrip.ferriswheel.quarks.Tokenizer;
 import com.ctrip.ferriswheel.quarks.exception.QuarksLexicalException;
 import com.ctrip.ferriswheel.quarks.util.Trie;
@@ -162,6 +162,9 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
         from = to = next;
         char ch;
 
+        TokenDecoder quotedIdentifierDecoder = lex.getQuotedIdentifierDecoder();
+        TokenDecoder stringDecoder = lex.getStringDecoder();
+
         while (true) { // seek to next non-whitespace character.
             if (src == null || from >= src.length()) {
                 if (reader == null)
@@ -214,30 +217,11 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
 
         ch = src.charAt(from);
 
-        if (lex.isIdentifierQuoteStart(ch)) {
-            char quoteStart = ch;
-            to = ++from;
-            if (to >= src.length())
-                raiseException("Unexpected end, expects identifier.");
+        if (quotedIdentifierDecoder.isStartChar(ch)) {
+            to = from + 1;
+            return parseQuotedIdentifier(ch);
 
-            if (!lex.isIdentifierStart(src.charAt(to)))
-                raiseException("Unexpected character: '" + src.charAt(to)
-                        + "', expects identifier.");
-
-            if (!parseIdentifier())
-                raiseException("Failed to parse identifier.");
-
-            if (to >= src.length())
-                raiseException("Unexpected end, expects quote end.");
-
-            if (!lex.isIdentifierQuoteEnd(src.charAt(to), quoteStart))
-                raiseException("Unexpected character: '" + src.charAt(to)
-                        + "', expects quote end.");
-
-            next = to + 1;
-            return true;
-
-        } else if (lex.getStringDecoder().isQuoteStart(ch)) {
+        } else if (stringDecoder.isStartChar(ch)) {
             to = from + 1;
             return parseString(ch);
 
@@ -302,17 +286,18 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
     }
 
     boolean parseString(char quoteStart) throws QuarksLexicalException {
-        StringDecoder decoder = lex.getStringDecoder();
+        TokenDecoder decoder = lex.getStringDecoder();
         decoder.start(quoteStart);
         while (to < src.length()) {
             char ch = src.charAt(to);
             boolean accepted = decoder.feed(ch);
-            to++;
-            if (!accepted) {
+            if (accepted) {
+                to++;
+            } else {
                 break;
             }
         }
-        if (decoder.isEnded()) {
+        if (decoder.isTerminable()) {
             type = Type.String;
             token = decoder.finish();
             next = to;
@@ -449,6 +434,29 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
         next = to;
         type = Type.Identifier;
         return true;
+    }
+
+    boolean parseQuotedIdentifier(char quoteStart) throws QuarksLexicalException {
+        TokenDecoder decoder = lex.getQuotedIdentifierDecoder();
+        decoder.start(quoteStart);
+        while (to < src.length()) {
+            char ch = src.charAt(to);
+            boolean accepted = decoder.feed(ch);
+            if (accepted) {
+                to++;
+            } else {
+                break;
+            }
+        }
+        if (decoder.isTerminable()) {
+            type = Type.Identifier;
+            token = decoder.finish();
+            next = to;
+            return true;
+        } else {
+            raiseException("Unexpected end.");
+            return false; // useless as above line will certainly throw an exception.
+        }
     }
 
     boolean checkKeyword() {

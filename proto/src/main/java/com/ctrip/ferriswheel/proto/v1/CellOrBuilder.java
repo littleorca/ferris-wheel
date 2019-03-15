@@ -24,4 +24,14 @@ public interface CellOrBuilder extends
    * <code>.ferriswheel.v1.UnionValue value = 2;</code>
    */
   com.ctrip.ferriswheel.proto.v1.UnionValueOrBuilder getValueOrBuilder();
+
+  /**
+   * <code>string format = 3;</code>
+   */
+  java.lang.String getFormat();
+  /**
+   * <code>string format = 3;</code>
+   */
+  com.google.protobuf.ByteString
+      getFormatBytes();
 }

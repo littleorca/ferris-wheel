@@ -1,9 +1,8 @@
 package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.quarks.LexContext;
-import com.ctrip.ferriswheel.quarks.StringDecoder;
+import com.ctrip.ferriswheel.quarks.TokenDecoder;
 import com.ctrip.ferriswheel.quarks.token.DefaultLexContext;
-import com.ctrip.ferriswheel.quarks.token.DefaultStringCodec;
 
 public class FormulaLexContext implements LexContext {
 
@@ -14,7 +13,8 @@ public class FormulaLexContext implements LexContext {
     final String[] delimiters = new String[]{",", "(", ")"};
     final String[] keywords = new String[]{};
     final String[] literals = new String[]{"true", "false", "null"};
-    final DefaultStringCodec stringCodec = new DefaultStringCodec();
+    final TokenDecoder quotedIdentifierDecoder = new FormulaQuotedIdentifierDecoder();
+    final TokenDecoder stringDecoder = new FormulaStringDecoder();
 
     public static FormulaLexContext getDefaultInstance() {
         if (DEFAULT == null) {
@@ -45,18 +45,13 @@ public class FormulaLexContext implements LexContext {
     }
 
     @Override
-    public boolean isIdentifierQuoteStart(char ch) {
-        return (ch == '#');
+    public TokenDecoder getQuotedIdentifierDecoder() {
+        return quotedIdentifierDecoder;
     }
 
     @Override
-    public boolean isIdentifierQuoteEnd(char ch, char quoteStart) {
-        return (ch == '!');
-    }
-
-    @Override
-    public StringDecoder getStringDecoder() {
-        return stringCodec;
+    public TokenDecoder getStringDecoder() {
+        return stringDecoder;
     }
 
     @Override
@@ -94,4 +89,107 @@ public class FormulaLexContext implements LexContext {
         return literals;
     }
 
+    class FormulaQuotedIdentifierDecoder extends FormulaStringDecoder {
+        @Override
+        public boolean isStartChar(char ch) {
+            return ch == '\'' || ch == '#';
+        }
+
+        @Override
+        boolean isEndChar(char ch) {
+            if (startQuote == '\'') {
+                return ch == startQuote;
+            } else if (startQuote == '#') {
+                return ch == '!';
+            }
+            return false;
+        }
+
+        @Override
+        public boolean feed(char ch) {
+            if (ended) {
+                return false;
+            }
+            if (startQuote == '\'') {
+                return super.feed(ch);
+
+            } else if (startQuote == '#') {
+                if (ch == '!') {
+                    ended = true;
+                } else {
+                    stringBuilder.append(ch);
+                }
+                return true;
+
+            } else {
+                return false;
+            }
+        }
+    }
+
+    class FormulaStringDecoder implements TokenDecoder {
+        final char QUOTE_FOR_STRING = '"';
+        char startQuote;
+        StringBuilder stringBuilder;
+        boolean quotePending = false;
+        boolean ended = false;
+
+        @Override
+        public boolean isStartChar(char ch) {
+            return ch == QUOTE_FOR_STRING;
+        }
+
+        boolean isEndChar(char ch) {
+            return (ch == startQuote);
+        }
+
+        @Override
+        public void start(char quoteStart) {
+            startQuote = quoteStart;
+            stringBuilder = new StringBuilder();
+            quotePending = false;
+            ended = false;
+        }
+
+        @Override
+        public boolean feed(char ch) {
+            if (ended) {
+                return false;
+            }
+            if (quotePending) {
+                if (ch == startQuote) {
+                    stringBuilder.append(ch);
+                    quotePending = false;
+                    return true;
+
+                } else {
+                    ended = true;
+                    return false;
+                }
+
+            } else if (isEndChar(ch)) {
+                quotePending = true;
+                return true;
+
+            } else {
+                stringBuilder.append(ch);
+                return true;
+            }
+        }
+
+        @Override
+        public boolean isTerminable() {
+            return ended || quotePending;
+        }
+
+        @Override
+        public String finish() {
+            if (!isTerminable() || stringBuilder == null) {
+                throw new RuntimeException();
+            }
+            String result = stringBuilder.toString();
+            stringBuilder = null;
+            return result;
+        }
+    }
 }

@@ -5,6 +5,7 @@ import com.ctrip.ferriswheel.common.variant.Value;
 
 public class DefaultCell extends ValueNode implements Cell {
     private int columnIndex;
+    private String format;
     private boolean fillUp;
     private boolean fillDown;
     private boolean fillLeft;
@@ -19,7 +20,12 @@ public class DefaultCell extends ValueNode implements Cell {
     }
 
     DefaultCell(DefaultAssetManager assetManager, Value value, String formulaString) {
+        this(assetManager, value, formulaString, null);
+    }
+
+    DefaultCell(DefaultAssetManager assetManager, Value value, String formulaString, String format) {
         super(assetManager, value, formulaString);
+        this.format = format;
     }
 
     public DefaultRow getRow() {
@@ -40,6 +46,15 @@ public class DefaultCell extends ValueNode implements Cell {
 
     void setColumnIndex(int columnIndex) {
         this.columnIndex = columnIndex;
+    }
+
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    void setFormat(String format) {
+        this.format = format;
     }
 
     @Override

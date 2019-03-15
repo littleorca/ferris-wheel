@@ -11,7 +11,7 @@ import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
 import com.ctrip.ferriswheel.core.bean.AxisImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
+import com.ctrip.ferriswheel.core.formula.SimpleReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.formula.ReferenceElement;
@@ -185,8 +185,8 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
         RangeRef rangeRef = null;
         FormulaElement elem = data.getFormulaElements()[0];
-        if (elem instanceof CellReferenceElement) {
-            CellRef cellRef = ((CellReferenceElement) elem).getCellRef();
+        if (elem instanceof SimpleReferenceElement) {
+            CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
             rangeRef = new RangeRef(cellRef, cellRef);
         } else if (elem instanceof RangeReferenceElement) {
             rangeRef = ((RangeReferenceElement) elem).getRangeRef();

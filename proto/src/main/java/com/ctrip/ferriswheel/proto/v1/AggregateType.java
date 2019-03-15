@@ -45,17 +45,21 @@ public enum AggregateType
    */
   AT_STANDARD_DEVIATION(8),
   /**
-   * <code>AT_GLOBAL_STANDARD_DEVIATION = 9;</code>
+   * <code>AT_STANDARD_DEVIATION_POPULATION = 9;</code>
    */
-  AT_GLOBAL_STANDARD_DEVIATION(9),
+  AT_STANDARD_DEVIATION_POPULATION(9),
   /**
    * <code>AT_VARIANCE = 10;</code>
    */
   AT_VARIANCE(10),
   /**
-   * <code>AT_GLOBAL_VARIANCE = 11;</code>
+   * <code>AT_VARIANCE_POPULATION = 11;</code>
    */
-  AT_GLOBAL_VARIANCE(11),
+  AT_VARIANCE_POPULATION(11),
+  /**
+   * <code>AT_CUSTOM = 12;</code>
+   */
+  AT_CUSTOM(12),
   UNRECOGNIZED(-1),
   ;
 
@@ -96,17 +100,21 @@ public enum AggregateType
    */
   public static final int AT_STANDARD_DEVIATION_VALUE = 8;
   /**
-   * <code>AT_GLOBAL_STANDARD_DEVIATION = 9;</code>
+   * <code>AT_STANDARD_DEVIATION_POPULATION = 9;</code>
    */
-  public static final int AT_GLOBAL_STANDARD_DEVIATION_VALUE = 9;
+  public static final int AT_STANDARD_DEVIATION_POPULATION_VALUE = 9;
   /**
    * <code>AT_VARIANCE = 10;</code>
    */
   public static final int AT_VARIANCE_VALUE = 10;
   /**
-   * <code>AT_GLOBAL_VARIANCE = 11;</code>
+   * <code>AT_VARIANCE_POPULATION = 11;</code>
    */
-  public static final int AT_GLOBAL_VARIANCE_VALUE = 11;
+  public static final int AT_VARIANCE_POPULATION_VALUE = 11;
+  /**
+   * <code>AT_CUSTOM = 12;</code>
+   */
+  public static final int AT_CUSTOM_VALUE = 12;
 
 
   public final int getNumber() {
@@ -136,9 +144,10 @@ public enum AggregateType
       case 6: return AT_PRODUCT;
       case 7: return AT_DECIMAL_ONLY_COUNT;
       case 8: return AT_STANDARD_DEVIATION;
-      case 9: return AT_GLOBAL_STANDARD_DEVIATION;
+      case 9: return AT_STANDARD_DEVIATION_POPULATION;
       case 10: return AT_VARIANCE;
-      case 11: return AT_GLOBAL_VARIANCE;
+      case 11: return AT_VARIANCE_POPULATION;
+      case 12: return AT_CUSTOM;
       default: return null;
     }
   }

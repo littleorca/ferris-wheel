@@ -1,0 +1,34 @@
+.dialog,
+.dialog>.dialog-title,
+.dialog>.dialog-content,
+.dialog>.dialog-actions {
+    box-sizing: border-box;
+}
+
+.dialog {
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.dialog>.dialog-title {
+    flex: 0 0 auto;
+    margin: 0 auto;
+    padding-bottom: 1em;
+}
+
+.dialog>.dialog-content {
+    flex: 1 0 auto;
+    display: flex;
+}
+
+.dialog>.dialog-actions {
+    flex: 0 0 auto;
+    padding-top: 1em;
+    text-align: right;
+}
+
+.dialog>.dialog-actions>.button {
+    margin-left: .5em;
+}

@@ -182,6 +182,23 @@ public class TableDataImpl implements Table, Serializable {
     }
 
     @Override
+    public void setCellsFormat(int rowIndex, int columnIndex, int nRows, int nColumns, String format) {
+        final int left = columnIndex;
+        final int top = rowIndex;
+        final int right = columnIndex + nColumns - 1;
+        final int bottom = rowIndex + nRows - 1;
+        if (left < 0 || top < 0 || right <= left || bottom <= top) {
+            throw new IllegalArgumentException();
+        }
+        for (int r = top; r <= bottom; r++) {
+            for (int c = left; c <= right; c++) {
+                CellData cell = (CellData) getOrCreateCell(r, c);
+                cell.setFormat(format);
+            }
+        }
+    }
+
+    @Override
     public void eraseCell(int rowIndex, int columnIndex) {
         Cell cell = getCell(rowIndex, columnIndex);
         if (!cell.getData().isBlank()) {

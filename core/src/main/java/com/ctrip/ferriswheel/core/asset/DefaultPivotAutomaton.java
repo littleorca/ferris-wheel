@@ -1,18 +1,22 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.common.aggregate.AggregateType;
+import com.ctrip.ferriswheel.common.aggregate.NamedValuesSample;
 import com.ctrip.ferriswheel.common.automaton.*;
-import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.ListDataSet;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.core.analysis.DimensionalAggregator;
+import com.ctrip.ferriswheel.core.analysis.AggregateMeta;
+import com.ctrip.ferriswheel.core.analysis.DimensionalAggregateMaster;
 import com.ctrip.ferriswheel.core.bean.PivotFieldImpl;
 import com.ctrip.ferriswheel.core.bean.PivotValueImpl;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +26,9 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
     private static final Logger LOG = LoggerFactory.getLogger(DefaultPivotAutomaton.class);
     private final ValueNode data;
     private List<PivotFilter> filters; // TODO
-    private List<FieldMeta> rows;
-    private List<FieldMeta> columns;
-    private List<ValueMeta> values;
+    private List<PivotField> rows;
+    private List<PivotField> columns;
+    private List<com.ctrip.ferriswheel.common.automaton.PivotValue> values;
     private DataSet dataSet;
 
     DefaultPivotAutomaton(AssetManager assetManager, PivotConfiguration pivot) {
@@ -65,24 +69,16 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         }
 
         if (pivot.getFilters() != null) {
-//            pivot.getFilters(); // TODO
+            this.filters = pivot.getFilters();
         }
-
-        this.rows = new ArrayList<>(pivot.getRows().size());
-        for (PivotField row : pivot.getRows()) {
-            this.rows.add(new FieldMeta(row, -1)); // make copy to avoid being modified outside.
+        if (pivot.getRows() != null) {
+            this.rows = pivot.getRows();
         }
-
         if (pivot.getColumns() != null) {
-            this.columns = new ArrayList<>(pivot.getColumns().size());
-            for (PivotField column : pivot.getColumns()) {
-                this.columns.add(new FieldMeta(column, -1));
-            }
+            this.columns = pivot.getColumns();
         }
-
-        this.values = new ArrayList<>(pivot.getValues().size());
-        for (PivotValue value : pivot.getValues()) {
-            this.values.add(new ValueMeta(value, -1));
+        if (pivot.getValues() != null) {
+            this.values = pivot.getValues();
         }
     }
 
@@ -137,6 +133,18 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         return (DefaultTable) getParent();
     }
 
+    /**
+     * TODO values should be able to present as either pivot column or row, and users should
+     * be allowed to change values' level among other pivot fields. For now value is hardcoded
+     * as the last level of the column fields.
+     *
+     * @param table
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @return
+     */
     private DataSet analyse(final DefaultTable table,
                             final int left,
                             final int top,
@@ -147,58 +155,96 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 //        }
 
         // map field -> column index
-        analyseHeader(table, top, left, right);
+        Map<String, Integer> nameMapper = analyseHeader(table, top, left, right);
 
         // aggregate
-        DimensionalAggregator aggregator = aggregate(table, left, top + 1, right, bottom);
+        DimensionalAggregateMaster aggregator = aggregate(nameMapper, table, left, top + 1, right, bottom);
 
         // expand column/row dimensions
 
         List<Dimension[]> allColumnDimensions = combineDimensions(aggregator, columns);
         List<Dimension[]> allRowDimensions = combineDimensions(aggregator, rows);
 
+        if (!values.isEmpty()) { // make sure both column and row are not empty
+            if (allColumnDimensions.isEmpty()) {
+                allColumnDimensions.add(new Dimension[0]); // default column
+            }
+            if (allRowDimensions.isEmpty()) {
+                allRowDimensions.add(new Dimension[0]); // default row
+            }
+        }
+
+        if (values.isEmpty() && allColumnDimensions.isEmpty() && allRowDimensions.isEmpty()) {
+            return ListDataSet.Builder.emptyDataSet();
+        }
+
         // prepare data set
 
         ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
-                .setColumnCount(rows.size() + allColumnDimensions.size() * values.size());
+                .setColumnCount((rows.isEmpty() ? 0 : 1) + allColumnDimensions.size() * values.size());
 
         // add headers
 
-        for (int i = 0; i < columns.size(); i++) {
-            ListDataSet.RecordBuilder recordBuilder = dataSetBuilder.newRecordBuilder();
-            int fieldOffset = rows.size();
-            for (Dimension[] columnDimensions : allColumnDimensions) {
-                for (ValueMeta ignored : values) {
-                    recordBuilder.set(fieldOffset++, columnDimensions[i].value);
+        ListDataSet.RecordBuilder headerBuilder = dataSetBuilder.newRecordBuilder();
+
+        if (!rows.isEmpty()) {
+            StringBuilder name = new StringBuilder();
+            for (PivotField row : rows) {
+                if (name.length() > 0) {
+                    name.append("/");
                 }
+                name.append(row.getField());
             }
-            recordBuilder.commit();
+            headerBuilder.set(0, Value.str(name.toString()));
         }
-        if (values.size() > 1) {
-            ListDataSet.RecordBuilder valueNameRow = dataSetBuilder.newRecordBuilder();
-            int fieldOffset = rows.size();
-            for (int i = 0; i < allColumnDimensions.size(); i++) {
-                for (ValueMeta valueMeta : values) {
-                    valueNameRow.set(fieldOffset++, Value.str(valueMeta.getLabel()));
+
+        int fieldOffset = rows.isEmpty() ? 0 : 1;
+        for (Dimension[] columnDimensions : allColumnDimensions) {
+            StringBuilder namePrefix = new StringBuilder();
+            for (Dimension columnDimension : columnDimensions) {
+                if (namePrefix.length() > 0) {
+                    namePrefix.append("\n");
                 }
+                namePrefix.append(columnDimension.getValue().strValue());
             }
-            valueNameRow.commit();
+            for (com.ctrip.ferriswheel.common.automaton.PivotValue value : values) {
+                String name = namePrefix.toString();
+                if (values.size() > 1 || name.isEmpty()) {
+                    if (!name.isEmpty()) {
+                        name += "\n";
+                    }
+                    name += StringUtils.isNullOrEmpty(value.getLabel()) ? value.getField() : value.getLabel();
+                }
+                headerBuilder.set(fieldOffset++, Value.str(name));
+            }
         }
+        headerBuilder.commit();
 
         // extract data
 
         for (Dimension[] rowDimensions : allRowDimensions) {
             ListDataSet.RecordBuilder recordBuilder = dataSetBuilder.newRecordBuilder();
             int fieldIdx = 0;
+            StringBuilder name = new StringBuilder();
             Map<String, Variant> rowDimMap = new HashMap<>();
-            for (Dimension rowDimension : rowDimensions) {
-                rowDimMap.put(rowDimension.getName(), rowDimension.getValue());
-                recordBuilder.set(fieldIdx++, rowDimension.getValue());
+            if (rowDimensions.length > 0) {
+                for (Dimension rowDimension : rowDimensions) {
+                    rowDimMap.put(rowDimension.getName(), rowDimension.getValue());
+                    if (name.length() > 0) {
+                        name.append("/");
+                    }
+                    name.append(rowDimension.getValue().strValue());
+                }
+                recordBuilder.set(fieldIdx, Value.str(name.toString()));
+                fieldIdx++;
             }
 
             for (Dimension[] columnDimensions : allColumnDimensions) {
                 Map<String, Variant> allDimMap = new HashMap<>(rowDimMap);
                 for (Dimension columnDimension : columnDimensions) {
+                    if (allDimMap.containsKey(columnDimension.getName())) {
+                        throw new RuntimeException("Illegal pivot settings.");
+                    }
                     allDimMap.put(columnDimension.getName(), columnDimension.getValue());
                 }
                 Variant[] aggValues = aggregator.getValues(allDimMap);
@@ -228,77 +274,80 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
             }
         }
 
-        for (FieldMeta meta : rows) {
-            if (!fieldMap.containsKey(meta.getField())) {
-                throw new RuntimeException("Field \"" + meta.getField() + "\" not found.");
+        for (PivotField field : rows) {
+            if (!fieldMap.containsKey(field.getField())) {
+                throw new RuntimeException("Field \"" + field.getField() + "\" not found.");
             }
-            meta.setColumnIndex(fieldMap.get(meta.getField()));
         }
-        for (FieldMeta meta : columns) {
-            if (!fieldMap.containsKey(meta.getField())) {
-                throw new RuntimeException("Field \"" + meta.getField() + "\" not found.");
+        for (PivotField field : columns) {
+            if (!fieldMap.containsKey(field.getField())) {
+                throw new RuntimeException("Field \"" + field.getField() + "\" not found.");
             }
-            meta.setColumnIndex(fieldMap.get(meta.getField()));
         }
-        for (ValueMeta meta : values) {
-            if (!fieldMap.containsKey(meta.getField())) {
-                throw new RuntimeException("Field \"" + meta.getField() + "\" not found.");
+        for (com.ctrip.ferriswheel.common.automaton.PivotValue value : values) {
+            if (AggregateType.CUSTOM.equals(value.getAggregateType())) {
+                // TODO check formula references
+            } else if (!fieldMap.containsKey(value.getField())) {
+                throw new RuntimeException("Field \"" + value.getField() + "\" not found.");
             }
-            meta.setColumnIndex(fieldMap.get(meta.getField()));
         }
 
         return fieldMap;
     }
 
-    private DimensionalAggregator aggregate(DefaultTable table, int left, int top, int right, int bottom) {
-        AggregateType[] types = new AggregateType[values.size()];
-        for (int i = 0; i < values.size(); i++) {
-            types[i] = values.get(i).getAggregateType();
+    private DimensionalAggregateMaster aggregate(Map<String, Integer> nameMapper, DefaultTable table, int left, int top, int right, int bottom) {
+        List<String> dimensionNameList = new ArrayList<>(rows.size() + columns.size());
+        for (PivotField row : rows) {
+            dimensionNameList.add(row.getField());
         }
-        DimensionalAggregator aggregator = new DimensionalAggregator(types);
+        for (PivotField col : columns) {
+            dimensionNameList.add(col.getField());
+        }
+        String[] dimensionNames = dimensionNameList.toArray(new String[dimensionNameList.size()]);
+
+        AggregateMeta[] aggregateMetas = new AggregateMeta[values.size()];
+        for (int i = 0; i < values.size(); i++) {
+            com.ctrip.ferriswheel.common.automaton.PivotValue value = values.get(i);
+            aggregateMetas[i] = new AggregateMeta(value.getAggregateType(), value.getField());
+        }
+
+        DimensionalAggregateMaster aggregator = new DimensionalAggregateMaster(dimensionNames, aggregateMetas);
+        SampleWrapper sampleWrapper = new SampleWrapper(nameMapper);
 
         for (int rowIndex = top; rowIndex <= bottom; rowIndex++) {
-            DimensionalAggregator.Record record = aggregator.newRecord();
-            for (FieldMeta field : columns) {
-                DefaultCell cell = table.getCell(rowIndex, field.getColumnIndex());
-                record.dim(field.getField(), cell.getData());
-            }
-            for (FieldMeta field : rows) {
-                DefaultCell cell = table.getCell(rowIndex, field.getColumnIndex());
-                record.dim(field.getField(), cell.getData());
-            }
-            for (int i = 0; i < values.size(); i++) {
-                DefaultCell cell = table.getCell(rowIndex, values.get(i).getColumnIndex());
-                record.val(i, cell.getData());
-            }
-            record.commit();
+            sampleWrapper.wrap(table.getRow(rowIndex));
+            aggregator.feed(sampleWrapper);
         }
+
         return aggregator;
     }
 
-    private List<Dimension[]> combineDimensions(DimensionalAggregator aggregator, List<FieldMeta> fields) {
-        Dimension[][] rowDimensions = new Dimension[fields.size()][];
+    private List<Dimension[]> combineDimensions(DimensionalAggregateMaster aggregator, List<PivotField> fields) {
+        if (fields.isEmpty()) {
+            return new ArrayList<>(0);
+        }
+        Dimension[][] allFieldDimensions = new Dimension[fields.size()][];
         for (int i = 0; i < fields.size(); i++) {
-            FieldMeta meta = fields.get(i);
-            Set<Variant> dimensions = aggregator.getAllDimensions().get(meta.getField());
+            PivotField meta = fields.get(i);
+            Set<Variant> dimensions = aggregator.getDimensions(meta.getField());
             dimensions = new TreeSet<>(dimensions);
             List<Dimension> dimList = new ArrayList<>(dimensions.size());
             for (Variant dim : dimensions) {
                 dimList.add(new Dimension(meta.getField(), dim));
             }
-            rowDimensions[i] = dimList.toArray(new Dimension[dimList.size()]);
+            allFieldDimensions[i] = dimList.toArray(new Dimension[dimList.size()]);
         }
 
         List<Dimension[]> combinations = new ArrayList<>();
-        Dimension[] pendingCombination = new Dimension[rowDimensions.length];
-        combineDimensions(combinations, pendingCombination, rowDimensions, 0);
+        Dimension[] pendingCombination = new Dimension[allFieldDimensions.length];
+        combineDimensionsRecursively(combinations, pendingCombination, allFieldDimensions, 0);
         return combinations;
     }
 
-    private void combineDimensions(final List<Dimension[]> combinations,
-                                   final Dimension[] pendingCombination,
-                                   final Dimension[][] allDimensions,
-                                   final int dimensionsIndex) {
+    private void combineDimensionsRecursively(final List<Dimension[]> combinations,
+                                              final Dimension[] pendingCombination,
+                                              final Dimension[][] allDimensions,
+                                              final int dimensionsIndex) {
         if (dimensionsIndex >= allDimensions.length) {
             combinations.add(Arrays.copyOf(pendingCombination, pendingCombination.length));
             return;
@@ -306,7 +355,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         final Dimension[] currentDimensions = allDimensions[dimensionsIndex];
         for (int i = 0; i < currentDimensions.length; i++) {
             pendingCombination[dimensionsIndex] = currentDimensions[i];
-            combineDimensions(combinations,
+            combineDimensionsRecursively(combinations,
                     pendingCombination,
                     allDimensions,
                     dimensionsIndex + 1);
@@ -317,16 +366,16 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         List<PivotFilter> filterList = new ArrayList<>(filters.size());
         List<PivotField> rowList = new ArrayList<>(rows.size());
         List<PivotField> columnList = new ArrayList<>(columns.size());
-        List<PivotValue> valueList = new ArrayList<>(values.size());
+        List<com.ctrip.ferriswheel.common.automaton.PivotValue> valueList = new ArrayList<>(values.size());
 
-        for (FieldMeta fm : rows) {
-            rowList.add(new PivotFieldImpl(fm));
+        for (PivotField field : rows) {
+            rowList.add(new PivotFieldImpl(field));
         }
-        for (FieldMeta fm : columns) {
-            columnList.add(new PivotFieldImpl(fm));
+        for (PivotField field : columns) {
+            columnList.add(new PivotFieldImpl(field));
         }
-        for (ValueMeta vm : values) {
-            valueList.add(new PivotValueImpl(vm));
+        for (PivotValue value : values) {
+            valueList.add(new PivotValueImpl(value));
         }
 
         return new TableAutomatonInfo.PivotAutomatonInfo(
@@ -349,42 +398,8 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         return Collections.unmodifiableList(columns);
     }
 
-    public List<PivotValue> getValues() {
+    public List<com.ctrip.ferriswheel.common.automaton.PivotValue> getValues() {
         return Collections.unmodifiableList(values);
-    }
-
-    class FieldMeta extends PivotFieldImpl {
-        private int columnIndex;
-
-        public FieldMeta(PivotField field, int columnIndex) {
-            super(field);
-            this.columnIndex = columnIndex;
-        }
-
-        public int getColumnIndex() {
-            return columnIndex;
-        }
-
-        public void setColumnIndex(int columnIndex) {
-            this.columnIndex = columnIndex;
-        }
-    }
-
-    class ValueMeta extends PivotValueImpl {
-        private int columnIndex;
-
-        public ValueMeta(PivotValue value, int columnIndex) {
-            super(value);
-            this.columnIndex = columnIndex;
-        }
-
-        public int getColumnIndex() {
-            return columnIndex;
-        }
-
-        public void setColumnIndex(int columnIndex) {
-            this.columnIndex = columnIndex;
-        }
     }
 
     class Dimension {
@@ -410,6 +425,36 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 
         public void setValue(Variant value) {
             this.value = value;
+        }
+    }
+
+    class SampleWrapper implements NamedValuesSample {
+        private final Map<String, Integer> nameMapper;
+        private Row row;
+
+        public SampleWrapper(Map<String, Integer> nameMapper) {
+            this.nameMapper = Collections.unmodifiableMap(nameMapper);
+        }
+
+        public SampleWrapper wrap(Row row) {
+            this.row = row;
+            return this;
+        }
+
+        @Override
+        public int size() {
+            return nameMapper.size();
+        }
+
+        @Override
+        public Variant getValue(String name) {
+            Integer index = nameMapper.get(name);
+            return row.getCell(index).getData();
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return nameMapper.keySet().iterator();
         }
     }
 }

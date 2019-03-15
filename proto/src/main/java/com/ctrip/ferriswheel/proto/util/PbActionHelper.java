@@ -510,6 +510,18 @@ public class PbActionHelper {
         return builder.build();
     }
 
+    public static com.ctrip.ferriswheel.proto.v1.SetCellsFormat pb(SetCellsFormat bean) {
+        com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder builder = com.ctrip.ferriswheel.proto.v1.SetCellsFormat.newBuilder()
+                .setSheetName(bean.getSheetName())
+                .setTableName(bean.getTableName())
+                .setRowIndex(bean.getRowIndex())
+                .setColumnIndex(bean.getColumnIndex())
+                .setNRows(bean.getnRows())
+                .setNColumns(bean.getnColumns())
+                .setFormat(bean.getFormat());
+        return builder.build();
+    }
+
     public static com.ctrip.ferriswheel.proto.v1.Action pb(Action action) {
         if (action instanceof AddChart) {
             return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
@@ -661,6 +673,11 @@ public class PbActionHelper {
         } else if (action instanceof ResetTable) {
             return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
                     .setResetTable(pb((ResetTable) action))
+                    .build();
+
+        } else if (action instanceof SetCellsFormat) {
+            return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
+                    .setSetCellsFormat(pb((SetCellsFormat) action))
                     .build();
 
         } else {

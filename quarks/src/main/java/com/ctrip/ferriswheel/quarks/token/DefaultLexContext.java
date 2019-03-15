@@ -1,7 +1,7 @@
 package com.ctrip.ferriswheel.quarks.token;
 
 import com.ctrip.ferriswheel.quarks.LexContext;
-import com.ctrip.ferriswheel.quarks.StringDecoder;
+import com.ctrip.ferriswheel.quarks.TokenDecoder;
 
 public class DefaultLexContext implements LexContext {
     private static final long serialVersionUID = 1L;
@@ -12,7 +12,8 @@ public class DefaultLexContext implements LexContext {
     final String[] delimiters;
     final String[] keywords;
     final String[] literals;
-    final StringDecoder stringDecoder;
+    final TokenDecoder quotedIdentifierDecoder;
+    final TokenDecoder stringDecoder;
 
     public static DefaultLexContext getDefaultInstance() {
         if (DEFAULT == null) {
@@ -28,7 +29,8 @@ public class DefaultLexContext implements LexContext {
                             /* delimiters -> */new String[]{",", ";", "{", "}", "//", "/*", "*/"},
                             /* keywords ---> */new String[]{},
                             /* literals ---> */new String[]{"true", "false", "null"},
-                            new DefaultStringCodec());
+                            new DummyDecoder(),
+                            new DefaultStringDecoder());
                 }
             }
         }
@@ -37,16 +39,19 @@ public class DefaultLexContext implements LexContext {
 
     public DefaultLexContext(String[] operators, String[] delimiters,
                              String[] keywords, String[] literals) {
-        this(operators, delimiters, keywords, literals, new DefaultStringCodec());
+        this(operators, delimiters, keywords, literals,
+                new DummyDecoder(), new DefaultStringDecoder());
     }
 
     public DefaultLexContext(String[] operators, String[] delimiters,
                              String[] keywords, String[] literals,
-                             StringDecoder stringDecoder) {
+                             TokenDecoder quotedIdentifierDecoder,
+                             TokenDecoder stringDecoder) {
         this.operators = operators;
         this.delimiters = delimiters;
         this.keywords = keywords;
         this.literals = literals;
+        this.quotedIdentifierDecoder = quotedIdentifierDecoder;
         this.stringDecoder = stringDecoder;
     }
 
@@ -68,17 +73,12 @@ public class DefaultLexContext implements LexContext {
     }
 
     @Override
-    public boolean isIdentifierQuoteStart(char ch) {
-        return (ch == '`');
+    public TokenDecoder getQuotedIdentifierDecoder() {
+        return quotedIdentifierDecoder;
     }
 
     @Override
-    public boolean isIdentifierQuoteEnd(char ch, char quoteStart) {
-        return isIdentifierQuoteStart(quoteStart) && ch == quoteStart;
-    }
-
-    @Override
-    public StringDecoder getStringDecoder() {
+    public TokenDecoder getStringDecoder() {
         return stringDecoder;
     }
 

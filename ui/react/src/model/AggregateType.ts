@@ -7,9 +7,10 @@ enum AggregateType {
     PRODUCT = 'AT_PRODUCT',
     DECIMAL_ONLY_COUNT = 'AT_DECIMAL_ONLY_COUNT',
     STANDARD_DEVIATION = 'AT_STANDARD_DEVIATION',
-    GLOBAL_STANDARD_DEVIATION = 'AT_GLOBAL_STANDARD_DEVIATION',
+    STANDARD_DEVIATION_POPULATION = 'AT_STANDARD_DEVIATION_POPULATION',
     VARIANCE = 'AT_VARIANCE',
-    GLOBAL_VARIANCE = 'AT_GLOBAL_VARIANCE',
+    VARIANCE_POPULATION = 'AT_VARIANCE_POPULATION',
+    CUSTOM = 'AT_CUSTOM',
 };
 
 const AggregateTypeNames = Object.freeze({
@@ -21,9 +22,10 @@ const AggregateTypeNames = Object.freeze({
     [AggregateType.PRODUCT]: '乘积',
     [AggregateType.DECIMAL_ONLY_COUNT]: '数值计数',
     [AggregateType.STANDARD_DEVIATION]: '标准偏差',
-    [AggregateType.GLOBAL_STANDARD_DEVIATION]: '总体标准偏差',
+    [AggregateType.STANDARD_DEVIATION_POPULATION]: '总体标准偏差',
     [AggregateType.VARIANCE]: '方差',
-    [AggregateType.GLOBAL_VARIANCE]: '总体方差',
+    [AggregateType.VARIANCE_POPULATION]: '总体方差',
+    [AggregateType.CUSTOM]: '自定义公式',
 });
 
 /**
@@ -38,9 +40,10 @@ const AggregateTypeList = Object.freeze([
     AggregateType.PRODUCT,
     AggregateType.DECIMAL_ONLY_COUNT,
     AggregateType.STANDARD_DEVIATION,
-    AggregateType.GLOBAL_STANDARD_DEVIATION,
+    AggregateType.STANDARD_DEVIATION_POPULATION,
     AggregateType.VARIANCE,
-    AggregateType.GLOBAL_VARIANCE,
+    AggregateType.VARIANCE_POPULATION,
+    AggregateType.CUSTOM,
 ]);
 
 export default AggregateType;

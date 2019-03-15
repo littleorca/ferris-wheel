@@ -45,8 +45,16 @@ public class FormulaParser {
 
     static {
         // register functions
-        registerFunction(new Average());
-        registerFunction(new Sum());
+        registerFunction(new AggregatorFunctions.Average());
+        registerFunction(new AggregatorFunctions.Sum());
+        registerFunction(new AggregatorFunctions.Count());
+        registerFunction(new AggregatorFunctions.Max());
+        registerFunction(new AggregatorFunctions.Min());
+        registerFunction(new AggregatorFunctions.StDev());
+        registerFunction(new AggregatorFunctions.StDevP());
+        registerFunction(new AggregatorFunctions.Var());
+        registerFunction(new AggregatorFunctions.VarP());
+
         registerFunction(new If());
         registerFunction(new VLookup());
         // bool
@@ -144,8 +152,8 @@ public class FormulaParser {
                     newFormula.append(token.getSource(), pos, elem.getToken().getFrom());
                 }
 
-                if (elem instanceof CellReferenceElement) {
-                    CellRef cellRef = ((CellReferenceElement) elem).getCellRef();
+                if (elem instanceof SimpleReferenceElement) {
+                    CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
                     newFormula.append(References.toFormula(cellRef, nShiftRows, nShiftCols));
 
                 } else if (elem instanceof RangeReferenceElement) {

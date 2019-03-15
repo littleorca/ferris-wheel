@@ -37,12 +37,18 @@ public interface Cell {
 
     DynamicVariant getData();
 
+    String getFormat();
+
+    @Deprecated
     boolean isFillUp();
 
+    @Deprecated
     boolean isFillDown();
 
+    @Deprecated
     boolean isFillLeft();
 
+    @Deprecated
     boolean isFillRight();
 
 }

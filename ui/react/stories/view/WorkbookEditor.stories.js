@@ -16,9 +16,9 @@ table.rows.push(new Row(0,
     ]));
 table.rows.push(new Row(1,
     [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(15)),
-        new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2")),
+        new Cell(0, Values.dec(123.456), "#,##0.00"),
+        new Cell(1, Values.dec(3.141592), "#,##0.000"),
+        new Cell(2, Values.withType(VariantType.DECIMAL, 39.3171974522, "A2/B2"), "#,##0.00%"),
     ]));
 
 const lineChart = new Chart(
@@ -125,6 +125,7 @@ const workbook = new Workbook(
 
 const fakeService = {
     call: (request, okCallback, errorCallback) => {
+        console.log("fakeService:", request);
         okCallback(new EditResponse(request.txId, 0, 'Ok', new ChangeList([request.action])));
     },
 

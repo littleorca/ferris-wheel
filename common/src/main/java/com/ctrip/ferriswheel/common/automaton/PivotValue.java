@@ -25,7 +25,7 @@
 
 package com.ctrip.ferriswheel.common.automaton;
 
-import com.ctrip.ferriswheel.common.table.AggregateType;
+import com.ctrip.ferriswheel.common.aggregate.AggregateType;
 
 public interface PivotValue {
 

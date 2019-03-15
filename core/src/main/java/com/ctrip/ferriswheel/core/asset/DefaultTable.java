@@ -245,6 +245,31 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     @Override
+    public void setCellsFormat(int rowIndex, int columnIndex, int nRows, int nColumns, String format) {
+        handleAction(new SetCellsFormat(getSheet().getName(), getName(), rowIndex, columnIndex, nRows, nColumns, format));
+    }
+
+    void handleAction(SetCellsFormat setCellsFormat) {
+        final int left = setCellsFormat.getColumnIndex();
+        final int top = setCellsFormat.getRowIndex();
+        final int right = left + setCellsFormat.getnColumns() - 1;
+        final int bottom = top + setCellsFormat.getnRows() - 1;
+        final String format = setCellsFormat.getFormat();
+        if (right < left || bottom < top) {
+            throw new IllegalArgumentException();
+        }
+        checkForUpdate(left, top, right, bottom);
+        publicly(setCellsFormat, () -> {
+            for (int rowIndex = top; rowIndex <= bottom; rowIndex++) {
+                DefaultRow row = getRow(rowIndex);
+                for (int columnIndex = left; columnIndex <= right; columnIndex++) {
+                    row.getCell(columnIndex).setFormat(format);
+                }
+            }
+        });
+    }
+
+    @Override
     public void eraseCell(int rowIndex, int colIndex) {
         checkForUpdate(rowIndex, colIndex);
         DefaultCell cell = getCell(rowIndex, colIndex);

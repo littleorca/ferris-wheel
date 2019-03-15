@@ -12,14 +12,20 @@ interface UnionValueListEditProps extends React.ClassAttributes<UnionValueListEd
     type?: VariantType, // TODO add type restraction.
     readOnly?: boolean,
     className?: string,
-    fixedItems?: boolean,
+    hideActions?: boolean,
+    sortable?: boolean,
+    addible?: boolean,
+    removable?: boolean,
     afterChange?(list: UnionValue[]): void,
 }
 
 class UnionValueListEdit extends React.Component<UnionValueListEditProps> {
     protected static defaultProps: Partial<UnionValueListEditProps> = {
         readOnly: false,
-        fixedItems: false,
+        hideActions: false,
+        sortable: true,
+        addible: true,
+        removable: true,
     };
 
     private manipulableListRef: React.RefObject<ManipulableList<UnionValue>>;
@@ -110,24 +116,24 @@ class UnionValueListEdit extends React.Component<UnionValueListEditProps> {
                     ref={this.manipulableListRef}
                     list={list}
                     itemRenderer={this.itemRenderer}
-                    sortable={!this.props.fixedItems}
-                    addible={!this.props.fixedItems}
-                    removable={!this.props.fixedItems}
+                    sortable={this.props.sortable}
+                    addible={this.props.addible}
+                    removable={this.props.removable}
                     onItemMoved={this.onItemMoved}
                     onItemRemoved={this.onItemRemoved}
                     onItemAdded={this.onItemAppended}
                     onItemUpdated={this.onItemUpdated}
                     createItem={Values.blank} />
-                {this.props.fixedItems || (
+                {this.props.hideActions || (
                     <div className="actions">
-                        <button
+                        {this.props.addible && <button
                             type="button"
                             className="add-item"
-                            onClick={this.addNewItem}>添加</button>
-                        <button
+                            onClick={this.addNewItem}>添加</button>}
+                        {this.props.removable && <button
                             type="button"
                             className="remove-item"
-                            onClick={this.removeItem}>删除</button>
+                            onClick={this.removeItem}>删除</button>}
                     </div>
                 )}
             </div>

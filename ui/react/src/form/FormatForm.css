@@ -1,0 +1,51 @@
+.format-form {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+.format-form .format-type {
+    flex: 0 0 auto;
+}
+
+.format-form .format-option {
+    flex: 1 0 10em;
+    padding-left: 1em;
+}
+
+.format-form .format-option .decimal-format-option,
+.format-form .format-option .datetime-format-option {
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+}
+
+.format-form .format-option label {
+    display: block;
+    margin-bottom: .5em;
+}
+
+.format-form .format-option label span::after {
+    content: ": ";
+}
+
+.format-form .format-option label input[type="text"] {
+    width: 2em;
+    font-size: 1em;
+}
+
+.format-form select {
+    font-size: 1em;
+    overflow-y: auto;
+}
+
+.format-form .format-sample {
+    margin-bottom: .5em;
+    padding: 0 .5em;
+    height: 2em;
+    line-height: 2em;
+    border-radius: .5em;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+}

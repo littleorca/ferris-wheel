@@ -84,7 +84,7 @@ class Values {
                 t = VariantType.BOOL;
                 v = value.boolean;
 
-            } else if (value.date instanceof Date) {
+            } else if (typeof value.date !== "undefined") {
                 t = VariantType.DATE;
                 v = value.date;
 

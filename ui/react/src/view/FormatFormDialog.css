@@ -1,0 +1,8 @@
+.format-form-dialog {
+    width: 18em;
+    height: 15em;
+}
+
+.format-form-dialog .format-form {
+    flex: 1 0 auto;
+}

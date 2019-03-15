@@ -30,28 +30,18 @@ public interface LexContext extends Serializable {
     boolean isIdentifierPart(char ch);
 
     /**
-     * Determine if the given character is an identifier quote start.
+     * Get identifier decoder.
      *
-     * @param ch
      * @return
      */
-    boolean isIdentifierQuoteStart(char ch);
+    TokenDecoder getQuotedIdentifierDecoder();
 
     /**
-     * Determine if the given character is the counterpart of the specified
-     * identifier quote start.
-     *
-     * @param ch
-     * @return
-     */
-    boolean isIdentifierQuoteEnd(char ch, char quoteStart);
-
-    /**
-     * Get string parser that takes care of escaped characters.
+     * Get string decoder that takes care of escaped characters.
      *
      * @return
      */
-    StringDecoder getStringDecoder();
+    TokenDecoder getStringDecoder();
 
     /**
      * Determine if the given token is line comment delimiter.

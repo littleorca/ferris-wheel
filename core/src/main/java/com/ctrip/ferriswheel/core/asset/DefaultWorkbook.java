@@ -712,7 +712,8 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     }
 
     @Override
-    public Variant resolve(CellRef cellRef, FormulaEvaluationContext context) {
+    public Variant resolve(SimpleReferenceElement referenceElement, FormulaEvaluationContext context) {
+        CellRef cellRef = referenceElement.getCellRef();
         if (!cellRef.isValid()) {
             return Value.err(ErrorCodes.ILLEGAL_REF);
         }
@@ -801,8 +802,8 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             evaluableNodes.add(valueNode.getAssetId());
             Formula f = valueNode.getFormula();
             for (FormulaElement e : f.getElements()) {
-                if (e instanceof CellReferenceElement) {
-                    CellRef cellRef = ((CellReferenceElement) e).getCellRef();
+                if (e instanceof SimpleReferenceElement) {
+                    CellRef cellRef = ((SimpleReferenceElement) e).getCellRef();
                     hookCellRef(sheet, table, valueNode, cellRef);
                     traceRange(sheet, table, valueNode, cellRef);
 
@@ -1052,8 +1053,8 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             if (!(elem instanceof ReferenceElement)) {
                 continue;
             }
-            if (elem instanceof CellReferenceElement) {
-                CellRef cellRef = ((CellReferenceElement) elem).getCellRef();
+            if (elem instanceof SimpleReferenceElement) {
+                CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
                 modified |= fixCellRef(cellRef, table.getAutomaton() != null);
 
             } else if (elem instanceof RangeReferenceElement) {

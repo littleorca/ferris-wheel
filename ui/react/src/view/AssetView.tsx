@@ -14,43 +14,6 @@ interface AssetViewProps extends SharedViewProps<AssetView> {
     className?: string;
 }
 
-const AssetContentView = (props: AssetViewProps) => {
-    if (typeof props.asset.table !== 'undefined') {
-        return (
-            <TableView
-                className={props.className}
-                table={props.asset.table}
-                editable={props.editable}
-                onAction={props.onAction}
-                herald={props.herald} />
-        );
-    } else if (typeof props.asset.chart !== 'undefined') {
-        return (
-            <ChartView
-                className={props.className}
-                chart={props.asset.chart}
-                editable={props.editable}
-                onAction={props.onAction}
-                herald={props.herald} />
-        );
-    } else if (typeof props.asset.text !== 'undefined') {
-        return (
-            <TextView
-                className={props.className}
-                text={props.asset.text}
-                editable={props.editable}
-                onAction={props.onAction}
-                herald={props.herald} />
-        );
-    } else { // maybe should just throw error
-        return (
-            <div className={props.className}>
-                <p className="alert">Invalid asset!</p>
-            </div>
-        );
-    }
-}
-
 class AssetView extends React.Component<AssetViewProps> implements ActionHerald {
     private listeners: Set<ActionHandler> = new Set();
 
@@ -93,15 +56,40 @@ class AssetView extends React.Component<AssetViewProps> implements ActionHerald 
 
     public render() {
         const className = classnames("asset-view", this.props.className);
+        const asset = this.props.asset;
+        const commonProps = {
+            className,
+            asset,
+            editable: this.props.editable,
+            onAction: this.onRequestAction,
+            herald: this,
+        }
 
-        return (
-            <AssetContentView
-                className={className}
-                asset={this.props.asset}
-                editable={this.props.editable}
-                onAction={this.onRequestAction}
-                herald={this} />
-        );
+        if (typeof asset.table !== 'undefined') {
+            return (
+                <TableView
+                    {...commonProps}
+                    table={asset.table} />
+            );
+        } else if (typeof asset.chart !== 'undefined') {
+            return (
+                <ChartView
+                    {...commonProps}
+                    chart={asset.chart} />
+            );
+        } else if (typeof asset.text !== 'undefined') {
+            return (
+                <TextView
+                    {...commonProps}
+                    text={asset.text} />
+            );
+        } else { // maybe should just throw error
+            return (
+                <div {...commonProps}>
+                    <p className="alert">Invalid asset!</p>
+                </div>
+            );
+        }
     }
 }
 

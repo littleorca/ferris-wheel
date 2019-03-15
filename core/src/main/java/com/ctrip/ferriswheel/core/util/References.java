@@ -186,9 +186,9 @@ public class References {
     static StringBuilder appendQualifier(StringBuilder sb, String sheetName, String tableName) {
         if (tableName != null) {
             if (sheetName != null) {
-                sb.append(EscapeHelper.escape(sheetName)).append('!');
+                sb.append(EscapeHelper.escapeNameIfNeeded(sheetName)).append('!');
             }
-            sb.append(EscapeHelper.escape(tableName)).append('!');
+            sb.append(EscapeHelper.escapeNameIfNeeded(tableName)).append('!');
         }
         return sb;
     }

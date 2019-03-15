@@ -24,7 +24,7 @@ public class SymbolHandlers {
 
     static {
         r(new TransparentHandler());
-        r(new CellHandler());
+        r(new SimpleReferenceHandler());
         r(new RangeHandler());
         r(new ReferenceHandler());
         r(new PositiveHandler());
@@ -91,13 +91,13 @@ public class SymbolHandlers {
     //                    | <number> ":" <number>
     //<cell_reference> ::= <identifier>
 
-    @Handle("cell_reference")
-    public static class CellHandler implements SymbolHandler {
+    @Handle("simple_reference")
+    public static class SimpleReferenceHandler implements SymbolHandler {
         //<cell_reference> ::= <identifier>
         @Override
         public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
             FormulaElement identifier = stack.pop();
-            CellReferenceElement elem = new CellReferenceElement(References.parseSimpleCellRef(identifier.getTokenString()));
+            SimpleReferenceElement elem = new SimpleReferenceElement(References.parseSimpleCellRef(identifier.getTokenString()));
             elem.setSlices(1);
             elem.setToken(identifier.getToken());
             stack.push(elem);
@@ -181,8 +181,8 @@ public class SymbolHandlers {
             String tableName = q2 == null ? null : q2.getTokenString();
             FormulaElement startElement = q1 != null ? q1 : q2 != null ? q2 : null;
 
-            if (elem instanceof CellReferenceElement) {
-                CellRef cellRef = ((CellReferenceElement) elem).getCellRef();
+            if (elem instanceof SimpleReferenceElement) {
+                CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
                 cellRef.setSheetName(sheetName);
                 cellRef.setTableName(tableName);
             } else if (elem instanceof RangeReferenceElement) {

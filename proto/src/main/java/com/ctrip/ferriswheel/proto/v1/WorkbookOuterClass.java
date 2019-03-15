@@ -191,109 +191,110 @@ public final class WorkbookOuterClass {
       ".ferriswheel.v1.TableAutomaton\022&\n\006layout" +
       "\030\004 \001(\0132\026.ferriswheel.v1.Layout\"=\n\003Row\022\021\n" +
       "\trow_index\030\001 \001(\005\022#\n\005cells\030\002 \003(\0132\024.ferris" +
-      "wheel.v1.Cell\"G\n\004Cell\022\024\n\014column_index\030\001 " +
+      "wheel.v1.Cell\"W\n\004Cell\022\024\n\014column_index\030\001 " +
       "\001(\005\022)\n\005value\030\002 \001(\0132\032.ferriswheel.v1.Unio" +
-      "nValue\"\350\001\n\nUnionValue\022\026\n\016formula_string\030" +
-      "\001 \001(\t\022*\n\005error\030\002 \001(\0162\031.ferriswheel.v1.Er" +
-      "rorCodeH\000\022\021\n\007decimal\030\003 \001(\tH\000\022\021\n\007boolean\030" +
-      "\004 \001(\010H\000\022*\n\004date\030\005 \001(\0132\032.google.protobuf." +
-      "TimestampH\000\022\020\n\006string\030\006 \001(\tH\000\022)\n\004list\030\007 " +
-      "\001(\0132\031.ferriswheel.v1.ListValueH\000B\007\n\005valu" +
-      "e\"G\n\tListValue\022)\n\005items\030\001 \003(\0132\032.ferriswh" +
-      "eel.v1.UnionValue\022\017\n\007columns\030\002 \001(\005\"\223\001\n\016T" +
-      "ableAutomaton\0229\n\017query_automaton\030\001 \001(\0132\036" +
-      ".ferriswheel.v1.QueryAutomatonH\000\0229\n\017pivo" +
-      "t_automaton\030\002 \001(\0132\036.ferriswheel.v1.Pivot" +
-      "AutomatonH\000B\013\n\tautomaton\"\227\001\n\016QueryAutoma" +
-      "ton\022/\n\010template\030\001 \001(\0132\035.ferriswheel.v1.Q" +
-      "ueryTemplate\022*\n\006params\030\002 \003(\0132\032.ferriswhe" +
-      "el.v1.NamedValue\022(\n\005query\030\003 \001(\0132\031.ferris" +
-      "wheel.v1.DataQuery\"\210\001\n\rQueryTemplate\022\016\n\006" +
-      "scheme\030\001 \001(\t\0222\n\016builtin_params\030\002 \003(\0132\032.f" +
-      "erriswheel.v1.NamedValue\0223\n\020user_param_r" +
-      "ules\030\003 \003(\0132\031.ferriswheel.v1.ParamRule\"G\n" +
-      "\tDataQuery\022\016\n\006scheme\030\001 \001(\t\022*\n\006params\030\002 \003" +
-      "(\0132\032.ferriswheel.v1.NamedValue\"\353\001\n\016Pivot" +
-      "Automaton\022(\n\004data\030\001 \001(\0132\032.ferriswheel.v1" +
-      ".UnionValue\022,\n\007filters\030\002 \003(\0132\033.ferriswhe" +
-      "el.v1.PivotFilter\022(\n\004rows\030\003 \003(\0132\032.ferris" +
-      "wheel.v1.PivotField\022+\n\007columns\030\004 \003(\0132\032.f" +
-      "erriswheel.v1.PivotField\022*\n\006values\030\005 \003(\013" +
-      "2\032.ferriswheel.v1.PivotValue\"\034\n\013PivotFil" +
-      "ter\022\r\n\005field\030\001 \001(\t\"\033\n\nPivotField\022\r\n\005fiel" +
-      "d\030\001 \001(\t\"a\n\nPivotValue\022\r\n\005field\030\001 \001(\t\0225\n\016" +
-      "aggregate_type\030\002 \001(\0162\035.ferriswheel.v1.Ag" +
-      "gregateType\022\r\n\005label\030\003 \001(\t\"E\n\nNamedValue" +
-      "\022\014\n\004name\030\001 \001(\t\022)\n\005value\030\002 \001(\0132\032.ferriswh" +
-      "eel.v1.UnionValue\"\212\001\n\tParamRule\022\014\n\004name\030" +
-      "\001 \001(\t\022)\n\004type\030\002 \001(\0162\033.ferriswheel.v1.Var" +
-      "iantType\022\020\n\010nullable\030\003 \001(\010\0222\n\016allowed_va" +
-      "lues\030\004 \003(\0132\032.ferriswheel.v1.UnionValue\"\355" +
-      "\002\n\005Chart\022\014\n\004name\030\001 \001(\t\022\014\n\004type\030\002 \001(\t\022)\n\005" +
-      "title\030\003 \001(\0132\032.ferriswheel.v1.UnionValue\022" +
-      ".\n\ncategories\030\004 \001(\0132\032.ferriswheel.v1.Uni" +
-      "onValue\022&\n\006series\030\005 \003(\0132\026.ferriswheel.v1" +
-      ".Series\022&\n\006layout\030\006 \001(\0132\026.ferriswheel.v1" +
-      ".Layout\022+\n\006binder\030\007 \001(\0132\033.ferriswheel.v1" +
-      ".ChartBinder\022$\n\006x_axis\030\010 \001(\0132\024.ferriswhe" +
-      "el.v1.Axis\022$\n\006y_axis\030\t \001(\0132\024.ferriswheel" +
-      ".v1.Axis\022$\n\006z_axis\030\n \001(\0132\024.ferriswheel.v" +
-      "1.Axis\"\274\001\n\006Series\022(\n\004name\030\001 \001(\0132\032.ferris" +
-      "wheel.v1.UnionValue\022,\n\010x_values\030\002 \001(\0132\032." +
-      "ferriswheel.v1.UnionValue\022,\n\010y_values\030\003 " +
-      "\001(\0132\032.ferriswheel.v1.UnionValue\022,\n\010z_val" +
-      "ues\030\004 \001(\0132\032.ferriswheel.v1.UnionValue\"\322\001" +
-      "\n\006Layout\022(\n\007display\030\001 \001(\0162\027.ferriswheel." +
-      "v1.Display\022\r\n\005width\030\002 \001(\005\022\016\n\006height\030\003 \001(" +
-      "\005\022(\n\005align\030\004 \001(\0162\031.ferriswheel.v1.Placem" +
-      "ent\0221\n\016vertical_align\030\005 \001(\0162\031.ferriswhee" +
-      "l.v1.Placement\022\"\n\004grid\030\006 \001(\0132\024.ferriswhe" +
-      "el.v1.Grid\"n\n\004Grid\022\017\n\007columns\030\001 \001(\005\022\014\n\004r" +
-      "ows\030\002 \001(\005\022$\n\006column\030\003 \001(\0132\024.ferriswheel." +
-      "v1.Span\022!\n\003row\030\004 \001(\0132\024.ferriswheel.v1.Sp" +
-      "an\"\"\n\004Span\022\r\n\005start\030\001 \001(\005\022\013\n\003end\030\002 \001(\005\"\334" +
-      "\001\n\013ChartBinder\022(\n\004data\030\001 \001(\0132\032.ferriswhe" +
-      "el.v1.UnionValue\0220\n\013orientation\030\002 \001(\0162\033." +
-      "ferriswheel.v1.Orientation\0227\n\024categories" +
-      "_placement\030\003 \001(\0162\031.ferriswheel.v1.Placem" +
-      "ent\0228\n\025series_name_placement\030\004 \001(\0162\031.fer" +
-      "riswheel.v1.Placement\"\345\001\n\004Axis\022\r\n\005title\030" +
-      "\001 \001(\t\022\r\n\005label\030\002 \001(\t\022,\n\tplacement\030\003 \001(\0162" +
-      "\031.ferriswheel.v1.Placement\022\020\n\010reversed\030\004" +
-      " \001(\010\022*\n\010interval\030\005 \001(\0132\030.ferriswheel.v1." +
-      "Interval\022\'\n\005bands\030\006 \003(\0132\030.ferriswheel.v1" +
-      ".AxisBand\022*\n\010stacking\030\007 \001(\0162\030.ferriswhee" +
-      "l.v1.Stacking\"$\n\010Interval\022\014\n\004from\030\001 \001(\001\022" +
-      "\n\n\002to\030\002 \001(\001\"k\n\010AxisBand\022*\n\010interval\030\001 \001(" +
-      "\0132\030.ferriswheel.v1.Interval\022\r\n\005label\030\002 \001" +
-      "(\t\022$\n\005color\030\003 \001(\0132\025.ferriswheel.v1.Color" +
-      "\"@\n\005Color\022\013\n\003red\030\001 \001(\002\022\r\n\005green\030\002 \001(\002\022\014\n" +
-      "\004blue\030\003 \001(\002\022\r\n\005alpha\030\004 \001(\002\"i\n\004Text\022\014\n\004na" +
-      "me\030\001 \001(\t\022+\n\007content\030\002 \001(\0132\032.ferriswheel." +
-      "v1.UnionValue\022&\n\006layout\030\003 \001(\0132\026.ferriswh" +
-      "eel.v1.Layout*l\n\tErrorCode\022\014\n\010EC_UNSET\020\000" +
-      "\022\t\n\005EC_OK\020\001\022\016\n\nEC_UNKNOWN\020\002\022\022\n\016EC_ILLEGA" +
-      "L_REF\020\003\022\024\n\020EC_ILLEGAL_VALUE\020\004\022\014\n\010EC_DIV_" +
-      "0\020\005*\374\001\n\rAggregateType\022\014\n\010AT_UNSET\020\000\022\016\n\nA" +
-      "T_SUMMARY\020\001\022\014\n\010AT_COUNT\020\002\022\016\n\nAT_AVERAGE\020" +
-      "\003\022\016\n\nAT_MAXIMUM\020\004\022\016\n\nAT_MINIMUM\020\005\022\016\n\nAT_" +
-      "PRODUCT\020\006\022\031\n\025AT_DECIMAL_ONLY_COUNT\020\007\022\031\n\025" +
-      "AT_STANDARD_DEVIATION\020\010\022 \n\034AT_GLOBAL_STA" +
-      "NDARD_DEVIATION\020\t\022\017\n\013AT_VARIANCE\020\n\022\026\n\022AT" +
-      "_GLOBAL_VARIANCE\020\013*}\n\013VariantType\022\014\n\010VT_" +
-      "UNSET\020\000\022\014\n\010VT_ERROR\020\001\022\014\n\010VT_BLANK\020\002\022\016\n\nV" +
-      "T_DECIMAL\020\003\022\013\n\007VT_BOOL\020\004\022\013\n\007VT_DATE\020\005\022\r\n" +
-      "\tVT_STRING\020\006\022\013\n\007VT_LIST\020\007*G\n\007Display\022\016\n\n" +
-      "DISP_UNSET\020\000\022\r\n\tDISP_NONE\020\001\022\016\n\nDISP_BLOC" +
-      "K\020\002\022\r\n\tDISP_GRID\020\005*K\n\013Orientation\022\020\n\014ORI" +
-      "ENT_UNSET\020\000\022\025\n\021ORIENT_HORIZONTAL\020\001\022\023\n\017OR" +
-      "IENT_VERTICAL\020\002*p\n\tPlacement\022\017\n\013PLCMT_UN" +
-      "SET\020\000\022\016\n\nPLCMT_LEFT\020\001\022\r\n\tPLCMT_TOP\020\002\022\017\n\013" +
-      "PLCMT_RIGHT\020\003\022\020\n\014PLCMT_BOTTOM\020\004\022\020\n\014PLCMT" +
-      "_CENTER\020\005*K\n\010Stacking\022\022\n\016STACKING_UNSET\020" +
-      "\000\022\025\n\021STACKING_ABSOLUTE\020\001\022\024\n\020STACKING_PER" +
-      "CENT\020\002B\"\n\036com.ctrip.ferriswheel.proto.v1" +
-      "P\001b\006proto3"
+      "nValue\022\016\n\006format\030\003 \001(\t\"\350\001\n\nUnionValue\022\026\n" +
+      "\016formula_string\030\001 \001(\t\022*\n\005error\030\002 \001(\0162\031.f" +
+      "erriswheel.v1.ErrorCodeH\000\022\021\n\007decimal\030\003 \001" +
+      "(\tH\000\022\021\n\007boolean\030\004 \001(\010H\000\022*\n\004date\030\005 \001(\0132\032." +
+      "google.protobuf.TimestampH\000\022\020\n\006string\030\006 " +
+      "\001(\tH\000\022)\n\004list\030\007 \001(\0132\031.ferriswheel.v1.Lis" +
+      "tValueH\000B\007\n\005value\"G\n\tListValue\022)\n\005items\030" +
+      "\001 \003(\0132\032.ferriswheel.v1.UnionValue\022\017\n\007col" +
+      "umns\030\002 \001(\005\"\223\001\n\016TableAutomaton\0229\n\017query_a" +
+      "utomaton\030\001 \001(\0132\036.ferriswheel.v1.QueryAut" +
+      "omatonH\000\0229\n\017pivot_automaton\030\002 \001(\0132\036.ferr" +
+      "iswheel.v1.PivotAutomatonH\000B\013\n\tautomaton" +
+      "\"\227\001\n\016QueryAutomaton\022/\n\010template\030\001 \001(\0132\035." +
+      "ferriswheel.v1.QueryTemplate\022*\n\006params\030\002" +
+      " \003(\0132\032.ferriswheel.v1.NamedValue\022(\n\005quer" +
+      "y\030\003 \001(\0132\031.ferriswheel.v1.DataQuery\"\210\001\n\rQ" +
+      "ueryTemplate\022\016\n\006scheme\030\001 \001(\t\0222\n\016builtin_" +
+      "params\030\002 \003(\0132\032.ferriswheel.v1.NamedValue" +
+      "\0223\n\020user_param_rules\030\003 \003(\0132\031.ferriswheel" +
+      ".v1.ParamRule\"G\n\tDataQuery\022\016\n\006scheme\030\001 \001" +
+      "(\t\022*\n\006params\030\002 \003(\0132\032.ferriswheel.v1.Name" +
+      "dValue\"\353\001\n\016PivotAutomaton\022(\n\004data\030\001 \001(\0132" +
+      "\032.ferriswheel.v1.UnionValue\022,\n\007filters\030\002" +
+      " \003(\0132\033.ferriswheel.v1.PivotFilter\022(\n\004row" +
+      "s\030\003 \003(\0132\032.ferriswheel.v1.PivotField\022+\n\007c" +
+      "olumns\030\004 \003(\0132\032.ferriswheel.v1.PivotField" +
+      "\022*\n\006values\030\005 \003(\0132\032.ferriswheel.v1.PivotV" +
+      "alue\"\034\n\013PivotFilter\022\r\n\005field\030\001 \001(\t\"\033\n\nPi" +
+      "votField\022\r\n\005field\030\001 \001(\t\"a\n\nPivotValue\022\r\n" +
+      "\005field\030\001 \001(\t\0225\n\016aggregate_type\030\002 \001(\0162\035.f" +
+      "erriswheel.v1.AggregateType\022\r\n\005label\030\003 \001" +
+      "(\t\"E\n\nNamedValue\022\014\n\004name\030\001 \001(\t\022)\n\005value\030" +
+      "\002 \001(\0132\032.ferriswheel.v1.UnionValue\"\212\001\n\tPa" +
+      "ramRule\022\014\n\004name\030\001 \001(\t\022)\n\004type\030\002 \001(\0162\033.fe" +
+      "rriswheel.v1.VariantType\022\020\n\010nullable\030\003 \001" +
+      "(\010\0222\n\016allowed_values\030\004 \003(\0132\032.ferriswheel" +
+      ".v1.UnionValue\"\355\002\n\005Chart\022\014\n\004name\030\001 \001(\t\022\014" +
+      "\n\004type\030\002 \001(\t\022)\n\005title\030\003 \001(\0132\032.ferriswhee" +
+      "l.v1.UnionValue\022.\n\ncategories\030\004 \001(\0132\032.fe" +
+      "rriswheel.v1.UnionValue\022&\n\006series\030\005 \003(\0132" +
+      "\026.ferriswheel.v1.Series\022&\n\006layout\030\006 \001(\0132" +
+      "\026.ferriswheel.v1.Layout\022+\n\006binder\030\007 \001(\0132" +
+      "\033.ferriswheel.v1.ChartBinder\022$\n\006x_axis\030\010" +
+      " \001(\0132\024.ferriswheel.v1.Axis\022$\n\006y_axis\030\t \001" +
+      "(\0132\024.ferriswheel.v1.Axis\022$\n\006z_axis\030\n \001(\013" +
+      "2\024.ferriswheel.v1.Axis\"\274\001\n\006Series\022(\n\004nam" +
+      "e\030\001 \001(\0132\032.ferriswheel.v1.UnionValue\022,\n\010x" +
+      "_values\030\002 \001(\0132\032.ferriswheel.v1.UnionValu" +
+      "e\022,\n\010y_values\030\003 \001(\0132\032.ferriswheel.v1.Uni" +
+      "onValue\022,\n\010z_values\030\004 \001(\0132\032.ferriswheel." +
+      "v1.UnionValue\"\322\001\n\006Layout\022(\n\007display\030\001 \001(" +
+      "\0162\027.ferriswheel.v1.Display\022\r\n\005width\030\002 \001(" +
+      "\005\022\016\n\006height\030\003 \001(\005\022(\n\005align\030\004 \001(\0162\031.ferri" +
+      "swheel.v1.Placement\0221\n\016vertical_align\030\005 " +
+      "\001(\0162\031.ferriswheel.v1.Placement\022\"\n\004grid\030\006" +
+      " \001(\0132\024.ferriswheel.v1.Grid\"n\n\004Grid\022\017\n\007co" +
+      "lumns\030\001 \001(\005\022\014\n\004rows\030\002 \001(\005\022$\n\006column\030\003 \001(" +
+      "\0132\024.ferriswheel.v1.Span\022!\n\003row\030\004 \001(\0132\024.f" +
+      "erriswheel.v1.Span\"\"\n\004Span\022\r\n\005start\030\001 \001(" +
+      "\005\022\013\n\003end\030\002 \001(\005\"\334\001\n\013ChartBinder\022(\n\004data\030\001" +
+      " \001(\0132\032.ferriswheel.v1.UnionValue\0220\n\013orie" +
+      "ntation\030\002 \001(\0162\033.ferriswheel.v1.Orientati" +
+      "on\0227\n\024categories_placement\030\003 \001(\0162\031.ferri" +
+      "swheel.v1.Placement\0228\n\025series_name_place" +
+      "ment\030\004 \001(\0162\031.ferriswheel.v1.Placement\"\345\001" +
+      "\n\004Axis\022\r\n\005title\030\001 \001(\t\022\r\n\005label\030\002 \001(\t\022,\n\t" +
+      "placement\030\003 \001(\0162\031.ferriswheel.v1.Placeme" +
+      "nt\022\020\n\010reversed\030\004 \001(\010\022*\n\010interval\030\005 \001(\0132\030" +
+      ".ferriswheel.v1.Interval\022\'\n\005bands\030\006 \003(\0132" +
+      "\030.ferriswheel.v1.AxisBand\022*\n\010stacking\030\007 " +
+      "\001(\0162\030.ferriswheel.v1.Stacking\"$\n\010Interva" +
+      "l\022\014\n\004from\030\001 \001(\001\022\n\n\002to\030\002 \001(\001\"k\n\010AxisBand\022" +
+      "*\n\010interval\030\001 \001(\0132\030.ferriswheel.v1.Inter" +
+      "val\022\r\n\005label\030\002 \001(\t\022$\n\005color\030\003 \001(\0132\025.ferr" +
+      "iswheel.v1.Color\"@\n\005Color\022\013\n\003red\030\001 \001(\002\022\r" +
+      "\n\005green\030\002 \001(\002\022\014\n\004blue\030\003 \001(\002\022\r\n\005alpha\030\004 \001" +
+      "(\002\"i\n\004Text\022\014\n\004name\030\001 \001(\t\022+\n\007content\030\002 \001(" +
+      "\0132\032.ferriswheel.v1.UnionValue\022&\n\006layout\030" +
+      "\003 \001(\0132\026.ferriswheel.v1.Layout*l\n\tErrorCo" +
+      "de\022\014\n\010EC_UNSET\020\000\022\t\n\005EC_OK\020\001\022\016\n\nEC_UNKNOW" +
+      "N\020\002\022\022\n\016EC_ILLEGAL_REF\020\003\022\024\n\020EC_ILLEGAL_VA" +
+      "LUE\020\004\022\014\n\010EC_DIV_0\020\005*\223\002\n\rAggregateType\022\014\n" +
+      "\010AT_UNSET\020\000\022\016\n\nAT_SUMMARY\020\001\022\014\n\010AT_COUNT\020" +
+      "\002\022\016\n\nAT_AVERAGE\020\003\022\016\n\nAT_MAXIMUM\020\004\022\016\n\nAT_" +
+      "MINIMUM\020\005\022\016\n\nAT_PRODUCT\020\006\022\031\n\025AT_DECIMAL_" +
+      "ONLY_COUNT\020\007\022\031\n\025AT_STANDARD_DEVIATION\020\010\022" +
+      "$\n AT_STANDARD_DEVIATION_POPULATION\020\t\022\017\n" +
+      "\013AT_VARIANCE\020\n\022\032\n\026AT_VARIANCE_POPULATION" +
+      "\020\013\022\r\n\tAT_CUSTOM\020\014*}\n\013VariantType\022\014\n\010VT_U" +
+      "NSET\020\000\022\014\n\010VT_ERROR\020\001\022\014\n\010VT_BLANK\020\002\022\016\n\nVT" +
+      "_DECIMAL\020\003\022\013\n\007VT_BOOL\020\004\022\013\n\007VT_DATE\020\005\022\r\n\t" +
+      "VT_STRING\020\006\022\013\n\007VT_LIST\020\007*G\n\007Display\022\016\n\nD" +
+      "ISP_UNSET\020\000\022\r\n\tDISP_NONE\020\001\022\016\n\nDISP_BLOCK" +
+      "\020\002\022\r\n\tDISP_GRID\020\005*K\n\013Orientation\022\020\n\014ORIE" +
+      "NT_UNSET\020\000\022\025\n\021ORIENT_HORIZONTAL\020\001\022\023\n\017ORI" +
+      "ENT_VERTICAL\020\002*p\n\tPlacement\022\017\n\013PLCMT_UNS" +
+      "ET\020\000\022\016\n\nPLCMT_LEFT\020\001\022\r\n\tPLCMT_TOP\020\002\022\017\n\013P" +
+      "LCMT_RIGHT\020\003\022\020\n\014PLCMT_BOTTOM\020\004\022\020\n\014PLCMT_" +
+      "CENTER\020\005*K\n\010Stacking\022\022\n\016STACKING_UNSET\020\000" +
+      "\022\025\n\021STACKING_ABSOLUTE\020\001\022\024\n\020STACKING_PERC" +
+      "ENT\020\002B\"\n\036com.ctrip.ferriswheel.proto.v1P" +
+      "\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -349,7 +350,7 @@ public final class WorkbookOuterClass {
     internal_static_ferriswheel_v1_Cell_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Cell_descriptor,
-        new java.lang.String[] { "ColumnIndex", "Value", });
+        new java.lang.String[] { "ColumnIndex", "Value", "Format", });
     internal_static_ferriswheel_v1_UnionValue_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_ferriswheel_v1_UnionValue_fieldAccessorTable = new

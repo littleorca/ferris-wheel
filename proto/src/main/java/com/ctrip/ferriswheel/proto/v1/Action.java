@@ -533,6 +533,20 @@ private static final long serialVersionUID = 0L;
             actionCase_ = 35;
             break;
           }
+          case 290: {
+            com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder subBuilder = null;
+            if (actionCase_ == 36) {
+              subBuilder = ((com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_).toBuilder();
+            }
+            action_ =
+                input.readMessage(com.ctrip.ferriswheel.proto.v1.SetCellsFormat.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom((com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_);
+              action_ = subBuilder.buildPartial();
+            }
+            actionCase_ = 36;
+            break;
+          }
           default: {
             if (!parseUnknownFieldProto3(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -604,6 +618,7 @@ private static final long serialVersionUID = 0L;
     UPDATE_TEXT(33),
     EXECUTE_QUERY(34),
     RESET_TABLE(35),
+    SET_CELLS_FORMAT(36),
     ACTION_NOT_SET(0);
     private final int value;
     private ActionCase(int value) {
@@ -654,6 +669,7 @@ private static final long serialVersionUID = 0L;
         case 33: return UPDATE_TEXT;
         case 34: return EXECUTE_QUERY;
         case 35: return RESET_TABLE;
+        case 36: return SET_CELLS_FORMAT;
         case 0: return ACTION_NOT_SET;
         default: return null;
       }
@@ -1579,6 +1595,32 @@ private static final long serialVersionUID = 0L;
     return com.ctrip.ferriswheel.proto.v1.ResetTable.getDefaultInstance();
   }
 
+  public static final int SET_CELLS_FORMAT_FIELD_NUMBER = 36;
+  /**
+   * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+   */
+  public boolean hasSetCellsFormat() {
+    return actionCase_ == 36;
+  }
+  /**
+   * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+   */
+  public com.ctrip.ferriswheel.proto.v1.SetCellsFormat getSetCellsFormat() {
+    if (actionCase_ == 36) {
+       return (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_;
+    }
+    return com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance();
+  }
+  /**
+   * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+   */
+  public com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder getSetCellsFormatOrBuilder() {
+    if (actionCase_ == 36) {
+       return (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_;
+    }
+    return com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -1697,6 +1739,9 @@ private static final long serialVersionUID = 0L;
     }
     if (actionCase_ == 35) {
       output.writeMessage(35, (com.ctrip.ferriswheel.proto.v1.ResetTable) action_);
+    }
+    if (actionCase_ == 36) {
+      output.writeMessage(36, (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_);
     }
     unknownFields.writeTo(output);
   }
@@ -1846,6 +1891,10 @@ private static final long serialVersionUID = 0L;
     if (actionCase_ == 35) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(35, (com.ctrip.ferriswheel.proto.v1.ResetTable) action_);
+    }
+    if (actionCase_ == 36) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(36, (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -2007,6 +2056,10 @@ private static final long serialVersionUID = 0L;
         result = result && getResetTable()
             .equals(other.getResetTable());
         break;
+      case 36:
+        result = result && getSetCellsFormat()
+            .equals(other.getSetCellsFormat());
+        break;
       case 0:
       default:
     }
@@ -2161,6 +2214,10 @@ private static final long serialVersionUID = 0L;
       case 35:
         hash = (37 * hash) + RESET_TABLE_FIELD_NUMBER;
         hash = (53 * hash) + getResetTable().hashCode();
+        break;
+      case 36:
+        hash = (37 * hash) + SET_CELLS_FORMAT_FIELD_NUMBER;
+        hash = (53 * hash) + getSetCellsFormat().hashCode();
         break;
       case 0:
       default:
@@ -2571,6 +2628,13 @@ private static final long serialVersionUID = 0L;
           result.action_ = resetTableBuilder_.build();
         }
       }
+      if (actionCase_ == 36) {
+        if (setCellsFormatBuilder_ == null) {
+          result.action_ = action_;
+        } else {
+          result.action_ = setCellsFormatBuilder_.build();
+        }
+      }
       result.actionCase_ = actionCase_;
       onBuilt();
       return result;
@@ -2759,6 +2823,10 @@ private static final long serialVersionUID = 0L;
         }
         case RESET_TABLE: {
           mergeResetTable(other.getResetTable());
+          break;
+        }
+        case SET_CELLS_FORMAT: {
+          mergeSetCellsFormat(other.getSetCellsFormat());
           break;
         }
         case ACTION_NOT_SET: {
@@ -7567,6 +7635,142 @@ private static final long serialVersionUID = 0L;
       actionCase_ = 35;
       onChanged();;
       return resetTableBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.ctrip.ferriswheel.proto.v1.SetCellsFormat, com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder, com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder> setCellsFormatBuilder_;
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public boolean hasSetCellsFormat() {
+      return actionCase_ == 36;
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public com.ctrip.ferriswheel.proto.v1.SetCellsFormat getSetCellsFormat() {
+      if (setCellsFormatBuilder_ == null) {
+        if (actionCase_ == 36) {
+          return (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_;
+        }
+        return com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance();
+      } else {
+        if (actionCase_ == 36) {
+          return setCellsFormatBuilder_.getMessage();
+        }
+        return com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public Builder setSetCellsFormat(com.ctrip.ferriswheel.proto.v1.SetCellsFormat value) {
+      if (setCellsFormatBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        action_ = value;
+        onChanged();
+      } else {
+        setCellsFormatBuilder_.setMessage(value);
+      }
+      actionCase_ = 36;
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public Builder setSetCellsFormat(
+        com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder builderForValue) {
+      if (setCellsFormatBuilder_ == null) {
+        action_ = builderForValue.build();
+        onChanged();
+      } else {
+        setCellsFormatBuilder_.setMessage(builderForValue.build());
+      }
+      actionCase_ = 36;
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public Builder mergeSetCellsFormat(com.ctrip.ferriswheel.proto.v1.SetCellsFormat value) {
+      if (setCellsFormatBuilder_ == null) {
+        if (actionCase_ == 36 &&
+            action_ != com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance()) {
+          action_ = com.ctrip.ferriswheel.proto.v1.SetCellsFormat.newBuilder((com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          action_ = value;
+        }
+        onChanged();
+      } else {
+        if (actionCase_ == 36) {
+          setCellsFormatBuilder_.mergeFrom(value);
+        }
+        setCellsFormatBuilder_.setMessage(value);
+      }
+      actionCase_ = 36;
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public Builder clearSetCellsFormat() {
+      if (setCellsFormatBuilder_ == null) {
+        if (actionCase_ == 36) {
+          actionCase_ = 0;
+          action_ = null;
+          onChanged();
+        }
+      } else {
+        if (actionCase_ == 36) {
+          actionCase_ = 0;
+          action_ = null;
+        }
+        setCellsFormatBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder getSetCellsFormatBuilder() {
+      return getSetCellsFormatFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    public com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder getSetCellsFormatOrBuilder() {
+      if ((actionCase_ == 36) && (setCellsFormatBuilder_ != null)) {
+        return setCellsFormatBuilder_.getMessageOrBuilder();
+      } else {
+        if (actionCase_ == 36) {
+          return (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_;
+        }
+        return com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.ctrip.ferriswheel.proto.v1.SetCellsFormat, com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder, com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder> 
+        getSetCellsFormatFieldBuilder() {
+      if (setCellsFormatBuilder_ == null) {
+        if (!(actionCase_ == 36)) {
+          action_ = com.ctrip.ferriswheel.proto.v1.SetCellsFormat.getDefaultInstance();
+        }
+        setCellsFormatBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.ctrip.ferriswheel.proto.v1.SetCellsFormat, com.ctrip.ferriswheel.proto.v1.SetCellsFormat.Builder, com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder>(
+                (com.ctrip.ferriswheel.proto.v1.SetCellsFormat) action_,
+                getParentForChildren(),
+                isClean());
+        action_ = null;
+      }
+      actionCase_ = 36;
+      onChanged();;
+      return setCellsFormatBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

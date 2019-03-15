@@ -115,7 +115,11 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
             // UpdateText(33)
             new UpdateTextHandler(),
             // ExecuteQuery(34)
-            new ExecuteQueryHandler()
+            new ExecuteQueryHandler(),
+            // ResetTable(35)
+            new DummyHandler(),
+            // SetCellsFormat(36)
+            new SetCellsFormatHandler(),
     };
 
     @Override
@@ -709,4 +713,24 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         }
     }
 
+    class SetCellsFormatHandler extends WorkbookActionHandler {
+        @Override
+        void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
+            com.ctrip.ferriswheel.proto.v1.SetCellsFormat setCellsFormat = action.getSetCellsFormat();
+            ((DefaultTable) workbook.getSheet(setCellsFormat.getSheetName())
+                    .getAsset(setCellsFormat.getTableName()))
+                    .setCellsFormat(setCellsFormat.getRowIndex(),
+                            setCellsFormat.getColumnIndex(),
+                            setCellsFormat.getNRows(),
+                            setCellsFormat.getNColumns(),
+                            setCellsFormat.getFormat());
+        }
+    }
+
+    class DummyHandler extends WorkbookActionHandler {
+        @Override
+        void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
+            throw new UnsupportedOperationException();
+        }
+    }
 }

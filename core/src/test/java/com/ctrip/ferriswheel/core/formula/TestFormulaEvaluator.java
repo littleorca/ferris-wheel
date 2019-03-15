@@ -39,7 +39,7 @@ public class TestFormulaEvaluator extends TestCase {
         value = evaluator.evaluate(elements);
         assertEquals(ErrorCodes.ILLEGAL_VALUE, value.errorValue());
 
-        elements = FormulaParser.parse("\"abc\"&\"def\"");
+        elements = FormulaParser.parse("\"abc\"&\"def\" ");
         value = evaluator.evaluate(elements);
         assertEquals("abcdef", value.strValue());
 
@@ -90,7 +90,8 @@ public class TestFormulaEvaluator extends TestCase {
         }
 
         @Override
-        public Variant resolve(CellRef cellRef, FormulaEvaluationContext context) {
+        public Variant resolve(SimpleReferenceElement referenceElement, FormulaEvaluationContext context) {
+            CellRef cellRef = referenceElement.getCellRef();
             Sheet sheet = cellRef.getSheetName() == null ?
                     context.getCurrentSheet() : workbook.getSheet(cellRef.getSheetName());
             Table table = cellRef.getTableName() == null ?

@@ -46,7 +46,7 @@ public class FakeEvalContext implements FormulaEvaluationContext {
     }
 
     @Override
-    public Variant resolveReference(CellRef cellRef) {
+    public Variant resolveReference(SimpleReferenceElement referenceElement) {
         throw new UnsupportedOperationException();
     }
 

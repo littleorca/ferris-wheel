@@ -44,28 +44,6 @@ public class TestDefaultLexContext extends TestCase {
         }
     }
 
-    public void testIsIdentifierQuoteStart(char ch) {
-        assertTrue("'`' is supposed to be a legal identifier quote.",
-                lex.isIdentifierQuoteStart('`'));
-
-        String s = "$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?";
-        for (int i = 0; i < s.length(); i++) {
-            assertFalse("'" + s.charAt(i)
-                            + "' is supposed to be an illegal identifier quote.",
-                    lex.isIdentifierQuoteStart(s.charAt(i)));
-        }
-    }
-
-    public void testIsIdentifierQuoteEnd(char ch, char quoteStart) {
-        assertTrue(lex.isIdentifierQuoteEnd('`', '`'));
-        assertFalse(lex.isIdentifierQuoteEnd('`', '"'));
-        assertFalse(lex.isIdentifierQuoteEnd('"', '`'));
-        assertFalse(lex.isIdentifierQuoteEnd('a', '`'));
-        assertFalse(lex.isIdentifierQuoteEnd('`', 'a'));
-        assertFalse(lex.isIdentifierQuoteEnd('9', '`'));
-        assertFalse(lex.isIdentifierQuoteEnd('`', '9'));
-    }
-
     public void testOthers() {
         String[] operators = lex.getOperators();
         assertNotNull(operators);

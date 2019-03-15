@@ -5,8 +5,10 @@ import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.asset.DefaultTable;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
-import com.ctrip.ferriswheel.core.ref.CellRef;
+import com.ctrip.ferriswheel.core.formula.SimpleReferenceElement;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class FormulaEvaluator {
@@ -28,6 +30,14 @@ public class FormulaEvaluator {
             throw new RuntimeException("Abnormal stack state.");
         }
         return ret;
+    }
+
+    public List<Variant> evaluatePartial(FormulaElement[] partialElements) {
+        Context context = new Context();
+        for (FormulaElement elem : partialElements) {
+            elem.evaluate(context);
+        }
+        return new ArrayList<>(context.operands);
     }
 
     public Sheet getCurrentSheet() {
@@ -82,8 +92,8 @@ public class FormulaEvaluator {
         }
 
         @Override
-        public Variant resolveReference(CellRef cellRef) {
-            return resolver.resolve(cellRef, this);
+        public Variant resolveReference(SimpleReferenceElement referenceElement) {
+            return resolver.resolve(referenceElement, this);
         }
 
         @Override

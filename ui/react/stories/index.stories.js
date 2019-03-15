@@ -52,6 +52,7 @@ import WorkbookEditorStories from './view/WorkbookEditor.stories';
 import WorkbookPresenterStories from './view/WorkbookPresenter.stories'
 import WorkbookViewStories from './view/WorkbookView.stories';
 import QueryWizardStories from './view/QueryWizard.stories';
+import FormatFormStories from './ctrl/FormatForm.stories';
 
 // storiesOf('Welcome', module)
 //   .add('Example', () => <ExampleStories />);
@@ -165,6 +166,7 @@ storiesOf('Form', module)
   .add('BandForm', () => <BandFormStroies />)
   .add('ChartForm', () => <ChartFormStories />)
   .add('DataBinderForm', () => <DataBinderFormStories />)
+  .add('FormatForm', () => <FormatFormStories />)
   .add('LayoutForm', () => <LayoutFormStories />)
   .add('NamedValueForm', () => <NamedValueFormStories />)
   .add('ParamRuleForm', () => <ParamRuleFormStories />)

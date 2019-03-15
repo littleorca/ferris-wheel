@@ -17,7 +17,9 @@ interface EditableListProps<T> extends React.ClassAttributes<EditableList<T>> {
     className?: string,
     horizontal?: boolean,
     hideActions?: boolean,
-    fixedItems?: boolean,
+    sortable?: boolean,
+    addible?: boolean,
+    removable?: boolean,
     getKey?(item: T, index: number): string,
     getLabel?(item: T, index: number): string,
     createItem?(): T,
@@ -31,7 +33,11 @@ interface EditableListState<T> {
 }
 
 class EditableList<T> extends React.Component<EditableListProps<T>, EditableListState<T>> {
-    protected static defaultProps: Partial<EditableListProps<any>> = {};
+    protected static defaultProps: Partial<EditableListProps<any>> = {
+        sortable: true,
+        removable: true,
+        addible: true,
+    };
 
     private listRef: React.RefObject<ManipulableList<T>>;
 
@@ -141,7 +147,7 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
             this.props.horizontal ? "horizontal" : "vertical",
             this.props.className);
 
-        const hideActions = this.props.fixedItems || this.props.hideActions;
+        const hideActions = this.props.hideActions;
         return (
             <div className={className}>
                 <div className="list-container">
@@ -150,9 +156,9 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
                         list={list}
                         initialSelect={this.props.initialSelect}
                         horizontal={this.props.horizontal}
-                        sortable={!this.props.fixedItems}
-                        addible={!this.props.fixedItems}
-                        removable={!this.props.fixedItems}
+                        sortable={this.props.sortable}
+                        addible={this.props.addible}
+                        removable={this.props.removable}
                         onSelect={this.handleSelect}
                         onItemMoved={this.onMoved}
                         onItemRemoved={this.onRemoved}
@@ -163,20 +169,20 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
                     />
                     {hideActions || (
                         <div className="actions">
-                            <button
+                            {this.props.addible && <button
                                 type="button"
                                 className="add-item"
                                 onClick={this.handleAddItem}
                             >
                                 添加
-                            </button>
-                            <button
+                            </button>}
+                            {this.props.removable && <button
                                 type="button"
                                 className="remove-item"
                                 onClick={this.handleRemoveItem}
                             >
                                 删除
-                            </button>
+                            </button>}
                         </div>
                     )}
                 </div>

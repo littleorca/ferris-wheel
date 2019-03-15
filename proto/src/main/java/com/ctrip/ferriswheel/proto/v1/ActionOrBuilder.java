@@ -462,5 +462,18 @@ public interface ActionOrBuilder extends
    */
   com.ctrip.ferriswheel.proto.v1.ResetTableOrBuilder getResetTableOrBuilder();
 
+  /**
+   * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+   */
+  boolean hasSetCellsFormat();
+  /**
+   * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.SetCellsFormat getSetCellsFormat();
+  /**
+   * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder getSetCellsFormatOrBuilder();
+
   public com.ctrip.ferriswheel.proto.v1.Action.ActionCase getActionCase();
 }
