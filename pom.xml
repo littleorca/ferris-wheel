@@ -29,7 +29,7 @@
     <groupId>com.ctrip.ferriswheel</groupId>
     <artifactId>ferris-wheel</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.1</version>
+    <version>0.1.2-SNAPSHOT</version>
     <name>Ferris Wheel Spreadsheet</name>
     <description>A fantastic spreadsheet framework.</description>
     <url>https://github.com/littleorca/ferris-wheel</url>
@@ -74,32 +74,32 @@
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-common</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-core</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-provider</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-proto</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>ferris-wheel-example</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ctrip.ferriswheel</groupId>
                 <artifactId>quarks</artifactId>
-                <version>0.1.1</version>
+                <version>0.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -362,7 +362,7 @@
         <developerConnection>
             scm:git:https://github.com/littleorca/ferris-wheel.git
         </developerConnection>
-        <tag>ferris-wheel-0.1.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <repository>
