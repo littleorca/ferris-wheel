@@ -9,7 +9,6 @@ import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.text.Text;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
-import com.ctrip.ferriswheel.core.asset.DefaultTable;
 import com.ctrip.ferriswheel.core.asset.ReviseCollector;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
@@ -310,7 +309,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.SetCellValue setCellValue = action.getSetCellValue();
-            ((DefaultTable) workbook.getSheet(setCellValue.getSheetName())
+            ((Table) workbook.getSheet(setCellValue.getSheetName())
                     .getAsset(setCellValue.getTableName()))
                     .setCellValue(setCellValue.getRowIndex(),
                             setCellValue.getColumnIndex(),
@@ -323,7 +322,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.SetCellFormula setCellFormula = action.getSetCellFormula();
-            ((DefaultTable) workbook.getSheet(setCellFormula.getSheetName())
+            ((Table) workbook.getSheet(setCellFormula.getSheetName())
                     .getAsset(setCellFormula.getTableName()))
                     .setCellFormula(setCellFormula.getRowIndex(),
                             setCellFormula.getColumnIndex(),
@@ -389,7 +388,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.EraseColumns eraseColumns = action.getEraseColumns();
-            ((DefaultTable) workbook.getSheet(eraseColumns.getSheetName())
+            ((Table) workbook.getSheet(eraseColumns.getSheetName())
                     .getAsset(eraseColumns.getTableName()))
                     .eraseColumns(eraseColumns.getColumnIndex(), eraseColumns.getNColumns());
         }
@@ -400,7 +399,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.EraseRows eraseRows = action.getEraseRows();
-            ((DefaultTable) workbook.getSheet(eraseRows.getSheetName())
+            ((Table) workbook.getSheet(eraseRows.getSheetName())
                     .getAsset(eraseRows.getTableName()))
                     .eraseRows(eraseRows.getRowIndex(), eraseRows.getNRows());
         }
@@ -411,7 +410,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillUp fillUp = action.getFillUp();
-            ((DefaultTable) workbook.getSheet(fillUp.getSheetName())
+            ((Table) workbook.getSheet(fillUp.getSheetName())
                     .getAsset(fillUp.getTableName()))
                     .fillUp(fillUp.getRowIndex(),
                             fillUp.getFirstColumn(),
@@ -425,7 +424,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillRight fillRight = action.getFillRight();
-            ((DefaultTable) workbook.getSheet(fillRight.getSheetName())
+            ((Table) workbook.getSheet(fillRight.getSheetName())
                     .getAsset(fillRight.getTableName()))
                     .fillRight(fillRight.getColumnIndex(),
                             fillRight.getFirstRow(),
@@ -439,7 +438,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillDown fillDown = action.getFillDown();
-            ((DefaultTable) workbook.getSheet(fillDown.getSheetName())
+            ((Table) workbook.getSheet(fillDown.getSheetName())
                     .getAsset(fillDown.getTableName()))
                     .fillDown(fillDown.getRowIndex(),
                             fillDown.getFirstColumn(),
@@ -453,7 +452,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.FillLeft fillLeft = action.getFillLeft();
-            ((DefaultTable) workbook.getSheet(fillLeft.getSheetName())
+            ((Table) workbook.getSheet(fillLeft.getSheetName())
                     .getAsset(fillLeft.getTableName()))
                     .fillLeft(fillLeft.getColumnIndex(),
                             fillLeft.getFirstRow(),
@@ -467,7 +466,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.InsertColumns insertColumns = action.getInsertColumns();
-            ((DefaultTable) workbook.getSheet(insertColumns.getSheetName())
+            ((Table) workbook.getSheet(insertColumns.getSheetName())
                     .getAsset(insertColumns.getTableName()))
                     .insertColumns(insertColumns.getColumnIndex(), insertColumns.getNColumns());
         }
@@ -478,7 +477,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.InsertRows insertRows = action.getInsertRows();
-            ((DefaultTable) workbook.getSheet(insertRows.getSheetName())
+            ((Table) workbook.getSheet(insertRows.getSheetName())
                     .getAsset(insertRows.getTableName()))
                     .insertRows(insertRows.getRowIndex(), insertRows.getNRows());
         }
@@ -508,7 +507,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.RemoveColumns removeColumns = action.getRemoveColumns();
-            ((DefaultTable) workbook.getSheet(removeColumns.getSheetName())
+            ((Table) workbook.getSheet(removeColumns.getSheetName())
                     .getAsset(removeColumns.getTableName()))
                     .removeColumns(removeColumns.getColumnIndex(), removeColumns.getNColumns());
         }
@@ -519,7 +518,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.RemoveRows removeRows = action.getRemoveRows();
-            ((DefaultTable) workbook.getSheet(removeRows.getSheetName())
+            ((Table) workbook.getSheet(removeRows.getSheetName())
                     .getAsset(removeRows.getTableName()))
                     .removeRows(removeRows.getRowIndex(), removeRows.getNRows());
         }
@@ -717,7 +716,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         @Override
         void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
             com.ctrip.ferriswheel.proto.v1.SetCellsFormat setCellsFormat = action.getSetCellsFormat();
-            ((DefaultTable) workbook.getSheet(setCellsFormat.getSheetName())
+            ((Table) workbook.getSheet(setCellsFormat.getSheetName())
                     .getAsset(setCellsFormat.getTableName()))
                     .setCellsFormat(setCellsFormat.getRowIndex(),
                             setCellsFormat.getColumnIndex(),

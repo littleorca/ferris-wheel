@@ -197,6 +197,9 @@ public class PbHelper {
                         table.setCellFormula(rowIndex, columnIndex,
                                 cellProto.getValue().getFormulaString());
                     }
+                    if (!"".equals(cellProto.getFormat())) {
+                        table.setCellsFormat(rowIndex, columnIndex, 1, 1, cellProto.getFormat());
+                    }
                 }
             }
         }
