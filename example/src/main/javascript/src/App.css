@@ -39,7 +39,12 @@
 }
 
 #root > .wrapper > .header ul li a {
+    color: #eee;
     text-decoration: none;
+}
+
+#root > .wrapper > .header ul li.selected a {
+    color: #333;
 }
 
 #root > .wrapper > .content {

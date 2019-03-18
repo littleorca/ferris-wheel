@@ -68,10 +68,10 @@ class App extends Component {
         <div className="header">
           <ul>
             <li className={this.state.presentation ? "" : "selected"}>
-              <a onClick={this.setEditMode}>编辑模式</a>
+              <a href="javascript:void(0);" onClick={this.setEditMode}>编辑模式</a>
             </li>
             <li className={this.state.presentation ? "selected" : ""}>
-              <a onClick={this.setPresentationMode}>展示模式</a>
+              <a href="javascript:void(0);" onClick={this.setPresentationMode}>展示模式</a>
             </li>
           </ul>
         </div>
