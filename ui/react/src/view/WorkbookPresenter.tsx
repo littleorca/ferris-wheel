@@ -62,7 +62,7 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
             return;
         }
 
-        const request = new EditRequest(0, action);
+        const request = new EditRequest(this.state.txId + 1, action);
         this.setState({
             txId: request.txId,
             message: `服务请求中，txId=${request.txId}…`,
