@@ -117,12 +117,14 @@ message PivotFilter {
 
 message PivotField {
     string field = 1;
+    string format = 2;
 }
 
 message PivotValue {
     string field = 1;
     AggregateType aggregate_type = 2;
     string label = 3;
+    string format = 4;
 }
 
 enum AggregateType {

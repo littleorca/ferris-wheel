@@ -64,9 +64,9 @@ public class TestPivotAutomaton extends TestCase {
 
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
         pivot.setData(new DynamicValue("normal!A:C"));
-        pivot.setRows(Arrays.asList(new PivotFieldImpl("a")));
-        pivot.setColumns(Arrays.asList(new PivotFieldImpl("b")));
-        pivot.setValues(Arrays.asList(new PivotValueImpl("c", AggregateType.SUMMARY, "SUM:c")));
+        pivot.setRows(Arrays.asList(new PivotFieldImpl("a", "")));
+        pivot.setColumns(Arrays.asList(new PivotFieldImpl("b", "")));
+        pivot.setValues(Arrays.asList(new PivotValueImpl("c", AggregateType.SUMMARY, "SUM:c", "")));
         autoTable.automate(pivot);
 
         System.out.println(autoTable);
@@ -90,16 +90,16 @@ public class TestPivotAutomaton extends TestCase {
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
         pivot.setData(new DynamicValue("normal!A:F"));
         pivot.setRows(Arrays.asList(
-                new PivotFieldImpl("f1"),
-                new PivotFieldImpl("f2")
+                new PivotFieldImpl("f1", ""),
+                new PivotFieldImpl("f2", "")
         ));
         pivot.setColumns(Arrays.asList(
-                new PivotFieldImpl("f3"),
-                new PivotFieldImpl("f4")
+                new PivotFieldImpl("f3", ""),
+                new PivotFieldImpl("f4", "")
         ));
         pivot.setValues(Arrays.asList(
-                new PivotValueImpl("f5", AggregateType.SUMMARY, "SUM:f5"),
-                new PivotValueImpl("f6", AggregateType.STANDARD_DEVIATION, "STD:f6")
+                new PivotValueImpl("f5", AggregateType.SUMMARY, "SUM:f5", ""),
+                new PivotValueImpl("f6", AggregateType.STANDARD_DEVIATION, "STD:f6", "")
         ));
 
         autoTable.automate(pivot);

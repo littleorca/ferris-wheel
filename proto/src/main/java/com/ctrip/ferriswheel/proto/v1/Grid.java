@@ -16,8 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Grid() {
-    columns_ = 0;
-    rows_ = 0;
   }
 
   @java.lang.Override
@@ -81,7 +79,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -238,23 +236,22 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.Grid other = (com.ctrip.ferriswheel.proto.v1.Grid) obj;
 
-    boolean result = true;
-    result = result && (getColumns()
-        == other.getColumns());
-    result = result && (getRows()
-        == other.getRows());
-    result = result && (hasColumn() == other.hasColumn());
+    if (getColumns()
+        != other.getColumns()) return false;
+    if (getRows()
+        != other.getRows()) return false;
+    if (hasColumn() != other.hasColumn()) return false;
     if (hasColumn()) {
-      result = result && getColumn()
-          .equals(other.getColumn());
+      if (!getColumn()
+          .equals(other.getColumn())) return false;
     }
-    result = result && (hasRow() == other.hasRow());
+    if (hasRow() != other.hasRow()) return false;
     if (hasRow()) {
-      result = result && getRow()
-          .equals(other.getRow());
+      if (!getRow()
+          .equals(other.getRow())) return false;
     }
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -469,35 +466,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -604,7 +601,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Span column_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Span column_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Span, com.ctrip.ferriswheel.proto.v1.Span.Builder, com.ctrip.ferriswheel.proto.v1.SpanOrBuilder> columnBuilder_;
     /**
@@ -721,7 +718,7 @@ private static final long serialVersionUID = 0L;
       return columnBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Span row_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Span row_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Span, com.ctrip.ferriswheel.proto.v1.Span.Builder, com.ctrip.ferriswheel.proto.v1.SpanOrBuilder> rowBuilder_;
     /**
@@ -840,7 +837,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

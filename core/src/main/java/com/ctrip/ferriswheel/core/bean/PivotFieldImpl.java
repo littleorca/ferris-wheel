@@ -31,16 +31,18 @@ import java.io.Serializable;
 
 public class PivotFieldImpl implements PivotField, Serializable {
     private String field;
+    private String format;
 
     public PivotFieldImpl() {
     }
 
     public PivotFieldImpl(PivotField another) {
-        this(another.getField());
+        this(another.getField(), another.getFormat());
     }
 
-    public PivotFieldImpl(String field) {
+    public PivotFieldImpl(String field, String format) {
         this.field = field;
+        this.format = format;
     }
 
     public String getField() {
@@ -49,5 +51,14 @@ public class PivotFieldImpl implements PivotField, Serializable {
 
     public void setField(String field) {
         this.field = field;
+    }
+
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 }

@@ -3,6 +3,7 @@ import PivotValue from '../model/PivotValue';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
 import { AggregateTypeNames, AggregateTypeList } from '../model/AggregateType';
 import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import FormatInput from '../ctrl/FormatInput';
 
 interface PivotValueFormProps extends React.ClassAttributes<PivotValueForm> {
     values: PivotValue[];
@@ -33,6 +34,11 @@ const PivotValueEditor = (props: EditorProps<PivotValue>) => {
         props.onSubmit(pivotValue);
     };
 
+    const handleFormatChange = (format: string) => {
+        pivotValue.format = format;
+        props.onSubmit(pivotValue);
+    }
+
     return (
         <div className="pivot-value-editor">
             <label className="field pivot-value-field">
@@ -62,6 +68,11 @@ const PivotValueEditor = (props: EditorProps<PivotValue>) => {
                     placeholder="标签"
                     value={pivotValue.label}
                     afterChange={handleEditBoxChange} />
+            </label>
+            <label className="field pivot-value-format">
+                <FormatInput
+                    format={pivotValue.format}
+                    afterChange={handleFormatChange} />
             </label>
         </div>
     );

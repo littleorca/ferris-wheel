@@ -1,0 +1,28 @@
+.format-input {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 .5em;
+    min-width: 4em;
+    min-height: 1.75em;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: .25em;
+    background: #f9f9f9;
+    cursor: pointer;
+    color: #333;
+}
+
+.format-input-popover {
+    fill: #ccc;
+    z-index: 1;
+}
+
+.format-input-popover .format-form {
+    width: 18em;
+    height: 10em;
+    padding: 1em;
+    border: 1px solid #ccc;
+    border-radius: .25em;
+    background: #fff;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, .2);
+}

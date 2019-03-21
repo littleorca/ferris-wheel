@@ -17,6 +17,7 @@ private static final long serialVersionUID = 0L;
   }
   private PivotField() {
     field_ = "";
+    format_ = "";
   }
 
   @java.lang.Override
@@ -49,8 +50,14 @@ private static final long serialVersionUID = 0L;
             field_ = s;
             break;
           }
+          case 18: {
+            java.lang.String s = input.readStringRequireUtf8();
+
+            format_ = s;
+            break;
+          }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -115,6 +122,40 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int FORMAT_FIELD_NUMBER = 2;
+  private volatile java.lang.Object format_;
+  /**
+   * <code>string format = 2;</code>
+   */
+  public java.lang.String getFormat() {
+    java.lang.Object ref = format_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      format_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string format = 2;</code>
+   */
+  public com.google.protobuf.ByteString
+      getFormatBytes() {
+    java.lang.Object ref = format_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      format_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -132,6 +173,9 @@ private static final long serialVersionUID = 0L;
     if (!getFieldBytes().isEmpty()) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, field_);
     }
+    if (!getFormatBytes().isEmpty()) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 2, format_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -143,6 +187,9 @@ private static final long serialVersionUID = 0L;
     size = 0;
     if (!getFieldBytes().isEmpty()) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, field_);
+    }
+    if (!getFormatBytes().isEmpty()) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, format_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -159,11 +206,12 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.PivotField other = (com.ctrip.ferriswheel.proto.v1.PivotField) obj;
 
-    boolean result = true;
-    result = result && getField()
-        .equals(other.getField());
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!getField()
+        .equals(other.getField())) return false;
+    if (!getFormat()
+        .equals(other.getFormat())) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -175,6 +223,8 @@ private static final long serialVersionUID = 0L;
     hash = (19 * hash) + getDescriptor().hashCode();
     hash = (37 * hash) + FIELD_FIELD_NUMBER;
     hash = (53 * hash) + getField().hashCode();
+    hash = (37 * hash) + FORMAT_FIELD_NUMBER;
+    hash = (53 * hash) + getFormat().hashCode();
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -310,6 +360,8 @@ private static final long serialVersionUID = 0L;
       super.clear();
       field_ = "";
 
+      format_ = "";
+
       return this;
     }
 
@@ -337,41 +389,42 @@ private static final long serialVersionUID = 0L;
     public com.ctrip.ferriswheel.proto.v1.PivotField buildPartial() {
       com.ctrip.ferriswheel.proto.v1.PivotField result = new com.ctrip.ferriswheel.proto.v1.PivotField(this);
       result.field_ = field_;
+      result.format_ = format_;
       onBuilt();
       return result;
     }
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -387,6 +440,10 @@ private static final long serialVersionUID = 0L;
       if (other == com.ctrip.ferriswheel.proto.v1.PivotField.getDefaultInstance()) return this;
       if (!other.getField().isEmpty()) {
         field_ = other.field_;
+        onChanged();
+      }
+      if (!other.getFormat().isEmpty()) {
+        format_ = other.format_;
         onChanged();
       }
       this.mergeUnknownFields(other.unknownFields);
@@ -486,10 +543,79 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
+    private java.lang.Object format_ = "";
+    /**
+     * <code>string format = 2;</code>
+     */
+    public java.lang.String getFormat() {
+      java.lang.Object ref = format_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        format_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string format = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFormatBytes() {
+      java.lang.Object ref = format_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        format_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string format = 2;</code>
+     */
+    public Builder setFormat(
+        java.lang.String value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  
+      format_ = value;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string format = 2;</code>
+     */
+    public Builder clearFormat() {
+      
+      format_ = getDefaultInstance().getFormat();
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string format = 2;</code>
+     */
+    public Builder setFormatBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+      
+      format_ = value;
+      onChanged();
+      return this;
+    }
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

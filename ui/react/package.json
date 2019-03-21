@@ -1,6 +1,6 @@
 {
   "name": "@littleorca/ferris-wheel",
-  "version": "0.1.1-alpha.4",
+  "version": "0.1.1-alpha.5",
   "author": {
     "name": "Liu Haifeng",
     "email": "haifeng.813@gmail.com"
@@ -34,7 +34,6 @@
     "@types/react-color": "^2.13.6",
     "@types/react-datepicker": "^1.1.7",
     "@types/react-grid-layout": "^0.16.5",
-    "@types/react-modal": "^3.8.0",
     "@types/react-popover": "^0.5.2",
     "@types/react-sortable-hoc": "^0.6.4",
     "chart.js": "^2.7.2",
@@ -49,7 +48,6 @@
     "react-dom": "^16.4.2",
     "react-grid-layout": "^0.16.6",
     "react-loading": "^2.0.3",
-    "react-modal": "^3.8.1",
     "react-popover": "^0.5.7",
     "react-sortable-hoc": "^0.8.3"
   },

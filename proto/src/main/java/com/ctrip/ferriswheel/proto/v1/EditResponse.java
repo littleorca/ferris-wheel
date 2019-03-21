@@ -16,8 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private EditResponse() {
-    txId_ = 0L;
-    statusCode_ = 0;
     message_ = "";
   }
 
@@ -104,7 +102,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -384,34 +382,31 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.EditResponse other = (com.ctrip.ferriswheel.proto.v1.EditResponse) obj;
 
-    boolean result = true;
-    result = result && (getTxId()
-        == other.getTxId());
-    result = result && (getStatusCode()
-        == other.getStatusCode());
-    result = result && getMessage()
-        .equals(other.getMessage());
-    result = result && getResponseCase().equals(
-        other.getResponseCase());
-    if (!result) return false;
+    if (getTxId()
+        != other.getTxId()) return false;
+    if (getStatusCode()
+        != other.getStatusCode()) return false;
+    if (!getMessage()
+        .equals(other.getMessage())) return false;
+    if (!getResponseCase().equals(other.getResponseCase())) return false;
     switch (responseCase_) {
       case 4:
-        result = result && getChanges()
-            .equals(other.getChanges());
+        if (!getChanges()
+            .equals(other.getChanges())) return false;
         break;
       case 5:
-        result = result && getWorkbook()
-            .equals(other.getWorkbook());
+        if (!getWorkbook()
+            .equals(other.getWorkbook())) return false;
         break;
       case 6:
-        result = result && getSuggestedChart()
-            .equals(other.getSuggestedChart());
+        if (!getSuggestedChart()
+            .equals(other.getSuggestedChart())) return false;
         break;
       case 0:
       default:
     }
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -642,35 +637,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1286,7 +1281,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

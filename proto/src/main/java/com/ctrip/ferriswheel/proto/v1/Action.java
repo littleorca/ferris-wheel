@@ -548,7 +548,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -1911,160 +1911,157 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.Action other = (com.ctrip.ferriswheel.proto.v1.Action) obj;
 
-    boolean result = true;
-    result = result && getActionCase().equals(
-        other.getActionCase());
-    if (!result) return false;
+    if (!getActionCase().equals(other.getActionCase())) return false;
     switch (actionCase_) {
       case 1:
-        result = result && getAddChart()
-            .equals(other.getAddChart());
+        if (!getAddChart()
+            .equals(other.getAddChart())) return false;
         break;
       case 2:
-        result = result && getAddSheet()
-            .equals(other.getAddSheet());
+        if (!getAddSheet()
+            .equals(other.getAddSheet())) return false;
         break;
       case 3:
-        result = result && getAddTable()
-            .equals(other.getAddTable());
+        if (!getAddTable()
+            .equals(other.getAddTable())) return false;
         break;
       case 4:
-        result = result && getAutomateTable()
-            .equals(other.getAutomateTable());
+        if (!getAutomateTable()
+            .equals(other.getAutomateTable())) return false;
         break;
       case 5:
-        result = result && getSetCellValue()
-            .equals(other.getSetCellValue());
+        if (!getSetCellValue()
+            .equals(other.getSetCellValue())) return false;
         break;
       case 6:
-        result = result && getSetCellFormula()
-            .equals(other.getSetCellFormula());
+        if (!getSetCellFormula()
+            .equals(other.getSetCellFormula())) return false;
         break;
       case 7:
-        result = result && getRefreshCellValue()
-            .equals(other.getRefreshCellValue());
+        if (!getRefreshCellValue()
+            .equals(other.getRefreshCellValue())) return false;
         break;
       case 8:
-        result = result && getChartConsult()
-            .equals(other.getChartConsult());
+        if (!getChartConsult()
+            .equals(other.getChartConsult())) return false;
         break;
       case 9:
-        result = result && getEraseColumns()
-            .equals(other.getEraseColumns());
+        if (!getEraseColumns()
+            .equals(other.getEraseColumns())) return false;
         break;
       case 10:
-        result = result && getEraseRows()
-            .equals(other.getEraseRows());
+        if (!getEraseRows()
+            .equals(other.getEraseRows())) return false;
         break;
       case 11:
-        result = result && getFillUp()
-            .equals(other.getFillUp());
+        if (!getFillUp()
+            .equals(other.getFillUp())) return false;
         break;
       case 12:
-        result = result && getFillRight()
-            .equals(other.getFillRight());
+        if (!getFillRight()
+            .equals(other.getFillRight())) return false;
         break;
       case 13:
-        result = result && getFillDown()
-            .equals(other.getFillDown());
+        if (!getFillDown()
+            .equals(other.getFillDown())) return false;
         break;
       case 14:
-        result = result && getFillLeft()
-            .equals(other.getFillLeft());
+        if (!getFillLeft()
+            .equals(other.getFillLeft())) return false;
         break;
       case 15:
-        result = result && getInsertColumns()
-            .equals(other.getInsertColumns());
+        if (!getInsertColumns()
+            .equals(other.getInsertColumns())) return false;
         break;
       case 16:
-        result = result && getInsertRows()
-            .equals(other.getInsertRows());
+        if (!getInsertRows()
+            .equals(other.getInsertRows())) return false;
         break;
       case 17:
-        result = result && getMoveSheet()
-            .equals(other.getMoveSheet());
+        if (!getMoveSheet()
+            .equals(other.getMoveSheet())) return false;
         break;
       case 18:
-        result = result && getRemoveAsset()
-            .equals(other.getRemoveAsset());
+        if (!getRemoveAsset()
+            .equals(other.getRemoveAsset())) return false;
         break;
       case 19:
-        result = result && getRemoveColumns()
-            .equals(other.getRemoveColumns());
+        if (!getRemoveColumns()
+            .equals(other.getRemoveColumns())) return false;
         break;
       case 20:
-        result = result && getRemoveRows()
-            .equals(other.getRemoveRows());
+        if (!getRemoveRows()
+            .equals(other.getRemoveRows())) return false;
         break;
       case 21:
-        result = result && getRemoveSheet()
-            .equals(other.getRemoveSheet());
+        if (!getRemoveSheet()
+            .equals(other.getRemoveSheet())) return false;
         break;
       case 22:
-        result = result && getRenameAsset()
-            .equals(other.getRenameAsset());
+        if (!getRenameAsset()
+            .equals(other.getRenameAsset())) return false;
         break;
       case 23:
-        result = result && getRenameSheet()
-            .equals(other.getRenameSheet());
+        if (!getRenameSheet()
+            .equals(other.getRenameSheet())) return false;
         break;
       case 24:
-        result = result && getTransferAsset()
-            .equals(other.getTransferAsset());
+        if (!getTransferAsset()
+            .equals(other.getTransferAsset())) return false;
         break;
       case 25:
-        result = result && getUpdateAutomaton()
-            .equals(other.getUpdateAutomaton());
+        if (!getUpdateAutomaton()
+            .equals(other.getUpdateAutomaton())) return false;
         break;
       case 26:
-        result = result && getUpdateChart()
-            .equals(other.getUpdateChart());
+        if (!getUpdateChart()
+            .equals(other.getUpdateChart())) return false;
         break;
       case 27:
-        result = result && getCreateWorkbook()
-            .equals(other.getCreateWorkbook());
+        if (!getCreateWorkbook()
+            .equals(other.getCreateWorkbook())) return false;
         break;
       case 28:
-        result = result && getOpenWorkbook()
-            .equals(other.getOpenWorkbook());
+        if (!getOpenWorkbook()
+            .equals(other.getOpenWorkbook())) return false;
         break;
       case 29:
-        result = result && getSaveWorkbook()
-            .equals(other.getSaveWorkbook());
+        if (!getSaveWorkbook()
+            .equals(other.getSaveWorkbook())) return false;
         break;
       case 30:
-        result = result && getCloseWorkbook()
-            .equals(other.getCloseWorkbook());
+        if (!getCloseWorkbook()
+            .equals(other.getCloseWorkbook())) return false;
         break;
       case 31:
-        result = result && getLayoutAsset()
-            .equals(other.getLayoutAsset());
+        if (!getLayoutAsset()
+            .equals(other.getLayoutAsset())) return false;
         break;
       case 32:
-        result = result && getAddText()
-            .equals(other.getAddText());
+        if (!getAddText()
+            .equals(other.getAddText())) return false;
         break;
       case 33:
-        result = result && getUpdateText()
-            .equals(other.getUpdateText());
+        if (!getUpdateText()
+            .equals(other.getUpdateText())) return false;
         break;
       case 34:
-        result = result && getExecuteQuery()
-            .equals(other.getExecuteQuery());
+        if (!getExecuteQuery()
+            .equals(other.getExecuteQuery())) return false;
         break;
       case 35:
-        result = result && getResetTable()
-            .equals(other.getResetTable());
+        if (!getResetTable()
+            .equals(other.getResetTable())) return false;
         break;
       case 36:
-        result = result && getSetCellsFormat()
-            .equals(other.getSetCellsFormat());
+        if (!getSetCellsFormat()
+            .equals(other.getSetCellsFormat())) return false;
         break;
       case 0:
       default:
     }
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -2642,35 +2639,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -7775,7 +7772,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

@@ -6,6 +6,7 @@ import com.ctrip.ferriswheel.common.automaton.*;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.util.StylizedValue;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
@@ -256,7 +257,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
                     if (val == null) {
                         val = Value.BLANK;
                     }
-                    recordBuilder.set(fieldIdx++, val);
+                    recordBuilder.set(fieldIdx++, new StylizedValue(val, values.get(i).getFormat()));
                 }
             }
             recordBuilder.commit();

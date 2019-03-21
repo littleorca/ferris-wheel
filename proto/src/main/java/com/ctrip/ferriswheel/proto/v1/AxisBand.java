@@ -76,7 +76,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -241,21 +241,20 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.AxisBand other = (com.ctrip.ferriswheel.proto.v1.AxisBand) obj;
 
-    boolean result = true;
-    result = result && (hasInterval() == other.hasInterval());
+    if (hasInterval() != other.hasInterval()) return false;
     if (hasInterval()) {
-      result = result && getInterval()
-          .equals(other.getInterval());
+      if (!getInterval()
+          .equals(other.getInterval())) return false;
     }
-    result = result && getLabel()
-        .equals(other.getLabel());
-    result = result && (hasColor() == other.hasColor());
+    if (!getLabel()
+        .equals(other.getLabel())) return false;
+    if (hasColor() != other.hasColor()) return false;
     if (hasColor()) {
-      result = result && getColor()
-          .equals(other.getColor());
+      if (!getColor()
+          .equals(other.getColor())) return false;
     }
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -465,35 +464,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -546,7 +545,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Interval interval_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Interval interval_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Interval, com.ctrip.ferriswheel.proto.v1.Interval.Builder, com.ctrip.ferriswheel.proto.v1.IntervalOrBuilder> intervalBuilder_;
     /**
@@ -732,7 +731,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Color color_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Color color_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Color, com.ctrip.ferriswheel.proto.v1.Color.Builder, com.ctrip.ferriswheel.proto.v1.ColorOrBuilder> colorBuilder_;
     /**
@@ -851,7 +850,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

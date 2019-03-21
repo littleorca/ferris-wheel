@@ -35,4 +35,6 @@ public interface PivotValue {
 
     String getLabel();
 
+    String getFormat();
+
 }

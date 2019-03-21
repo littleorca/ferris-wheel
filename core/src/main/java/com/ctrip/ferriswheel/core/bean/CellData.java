@@ -4,6 +4,7 @@ import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
 
 import java.io.Serializable;
 
@@ -18,12 +19,12 @@ public class CellData implements Cell, Serializable {
     public CellData() {
     }
 
-    public CellData(DynamicVariant data) {
+    public CellData(Variant data) {
         this(data, null);
     }
 
-    public CellData(DynamicVariant data, String format) {
-        this.data = data;
+    public CellData(Variant data, String format) {
+        this.data = data instanceof DynamicVariant ? (DynamicVariant) data : new DynamicValue(Value.from(data));
         this.format = format;
     }
 

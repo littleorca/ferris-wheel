@@ -35,4 +35,14 @@ public interface PivotValueOrBuilder extends
    */
   com.google.protobuf.ByteString
       getLabelBytes();
+
+  /**
+   * <code>string format = 4;</code>
+   */
+  java.lang.String getFormat();
+  /**
+   * <code>string format = 4;</code>
+   */
+  com.google.protobuf.ByteString
+      getFormatBytes();
 }

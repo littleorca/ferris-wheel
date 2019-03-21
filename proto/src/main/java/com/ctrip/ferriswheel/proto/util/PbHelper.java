@@ -386,34 +386,40 @@ public class PbHelper {
 
     public static com.ctrip.ferriswheel.proto.v1.PivotFilter pb(PivotFilter bean) {
         return com.ctrip.ferriswheel.proto.v1.PivotFilter.newBuilder()
-                // TODO
+                .setField(bean.getField())
                 .build();
     }
 
     public static PivotFilterImpl bean(com.ctrip.ferriswheel.proto.v1.PivotFilter pb) {
-        return new PivotFilterImpl(); // TODO
+        return new PivotFilterImpl(pb.getField());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.PivotField pb(PivotField bean) {
-        return com.ctrip.ferriswheel.proto.v1.PivotField.newBuilder()
-                .setField(bean.getField())
-                .build();
+        com.ctrip.ferriswheel.proto.v1.PivotField.Builder builder = com.ctrip.ferriswheel.proto.v1.PivotField.newBuilder()
+                .setField(bean.getField());
+        if (bean.getFormat() != null) {
+            builder.setFormat(bean.getFormat());
+        }
+        return builder.build();
     }
 
     public static PivotFieldImpl bean(com.ctrip.ferriswheel.proto.v1.PivotField pb) {
-        return new PivotFieldImpl(pb.getField());
+        return new PivotFieldImpl(pb.getField(), pb.getFormat());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.PivotValue pb(PivotValue bean) {
-        return com.ctrip.ferriswheel.proto.v1.PivotValue.newBuilder()
+        com.ctrip.ferriswheel.proto.v1.PivotValue.Builder builder = com.ctrip.ferriswheel.proto.v1.PivotValue.newBuilder()
                 .setField(bean.getField())
                 .setAggregateType(pb(bean.getAggregateType()))
-                .setLabel(bean.getLabel())
-                .build();
+                .setLabel(bean.getLabel());
+        if (bean.getFormat() != null) {
+            builder.setFormat(bean.getFormat());
+        }
+        return builder.build();
     }
 
     public static PivotValueImpl bean(com.ctrip.ferriswheel.proto.v1.PivotValue pb) {
-        return new PivotValueImpl(pb.getField(), bean(pb.getAggregateType()), pb.getLabel());
+        return new PivotValueImpl(pb.getField(), bean(pb.getAggregateType()), pb.getLabel(), pb.getFormat());
     }
 
     public static com.ctrip.ferriswheel.proto.v1.AggregateType pb(AggregateType bean) {

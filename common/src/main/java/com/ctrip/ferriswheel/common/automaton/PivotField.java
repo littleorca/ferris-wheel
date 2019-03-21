@@ -27,4 +27,6 @@ package com.ctrip.ferriswheel.common.automaton;
 
 public interface PivotField {
     String getField();
+
+    String getFormat();
 }

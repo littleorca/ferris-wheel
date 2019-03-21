@@ -30,4 +30,25 @@ import com.ctrip.ferriswheel.common.automaton.PivotFilter;
 import java.io.Serializable;
 
 public class PivotFilterImpl implements PivotFilter, Serializable {
+    private String field;
+
+    public PivotFilterImpl() {
+    }
+
+    public PivotFilterImpl(PivotFilter another) {
+        this(another.getField());
+    }
+
+    public PivotFilterImpl(String field) {
+        this.field = field;
+    }
+
+    @Override
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
+    }
 }

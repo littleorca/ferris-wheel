@@ -10,6 +10,7 @@ import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.DataSetMetaData;
+import com.ctrip.ferriswheel.common.util.StylizedVariant;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
@@ -888,11 +889,18 @@ public class DefaultTable extends SheetAssetNode implements Table {
         dataSet.rewind();
         while (dataSet.next()) {
             for (int col = 0; col < setMeta.getColumnCount(); col++) {
-                Variant value = dataSet.getColumn(col);
+                StylizedVariant stylizedVariant = dataSet.getColumn(col);
+                Variant value = stylizedVariant.getValue();
                 if (value == null) {
                     value = Value.BLANK;
                 }
-                refreshCellValue(row, col, Value.from(value));
+                String format = stylizedVariant.getFormat();
+//                refreshCellValue(row, col, Value.from(value));
+                DefaultCell cell = getOrCreateCell(row, col);
+                cell.setValue(value);
+                if (format != null) {
+                    cell.setFormat(format);
+                }
             }
             row++;
         }

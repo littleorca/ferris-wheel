@@ -1,15 +1,28 @@
-.dialog,
-.dialog>.dialog-title,
-.dialog>.dialog-content,
-.dialog>.dialog-actions {
-    box-sizing: border-box;
-}
-
 .dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-flow: column;
     align-items: stretch;
     justify-content: stretch;
+    box-sizing: content-box;
+    padding: 1.5em;
+    background: #fff;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, .25);
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    overflow: auto;
+}
+
+.dialog>.dialog-title,
+.dialog>.dialog-content,
+.dialog>.dialog-actions {
+    box-sizing: border-box;
 }
 
 .dialog>.dialog-title {

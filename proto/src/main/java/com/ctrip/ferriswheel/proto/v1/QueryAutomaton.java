@@ -57,7 +57,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 18: {
-            if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+            if (!((mutable_bitField0_ & 0x00000002) != 0)) {
               params_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.NamedValue>();
               mutable_bitField0_ |= 0x00000002;
             }
@@ -79,7 +79,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -93,7 +93,7 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+      if (((mutable_bitField0_ & 0x00000002) != 0)) {
         params_ = java.util.Collections.unmodifiableList(params_);
       }
       this.unknownFields = unknownFields.build();
@@ -250,21 +250,20 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.QueryAutomaton other = (com.ctrip.ferriswheel.proto.v1.QueryAutomaton) obj;
 
-    boolean result = true;
-    result = result && (hasTemplate() == other.hasTemplate());
+    if (hasTemplate() != other.hasTemplate()) return false;
     if (hasTemplate()) {
-      result = result && getTemplate()
-          .equals(other.getTemplate());
+      if (!getTemplate()
+          .equals(other.getTemplate())) return false;
     }
-    result = result && getParamsList()
-        .equals(other.getParamsList());
-    result = result && (hasQuery() == other.hasQuery());
+    if (!getParamsList()
+        .equals(other.getParamsList())) return false;
+    if (hasQuery() != other.hasQuery()) return false;
     if (hasQuery()) {
-      result = result && getQuery()
-          .equals(other.getQuery());
+      if (!getQuery()
+          .equals(other.getQuery())) return false;
     }
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -472,7 +471,7 @@ private static final long serialVersionUID = 0L;
         result.template_ = templateBuilder_.build();
       }
       if (paramsBuilder_ == null) {
-        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((bitField0_ & 0x00000002) != 0)) {
           params_ = java.util.Collections.unmodifiableList(params_);
           bitField0_ = (bitField0_ & ~0x00000002);
         }
@@ -492,35 +491,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -596,7 +595,7 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.ctrip.ferriswheel.proto.v1.QueryTemplate template_ = null;
+    private com.ctrip.ferriswheel.proto.v1.QueryTemplate template_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.QueryTemplate, com.ctrip.ferriswheel.proto.v1.QueryTemplate.Builder, com.ctrip.ferriswheel.proto.v1.QueryTemplateOrBuilder> templateBuilder_;
     /**
@@ -716,7 +715,7 @@ private static final long serialVersionUID = 0L;
     private java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> params_ =
       java.util.Collections.emptyList();
     private void ensureParamsIsMutable() {
-      if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+      if (!((bitField0_ & 0x00000002) != 0)) {
         params_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.NamedValue>(params_);
         bitField0_ |= 0x00000002;
        }
@@ -945,7 +944,7 @@ private static final long serialVersionUID = 0L;
         paramsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             com.ctrip.ferriswheel.proto.v1.NamedValue, com.ctrip.ferriswheel.proto.v1.NamedValue.Builder, com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder>(
                 params_,
-                ((bitField0_ & 0x00000002) == 0x00000002),
+                ((bitField0_ & 0x00000002) != 0),
                 getParentForChildren(),
                 isClean());
         params_ = null;
@@ -953,7 +952,7 @@ private static final long serialVersionUID = 0L;
       return paramsBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.DataQuery query_ = null;
+    private com.ctrip.ferriswheel.proto.v1.DataQuery query_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.DataQuery, com.ctrip.ferriswheel.proto.v1.DataQuery.Builder, com.ctrip.ferriswheel.proto.v1.DataQueryOrBuilder> queryBuilder_;
     /**
@@ -1072,7 +1071,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

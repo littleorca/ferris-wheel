@@ -25,8 +25,6 @@
 
 package com.ctrip.ferriswheel.common.util;
 
-import com.ctrip.ferriswheel.common.variant.Variant;
-
 public interface DataSet {
 
     DataSetMetaData getMetaData();
@@ -37,8 +35,6 @@ public interface DataSet {
 
     void rewind() throws UnsupportedOperationException;
 
-    Variant getColumn(int index);
-
-    Variant getColumn(String name);
+    StylizedVariant getColumn(int index);
 
 }

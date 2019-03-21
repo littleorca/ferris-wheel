@@ -26,4 +26,5 @@
 package com.ctrip.ferriswheel.common.automaton;
 
 public interface PivotFilter {
+    String getField();
 }

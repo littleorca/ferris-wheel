@@ -18,10 +18,6 @@ private static final long serialVersionUID = 0L;
   private FillDown() {
     sheetName_ = "";
     tableName_ = "";
-    rowIndex_ = 0;
-    firstColumn_ = 0;
-    lastColumn_ = 0;
-    nRows_ = 0;
   }
 
   @java.lang.Override
@@ -81,7 +77,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -294,21 +290,20 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.FillDown other = (com.ctrip.ferriswheel.proto.v1.FillDown) obj;
 
-    boolean result = true;
-    result = result && getSheetName()
-        .equals(other.getSheetName());
-    result = result && getTableName()
-        .equals(other.getTableName());
-    result = result && (getRowIndex()
-        == other.getRowIndex());
-    result = result && (getFirstColumn()
-        == other.getFirstColumn());
-    result = result && (getLastColumn()
-        == other.getLastColumn());
-    result = result && (getNRows()
-        == other.getNRows());
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!getSheetName()
+        .equals(other.getSheetName())) return false;
+    if (!getTableName()
+        .equals(other.getTableName())) return false;
+    if (getRowIndex()
+        != other.getRowIndex()) return false;
+    if (getFirstColumn()
+        != other.getFirstColumn()) return false;
+    if (getLastColumn()
+        != other.getLastColumn()) return false;
+    if (getNRows()
+        != other.getNRows()) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -513,35 +508,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -848,7 +843,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

@@ -18,6 +18,7 @@ import EditableListStories from './ctrl/EditableList.stories';
 import EditableTextStories from './ctrl/EditableText.stories';
 import EditableUnionValueStories from './ctrl/EditableUnionValue.stories';
 import EditBoxStories from './ctrl/EditBox.stories';
+import FormatInputStories from './ctrl/FormatInput.stories';
 import InlineEditableStories from './ctrl/InlineEditable.stories';
 import IntervalInputStories from './ctrl/IntervalInput.stories';
 import ManipulableListStories from './ctrl/ManipulableList.stories';
@@ -45,6 +46,7 @@ import SeriesBinderFormStories from './form/SeriesBinderForm.stories';
 import SeriesFormStories from './form/SeriesForm.stories';
 import ChartViewStories from './view/ChartView.stories';
 import GroupViewStories from './view/GroupView.stories';
+import ModalStories from './view/Modal.stories';
 import SheetViewStories from './view/SheetView.stories';
 import TableViewStories from './view/TableView.stories';
 import TextViewStories from './view/TextView.stories';
@@ -121,6 +123,7 @@ storiesOf('Control', module)
   .add('EditableText', () => <EditableTextStories />)
   .add('EditableUnionValue', () => <EditableUnionValueStories />)
   .add('EditBox', () => <EditBoxStories />)
+  .add('FormatInput', () => <FormatInputStories />)
   .add('InlineEditable', () => <InlineEditableStories />)
   .add('IntervalInput', () => <IntervalInputStories />)
   .add('ManipulableList', () => <ManipulableListStories />)
@@ -183,6 +186,7 @@ storiesOf('View', module)
   .add('AssetView', () => <AssetViewStories />)
   .add('ChartView', () => <ChartViewStories />)
   .add('GroupView', () => <GroupViewStories />)
+  .add('Modal', () => <ModalStories />)
   .add('SheetView', () => <SheetViewStories />)
   .add('TableView', () => <TableViewStories />)
   .add('TextView', () => <TextViewStories />)

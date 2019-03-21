@@ -45,4 +45,5 @@ public class ColumnMetaDataImpl implements ColumnMetaData {
     public VariantType getType() {
         return type;
     }
+
 }

@@ -16,4 +16,14 @@ public interface PivotFieldOrBuilder extends
    */
   com.google.protobuf.ByteString
       getFieldBytes();
+
+  /**
+   * <code>string format = 2;</code>
+   */
+  java.lang.String getFormat();
+  /**
+   * <code>string format = 2;</code>
+   */
+  com.google.protobuf.ByteString
+      getFormatBytes();
 }

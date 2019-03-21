@@ -34,18 +34,20 @@ public class PivotValueImpl implements PivotValue, Serializable {
     private String field;
     private AggregateType aggregateType;
     private String label;
+    private String format;
 
     public PivotValueImpl() {
     }
 
-    public PivotValueImpl(String field, AggregateType aggregateType, String label) {
+    public PivotValueImpl(String field, AggregateType aggregateType, String label, String format) {
         this.field = field;
         this.aggregateType = aggregateType;
         this.label = label;
+        this.format = format;
     }
 
     public PivotValueImpl(PivotValue another) {
-        this(another.getField(), another.getAggregateType(), another.getLabel());
+        this(another.getField(), another.getAggregateType(), another.getLabel(), another.getFormat());
     }
 
     public String getField() {
@@ -72,4 +74,12 @@ public class PivotValueImpl implements PivotValue, Serializable {
         this.label = label;
     }
 
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
 }

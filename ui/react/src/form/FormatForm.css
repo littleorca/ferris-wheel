@@ -10,7 +10,7 @@
 }
 
 .format-form .format-option {
-    flex: 1 0 10em;
+    flex: 1 0 auto;
     padding-left: 1em;
 }
 

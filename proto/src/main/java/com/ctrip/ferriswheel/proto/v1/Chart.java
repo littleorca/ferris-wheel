@@ -84,7 +84,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 42: {
-            if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+            if (!((mutable_bitField0_ & 0x00000010) != 0)) {
               series_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.Series>();
               mutable_bitField0_ |= 0x00000010;
             }
@@ -158,7 +158,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -172,7 +172,7 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+      if (((mutable_bitField0_ & 0x00000010) != 0)) {
         series_ = java.util.Collections.unmodifiableList(series_);
       }
       this.unknownFields = unknownFields.build();
@@ -549,50 +549,49 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.Chart other = (com.ctrip.ferriswheel.proto.v1.Chart) obj;
 
-    boolean result = true;
-    result = result && getName()
-        .equals(other.getName());
-    result = result && getType()
-        .equals(other.getType());
-    result = result && (hasTitle() == other.hasTitle());
+    if (!getName()
+        .equals(other.getName())) return false;
+    if (!getType()
+        .equals(other.getType())) return false;
+    if (hasTitle() != other.hasTitle()) return false;
     if (hasTitle()) {
-      result = result && getTitle()
-          .equals(other.getTitle());
+      if (!getTitle()
+          .equals(other.getTitle())) return false;
     }
-    result = result && (hasCategories() == other.hasCategories());
+    if (hasCategories() != other.hasCategories()) return false;
     if (hasCategories()) {
-      result = result && getCategories()
-          .equals(other.getCategories());
+      if (!getCategories()
+          .equals(other.getCategories())) return false;
     }
-    result = result && getSeriesList()
-        .equals(other.getSeriesList());
-    result = result && (hasLayout() == other.hasLayout());
+    if (!getSeriesList()
+        .equals(other.getSeriesList())) return false;
+    if (hasLayout() != other.hasLayout()) return false;
     if (hasLayout()) {
-      result = result && getLayout()
-          .equals(other.getLayout());
+      if (!getLayout()
+          .equals(other.getLayout())) return false;
     }
-    result = result && (hasBinder() == other.hasBinder());
+    if (hasBinder() != other.hasBinder()) return false;
     if (hasBinder()) {
-      result = result && getBinder()
-          .equals(other.getBinder());
+      if (!getBinder()
+          .equals(other.getBinder())) return false;
     }
-    result = result && (hasXAxis() == other.hasXAxis());
+    if (hasXAxis() != other.hasXAxis()) return false;
     if (hasXAxis()) {
-      result = result && getXAxis()
-          .equals(other.getXAxis());
+      if (!getXAxis()
+          .equals(other.getXAxis())) return false;
     }
-    result = result && (hasYAxis() == other.hasYAxis());
+    if (hasYAxis() != other.hasYAxis()) return false;
     if (hasYAxis()) {
-      result = result && getYAxis()
-          .equals(other.getYAxis());
+      if (!getYAxis()
+          .equals(other.getYAxis())) return false;
     }
-    result = result && (hasZAxis() == other.hasZAxis());
+    if (hasZAxis() != other.hasZAxis()) return false;
     if (hasZAxis()) {
-      result = result && getZAxis()
-          .equals(other.getZAxis());
+      if (!getZAxis()
+          .equals(other.getZAxis())) return false;
     }
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -865,7 +864,7 @@ private static final long serialVersionUID = 0L;
         result.categories_ = categoriesBuilder_.build();
       }
       if (seriesBuilder_ == null) {
-        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((bitField0_ & 0x00000010) != 0)) {
           series_ = java.util.Collections.unmodifiableList(series_);
           bitField0_ = (bitField0_ & ~0x00000010);
         }
@@ -905,35 +904,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1170,7 +1169,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.UnionValue title_ = null;
+    private com.ctrip.ferriswheel.proto.v1.UnionValue title_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.UnionValue, com.ctrip.ferriswheel.proto.v1.UnionValue.Builder, com.ctrip.ferriswheel.proto.v1.UnionValueOrBuilder> titleBuilder_;
     /**
@@ -1287,7 +1286,7 @@ private static final long serialVersionUID = 0L;
       return titleBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.UnionValue categories_ = null;
+    private com.ctrip.ferriswheel.proto.v1.UnionValue categories_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.UnionValue, com.ctrip.ferriswheel.proto.v1.UnionValue.Builder, com.ctrip.ferriswheel.proto.v1.UnionValueOrBuilder> categoriesBuilder_;
     /**
@@ -1407,7 +1406,7 @@ private static final long serialVersionUID = 0L;
     private java.util.List<com.ctrip.ferriswheel.proto.v1.Series> series_ =
       java.util.Collections.emptyList();
     private void ensureSeriesIsMutable() {
-      if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+      if (!((bitField0_ & 0x00000010) != 0)) {
         series_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.Series>(series_);
         bitField0_ |= 0x00000010;
        }
@@ -1636,7 +1635,7 @@ private static final long serialVersionUID = 0L;
         seriesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             com.ctrip.ferriswheel.proto.v1.Series, com.ctrip.ferriswheel.proto.v1.Series.Builder, com.ctrip.ferriswheel.proto.v1.SeriesOrBuilder>(
                 series_,
-                ((bitField0_ & 0x00000010) == 0x00000010),
+                ((bitField0_ & 0x00000010) != 0),
                 getParentForChildren(),
                 isClean());
         series_ = null;
@@ -1644,7 +1643,7 @@ private static final long serialVersionUID = 0L;
       return seriesBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Layout layout_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Layout layout_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Layout, com.ctrip.ferriswheel.proto.v1.Layout.Builder, com.ctrip.ferriswheel.proto.v1.LayoutOrBuilder> layoutBuilder_;
     /**
@@ -1761,7 +1760,7 @@ private static final long serialVersionUID = 0L;
       return layoutBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.ChartBinder binder_ = null;
+    private com.ctrip.ferriswheel.proto.v1.ChartBinder binder_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.ChartBinder, com.ctrip.ferriswheel.proto.v1.ChartBinder.Builder, com.ctrip.ferriswheel.proto.v1.ChartBinderOrBuilder> binderBuilder_;
     /**
@@ -1878,7 +1877,7 @@ private static final long serialVersionUID = 0L;
       return binderBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Axis xAxis_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Axis xAxis_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Axis, com.ctrip.ferriswheel.proto.v1.Axis.Builder, com.ctrip.ferriswheel.proto.v1.AxisOrBuilder> xAxisBuilder_;
     /**
@@ -1995,7 +1994,7 @@ private static final long serialVersionUID = 0L;
       return xAxisBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Axis yAxis_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Axis yAxis_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Axis, com.ctrip.ferriswheel.proto.v1.Axis.Builder, com.ctrip.ferriswheel.proto.v1.AxisOrBuilder> yAxisBuilder_;
     /**
@@ -2112,7 +2111,7 @@ private static final long serialVersionUID = 0L;
       return yAxisBuilder_;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Axis zAxis_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Axis zAxis_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Axis, com.ctrip.ferriswheel.proto.v1.Axis.Builder, com.ctrip.ferriswheel.proto.v1.AxisOrBuilder> zAxisBuilder_;
     /**
@@ -2231,7 +2230,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override

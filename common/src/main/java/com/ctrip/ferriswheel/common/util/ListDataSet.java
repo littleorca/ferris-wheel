@@ -87,42 +87,26 @@ public class ListDataSet implements DataSet {
     }
 
     @Override
-    public Variant getColumn(int index) {
+    public StylizedVariant getColumn(int index) {
         return current.getField(index);
     }
 
-    @Override
-    public Variant getColumn(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException();
-        }
-        if (!setMeta.hasColumnMeta()) {
-            throw new IllegalStateException("No column meta data, column name unresolvable.");
-        }
-        for (int i = 0; i < setMeta.getColumnCount(); i++) {
-            if (name.equals(setMeta.getColumnMeta(i).getName())) {
-                return getColumn(i);
-            }
-        }
-        return null;
-    }
-
     public static class Record implements Serializable {
-        private TreeMap<Integer, Variant> fields = new TreeMap<>();
+        private TreeMap<Integer, StylizedVariant> fields = new TreeMap<>();
 
-        public Variant getField(int index) {
+        public StylizedVariant getField(int index) {
             return fields.get(index);
         }
 
-        public void setField(int index, Variant value) {
+        public void setField(int index, StylizedVariant value) {
             fields.put(index, value);
         }
 
-        public TreeMap<Integer, Variant> getFields() {
+        public TreeMap<Integer, StylizedVariant> getFields() {
             return fields;
         }
 
-        public void setFields(TreeMap<Integer, Variant> fields) {
+        public void setFields(TreeMap<Integer, StylizedVariant> fields) {
             this.fields = fields;
         }
     }
@@ -136,6 +120,10 @@ public class ListDataSet implements DataSet {
         }
 
         public RecordBuilder set(int index, Variant value) {
+            return set(index, new StylizedValue(value));
+        }
+
+        public RecordBuilder set(int index, StylizedVariant value) {
             if (record == null) {
                 throw new IllegalStateException("Record has been committed, allows no further ops.");
             }
@@ -143,7 +131,7 @@ public class ListDataSet implements DataSet {
             return this;
         }
 
-        public RecordBuilder set(Variant... values) {
+        public RecordBuilder set(StylizedVariant... values) {
             if (record == null) {
                 throw new IllegalStateException("Record has been committed, allows no further ops.");
             }

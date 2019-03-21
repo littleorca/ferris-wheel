@@ -47,7 +47,6 @@ import WorkbookOperation from '../action/WorkbookOperation';
 import Extension, { QueryWizard } from '../extension/Extension';
 import Dialog from './Dialog';
 import Loading from 'react-loading';
-import * as ReactModal from 'react-modal';
 import classnames from "classnames";
 import './WorkbookEditor.css';
 
@@ -67,7 +66,6 @@ interface WorkbookEditorState {
     message: string;
     serviceStatus: string;
     showMask: boolean;
-    dialog?: React.ReactNode;
 }
 
 class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditorState> implements ActionHerald {
@@ -246,20 +244,22 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         if (typeof wizard === 'undefined') {
             throw new Error('Wizard component not found: ' + name); // TODO review
         }
-        this.showDialog(
-            <wizard.component
-                onOk={this.handleQueryWizardOk}
-                onCancel={this.handleQueryWizardCancelled} />
-        );
+        Dialog.show(props => <wizard.component
+                onOk={queryTemplate => {
+                    props.close();
+                    this.handleQueryWizardOk(queryTemplate);
+                }}
+                onCancel={() => {
+                    props.close();
+                    this.handleQueryWizardCancelled();
+                }} />);
     }
 
     protected handleQueryWizardOk(queryTemplate: QueryTemplate) {
         this.doAddQueryTable(queryTemplate);
-        this.closeDialog();
     }
 
     protected handleQueryWizardCancelled() {
-        this.closeDialog();
     }
 
     protected handleAddQueryTable() {
@@ -576,24 +576,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                             width="8rem"
                             height="8rem" />
                     </div>
-                )}
-                {this.state.dialog && (
-                    <ReactModal
-                        isOpen={true} 
-                        ariaHideApp={false}
-                        style={{
-                            content: {
-                                top: "50%",
-                                left: "50%",
-                                right: "auto",
-                                bottom: "auto",
-                                marginRight: "-50%",
-                                transform: "translate(-50%, -50%)"
-                            },
-                            overlay: { zIndex: 9999 }
-                        }}>
-                        {this.state.dialog}
-                    </ReactModal>
                 )}
             </div>
         );
@@ -915,16 +897,17 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         }
         const nonNullWizard = wizard;
         const openWizard = () => {
-            this.setState({
-                dialog: <nonNullWizard.component
+            Dialog.show(props => <nonNullWizard.component
                     initialQueryTemplate={queryTemplate}
                     onOk={(result) => {
-                        this.closeDialog();
+                        props.close();
                         Object.assign(queryTemplate, result);
                         handleAutomatonChange();
                     }}
-                    onCancel={this.handleQueryWizardCancelled} />
-            });
+                    onCancel={() => {
+                        props.close();
+                        this.handleQueryWizardCancelled();
+                    }} />);
         }
         return (
             <div className="query-wizard-actions">
@@ -961,25 +944,14 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                     }
                 }
             }
-            const showFormatDialog = (format: string)=> {
-                this.setState({
-                    dialog: <FormatFormDialog
-                        format={format}
-                        onCancel={() => this.closeDialog()}
-                        onOk={format => {
-                            this.closeDialog();
-                            submitCallback(format);
-                        }} />
-                });    
-            }
             if (formatSet.size > 1) {
-                this.confirm(
+                Dialog.confirm(
                         "所选区域存在多种格式，是否继续以统一设置新的格式？",
                         () => {
-                            showFormatDialog("");
+                            FormatFormDialog.show("", submitCallback);
                         });
             } else {
-                showFormatDialog(formatSet.values().next().value);
+                FormatFormDialog.show(formatSet.values().next().value, submitCallback);
             }
         }
         return (
@@ -1059,39 +1031,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                 </GroupItem>
             </GroupView>
         );
-    }
-
-    protected confirm(message: string, onOk: () => void, onCancel?: () => void) {
-        const actions = [{
-                name: "format-form-cancel",
-                label: "取消",
-                callback: () => {
-                    this.closeDialog();
-                    if (typeof onCancel !== "undefined") {
-                        onCancel();
-                    }
-                }
-            }, {
-                name: "format-form-ok",
-                label: "确定",
-                callback: () => {
-                    this.closeDialog();
-                    onOk();
-                }
-            }];
-        this.showDialog(
-            <Dialog className="confirm-dialog" actions={actions}>
-                {message}
-            </Dialog>
-        );
-    }
-    
-    protected showDialog(dialog: React.ReactNode) {
-        this.setState({ dialog });
-    }
-
-    protected closeDialog() {
-        this.setState({ dialog: undefined });
     }
 }
 

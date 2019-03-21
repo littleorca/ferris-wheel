@@ -19,7 +19,6 @@ private static final long serialVersionUID = 0L;
     title_ = "";
     label_ = "";
     placement_ = 0;
-    reversed_ = false;
     bands_ = java.util.Collections.emptyList();
     stacking_ = 0;
   }
@@ -85,7 +84,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           case 50: {
-            if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+            if (!((mutable_bitField0_ & 0x00000020) != 0)) {
               bands_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.AxisBand>();
               mutable_bitField0_ |= 0x00000020;
             }
@@ -100,7 +99,7 @@ private static final long serialVersionUID = 0L;
             break;
           }
           default: {
-            if (!parseUnknownFieldProto3(
+            if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
               done = true;
             }
@@ -114,7 +113,7 @@ private static final long serialVersionUID = 0L;
       throw new com.google.protobuf.InvalidProtocolBufferException(
           e).setUnfinishedMessage(this);
     } finally {
-      if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+      if (((mutable_bitField0_ & 0x00000020) != 0)) {
         bands_ = java.util.Collections.unmodifiableList(bands_);
       }
       this.unknownFields = unknownFields.build();
@@ -387,24 +386,23 @@ private static final long serialVersionUID = 0L;
     }
     com.ctrip.ferriswheel.proto.v1.Axis other = (com.ctrip.ferriswheel.proto.v1.Axis) obj;
 
-    boolean result = true;
-    result = result && getTitle()
-        .equals(other.getTitle());
-    result = result && getLabel()
-        .equals(other.getLabel());
-    result = result && placement_ == other.placement_;
-    result = result && (getReversed()
-        == other.getReversed());
-    result = result && (hasInterval() == other.hasInterval());
+    if (!getTitle()
+        .equals(other.getTitle())) return false;
+    if (!getLabel()
+        .equals(other.getLabel())) return false;
+    if (placement_ != other.placement_) return false;
+    if (getReversed()
+        != other.getReversed()) return false;
+    if (hasInterval() != other.hasInterval()) return false;
     if (hasInterval()) {
-      result = result && getInterval()
-          .equals(other.getInterval());
+      if (!getInterval()
+          .equals(other.getInterval())) return false;
     }
-    result = result && getBandsList()
-        .equals(other.getBandsList());
-    result = result && stacking_ == other.stacking_;
-    result = result && unknownFields.equals(other.unknownFields);
-    return result;
+    if (!getBandsList()
+        .equals(other.getBandsList())) return false;
+    if (stacking_ != other.stacking_) return false;
+    if (!unknownFields.equals(other.unknownFields)) return false;
+    return true;
   }
 
   @java.lang.Override
@@ -627,7 +625,7 @@ private static final long serialVersionUID = 0L;
         result.interval_ = intervalBuilder_.build();
       }
       if (bandsBuilder_ == null) {
-        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((bitField0_ & 0x00000020) != 0)) {
           bands_ = java.util.Collections.unmodifiableList(bands_);
           bitField0_ = (bitField0_ & ~0x00000020);
         }
@@ -643,35 +641,35 @@ private static final long serialVersionUID = 0L;
 
     @java.lang.Override
     public Builder clone() {
-      return (Builder) super.clone();
+      return super.clone();
     }
     @java.lang.Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.setField(field, value);
+      return super.setField(field, value);
     }
     @java.lang.Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
-      return (Builder) super.clearField(field);
+      return super.clearField(field);
     }
     @java.lang.Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-      return (Builder) super.clearOneof(oneof);
+      return super.clearOneof(oneof);
     }
     @java.lang.Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, java.lang.Object value) {
-      return (Builder) super.setRepeatedField(field, index, value);
+      return super.setRepeatedField(field, index, value);
     }
     @java.lang.Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         java.lang.Object value) {
-      return (Builder) super.addRepeatedField(field, value);
+      return super.addRepeatedField(field, value);
     }
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -970,7 +968,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private com.ctrip.ferriswheel.proto.v1.Interval interval_ = null;
+    private com.ctrip.ferriswheel.proto.v1.Interval interval_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.ctrip.ferriswheel.proto.v1.Interval, com.ctrip.ferriswheel.proto.v1.Interval.Builder, com.ctrip.ferriswheel.proto.v1.IntervalOrBuilder> intervalBuilder_;
     /**
@@ -1090,7 +1088,7 @@ private static final long serialVersionUID = 0L;
     private java.util.List<com.ctrip.ferriswheel.proto.v1.AxisBand> bands_ =
       java.util.Collections.emptyList();
     private void ensureBandsIsMutable() {
-      if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+      if (!((bitField0_ & 0x00000020) != 0)) {
         bands_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.AxisBand>(bands_);
         bitField0_ |= 0x00000020;
        }
@@ -1319,7 +1317,7 @@ private static final long serialVersionUID = 0L;
         bandsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
             com.ctrip.ferriswheel.proto.v1.AxisBand, com.ctrip.ferriswheel.proto.v1.AxisBand.Builder, com.ctrip.ferriswheel.proto.v1.AxisBandOrBuilder>(
                 bands_,
-                ((bitField0_ & 0x00000020) == 0x00000020),
+                ((bitField0_ & 0x00000020) != 0),
                 getParentForChildren(),
                 isClean());
         bands_ = null;
@@ -1374,7 +1372,7 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
-      return super.setUnknownFieldsProto3(unknownFields);
+      return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override
