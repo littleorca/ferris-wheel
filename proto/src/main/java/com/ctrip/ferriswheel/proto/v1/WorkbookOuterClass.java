@@ -258,44 +258,44 @@ public final class WorkbookOuterClass {
       "\002 \001(\0162\033.ferriswheel.v1.Orientation\0227\n\024ca" +
       "tegories_placement\030\003 \001(\0162\031.ferriswheel.v" +
       "1.Placement\0228\n\025series_name_placement\030\004 \001" +
-      "(\0162\031.ferriswheel.v1.Placement\"\345\001\n\004Axis\022\r" +
+      "(\0162\031.ferriswheel.v1.Placement\"\365\001\n\004Axis\022\r" +
       "\n\005title\030\001 \001(\t\022\r\n\005label\030\002 \001(\t\022,\n\tplacemen" +
       "t\030\003 \001(\0162\031.ferriswheel.v1.Placement\022\020\n\010re" +
       "versed\030\004 \001(\010\022*\n\010interval\030\005 \001(\0132\030.ferrisw" +
       "heel.v1.Interval\022\'\n\005bands\030\006 \003(\0132\030.ferris" +
       "wheel.v1.AxisBand\022*\n\010stacking\030\007 \001(\0162\030.fe" +
-      "rriswheel.v1.Stacking\"$\n\010Interval\022\014\n\004fro" +
-      "m\030\001 \001(\001\022\n\n\002to\030\002 \001(\001\"k\n\010AxisBand\022*\n\010inter" +
-      "val\030\001 \001(\0132\030.ferriswheel.v1.Interval\022\r\n\005l" +
-      "abel\030\002 \001(\t\022$\n\005color\030\003 \001(\0132\025.ferriswheel." +
-      "v1.Color\"@\n\005Color\022\013\n\003red\030\001 \001(\002\022\r\n\005green\030" +
-      "\002 \001(\002\022\014\n\004blue\030\003 \001(\002\022\r\n\005alpha\030\004 \001(\002\"i\n\004Te" +
-      "xt\022\014\n\004name\030\001 \001(\t\022+\n\007content\030\002 \001(\0132\032.ferr" +
-      "iswheel.v1.UnionValue\022&\n\006layout\030\003 \001(\0132\026." +
-      "ferriswheel.v1.Layout*l\n\tErrorCode\022\014\n\010EC" +
-      "_UNSET\020\000\022\t\n\005EC_OK\020\001\022\016\n\nEC_UNKNOWN\020\002\022\022\n\016E" +
-      "C_ILLEGAL_REF\020\003\022\024\n\020EC_ILLEGAL_VALUE\020\004\022\014\n" +
-      "\010EC_DIV_0\020\005*\223\002\n\rAggregateType\022\014\n\010AT_UNSE" +
-      "T\020\000\022\016\n\nAT_SUMMARY\020\001\022\014\n\010AT_COUNT\020\002\022\016\n\nAT_" +
-      "AVERAGE\020\003\022\016\n\nAT_MAXIMUM\020\004\022\016\n\nAT_MINIMUM\020" +
-      "\005\022\016\n\nAT_PRODUCT\020\006\022\031\n\025AT_DECIMAL_ONLY_COU" +
-      "NT\020\007\022\031\n\025AT_STANDARD_DEVIATION\020\010\022$\n AT_ST" +
-      "ANDARD_DEVIATION_POPULATION\020\t\022\017\n\013AT_VARI" +
-      "ANCE\020\n\022\032\n\026AT_VARIANCE_POPULATION\020\013\022\r\n\tAT" +
-      "_CUSTOM\020\014*}\n\013VariantType\022\014\n\010VT_UNSET\020\000\022\014" +
-      "\n\010VT_ERROR\020\001\022\014\n\010VT_BLANK\020\002\022\016\n\nVT_DECIMAL" +
-      "\020\003\022\013\n\007VT_BOOL\020\004\022\013\n\007VT_DATE\020\005\022\r\n\tVT_STRIN" +
-      "G\020\006\022\013\n\007VT_LIST\020\007*G\n\007Display\022\016\n\nDISP_UNSE" +
-      "T\020\000\022\r\n\tDISP_NONE\020\001\022\016\n\nDISP_BLOCK\020\002\022\r\n\tDI" +
-      "SP_GRID\020\005*K\n\013Orientation\022\020\n\014ORIENT_UNSET" +
-      "\020\000\022\025\n\021ORIENT_HORIZONTAL\020\001\022\023\n\017ORIENT_VERT" +
-      "ICAL\020\002*p\n\tPlacement\022\017\n\013PLCMT_UNSET\020\000\022\016\n\n" +
-      "PLCMT_LEFT\020\001\022\r\n\tPLCMT_TOP\020\002\022\017\n\013PLCMT_RIG" +
-      "HT\020\003\022\020\n\014PLCMT_BOTTOM\020\004\022\020\n\014PLCMT_CENTER\020\005" +
-      "*K\n\010Stacking\022\022\n\016STACKING_UNSET\020\000\022\025\n\021STAC" +
-      "KING_ABSOLUTE\020\001\022\024\n\020STACKING_PERCENT\020\002B\"\n" +
-      "\036com.ctrip.ferriswheel.proto.v1P\001b\006proto" +
-      "3"
+      "rriswheel.v1.Stacking\022\016\n\006format\030\010 \001(\t\"$\n" +
+      "\010Interval\022\014\n\004from\030\001 \001(\001\022\n\n\002to\030\002 \001(\001\"k\n\010A" +
+      "xisBand\022*\n\010interval\030\001 \001(\0132\030.ferriswheel." +
+      "v1.Interval\022\r\n\005label\030\002 \001(\t\022$\n\005color\030\003 \001(" +
+      "\0132\025.ferriswheel.v1.Color\"@\n\005Color\022\013\n\003red" +
+      "\030\001 \001(\002\022\r\n\005green\030\002 \001(\002\022\014\n\004blue\030\003 \001(\002\022\r\n\005a" +
+      "lpha\030\004 \001(\002\"i\n\004Text\022\014\n\004name\030\001 \001(\t\022+\n\007cont" +
+      "ent\030\002 \001(\0132\032.ferriswheel.v1.UnionValue\022&\n" +
+      "\006layout\030\003 \001(\0132\026.ferriswheel.v1.Layout*l\n" +
+      "\tErrorCode\022\014\n\010EC_UNSET\020\000\022\t\n\005EC_OK\020\001\022\016\n\nE" +
+      "C_UNKNOWN\020\002\022\022\n\016EC_ILLEGAL_REF\020\003\022\024\n\020EC_IL" +
+      "LEGAL_VALUE\020\004\022\014\n\010EC_DIV_0\020\005*\223\002\n\rAggregat" +
+      "eType\022\014\n\010AT_UNSET\020\000\022\016\n\nAT_SUMMARY\020\001\022\014\n\010A" +
+      "T_COUNT\020\002\022\016\n\nAT_AVERAGE\020\003\022\016\n\nAT_MAXIMUM\020" +
+      "\004\022\016\n\nAT_MINIMUM\020\005\022\016\n\nAT_PRODUCT\020\006\022\031\n\025AT_" +
+      "DECIMAL_ONLY_COUNT\020\007\022\031\n\025AT_STANDARD_DEVI" +
+      "ATION\020\010\022$\n AT_STANDARD_DEVIATION_POPULAT" +
+      "ION\020\t\022\017\n\013AT_VARIANCE\020\n\022\032\n\026AT_VARIANCE_PO" +
+      "PULATION\020\013\022\r\n\tAT_CUSTOM\020\014*}\n\013VariantType" +
+      "\022\014\n\010VT_UNSET\020\000\022\014\n\010VT_ERROR\020\001\022\014\n\010VT_BLANK" +
+      "\020\002\022\016\n\nVT_DECIMAL\020\003\022\013\n\007VT_BOOL\020\004\022\013\n\007VT_DA" +
+      "TE\020\005\022\r\n\tVT_STRING\020\006\022\013\n\007VT_LIST\020\007*G\n\007Disp" +
+      "lay\022\016\n\nDISP_UNSET\020\000\022\r\n\tDISP_NONE\020\001\022\016\n\nDI" +
+      "SP_BLOCK\020\002\022\r\n\tDISP_GRID\020\005*K\n\013Orientation" +
+      "\022\020\n\014ORIENT_UNSET\020\000\022\025\n\021ORIENT_HORIZONTAL\020" +
+      "\001\022\023\n\017ORIENT_VERTICAL\020\002*p\n\tPlacement\022\017\n\013P" +
+      "LCMT_UNSET\020\000\022\016\n\nPLCMT_LEFT\020\001\022\r\n\tPLCMT_TO" +
+      "P\020\002\022\017\n\013PLCMT_RIGHT\020\003\022\020\n\014PLCMT_BOTTOM\020\004\022\020" +
+      "\n\014PLCMT_CENTER\020\005*K\n\010Stacking\022\022\n\016STACKING" +
+      "_UNSET\020\000\022\025\n\021STACKING_ABSOLUTE\020\001\022\024\n\020STACK" +
+      "ING_PERCENT\020\002B\"\n\036com.ctrip.ferriswheel.p" +
+      "roto.v1P\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -465,7 +465,7 @@ public final class WorkbookOuterClass {
     internal_static_ferriswheel_v1_Axis_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Axis_descriptor,
-        new java.lang.String[] { "Title", "Label", "Placement", "Reversed", "Interval", "Bands", "Stacking", });
+        new java.lang.String[] { "Title", "Label", "Placement", "Reversed", "Interval", "Bands", "Stacking", "Format", });
     internal_static_ferriswheel_v1_Interval_descriptor =
       getDescriptor().getMessageTypes().get(26);
     internal_static_ferriswheel_v1_Interval_fieldAccessorTable = new

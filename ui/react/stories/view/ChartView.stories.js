@@ -32,6 +32,34 @@ const lineChart = new Chart(
     new Axis('Y-title', 'Y-label')
 );
 
+const lineChartWithDateAxis = new Chart(
+    'c0',
+    'Line',
+    Values.str('Chart'),
+    Values.auto([new Date('2019/04/07'), new Date('2019/04/08'), new Date('2019/04/09'), new Date('2019/04/10')]),
+    [
+        new Series(
+            Values.str('s1'),
+            Values.blank(),
+            Values.auto([19, 13, 21, 9]),
+        ),
+        new Series(
+            Values.str('s2'),
+            Values.blank(),
+            Values.auto([11, 8, 12, 15]),
+        ),
+        new Series(
+            Values.str('s3'),
+            Values.blank(),
+            Values.auto([10, 16, 17, 14]),
+        ),
+    ],
+    undefined,
+    undefined,
+    new Axis('X-title', 'X-label'),
+    new Axis('Y-title', 'Y-label')
+);
+
 const lineChartMissingCategories = new Chart(
     'c1',
     'Line',
@@ -97,6 +125,10 @@ const scatterChart = new Chart(
             Values.auto([11, 8, 12, 15]),
         ),
     ],
+    undefined,
+    undefined,
+    new Axis('X-title', 'X-label'),
+    new Axis('Y-title', 'Y-label')
 );
 
 const bubbleChart = new Chart(
@@ -115,9 +147,13 @@ const bubbleChart = new Chart(
             Values.str('s2'),
             Values.auto([3, 8, 6, 2]),
             Values.auto([11, 8, 12, 15]),
-            Values.auto([110, 180, 120, 150]),
+            Values.auto([110, 80, 120, 150]),
         ),
     ],
+    undefined,
+    undefined,
+    new Axis('X-title', 'X-label'),
+    new Axis('Y-title', 'Y-label')
 );
 
 const radarChart = Chart.deserialize(lineChart);
@@ -175,6 +211,11 @@ class ChartViewStories extends Component {
                     <h4>Line</h4>
                     <ChartView
                         chart={lineChart} />
+                </div>
+                <div>
+                    <h4>Line (date categories)</h4>
+                    <ChartView
+                        chart={lineChartWithDateAxis} />
                 </div>
                 <div>
                     <h4>Line (missing categories)</h4>

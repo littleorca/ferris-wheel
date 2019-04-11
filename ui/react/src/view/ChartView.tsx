@@ -2,17 +2,32 @@ import * as React from 'react';
 import Chart from '../model/Chart';
 import SharedViewProps from './SharedViewProps';
 import UnionValue from '../model/UnionValue';
-import Axis from '../model/Axis';
+import ChartRenderer, {
+    ChartSeriesData,
+    ChartData,
+    ChartRendererProps
+} from '../chart/ChartRenderer';
+// import {
+//     LineRenderer,
+//     BarRenderer,
+//     PieRenderer,
+//     RadarRenderer,
+//     ScatterRenderer,
+//     BubbleRenderer,
+    // GaugeRenderer,
+//     DoughnutRenderer
+// } from '../chart/ChartJsAdapter';
 import {
-    LineRenderer,
-    BarRenderer,
-    PieRenderer,
-    RadarRenderer,
-    ScatterRenderer,
-    BubbleRenderer,
-    GaugeRenderer,
-    DoughnutRenderer
-} from '../chart/ChartJsAdapter';
+    PlotlyLineChart,
+    PlotlyBarChart,
+    PlotlyPieChart,
+    PlotlyRadarChart,
+    PlotlyScatterChart,
+    PlotlyBubbleChart,
+    // PlotlyGaugeChart,
+    PlotlyDoughnutChart
+} from '../chart/PlotlyCharts';
+import GaugeChart from '../chart/GaugeChart';
 import  { VariantType }  from '../model/Variant';
 import RenameAsset from '../action/RenameAsset';
 import Action from '../action/Action';
@@ -20,32 +35,9 @@ import UpdateChart from '../action/UpdateChart';
 import classnames from "classnames";
 import './ChartView.css';
 
-interface ChartData {
-    type: string,
-    name: string,
-    title: string,
-    categories: string[];
-    series: ChartSeriesData[];
-    xAxis: Axis;
-    yAxis: Axis;
-    zAxis: Axis;
-}
-
-interface ChartSeriesData {
-    name: string,
-    xValues: number[],
-    yValues: number[],
-    zValues: number[],
-}
-
-interface ChartRendererProps extends React.ClassAttributes<any> {
-    data: ChartData;
-    className?: string;
-}
-
 interface ChartViewProps extends SharedViewProps<ChartView> {
     chart: Chart;
-    renderer?: React.SFC<ChartRendererProps>;
+    renderer?: ChartRenderer;
     className?: string;
 }
 
@@ -100,7 +92,11 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
         if (!categories.isBlank()) {
             const catList = categories.listValue();
             for (let i = 0; i < catList.length; i++) {
-                data.categories[i] = catList[i].toString();
+                if (catList[i].valueType() === VariantType.DATE) {
+                    data.categories[i] = catList[i].dateValue();
+                } else {
+                    data.categories[i] = catList[i].toString();
+                }
             }
         }
         for (const ser of chart.series) {
@@ -141,28 +137,28 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
         return values;
     }
 
-    protected getChartRenderer(type: string): React.SFC<ChartRendererProps> {
+    protected getChartRenderer(type: string): ChartRenderer {
         if (typeof this.props.renderer !== 'undefined') {
             return this.props.renderer;
         }
 
         switch (type) {
             case 'Line':
-                return LineRenderer;
+                return PlotlyLineChart;
             case 'Bar':
-                return BarRenderer;
+                return PlotlyBarChart;
             case 'Pie':
-                return PieRenderer;
+                return PlotlyPieChart;
             case 'Doughnut':
-                return DoughnutRenderer;
+                return PlotlyDoughnutChart;
             case 'Radar':
-                return RadarRenderer;
+                return PlotlyRadarChart;
             case 'Scatter':
-                return ScatterRenderer;
+                return PlotlyScatterChart;
             case 'Bubble':
-                return BubbleRenderer;
+                return PlotlyBubbleChart;
             case 'Gauge':
-                return GaugeRenderer;
+                return GaugeChart;
             default:
                 return UnknownRenderer;
         }

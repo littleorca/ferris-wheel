@@ -838,6 +838,9 @@ public class PbHelper {
             }
         }
         builder.setStacking(pb(bean.getStacking()));
+        if (bean.getFormat() != null) {
+            builder.setFormat(bean.getFormat());
+        }
         return builder.build();
     }
 
@@ -860,6 +863,9 @@ public class PbHelper {
         }
         bean.setBands(bands);
         bean.setStacking(bean(pb.getStacking()));
+        if (!pb.getFormat().isEmpty()) {
+            bean.setFormat(pb.getFormat());
+        }
         return bean;
     }
 

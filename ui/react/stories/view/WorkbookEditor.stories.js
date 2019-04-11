@@ -89,6 +89,8 @@ const gaugeChart = new Chart(
                 new Color(0.8, 0, 0, 1),
             ),
         ],
+        undefined,
+        '#,##0.000'
     ),
 );
 

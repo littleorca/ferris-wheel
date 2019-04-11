@@ -11,6 +11,7 @@ class Axis {
     public interval: Interval;
     public bands: AxisBand[];
     public stacking: Stacking;
+    public format: string;
 
     public static deserialize(input: any): Axis {
         const title = input.title;
@@ -26,6 +27,7 @@ class Axis {
             }
         }
         const stacking = input.stacking;
+        const format = typeof input.format === 'string' ? input.format : '';
         return new Axis(
             title,
             label,
@@ -33,7 +35,8 @@ class Axis {
             reversed,
             interval,
             bands,
-            stacking
+            stacking,
+            format
         );
     }
 
@@ -44,7 +47,8 @@ class Axis {
         reversed: boolean = false,
         interval: Interval = new Interval(),
         bands: AxisBand[] = [],
-        stacking: Stacking = Stacking.UNSET) {
+        stacking: Stacking = Stacking.UNSET,
+        format: string = '') {
 
         this.title = title;
         this.label = label;
@@ -53,6 +57,7 @@ class Axis {
         this.interval = interval;
         this.bands = bands;
         this.stacking = stacking;
+        this.format = format;
     }
 }
 

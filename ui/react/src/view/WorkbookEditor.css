@@ -118,6 +118,10 @@
 .workbook-editor > .editor-body > .sidebar input[type="text"],
 .workbook-editor > .editor-body > .sidebar .format-input {
     font-size: .875rem;
+}
+
+.workbook-editor > .editor-body > .sidebar select,
+.workbook-editor > .editor-body > .sidebar input[type="text"] {
     padding: .2857em;
 }
 

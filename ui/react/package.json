@@ -1,6 +1,6 @@
 {
   "name": "@littleorca/ferris-wheel",
-  "version": "0.1.1-alpha.5",
+  "version": "0.1.2-alpha.3",
   "author": {
     "name": "Liu Haifeng",
     "email": "haifeng.813@gmail.com"
@@ -29,25 +29,23 @@
   ],
   "dependencies": {
     "@handsontable/react": "^2.1.0",
-    "@types/chart.js": "^2.7.34",
     "@types/classnames": "^2.2.7",
     "@types/react-color": "^2.13.6",
     "@types/react-datepicker": "^1.1.7",
     "@types/react-grid-layout": "^0.16.5",
     "@types/react-popover": "^0.5.2",
     "@types/react-sortable-hoc": "^0.6.4",
-    "chart.js": "^2.7.2",
     "classnames": "^2.2.6",
     "handsontable": "^6.0.1",
     "moment": "^2.22.2",
     "numbro": "^2.1.2",
     "react": "^16.4.2",
-    "react-chartjs-2": "^2.7.4",
     "react-color": "^2.14.1",
     "react-datepicker": "^1.6.0",
     "react-dom": "^16.4.2",
     "react-grid-layout": "^0.16.6",
     "react-loading": "^2.0.3",
+    "react-plotly.js": "^2.3.0",
     "react-popover": "^0.5.7",
     "react-sortable-hoc": "^0.8.3"
   },
@@ -62,11 +60,12 @@
     "build-storybook": "build-storybook"
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^4.0.0-alpha.24",
-    "@storybook/addon-info": "^4.0.0-alpha.24",
-    "@storybook/addon-links": "^4.0.0-alpha.24",
-    "@storybook/addons": "^4.0.0-alpha.24",
-    "@storybook/react": "^4.0.0-alpha.24",
+    "@storybook/addon-actions": "^5.0.6",
+    "@storybook/addon-info": "^5.0.6",
+    "@storybook/addon-links": "^5.0.6",
+    "@storybook/addons": "^5.0.6",
+    "@storybook/react": "^5.0.6",
+    "@storybook/theming": "^5.0.6",
     "@types/jest": "^23.3.1",
     "@types/node": "^10.9.4",
     "@types/react": "^16.4.13",
@@ -75,6 +74,6 @@
     "copyfiles": "^2.1.0",
     "react-scripts": "^2.1.8",
     "rimraf": "^2.6.3",
-    "typescript": "^3.1.1"
+    "typescript": "^3.4.3"
   }
 }

@@ -244,6 +244,7 @@ message Axis {
     Interval interval = 5;
     repeated AxisBand bands = 6;
     Stacking stacking = 7;
+    string format = 8;
 }
 
 message Interval {

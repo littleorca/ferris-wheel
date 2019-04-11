@@ -44,6 +44,14 @@ export { default as UpdateChart } from "./action/UpdateChart";
 export { default as UpdateText } from "./action/UpdateText";
 export { default as WorkbookOperation } from "./action/WorkbookOperation";
 
+/* chart */
+export { default as ChartRenderer } from "./chart/ChartRenderer";
+export { default as GaugeChart } from "./chart/GaugeChart";
+
+export * from "./chart/ChartRenderer";
+export * from "./chart/GaugeChart";
+export * from "./chart/PlotlyCharts";
+
 /* controls */
 export { default as Button } from "./ctrl/Button";
 export { default as CheckBox } from "./ctrl/CheckBox";

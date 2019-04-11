@@ -8,6 +8,7 @@ import EditableList, { EditorProps } from '../ctrl/EditableList';
 import IntervalInput from '../ctrl/IntervalInput';
 import BandForm from './BandForm';
 import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import FormatInput from '../ctrl/FormatInput';
 
 interface AxisFormProps extends React.ClassAttributes<AxisForm> {
     axis: Axis,
@@ -33,6 +34,7 @@ class AxisForm extends React.Component<AxisFormProps> {
         this.handleEditBoxChange = this.handleEditBoxChange.bind(this);
         this.handleIntervalChange = this.handleIntervalChange.bind(this);
         this.handleBandsChange = this.handleBandsChange.bind(this);
+        this.handleFormatChange = this.handleFormatChange.bind(this);
     }
 
     protected handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -73,6 +75,11 @@ class AxisForm extends React.Component<AxisFormProps> {
 
     protected handleBandsChange(list: AxisBand[]) {
         // nothing to do
+        this.onUpdate();
+    }
+
+    protected handleFormatChange(format: string) {
+        this.props.axis.format = format;
         this.onUpdate();
     }
 
@@ -158,6 +165,11 @@ class AxisForm extends React.Component<AxisFormProps> {
                         editor={BandEditor}
                         afterChange={this.handleBandsChange} />
                 </div>
+                <label className="field axis-format">
+                    <FormatInput
+                        format={axis.format}
+                        afterChange={this.handleFormatChange} />
+                </label>
             </div>
         );
     }

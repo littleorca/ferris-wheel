@@ -86,4 +86,14 @@ public interface AxisOrBuilder extends
    * <code>.ferriswheel.v1.Stacking stacking = 7;</code>
    */
   com.ctrip.ferriswheel.proto.v1.Stacking getStacking();
+
+  /**
+   * <code>string format = 8;</code>
+   */
+  java.lang.String getFormat();
+  /**
+   * <code>string format = 8;</code>
+   */
+  com.google.protobuf.ByteString
+      getFormatBytes();
 }

@@ -31,6 +31,14 @@ class FormatInput extends React.Component<FormatInputProps, FormatInputState> {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    public componentDidUpdate(prevProps: FormatInputProps) {
+        if (this.props.format !== prevProps.format) {
+            this.setState({
+                pendingFormat: this.props.format
+            });
+        }
+    }
+
     protected handleClick() {
         if (!this.state.isOpen) {
             this.setState({

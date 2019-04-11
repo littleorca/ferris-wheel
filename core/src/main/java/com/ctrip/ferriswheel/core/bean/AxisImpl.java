@@ -42,6 +42,7 @@ public class AxisImpl implements Axis, Serializable {
     private IntervalImpl interval;
     private List<AxisBand> bands;
     private Stacking stacking;
+    private String format;
 
     public AxisImpl() {
     }
@@ -59,6 +60,7 @@ public class AxisImpl implements Axis, Serializable {
         this.interval = null;
         this.bands = null;
         this.stacking = another.getStacking();
+        this.format = another.getFormat();
 
         if (another.getInterval() != null) {
             this.interval = new IntervalImpl(another.getInterval());
@@ -78,7 +80,8 @@ public class AxisImpl implements Axis, Serializable {
                     boolean reversed,
                     IntervalImpl interval,
                     List<AxisBand> bands,
-                    Stacking stacking) {
+                    Stacking stacking,
+                    String format) {
         this.title = title;
         this.label = label;
         this.placement = placement;
@@ -86,6 +89,7 @@ public class AxisImpl implements Axis, Serializable {
         this.interval = interval;
         this.bands = bands;
         this.stacking = stacking;
+        this.format = format;
     }
 
     public String getTitle() {
@@ -142,5 +146,14 @@ public class AxisImpl implements Axis, Serializable {
 
     public void setStacking(Stacking stacking) {
         this.stacking = stacking;
+    }
+
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 }

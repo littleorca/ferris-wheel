@@ -46,4 +46,6 @@ public interface Axis {
     List<AxisBand> getBands();
 
     Stacking getStacking();
+
+    String getFormat();
 }
