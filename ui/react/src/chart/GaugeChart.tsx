@@ -5,6 +5,10 @@ import Values from "../model/Values";
 import Color, { floatToInt8 } from "../model/Color";
 
 function GaugeChart(props: ChartRendererProps) {
+    if (props.data.series.length < 1 ||
+        props.data.series[0].yValues.length < 1) {
+        return null;
+    }
     const series = props.data.series[0];
     const value = series.yValues[0];
     const formattedVal = Formatter.format(Values.auto(value), props.data.yAxis.format);
@@ -48,6 +52,8 @@ function GaugeChart(props: ChartRendererProps) {
         alpha = floatToInt8(color.alpha);
     const formattedMin = Formatter.format(Values.auto(min), props.data.yAxis.format);
     const formattedMax = Formatter.format(Values.auto(max), props.data.yAxis.format);
+
+    const axisTitle = props.data.yAxis.title;
 
     return (
         <svg
@@ -103,6 +109,15 @@ function GaugeChart(props: ChartRendererProps) {
                 fontSize="9"
                 fill="#666">
                 {formattedMax}
+            </text>
+            <text
+                x="0"
+                y="18"
+                dominantBaseline="middle"
+                textAnchor="middle"
+                fontSize="9"
+                fill="#666">
+                {axisTitle}
             </text>
         </svg>
     );

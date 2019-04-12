@@ -14,6 +14,9 @@ import {
   Group
 } from '../src';
 
+import GaugeChartStories from './chart/GaugeChart.stories';
+import PlotlyChartsStories from './chart/PlotlyCharts.stories';
+
 import EditableListStories from './ctrl/EditableList.stories';
 import EditableTextStories from './ctrl/EditableText.stories';
 import EditableUnionValueStories from './ctrl/EditableUnionValue.stories';
@@ -58,6 +61,11 @@ import FormatFormStories from './ctrl/FormatForm.stories';
 
 // storiesOf('Welcome', module)
 //   .add('Example', () => <ExampleStories />);
+
+storiesOf('Chart', module)
+  .add('Gauge', () => <GaugeChartStories />)
+  .add('PlotlyCharts', () => <PlotlyChartsStories />);
+
 
 storiesOf('Control', module)
   .add('Button', () =>

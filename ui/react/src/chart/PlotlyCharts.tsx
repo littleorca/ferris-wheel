@@ -33,6 +33,14 @@ function getCommonLayout() {
     };
 }
 
+function getHiddenAxisConfig() {
+    return {
+        zeroline: false,
+        showticklabels: false,
+        showgrid: false
+    };
+}
+
 export function PlotlyLineChart(props: ChartRendererProps) {
     const chartData = props.data;
     const plotData: any = [];
@@ -170,7 +178,9 @@ function _internalPlotlyPieChart(props: ChartRendererProps, hole?: number) {
         grid: {
             rows,
             columns
-        }
+        },
+        xaxis: getHiddenAxisConfig(),
+        yaxis: getHiddenAxisConfig()
     });
     layout.margin.b = 20;
 
@@ -220,6 +230,8 @@ export function PlotlyRadarChart(props: ChartRendererProps) {
                 visible: true
             }
         },
+        xaxis: getHiddenAxisConfig(),
+        yaxis: getHiddenAxisConfig()
     });
     layout.margin.b = 20;
 
