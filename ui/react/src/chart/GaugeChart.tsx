@@ -8,13 +8,19 @@ function GaugeChart(props: ChartRendererProps) {
     const series = props.data.series[0];
     const value = series.yValues[0];
     const formattedVal = Formatter.format(Values.auto(value), props.data.yAxis.format);
-    let min = Number.MAX_VALUE, max = Number.MIN_VALUE, color = null;
+    let min = Number.MAX_VALUE,
+        max = Number.MIN_VALUE,
+        color = null,
+        minColor = null,
+        maxColor = null;
     props.data.yAxis.bands.forEach(band => {
         if (band.interval.from < min) {
             min = band.interval.from;
+            minColor = band.color;
         }
         if (band.interval.to > max) {
             max = band.interval.to;
+            maxColor = band.color;
         }
         if (value >= band.interval.from && value <= band.interval.to) {
             color = band.color;
@@ -23,9 +29,15 @@ function GaugeChart(props: ChartRendererProps) {
     let arcLen = 212 * value / (max - min);
     if (arcLen < 0) {
         arcLen = 0;
+        if (color == null) {
+            color = minColor;
+        }
     }
     if (arcLen > 212) {
         arcLen = 212;
+        if (color == null) {
+            color = maxColor;
+        }
     }
     if (color == null) {
         color = new Color(16, 142, 233);
