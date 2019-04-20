@@ -6,9 +6,8 @@ import java.io.Serializable;
 
 /**
  * Default token implementation.
- * 
+ *
  * @author liuhaifeng
- * 
  */
 public class DefaultToken implements Token, Serializable {
     private static final long serialVersionUID = 1L;
@@ -26,7 +25,7 @@ public class DefaultToken implements Token, Serializable {
     }
 
     public DefaultToken(String src, int from, int to, int line, Type type,
-            String token) {
+                        String token) {
         this.src = src;
         this.from = from;
         this.to = to;
@@ -105,6 +104,22 @@ public class DefaultToken implements Token, Serializable {
     }
 
     @Override
+    public boolean startsWith(String s) {
+        if (length() < s.length()) {
+            return false;
+        }
+        return src.regionMatches(false, this.from, s, 0, s.length());
+    }
+
+    @Override
+    public boolean startsWithIgnoreCase(String s) {
+        if (length() < s.length()) {
+            return false;
+        }
+        return src.regionMatches(true, this.from, s, 0, s.length());
+    }
+
+    @Override
     public String toString() {
         return getString();
     }
@@ -142,27 +157,30 @@ public class DefaultToken implements Token, Serializable {
 
         StringBuilder sb = new StringBuilder();
         switch (getType()) {
-        case Identifier:
-            sb.append("ID");
-            break;
-        case Keyword:
-            sb.append("KW");
-            break;
-        case Literal:
-            sb.append("LI");
-            break;
-        case String:
-            sb.append("ST");
-            break;
-        case Number:
-            sb.append("NU");
-            break;
-        case Operator:
-            sb.append("OP");
-            break;
-        case Delimiter:
-            sb.append("DL");
-            break;
+            case Identifier:
+                sb.append("ID");
+                break;
+            case QuotedIdentifier:
+                sb.append("QI");
+                break;
+            case Keyword:
+                sb.append("KW");
+                break;
+            case Literal:
+                sb.append("LI");
+                break;
+            case String:
+                sb.append("ST");
+                break;
+            case Number:
+                sb.append("NU");
+                break;
+            case Operator:
+                sb.append("OP");
+                break;
+            case Delimiter:
+                sb.append("DL");
+                break;
         }
 
         sb.append(" \"").append(getString()).append("\" ").append(from)

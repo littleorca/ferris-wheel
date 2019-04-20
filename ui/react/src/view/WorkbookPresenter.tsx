@@ -55,9 +55,9 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
         if (action.isLocalAction()) {
             return;
         }
-        // Workbook presenter only deal with execute query action.
+        // Workbook presenter only deal with submit form action.
         // And there supposed to be no other remote actions from WorkbookView.
-        if (typeof action.executeQuery === 'undefined') {
+        if (typeof action.submitForm === 'undefined') {
             // throw new Error('Illegal action.');
             return;
         }

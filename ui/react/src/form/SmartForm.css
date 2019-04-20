@@ -1,0 +1,28 @@
+.smart-form {
+    display: flex;
+    flex-flow: row wrap;
+    padding: .25rem;
+}
+
+.smart-form .smart-field,
+.smart-form .submit-button {
+    margin: .25rem;
+    height: 2em;
+    box-sizing: border-box;
+}
+
+.smart-form .submit-button {
+    color: #fff;
+    background: #09c;
+    border-color: #069;
+}
+
+.smart-form .submit-button:hover {
+    background: #3ae;
+    transition: 200ms all;
+}
+
+.smart-form .submit-button:active {
+    box-shadow: inset 0 0 1em rgba(0, 0, 0, .4);
+    transition: 200ms all;
+}

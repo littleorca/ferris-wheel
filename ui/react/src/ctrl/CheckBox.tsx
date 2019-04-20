@@ -1,41 +1,59 @@
 import * as React from 'react';
+import InputCtrl, { InputCtrlProps } from './InputCtrl';
+import classnames from "classnames";
 
-interface CheckBoxProps extends React.ClassAttributes<CheckBox> {
-    value: boolean;
-    name?: string;
-    className?: string;
-    afterChange?: (value: boolean) => void;
+interface CheckBoxProps extends InputCtrlProps<boolean> {
+    label?: string;
+    indeterminate?: boolean;
+    readOnly?: boolean;
 }
 
-interface CheckBoxState {
-    checked: boolean;
-}
-
-class CheckBox extends React.Component<CheckBoxProps, CheckBoxState> {
+class CheckBox extends InputCtrl<boolean, CheckBoxProps> {
+    private checkBoxRef: React.RefObject<HTMLInputElement> = React.createRef();
     constructor(props: CheckBoxProps) {
         super(props);
-
-        this.state = { checked: props.value };
-
         this.handleChange = this.handleChange.bind(this);
     }
 
-    protected handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const target = event.currentTarget;
-        this.setState({ checked: target.checked });
-        if (typeof this.props.afterChange !== 'undefined') {
-            this.props.afterChange(target.checked);
+    componentDidMount() {
+        if (this.props.indeterminate) {
+            this.setIndeterminate();
         }
     }
 
+    componentDidUpdate() {
+        if (this.props.indeterminate) {
+            this.setIndeterminate();
+        }
+    }
+
+    protected setIndeterminate() {
+        const dom = this.checkBoxRef.current;
+        if (dom !== null) {
+            dom.indeterminate = true;
+        }
+    }
+
+    protected handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        this.afterChange(event.currentTarget.checked);
+    }
+
     public render() {
+        const props = this.props;
+        const className = classnames("checkbox", props.className);
+        const value = typeof props.value === "undefined" ? false : props.value;
+
         return (
-            <input
-                type="checkbox"
-                name={this.props.name}
-                checked={this.props.value}
-                className={this.props.className}
-                onChange={this.handleChange} />
+            <label className={className} style={props.style}>
+                <input
+                    ref={this.checkBoxRef}
+                    type="checkbox"
+                    name={props.name}
+                    checked={value}
+                    disabled={this.props.readOnly}
+                    onChange={this.handleChange} />
+                <span>{props.label}</span>
+            </label>
         );
     }
 }

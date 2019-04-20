@@ -5,8 +5,8 @@ import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.core.asset.DefaultCell;
 import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.ref.CellRef;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 import com.ctrip.ferriswheel.core.view.Rectangle;
 
 import java.util.ArrayList;
@@ -69,13 +69,13 @@ public class ChartConsultantHelper {
     }
 
     static private String formula(Table table, int row, int column) {
-        return References.toFormula(new CellRef((DefaultCell) table.getCell(row, column), true, true));
+        return References.toFormula(new CellReference((DefaultCell) table.getCell(row, column), true, true));
     }
 
     static private String formula(Table table, int left, int top, int right, int bottom) {
-        return References.toFormula(new RangeRef(
-                new CellRef((DefaultCell) table.getCell(top, left), true, true),
-                new CellRef((DefaultCell) table.getCell(bottom, right), true, true)));
+        return References.toFormula(new RangeReference(
+                new CellReference((DefaultCell) table.getCell(top, left), true, true),
+                new CellReference((DefaultCell) table.getCell(bottom, right), true, true)));
     }
 
 

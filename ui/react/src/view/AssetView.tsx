@@ -3,6 +3,7 @@ import SheetAsset from '../model/SheetAsset';
 import TableView from './TableView';
 import ChartView from './ChartView';
 import TextView from './TextView';
+import FormView from './FormView';
 import SharedViewProps from './SharedViewProps';
 import Action from '../action/Action';
 import ActionHandler from '../action/ActionHandler';
@@ -82,6 +83,12 @@ class AssetView extends React.Component<AssetViewProps> implements ActionHerald 
                 <TextView
                     {...commonProps}
                     text={asset.text} />
+            );
+        } else if (typeof asset.form !== 'undefined') {
+            return (
+                <FormView
+                    {...commonProps}
+                    form={asset.form} />
             );
         } else { // maybe should just throw error
             return (

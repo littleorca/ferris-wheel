@@ -99,7 +99,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(63, table.getCell(3, 0).intValue());
         assertEquals(0.5238095238095238, table.getCell(4, 0).doubleValue());
         assertEquals(0, table.getCell(3, 1).intValue());
-        assertEquals(ErrorCodes.DIV_0, table.getCell(4, 1).errorValue());
+        assertEquals(ErrorCodes.DIV, table.getCell(4, 1).errorValue());
         assertEquals(66, table.getCell(3, 2).intValue());
         assertEquals(0.5454545454545455, table.getCell(4, 2).doubleValue());
         assertEquals(69, table.getCell(3, 3).intValue());
@@ -143,7 +143,7 @@ public class TestDefaultWorkbook extends TestCase {
         table.eraseRows(1, 2);
         System.out.println(table);
 
-        assertEquals(1, table.getRowCount());
+        assertEquals(3, table.getRowCount()); // update: blank cells won't be trimmed.
         assertEquals(5, table.getColumnCount());
         assertEquals("SUM(A1:C3)", table.getCell(0, 3).getFormulaString());
         assertEquals(36, table.getCell(0, 3).intValue());
@@ -291,7 +291,7 @@ public class TestDefaultWorkbook extends TestCase {
                 series));
         table.removeColumns(0, 3);
 
-        assertEquals(0, table.getRowCount());
+        assertEquals(3, table.getRowCount()); // update: blank cells won't be trimmed.
         assertEquals(0, table.getColumnCount());
     }
 

@@ -29,32 +29,109 @@ function createGauge(title, value) {
     };
 }
 
-const gauge0 = {
-    type: "Gauge",
-    name: "gauge-0",
-    title: "Gauge 0 (empty)",
-    categories: [],
-    series: [],
-    xAxis: new Axis(),
-    yAxis: new Axis(),
-    zAxis: new Axis()
-};
-
-const gauge1 = createGauge("Gauge 1 (normal)", 10);
-const gauge2 = createGauge("Gauge 2 (normal)", 60);
-const gauge3 = createGauge("Gauge 3 (normal)", 80);
-const gauge4 = createGauge("Gauge 4 (less than min)", -10);
-const gauge5 = createGauge("Gauge 5 (min)", 0);
-const gauge6 = createGauge("Gauge 6 (max)", 100);
-const gauge7 = createGauge("Gauge 7 (greater than max)", 210);
+const gauges = [
+    {
+        type: "Gauge",
+        name: "gauge-0",
+        title: "Gauge 0 (empty)",
+        categories: [],
+        series: [],
+        xAxis: new Axis(),
+        yAxis: new Axis(),
+        zAxis: new Axis()
+    },
+    createGauge("Gauge 1 (normal)", 10),
+    createGauge("Gauge 2 (normal)", 60),
+    createGauge("Gauge 3 (normal)", 80),
+    createGauge("Gauge 4 (<min)", -10),
+    createGauge("Gauge 5 (min)", 0),
+    createGauge("Gauge 6 (max)", 100),
+    createGauge("Gauge 7 (>max)", 210),
+    {
+        type: "Gauge",
+        name: "gauge-8",
+        title: "Gauge 8 (#,##0.00%)",
+        categories: [],
+        series: [{
+            name: "s1",
+            xValues: [],
+            yValues: [0.12345],
+            zValues: []
+        }],
+        xAxis: new Axis(),
+        yAxis: new Axis(undefined, undefined, undefined, undefined, undefined, [
+            new AxisBand(new Interval(0, .5), "green", new Color(0, .7, 0)),
+            new AxisBand(new Interval(.5, .75), "yellow", new Color(.7, .6, 0)),
+            new AxisBand(new Interval(.75, 1), "red", new Color(.8, .2, 0)),
+        ], undefined, "#,##0.00%"),
+        zAxis: new Axis()
+    },
+    {
+        type: "Gauge",
+        name: "gauge-9",
+        title: "Gauge 9 (default fmt)",
+        categories: [],
+        series: [{
+            name: "s1",
+            xValues: [],
+            yValues: [123],
+            zValues: []
+        }],
+        xAxis: new Axis(),
+        yAxis: new Axis(undefined, undefined, undefined, undefined, undefined, [
+            new AxisBand(new Interval(0, 50), "green", new Color(0, .7, 0)),
+            new AxisBand(new Interval(50, 75), "yellow", new Color(.7, .6, 0)),
+            new AxisBand(new Interval(75, 150), "red", new Color(.8, .2, 0)),
+        ]),
+        zAxis: new Axis()
+    },
+    {
+        type: "Gauge",
+        name: "gauge-10",
+        title: "Gauge 10 (default fmt)",
+        categories: [],
+        series: [{
+            name: "s1",
+            xValues: [],
+            yValues: [12345],
+            zValues: []
+        }],
+        xAxis: new Axis(),
+        yAxis: new Axis(undefined, undefined, undefined, undefined, undefined, [
+            new AxisBand(new Interval(0, 5000), "green", new Color(0, .7, 0)),
+            new AxisBand(new Interval(5000, 7500), "yellow", new Color(.7, .6, 0)),
+            new AxisBand(new Interval(7500, 15000), "red", new Color(.8, .2, 0)),
+        ]),
+        zAxis: new Axis()
+    },
+    {
+        type: "Gauge",
+        name: "gauge-11",
+        title: "Gauge 11 (huge)",
+        categories: [],
+        series: [{
+            name: "s1",
+            xValues: [],
+            yValues: [12345678900000000],
+            zValues: []
+        }],
+        xAxis: new Axis(),
+        yAxis: new Axis(undefined, undefined, undefined, undefined, undefined, [
+            new AxisBand(new Interval(0, 10000000000000000), "green", new Color(0, .7, 0)),
+            new AxisBand(new Interval(10000000000000000, 20000000000000000), "yellow", new Color(.7, .6, 0)),
+            new AxisBand(new Interval(20000000000000000, 30000000000000000), "red", new Color(.8, .2, 0)),
+        ]),
+        zAxis: new Axis()
+    }
+];
 
 const containerStyle = {
-    display: "flex"
+    display: "flex",
+    flexFlow: "row wrap",
 }
 
 const paneStyle = {
-    minWidth: "100px",
-    maxWidth: "400px",
+    width: "180px",
     padding: "20px",
 }
 
@@ -62,54 +139,14 @@ class GaugeChartStories extends React.Component {
     render() {
         return (
             <div style={containerStyle}>
-                <div style={paneStyle}>
-                    <h3>Gauge 0 (empty)</h3>
-                    <div>
-                        <GaugeChart data={gauge0} />
+                {gauges.map((g, i) => (
+                    <div key={i} style={paneStyle}>
+                        <h3>{g.title}</h3>
+                        <div>
+                            <GaugeChart data={g} />
+                        </div>
                     </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Gauge 1 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge1} />
-                    </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Guague 2 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge2} />
-                    </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Gauge 3 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge3} />
-                    </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Gauge 4 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge4} />
-                    </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Gauge 5 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge5} />
-                    </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Gauge 6 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge6} />
-                    </div>
-                </div>
-                <div style={paneStyle}>
-                    <h3>Gauge 7 (normal)</h3>
-                    <div>
-                        <GaugeChart data={gauge7} />
-                    </div>
-                </div>
+                ))}
             </div>
         );
     }

@@ -46,5 +46,18 @@ public interface SheetAssetOrBuilder extends
    */
   com.ctrip.ferriswheel.proto.v1.TextOrBuilder getTextOrBuilder();
 
+  /**
+   * <code>.ferriswheel.v1.Form form = 4;</code>
+   */
+  boolean hasForm();
+  /**
+   * <code>.ferriswheel.v1.Form form = 4;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.Form getForm();
+  /**
+   * <code>.ferriswheel.v1.Form form = 4;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.FormOrBuilder getFormOrBuilder();
+
   public com.ctrip.ferriswheel.proto.v1.SheetAsset.AssetCase getAssetCase();
 }

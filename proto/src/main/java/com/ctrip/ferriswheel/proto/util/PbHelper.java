@@ -7,7 +7,9 @@ import com.ctrip.ferriswheel.common.Workbook;
 import com.ctrip.ferriswheel.common.aggregate.AggregateType;
 import com.ctrip.ferriswheel.common.automaton.*;
 import com.ctrip.ferriswheel.common.chart.*;
-import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.form.Form;
+import com.ctrip.ferriswheel.common.form.FormField;
+import com.ctrip.ferriswheel.common.form.FormFieldBinding;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
@@ -25,17 +27,24 @@ import com.google.protobuf.Timestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PbHelper {
 
     public static com.ctrip.ferriswheel.proto.v1.Workbook pb(Workbook workbook) {
+        return pb(workbook, false);
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.Workbook pb(Workbook workbook, boolean optimizedForStoreage) {
         com.ctrip.ferriswheel.proto.v1.Workbook.Builder builder = com.ctrip.ferriswheel.proto.v1.Workbook.newBuilder();
         if (workbook.getName() != null) {
             builder.setName(workbook.getName());
         }
         for (Sheet sheet : workbook) {
-            builder.addSheets(pb(sheet));
+            builder.addSheets(pb(sheet, optimizedForStoreage));
         }
         return builder.build();
     }
@@ -52,6 +61,10 @@ public class PbHelper {
     }
 
     public static com.ctrip.ferriswheel.proto.v1.Sheet pb(Sheet sheet) {
+        return pb(sheet, false);
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.Sheet pb(Sheet sheet, boolean optimizedForStorage) {
         com.ctrip.ferriswheel.proto.v1.Sheet.Builder builder = com.ctrip.ferriswheel.proto.v1.Sheet.newBuilder()
                 .setName(sheet.getName())
                 .setLayout(pb(sheet.getLayout()));
@@ -63,6 +76,8 @@ public class PbHelper {
                 builder.addAssets(pb((Chart) asset));
             } else if (asset instanceof Text) {
                 builder.addAssets(pb((Text) asset));
+            } else if (asset instanceof Form) {
+                builder.addAssets(pb((Form) asset, optimizedForStorage));
             } else {
                 throw new RuntimeException("Unsupported asset: " + asset.getClass());
             }
@@ -87,6 +102,9 @@ public class PbHelper {
                 case TEXT:
                     sheet.addAsset(Text.class, bean(asset.getText()));
                     break;
+                case FORM:
+                    sheet.addAsset(Form.class, bean(asset.getForm()));
+                    break;
                 case ASSET_NOT_SET:
                 default:
                     throw new RuntimeException("Illegal asset case: " + asset.getAssetCase());
@@ -95,7 +113,7 @@ public class PbHelper {
         return sheet;
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(String tableName, TableDataImpl tableData) {
+    public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(String tableName, TableData tableData) {
         com.ctrip.ferriswheel.proto.v1.Table.Builder builder = com.ctrip.ferriswheel.proto.v1.Table.newBuilder();
         builder.setName(tableName);
         for (Map.Entry<Integer, Row> rowEntry : tableData) {
@@ -116,8 +134,8 @@ public class PbHelper {
         return com.ctrip.ferriswheel.proto.v1.SheetAsset.newBuilder().setTable(builder).build();
     }
 
-    public static TableDataImpl bean(com.ctrip.ferriswheel.proto.v1.Table proto) {
-        TableDataImpl table = new TableDataImpl();
+    public static TableData bean(com.ctrip.ferriswheel.proto.v1.Table proto) {
+        TableData table = new TableData();
         TreeSparseArray<Row> rows = new TreeSparseArray<>();
         for (int i = 0; i < proto.getRowsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Row rowProto = proto.getRows(i);
@@ -252,27 +270,12 @@ public class PbHelper {
     public static com.ctrip.ferriswheel.proto.v1.QueryAutomaton pb(QueryConfiguration automatonInfo) {
         com.ctrip.ferriswheel.proto.v1.QueryAutomaton.Builder builder = com.ctrip.ferriswheel.proto.v1.QueryAutomaton.newBuilder()
                 .setTemplate(pb(automatonInfo.getTemplate()));
-        if (automatonInfo.getParameters() != null) {
-            for (Map.Entry<String, Variant> entry : automatonInfo.getParameters().entrySet()) {
-                builder.addParams(com.ctrip.ferriswheel.proto.v1.NamedValue.newBuilder()
-                        .setName(entry.getKey())
-                        .setValue(pb(entry.getValue())));
-            }
-        }
-        if (automatonInfo.getQuery() != null) {
-            builder.setQuery(pb(automatonInfo.getQuery()));
-        }
         return builder.build();
     }
 
     public static TableAutomatonInfo.QueryAutomatonInfo bean(com.ctrip.ferriswheel.proto.v1.QueryAutomaton queryAutomaton) {
         TableAutomatonInfo.QueryTemplateInfo template = queryAutomaton.hasTemplate() ? bean(queryAutomaton.getTemplate()) : null;
-        Map<String, Variant> parameters = new LinkedHashMap<>(queryAutomaton.getParamsCount());
-        for (com.ctrip.ferriswheel.proto.v1.NamedValue item : queryAutomaton.getParamsList()) {
-            parameters.put(item.getName(), toValue(item.getValue()));
-        }
-        TableAutomatonInfo.QueryInfo query = queryAutomaton.hasQuery() ? bean(queryAutomaton.getQuery()) : null;
-        return new TableAutomatonInfo.QueryAutomatonInfo(template, parameters, query);
+        return new TableAutomatonInfo.QueryAutomatonInfo(template);
     }
 
     public static com.ctrip.ferriswheel.proto.v1.QueryTemplate pb(QueryTemplate templateInfo) {
@@ -280,63 +283,46 @@ public class PbHelper {
         if (templateInfo.getScheme() != null) {
             builder.setScheme(templateInfo.getScheme());
         }
-        for (Map.Entry<String, DynamicVariant> entry : templateInfo.getAllBuiltinParams().entrySet()) {
-            DynamicVariant param = entry.getValue();
-            builder.addBuiltinParams(com.ctrip.ferriswheel.proto.v1.NamedValue.newBuilder()
-                    .setName(entry.getKey())
-                    .setValue(pb(param)));
-        }
-        for (Map.Entry<String, VariantRule> entry : templateInfo.getAllUserParamRules().entrySet()) {
-            VariantRule rule = entry.getValue();
-            com.ctrip.ferriswheel.proto.v1.ParamRule.Builder ruleBuilder = com.ctrip.ferriswheel.proto.v1.ParamRule.newBuilder()
-                    .setName(entry.getKey())
-                    .setType(pb(rule.getType()))
-                    .setNullable(rule.isNullable());
-            if (rule.getAllowedValues() != null) {
-                for (Variant value : rule.getAllowedValues()) {
-                    ruleBuilder.addAllowedValues(pb(value));
-                }
-            }
-            builder.addUserParamRules(ruleBuilder.build());
+        for (Map.Entry<String, Parameter> entry : templateInfo.getAllBuiltinParams().entrySet()) {
+            Parameter param = entry.getValue();
+            builder.addBuiltinParams(pb(param));
         }
         return builder.build();
     }
 
     public static TableAutomatonInfo.QueryTemplateInfo bean(com.ctrip.ferriswheel.proto.v1.QueryTemplate queryTemplate) {
         String scheme = queryTemplate.getScheme();
-        Map<String, DynamicVariant> builtinParams = new LinkedHashMap<>(queryTemplate.getBuiltinParamsCount());
-        Map<String, VariantRule> userParamRules = new LinkedHashMap<>(queryTemplate.getUserParamRulesCount());
-
-        for (com.ctrip.ferriswheel.proto.v1.NamedValue item : queryTemplate.getBuiltinParamsList()) {
-            builtinParams.put(item.getName(), toDynamicValue(item.getValue()));
+        Map<String, Parameter> builtinParams = new LinkedHashMap<>(queryTemplate.getBuiltinParamsCount());
+        for (com.ctrip.ferriswheel.proto.v1.Parameter item : queryTemplate.getBuiltinParamsList()) {
+            builtinParams.put(item.getName(), bean(item));
         }
-
-        for (com.ctrip.ferriswheel.proto.v1.ParamRule item : queryTemplate.getUserParamRulesList()) {
-            userParamRules.put(item.getName(), bean(item));
-        }
-        return new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams, userParamRules);
+        return new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams);
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.DataQuery pb(DataQuery queryInfo) {
-        com.ctrip.ferriswheel.proto.v1.DataQuery.Builder builder = com.ctrip.ferriswheel.proto.v1.DataQuery.newBuilder();
-        if (queryInfo.getScheme() != null) {
-            builder.setScheme(queryInfo.getScheme());
+    public static com.ctrip.ferriswheel.proto.v1.Parameter pb(Parameter bean) {
+        com.ctrip.ferriswheel.proto.v1.Parameter.Builder builder = com.ctrip.ferriswheel.proto.v1.Parameter.newBuilder();
+        if (bean.getName() != null) {
+            builder.setName(bean.getName());
         }
-        if (queryInfo.getAllParams() != null) {
-            for (Map.Entry<String, Variant> entry : queryInfo.getAllParams().entrySet()) {
-                builder.addParams(com.ctrip.ferriswheel.proto.v1.NamedValue.newBuilder()
-                        .setName(entry.getKey()).setValue(pb(entry.getValue())));
-            }
+        if (bean.getValue() != null) {
+            builder.setValue(pb(bean.getValue()));
         }
+        if (bean.getType() != null) {
+            builder.setType(pb(bean.getType()));
+        }
+        builder.setMandatory(bean.isMandatory())
+                .setMultiple(bean.isMultiple());
         return builder.build();
     }
 
-    public static TableAutomatonInfo.QueryInfo bean(com.ctrip.ferriswheel.proto.v1.DataQuery queryProto) {
-        Map<String, Variant> parameters = new LinkedHashMap<>(queryProto.getParamsCount());
-        for (com.ctrip.ferriswheel.proto.v1.NamedValue item : queryProto.getParamsList()) {
-            parameters.put(item.getName(), toDynamicValue(item.getValue()));
-        }
-        return new TableAutomatonInfo.QueryInfo(queryProto.getScheme(), parameters);
+    public static Parameter bean(com.ctrip.ferriswheel.proto.v1.Parameter pb) {
+        return new DefaultParameter(
+                pb.getName(),
+                toDynamicValue(pb.getValue()),
+                bean(pb.getType()),
+                pb.getMandatory(),
+                pb.getMultiple()
+        );
     }
 
     public static com.ctrip.ferriswheel.proto.v1.PivotAutomaton pb(PivotConfiguration pivot) {
@@ -490,27 +476,6 @@ public class PbHelper {
         }
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.ParamRule pb(VariantRule rule) {
-        com.ctrip.ferriswheel.proto.v1.ParamRule.Builder builder = com.ctrip.ferriswheel.proto.v1.ParamRule.newBuilder()
-                .setType(pb(rule.getType()))
-                .setNullable(rule.isNullable());
-        for (Variant var : rule.getAllowedValues()) {
-            builder.addAllowedValues(pb(var));
-        }
-        return builder.build();
-    }
-
-    static ValueRule bean(com.ctrip.ferriswheel.proto.v1.ParamRule ruleProto) {
-        ValueRule rule = new ValueRule(
-                bean(ruleProto.getType()),
-                ruleProto.getNullable(),
-                new LinkedHashSet<>(ruleProto.getAllowedValuesCount()));
-        for (int i = 0; i < ruleProto.getAllowedValuesCount(); i++) {
-            rule.getAllowedValues().add(toValue(ruleProto.getAllowedValues(i)));
-        }
-        return rule;
-    }
-
     public static com.ctrip.ferriswheel.proto.v1.UnionValue pb(Variant var) {
         com.ctrip.ferriswheel.proto.v1.UnionValue.Builder builder = com.ctrip.ferriswheel.proto.v1.UnionValue.newBuilder();
         if (var instanceof DynamicVariant) {
@@ -647,15 +612,23 @@ public class PbHelper {
         ErrorCodes errorCode = (ErrorCodes) error;
         switch (errorCode) {
             case OK:
-                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_OK;
-            case UNKNOWN:
-                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_UNKNOWN;
-            case ILLEGAL_REF:
-                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_ILLEGAL_REF;
-            case ILLEGAL_VALUE:
-                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_ILLEGAL_VALUE;
-            case DIV_0:
-                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_DIV_0;
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_UNSET;
+            case NULL:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_NULL;
+            case DIV:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_DIV;
+            case VALUE:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_VALUE;
+            case REF:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_REF;
+            case NAME:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_NAME;
+            case NUM:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_NUM;
+            case NA:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_NA;
+            case GETTING_DATA:
+                return com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_GETTING_DATA;
             default:
                 throw new RuntimeException("Unrecognized error code: " + errorCode);
         }
@@ -664,17 +637,23 @@ public class PbHelper {
     public static ErrorCodes bean(com.ctrip.ferriswheel.proto.v1.ErrorCode errorCodeProto) {
         switch (errorCodeProto) {
             case EC_UNSET:
-                return null;
-            case EC_OK:
                 return ErrorCodes.OK;
-            case EC_UNKNOWN:
-                return ErrorCodes.UNKNOWN;
-            case EC_ILLEGAL_REF:
-                return ErrorCodes.ILLEGAL_REF;
-            case EC_ILLEGAL_VALUE:
-                return ErrorCodes.ILLEGAL_VALUE;
-            case EC_DIV_0:
-                return ErrorCodes.DIV_0;
+            case EC_NULL:
+                return ErrorCodes.NULL;
+            case EC_DIV:
+                return ErrorCodes.DIV;
+            case EC_VALUE:
+                return ErrorCodes.VALUE;
+            case EC_REF:
+                return ErrorCodes.REF;
+            case EC_NAME:
+                return ErrorCodes.NAME;
+            case EC_NUM:
+                return ErrorCodes.NUM;
+            case EC_NA:
+                return ErrorCodes.NA;
+            case EC_GETTING_DATA:
+                return ErrorCodes.GETTING_DATA;
             case UNRECOGNIZED:
             default:
                 throw new RuntimeException("Invalid error code(pb): " + errorCodeProto);
@@ -1032,6 +1011,116 @@ public class PbHelper {
                                 .setContent(pb(text.getContent()))
                                 .setLayout(pb(text.getLayout())))
                 .build();
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(Form form) {
+        return pb(form, false);
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(Form form, boolean optimizedForStorage) {
+        return com.ctrip.ferriswheel.proto.v1.SheetAsset.newBuilder()
+                .setForm(pbForm(form, optimizedForStorage))
+                .build();
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.Form pbForm(Form form) {
+        return pbForm(form, false);
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.Form pbForm(Form form, boolean optimizedForStorage) {
+        com.ctrip.ferriswheel.proto.v1.Form.Builder formBuilder = com.ctrip.ferriswheel.proto.v1.Form.newBuilder()
+                .setName(form.getName())
+                .setLayout(pb(form.getLayout()));
+        for (int i = 0; i < form.getFieldCount(); i++) {
+            formBuilder.addFields(pb(form.getField(i), optimizedForStorage));
+        }
+        return formBuilder.build();
+    }
+
+    public static FormData bean(com.ctrip.ferriswheel.proto.v1.Form pb) {
+        FormData form = new FormData();
+        if (!pb.getName().isEmpty()) {
+            form.setName(pb.getName());
+        }
+        form.setLayout(bean(pb.getLayout()));
+        List<FormField> fields = new ArrayList<>(pb.getFieldsCount());
+        for (int i = 0; i < pb.getFieldsCount(); i++) {
+            com.ctrip.ferriswheel.proto.v1.FormField f = pb.getFields(i);
+            FormFieldData fieldBean = bean(f);
+            fields.add(fieldBean);
+        }
+        form.setFields(fields);
+        return form;
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.FormField pb(FormField field) {
+        return pb(field, false);
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.FormField pb(FormField field, boolean optimizedForStorage) {
+        com.ctrip.ferriswheel.proto.v1.FormField.Builder builder = com.ctrip.ferriswheel.proto.v1.FormField.newBuilder()
+                .setType(pb(field.getType()))
+                .setMandatory(field.isMandatory())
+                .setMultiple(field.isMultiple());
+        if (field.getName() != null) {
+            builder.setName(field.getName());
+        }
+        if (field.getValue() != null && !optimizedForStorage) {
+            builder.setValue(pb(field.getValue()));
+        }
+        if (field.getLabel() != null) {
+            builder.setLabel(field.getLabel());
+        }
+        if (field.getTips() != null) {
+            builder.setTips(field.getTips());
+        }
+        if (field.getOptions() != null) {
+            builder.setOptions(pb(field.getOptions()));
+        }
+        for (int i = 0; i < field.getBindingCount(); i++) {
+            builder.addBindings(pb(field.getBinding(i)));
+        }
+        return builder.build();
+    }
+
+    public static FormFieldData bean(com.ctrip.ferriswheel.proto.v1.FormField pb) {
+        FormFieldData field = new FormFieldData();
+        if (!pb.getName().isEmpty()) {
+            field.setName(pb.getName());
+        }
+        field.setType(bean(pb.getType()));
+        field.setMandatory(pb.getMandatory());
+        field.setMultiple(pb.getMultiple());
+        field.setValue(toValue(pb.getValue()));
+        if (!pb.getLabel().isEmpty()) {
+            field.setLabel(pb.getLabel());
+        }
+        if (!pb.getTips().isEmpty()) {
+            field.setTips(pb.getTips());
+        }
+        field.setOptions(toValue(pb.getOptions()));
+        List<FormFieldBinding> bindings = new ArrayList<>(pb.getBindingsCount());
+        for (int i = 0; i < pb.getBindingsCount(); i++) {
+            bindings.add(bean(pb.getBindings(i)));
+        }
+        field.setBindings(bindings);
+        return field;
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.FormFieldBinding pb(FormFieldBinding bean) {
+        com.ctrip.ferriswheel.proto.v1.FormFieldBinding.Builder builder = com.ctrip.ferriswheel.proto.v1.FormFieldBinding.newBuilder();
+        if (bean.getTarget() != null) {
+            builder.setTarget(bean.getTarget());
+        }
+        return builder.build();
+    }
+
+    public static FormFieldBinding bean(com.ctrip.ferriswheel.proto.v1.FormFieldBinding pb) {
+        FormFieldBinding binding = new FormFieldBindingData();
+        if (!pb.getTarget().isEmpty()) {
+            ((FormFieldBindingData) binding).setTarget(pb.getTarget());
+        }
+        return binding;
     }
 
     public static com.ctrip.ferriswheel.proto.v1.Layout pb(Layout bean) {

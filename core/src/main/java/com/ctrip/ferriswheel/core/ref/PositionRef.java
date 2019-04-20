@@ -11,6 +11,10 @@ public class PositionRef implements Serializable {
     public PositionRef() {
     }
 
+    public PositionRef(PositionRef another) {
+        this(another.getRowIndex(), another.isRowAbsolute(), another.getColumnIndex(), another.isColumnAbsolute());
+    }
+
     public PositionRef(int rowIndex, boolean isRowAbsolute, int columnIndex, boolean isColumnAbsolute) {
         this.rowIndex = rowIndex;
         this.isRowAbsolute = isRowAbsolute;

@@ -10,8 +10,7 @@ public class DefaultText extends SheetAssetNode implements Text {
     private final ValueNode content;
 
     protected DefaultText(String name, DefaultSheet sheet) {
-        super(name, sheet.getWorkbook().getAssetManager());
-        setParent(sheet);
+        super(name, sheet);
         this.content = new ValueNode(getAssetManager(), Value.BLANK, null);
 
         bindChild(content);
@@ -25,10 +24,6 @@ public class DefaultText extends SheetAssetNode implements Text {
     @Override
     public ValueNode getContent() {
         return content;
-    }
-
-    DefaultSheet getSheet() {
-        return (DefaultSheet) getParent();
     }
 
 }

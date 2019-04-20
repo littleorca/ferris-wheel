@@ -123,18 +123,18 @@ public class TestPivotAutomaton extends TestCase {
         row++;
         assertEquals("f1-bar/f2-bar", autoTable.getCell(row, 0).strValue());
         assertEquals(35, autoTable.getCell(row, 1).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 2).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 2).getData().getVariant());
         assertSame(Value.BLANK, autoTable.getCell(row, 3).getData().getVariant());
         assertSame(Value.BLANK, autoTable.getCell(row, 4).getData().getVariant());
         assertEquals(30, autoTable.getCell(row, 5).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 6).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 6).getData().getVariant());
         assertSame(Value.BLANK, autoTable.getCell(row, 7).getData().getVariant());
         assertSame(Value.BLANK, autoTable.getCell(row, 8).getData().getVariant());
 
         row++;
         assertEquals("f1-bar/f2-foo", autoTable.getCell(row, 0).strValue());
         assertEquals(25, autoTable.getCell(row, 1).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 2).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 2).getData().getVariant());
         assertEquals(242, autoTable.getCell(row, 3).intValue());
         assertEquals(32.52691193, autoTable.getCell(row, 4).doubleValue(), 0.00000001);
         assertSame(Value.BLANK, autoTable.getCell(row, 5).getData().getVariant());
@@ -151,18 +151,18 @@ public class TestPivotAutomaton extends TestCase {
         assertEquals(140, autoTable.getCell(row, 5).intValue());
         assertEquals(4.242640687, autoTable.getCell(row, 6).doubleValue(), 0.00000001);
         assertEquals(20, autoTable.getCell(row, 7).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 8).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 8).getData().getVariant());
 
         row++;
         assertEquals("f1-foo/f2-foo", autoTable.getCell(row, 0).strValue());
         assertEquals(5, autoTable.getCell(row, 1).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 2).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 2).getData().getVariant());
         assertEquals(10, autoTable.getCell(row, 3).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 4).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 4).getData().getVariant());
         assertEquals(15, autoTable.getCell(row, 5).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 6).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 6).getData().getVariant());
         assertEquals(40, autoTable.getCell(row, 7).intValue());
-        assertEquals(Value.err(ErrorCodes.DIV_0), autoTable.getCell(row, 8).getData().getVariant());
+        assertEquals(Value.err(ErrorCodes.DIV), autoTable.getCell(row, 8).getData().getVariant());
     }
 
     private void prepareSampleData(DefaultTable table) {

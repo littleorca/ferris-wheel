@@ -48,8 +48,6 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
     private boolean bypassComment;
     private LexContext lex;
     private Trie<Type> tokenTrie;
-    private Trie<Type> keywordTrie;
-    private Trie<Type> literalTrie;
     private BufferedReader reader;
 
     public DefaultTokenizer() {
@@ -85,7 +83,7 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
     public void setLexContext(LexContext lexContext) {
         this.lex = lexContext == null ? DefaultLexContext.getDefaultInstance()
                 : lexContext;
-        this.tokenTrie = new Trie<Type>();
+        this.tokenTrie = new Trie<>();
 
         for (String operator : this.lex.getOperators()) {
             tokenTrie.put(operator, Type.Operator);
@@ -95,14 +93,12 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
             tokenTrie.put(delimiter, Type.Delimiter);
         }
 
-        this.keywordTrie = new Trie<Type>();
         for (String keyword : this.lex.getKeywords()) {
-            keywordTrie.put(keyword, Type.Keyword);
+            tokenTrie.put(keyword, Type.Keyword);
         }
 
-        this.literalTrie = new Trie<Type>();
         for (String literal : this.lex.getLiterals()) {
-            literalTrie.put(literal, Type.Literal);
+            tokenTrie.put(literal, Type.Literal);
         }
     }
 
@@ -237,10 +233,7 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
                 to = from;
 
                 if (parseIdentifier()) {
-
-                    if (!checkKeyword())
-                        checkLiteral();
-
+                    checkTokenTrie();
                     return true;
                 }
             }
@@ -427,8 +420,9 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
     }
 
     boolean parseIdentifier() {
+        char startCh = src.charAt(to);
         to++;
-        while (to < src.length() && (lex.isIdentifierPart(src.charAt(to))))
+        while (to < src.length() && (lex.isIdentifierPart(src.charAt(to), startCh)))
             to++;
 
         next = to;
@@ -449,7 +443,7 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
             }
         }
         if (decoder.isTerminable()) {
-            type = Type.Identifier;
+            type = Type.QuotedIdentifier;
             token = decoder.finish();
             next = to;
             return true;
@@ -459,19 +453,10 @@ public class DefaultTokenizer extends DefaultToken implements Tokenizer {
         }
     }
 
-    boolean checkKeyword() {
-        if (keywordTrie.get(src, from, to) != null) {
-            type = Type.Keyword;
-            return true;
-
-        } else {
-            return false;
-        }
-    }
-
-    boolean checkLiteral() {
-        if (literalTrie.get(src, from, to) != null) {
-            type = Type.Literal;
+    boolean checkTokenTrie() {
+        Type matchedType = tokenTrie.get(src, from, to);
+        if (matchedType != null) {
+            type = matchedType;
             return true;
 
         } else {

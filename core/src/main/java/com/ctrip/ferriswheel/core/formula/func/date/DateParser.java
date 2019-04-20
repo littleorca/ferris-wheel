@@ -45,7 +45,7 @@ public abstract class DateParser implements Function {
                 }
             }
             if (result == null) {
-                context.pushOperand(Value.err(ErrorCodes.ILLEGAL_VALUE));
+                context.pushOperand(Value.err(ErrorCodes.VALUE));
             } else {
                 context.pushOperand(Value.date(result));
             }
@@ -79,7 +79,7 @@ public abstract class DateParser implements Function {
                 }
             }
             if (result == null) {
-                context.pushOperand(Value.err(ErrorCodes.ILLEGAL_VALUE));
+                context.pushOperand(Value.err(ErrorCodes.VALUE));
             } else {
                 context.pushOperand(Value.date(result));
             }

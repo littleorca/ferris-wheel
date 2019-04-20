@@ -13,7 +13,7 @@ import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.ref.CellRef;
+import com.ctrip.ferriswheel.core.ref.CellReference;
 import junit.framework.TestCase;
 
 public class TestFormulaEvaluator extends TestCase {
@@ -37,7 +37,7 @@ public class TestFormulaEvaluator extends TestCase {
 
         elements = FormulaParser.parse("\"abc\"+\"def\"");
         value = evaluator.evaluate(elements);
-        assertEquals(ErrorCodes.ILLEGAL_VALUE, value.errorValue());
+        assertEquals(ErrorCodes.VALUE, value.errorValue());
 
         elements = FormulaParser.parse("\"abc\"&\"def\" ");
         value = evaluator.evaluate(elements);
@@ -47,37 +47,37 @@ public class TestFormulaEvaluator extends TestCase {
         table.setCellValue(0, 1, new Value.DecimalValue(100.));
 
         elements = FormulaParser.parse("A1+B1");
-        evaluator.setCurrentTable(table);
+        evaluator.setCurrentAsset(table);
         value = evaluator.evaluate(elements);
         System.out.println(value);
 
         elements = FormulaParser.parse("test!A1*test!B1");
         evaluator.setCurrentSheet(((DefaultTable) table).getSheet());
-        evaluator.setCurrentTable(null);
+        evaluator.setCurrentAsset(null);
         value = evaluator.evaluate(elements);
         System.out.println(value);
 
         elements = FormulaParser.parse("10*3^2*3&10*3^(2*3)"); // = String.valueOf(10*pow(3,2)*3) + String.valueOf(10*pow(3, 2*3))
         evaluator.setCurrentSheet(null);
-        evaluator.setCurrentTable(null);
+        evaluator.setCurrentAsset(null);
         value = evaluator.evaluate(elements);
         assertEquals("2707290", value.strValue());
 
         elements = FormulaParser.parse("75%");
         evaluator.setCurrentSheet(null);
-        evaluator.setCurrentTable(null);
+        evaluator.setCurrentAsset(null);
         value = evaluator.evaluate(elements);
         assertEquals(0.75, value.floatValue(), 0.00001);
 
         elements = FormulaParser.parse("-75%");
         evaluator.setCurrentSheet(null);
-        evaluator.setCurrentTable(null);
+        evaluator.setCurrentAsset(null);
         value = evaluator.evaluate(elements);
         assertEquals(-0.75, value.floatValue(), 0.00001);
 
         elements = FormulaParser.parse("TODAY()-1");
         evaluator.setCurrentSheet(null);
-        evaluator.setCurrentTable(null);
+        evaluator.setCurrentAsset(null);
         value = evaluator.evaluate(elements);
         System.out.println(value.dateValue());
     }
@@ -90,20 +90,26 @@ public class TestFormulaEvaluator extends TestCase {
         }
 
         @Override
-        public Variant resolve(SimpleReferenceElement referenceElement, FormulaEvaluationContext context) {
-            CellRef cellRef = referenceElement.getCellRef();
-            Sheet sheet = cellRef.getSheetName() == null ?
-                    context.getCurrentSheet() : workbook.getSheet(cellRef.getSheetName());
-            Table table = cellRef.getTableName() == null ?
-                    context.getCurrentTable() : sheet.getAsset(cellRef.getTableName());
+        public Variant resolve(CellReferenceElement referenceElement, FormulaEvaluationContext context) {
+            CellReference cellReference = referenceElement.getCellReference();
+            Sheet sheet = cellReference.getSheetName() == null ?
+                    context.getCurrentSheet() : workbook.getSheet(cellReference.getSheetName());
+            Table table = cellReference.getAssetName() == null ?
+                    (Table) context.getCurrentAsset() : sheet.getAsset(cellReference.getAssetName());
 
-            return table.getCell(cellRef.getRowIndex(), cellRef.getColumnIndex()).getData();
+            return table.getCell(cellReference.getPositionRef().getRowIndex(),
+                    cellReference.getPositionRef().getColumnIndex()).getData();
+        }
+
+        @Override
+        public Variant resolve(NameReferenceElement referenceElement, FormulaEvaluationContext context) {
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
             if (sheetName == null && tableName == null) {
-                return context.getCurrentTable();
+                return (Table) context.getCurrentAsset();
             }
             Sheet sheet = sheetName == null ? context.getCurrentSheet() : workbook.getSheet(sheetName);
             if (sheet == null) {

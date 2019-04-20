@@ -31,9 +31,9 @@ abstract class UnionValue implements Variant {
     public booleanValue(): boolean { throw new Error('Illegal state.'); }
     public dateValue(): Date { throw new Error('Illegal state.'); }
     public strValue(): string { throw new Error('Illegal state.'); }
-    public listValue(): Variant[] { throw new Error('Illegal state.'); }
+    public listValue(): UnionValue[] { throw new Error('Illegal state.'); }
     public itemCount(): number { return 1; }
-    public item(i: number): Variant { throw new Error('Illegal state.'); }
+    public item(i: number): UnionValue { throw new Error('Illegal state.'); }
 
     public toString(): string {
         switch (this.valueType()) {

@@ -1,0 +1,27 @@
+.field-container:not(:last-of-type) {
+    margin-bottom: .5em;
+}
+
+.field-container .field-label,
+.field-container .field-control,
+.field-container .field-tips {
+    display: block;
+}
+
+.field-container .field-label {
+    color: #333;
+}
+
+.field-container .field-control {
+    position: relative;
+}
+
+.field-container .field-control .field-error {
+    color: #f00;
+}
+
+.field-container .field-tips {
+    margin: 0;
+    font-size: .9em;
+    color: #555;
+}

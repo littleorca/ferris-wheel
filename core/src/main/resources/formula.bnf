@@ -33,6 +33,7 @@
            | <parenthesis>
            | <function>
            | <reference>
+           | <error>
            | <string>
            | <number>
            | "true"
@@ -52,9 +53,19 @@
               | <qualifier> "!" <local_reference>
               | <local_reference>
 <qualifier> ::= <identifier>
-              | <string>
+              | <quoted_identifier>
 <local_reference> ::= <range_reference>
-                    | <simple_reference>
+                    | <cell_reference>
+                    | <name_reference>
 <range_reference> ::= <identifier> ":" <identifier>
                     | <number> ":" <number>
-<simple_reference> ::= <identifier>
+<cell_reference> ::= <identifier>
+<name_reference> ::= <quoted_identifier>
+<error> ::= "#NULL!"
+          | "#DIV/0!"
+          | "#VALUE!"
+          | "#REF!"
+          | "#NAME?"
+          | "#NUM!"
+          | "#N/A"
+          | "#GETTING_DATA"

@@ -19,7 +19,6 @@ public class PbActionHelper {
         }
         AddChart bean = new AddChart();
         bean.setSheetName(proto.getSheetName());
-        bean.setChartName(proto.getChart().getName());
         bean.setChartData(PbHelper.bean(proto.getChart()));
         return bean;
     }
@@ -27,7 +26,7 @@ public class PbActionHelper {
     public static com.ctrip.ferriswheel.proto.v1.AddChart pb(AddChart bean) {
         return com.ctrip.ferriswheel.proto.v1.AddChart.newBuilder()
                 .setSheetName(bean.getSheetName())
-                .setChart(PbHelper.pb(bean.getChartName(), bean.getChartData()))
+                .setChart(PbHelper.pb(bean.getChartData().getName(), bean.getChartData()))
                 .build();
     }
 
@@ -44,14 +43,15 @@ public class PbActionHelper {
 
     public static AddTable bean(com.ctrip.ferriswheel.proto.v1.AddTable proto) {
         // here ignores some of proto's table data such as layout.
-        return new AddTable(proto.getSheetName(), proto.getTable().getName(), PbHelper.bean(proto.getTable()));
+        return new AddTable(proto.getSheetName(), PbHelper.bean(proto.getTable()));
     }
 
     public static com.ctrip.ferriswheel.proto.v1.AddTable pb(AddTable bean) {
-        Table.Builder tableBuilder = Table.newBuilder()
-                .setName(bean.getTableName());
+        Table.Builder tableBuilder = Table.newBuilder();
         if (bean.getTableData() != null) {
-            for (Map.Entry<Integer, Row> rowEntry : bean.getTableData()) {
+            com.ctrip.ferriswheel.common.table.Table td = bean.getTableData();
+            tableBuilder.setName(td.getName());
+            for (Map.Entry<Integer, Row> rowEntry : td) {
                 tableBuilder.addRows(PbHelper.pb(rowEntry.getValue(), rowEntry.getKey()));
             }
             if (bean.getTableData().getAutomateConfiguration() != null) {
@@ -452,16 +452,13 @@ public class PbActionHelper {
     }
 
     public static AddText bean(com.ctrip.ferriswheel.proto.v1.AddText proto) {
-        return new AddText(proto.getSheetName(),
-                proto.getText().getName(),
-                PbHelper.bean(proto.getText())
-        );
+        return new AddText(proto.getSheetName(), PbHelper.bean(proto.getText()));
     }
 
     public static com.ctrip.ferriswheel.proto.v1.AddText pb(AddText bean) {
         return com.ctrip.ferriswheel.proto.v1.AddText.newBuilder()
                 .setSheetName(bean.getSheetName())
-                .setText(PbHelper.pb(bean.getTextName(), bean.getTextData()))
+                .setText(PbHelper.pb(bean.getTextData().getName(), bean.getTextData()))
                 .build();
     }
 
@@ -483,7 +480,7 @@ public class PbActionHelper {
         ExecuteQuery q = new ExecuteQuery(proto.getSheetName(),
                 proto.getTableName(),
                 new LinkedHashMap<>(proto.getParamsCount()));
-        for (com.ctrip.ferriswheel.proto.v1.NamedValue item : proto.getParamsList()) {
+        for (com.ctrip.ferriswheel.proto.v1.Parameter item : proto.getParamsList()) {
             q.getParams().put(item.getName(), PbHelper.toValue(item.getValue()));
         }
         return q;
@@ -495,7 +492,7 @@ public class PbActionHelper {
                 .setTableName(bean.getTableName());
         if (bean.getParams() != null) {
             for (Map.Entry<String, Variant> entry : bean.getParams().entrySet()) {
-                builder.addParams(com.ctrip.ferriswheel.proto.v1.NamedValue.newBuilder()
+                builder.addParams(com.ctrip.ferriswheel.proto.v1.Parameter.newBuilder()
                         .setName(entry.getKey())
                         .setValue(PbHelper.pb(entry.getValue())));
             }
@@ -519,6 +516,31 @@ public class PbActionHelper {
                 .setNRows(bean.getnRows())
                 .setNColumns(bean.getnColumns())
                 .setFormat(bean.getFormat());
+        return builder.build();
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.AddForm pb(AddForm addForm) {
+        com.ctrip.ferriswheel.proto.v1.AddForm.Builder builder = com.ctrip.ferriswheel.proto.v1.AddForm.newBuilder()
+                .setSheetName(addForm.getSheetName())
+                .setForm(PbHelper.pbForm(addForm.getFormData()));
+        return builder.build();
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.UpdateForm pb(UpdateForm updateForm) {
+        com.ctrip.ferriswheel.proto.v1.UpdateForm.Builder builder = com.ctrip.ferriswheel.proto.v1.UpdateForm.newBuilder()
+                .setSheetName(updateForm.getSheetName())
+                .setForm(PbHelper.pbForm(updateForm.getFormData()));
+        return builder.build();
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.SubmitForm pb(SubmitForm submitForm) {
+        com.ctrip.ferriswheel.proto.v1.SubmitForm.Builder builder = com.ctrip.ferriswheel.proto.v1.SubmitForm.newBuilder()
+                .setSheetName(submitForm.getSheetName());
+        for (Map.Entry<String, Variant> entry : submitForm.getFormData().entrySet()) {
+            builder.addParams(com.ctrip.ferriswheel.proto.v1.Parameter.newBuilder()
+                    .setName(entry.getKey())
+                    .setValue(PbHelper.pb(entry.getValue())));
+        }
         return builder.build();
     }
 
@@ -678,6 +700,21 @@ public class PbActionHelper {
         } else if (action instanceof SetCellsFormat) {
             return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
                     .setSetCellsFormat(pb((SetCellsFormat) action))
+                    .build();
+
+        } else if (action instanceof AddForm) {
+            return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
+                    .setAddForm(pb((AddForm) action))
+                    .build();
+
+        } else if (action instanceof UpdateForm) {
+            return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
+                    .setUpdateForm(pb((UpdateForm) action))
+                    .build();
+
+        } else if (action instanceof SubmitForm) {
+            return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
+                    .setSubmitForm(pb((SubmitForm) action))
                     .build();
 
         } else {

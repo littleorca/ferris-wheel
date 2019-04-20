@@ -90,13 +90,14 @@ public class DefaultRow extends AssetNode implements Row {
 
     @Override
     public int getCellCount() {
-        for (int i = cells.size() - 1; i >= 0; i--) {
-            Cell cell = cells.get(i);
-            if (cell != null && (!cell.getData().isBlank() || cell.getData().isFormula())) {
-                return i + 1;
-            }
-        }
-        return 0;
+        return cells.isEmpty() ? 0 : cells.last().getColumnIndex() + 1;
+//        for (int i = cells.size() - 1; i >= 0; i--) {
+//            Cell cell = cells.get(i);
+//            if (cell != null && (!cell.getData().isBlank() || cell.getData().isFormula())) {
+//                return i + 1;
+//            }
+//        }
+//        return 0;
     }
 
     @Override

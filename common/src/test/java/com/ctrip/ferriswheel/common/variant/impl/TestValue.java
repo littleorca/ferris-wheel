@@ -41,14 +41,14 @@ import java.util.Date;
 public class TestValue extends TestCase {
 
     public void testError() {
-        ErrorCodes ec = ErrorCodes.ILLEGAL_REF;
+        ErrorCodes ec = ErrorCodes.REF;
         Value.ErrorValue ev = Value.err(ec);
         TestCase.assertTrue(ev.booleanValue());
         TestCase.assertEquals(ec.getCode(), ev.intValue());
         TestCase.assertEquals(ec.getCode(), ev.longValue());
         TestCase.assertEquals(ec.getCode(), ev.floatValue(), 0.0001);
         TestCase.assertEquals(ec.getCode(), ev.doubleValue(), 0.0001);
-        TestCase.assertEquals(ec.getFullName(), ev.strValue());
+        TestCase.assertEquals(ec.getName(), ev.strValue());
         try {
             ev.listValue();
             fail();
@@ -205,32 +205,32 @@ public class TestValue extends TestCase {
     }
 
     public void testCompareErrorToError() {
-        checkCompare(0, Value.err(ErrorCodes.ILLEGAL_VALUE), Value.err(ErrorCodes.ILLEGAL_VALUE));
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_VALUE), Value.err(ErrorCodes.ILLEGAL_REF));
+        checkCompare(0, Value.err(ErrorCodes.VALUE), Value.err(ErrorCodes.VALUE));
+        checkUncomparable(Value.err(ErrorCodes.VALUE), Value.err(ErrorCodes.REF));
     }
 
     public void testCompareErrorToBlank() {
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.BLANK);
+        checkUncomparable(Value.err(ErrorCodes.REF), Value.BLANK);
     }
 
     public void testCompareErrorToDecimal() {
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.dec(10));
+        checkUncomparable(Value.err(ErrorCodes.REF), Value.dec(10));
     }
 
     public void testCompareErrorToBoolean() {
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.FALSE);
+        checkUncomparable(Value.err(ErrorCodes.REF), Value.FALSE);
     }
 
     public void testCompareErrorToDate() {
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.date(new Date()));
+        checkUncomparable(Value.err(ErrorCodes.REF), Value.date(new Date()));
     }
 
     public void testCompareErrorToString() {
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.str("hello world"));
+        checkUncomparable(Value.err(ErrorCodes.REF), Value.str("hello world"));
     }
 
     public void testCompareErrorToList() {
-        checkUncomparable(Value.err(ErrorCodes.ILLEGAL_REF), Value.list(Arrays.asList(Value.str("test"))));
+        checkUncomparable(Value.err(ErrorCodes.REF), Value.list(Arrays.asList(Value.str("test"))));
     }
 
     public void testCompareBlankToBlank() {

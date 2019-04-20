@@ -28,11 +28,11 @@ package com.ctrip.ferriswheel.core.asset;
 import com.ctrip.ferriswheel.common.SheetAsset;
 
 abstract class SheetAssetNode extends NamedAssetNode implements SheetAsset, NamedAsset {
-    public SheetAssetNode(String name, AssetManager assetManager) {
-        super(name, assetManager);
-    }
-
     public SheetAssetNode(String name, AssetNode parentAsset) {
         super(name, parentAsset);
+    }
+
+    public DefaultSheet getSheet() {
+        return (DefaultSheet) getParent();
     }
 }

@@ -7,6 +7,8 @@ import com.ctrip.ferriswheel.common.action.ActionNotifier;
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.ChartBinder;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.form.Form;
+import com.ctrip.ferriswheel.common.form.FormField;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
@@ -17,10 +19,7 @@ import com.ctrip.ferriswheel.common.view.Displayable;
 import com.ctrip.ferriswheel.common.view.Grid;
 import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.core.action.*;
-import com.ctrip.ferriswheel.core.bean.AxisImpl;
-import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.bean.TableDataImpl;
-import com.ctrip.ferriswheel.core.bean.TextData;
+import com.ctrip.ferriswheel.core.bean.*;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
@@ -54,7 +53,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     @Override
     public <T extends SheetAsset> T addAsset(Class<T> clazz, String name) {
         if (Table.class.isAssignableFrom(clazz)) {
-            TableDataImpl table = new TableDataImpl();
+            TableData table = new TableData();
             table.setName(name);
             return (T) addTable(table);
         } else if (Chart.class.isAssignableFrom(clazz)) {
@@ -65,8 +64,13 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             TextData text = new TextData();
             text.setName(name);
             return (T) addText(text);
+        } else if (Form.class.isAssignableFrom(clazz)) {
+            FormData form = new FormData();
+            form.setName(name);
+            return (T) addForm(form);
+        } else {
+            throw new IllegalArgumentException();
         }
-        return null;
     }
 
     @Override
@@ -80,8 +84,11 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             return (T) addChart((Chart) asset);
         } else if (Text.class.equals(clazz)) {
             return (T) addText((Text) asset);
+        } else if (Form.class.equals(clazz)) {
+            return (T) addForm((Form) asset);
+        } else {
+            throw new IllegalArgumentException();
         }
-        return null;
     }
 
     @Override
@@ -150,15 +157,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
                     // if renamed asset is  a table, there could be formulas which need update.
                     if (asset instanceof DefaultTable) {
                         DefaultTable table = (DefaultTable) asset;
-                        getWorkbook().updateRangeReferences(table,
-                                0,
-                                0,
-                                null, // null means unlimited
-                                null,
-                                null,
-                                null,
-                                null,
-                                null);
+                        getWorkbook().onTableUpdate(table);
                     }
                 }));
         // technically rename a table doesn't affect any cell value or chart property value,
@@ -167,18 +166,20 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     protected DefaultTable addTable(Table tableData) {
-        return handleAction(new AddTable(getName(), tableData.getName(), tableData));
+        return handleAction(new AddTable(getName(), tableData));
     }
 
     DefaultTable handleAction(AddTable addTable) {
-        if (addTable.getTableName() == null || addTable.getTableName().isEmpty()) {
-            addTable.setTableName(UUIDGen.generate().toString());
+        String tableName = addTable.getTableData().getName();
+        if (tableName == null || tableName.isEmpty()) {
+            tableName = UUIDGen.generate().toString();
         }
-        if (getAsset(addTable.getTableName()) != null) {
-            throw new IllegalArgumentException("Duplicated name: " + addTable.getTableName());
+        if (getAsset(tableName) != null) {
+            throw new IllegalArgumentException("Duplicated name: " + tableName);
         }
+        String finalTableName = tableName;
         return publicly(addTable, () -> {
-            DefaultTable table = createTable(addTable.getTableName());
+            DefaultTable table = createTable(finalTableName);
             assets.add(table);
 
             notifier.privately(() -> {
@@ -204,33 +205,37 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             });
 
             layoutNewAsset(table);
+            addTable.setTableData(table);
             return table;
         });
     }
 
     DefaultTable createTable(String name) {
-        return new DefaultTable(name, getAssetManager());
+        return new DefaultTable(name, this);
     }
 
     protected DefaultChart addChart(Chart chart) {
-        return handleAction(new AddChart(getName(), chart.getName(), chart));
+        return handleAction(new AddChart(getName(), chart));
     }
 
     DefaultChart handleAction(AddChart addChart) {
-        if (addChart.getChartName() == null || addChart.getChartName().isEmpty()) {
-            addChart.setChartName(UUIDGen.generate().toString());
+        String chartName = addChart.getChartData().getName();
+        if (chartName == null || chartName.isEmpty()) {
+            chartName = UUIDGen.generate().toString();
         }
-        if (getAsset(addChart.getChartName()) != null) {
-            throw new IllegalArgumentException("Duplicated name: " + addChart.getChartName());
+        if (getAsset(chartName) != null) {
+            throw new IllegalArgumentException("Duplicated name: " + chartName);
         }
+        final String finalChartName = chartName;
         return publicly(addChart, () -> {
             Chart chartData = addChart.getChartData();
-            DefaultChart chart = new DefaultChart(addChart.getChartName(), chartData.getType(), this);
+            DefaultChart chart = new DefaultChart(finalChartName, chartData.getType(), this);
             assets.add(chart);
             // now fill data
             layoutNewAsset(chart);
             updateChart(chart, chartData);
             getWorkbook().onChartCreated(chart);
+            addChart.setChartData(chart);
             return chart;
         });
     }
@@ -305,26 +310,28 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     protected DefaultText addText(Text text) {
-        return handleAction(new AddText(getName(), text.getName(), text));
+        return handleAction(new AddText(getName(), text));
     }
 
     DefaultText handleAction(AddText addText) {
-        if (addText.getTextName() == null || addText.getTextName().isEmpty()) {
-            addText.setTextName(UUIDGen.generate().toString());
+        String textName = addText.getTextData().getName();
+        if (textName == null || textName.isEmpty()) {
+            textName = UUIDGen.generate().toString();
         }
-        if (getAsset(addText.getTextName()) != null) {
-            throw new IllegalArgumentException("Duplicated name: " + addText.getTextName());
+        if (getAsset(textName) != null) {
+            throw new IllegalArgumentException("Duplicated name: " + textName);
         }
+        final String finalTextName = textName;
         return publicly(addText, () -> {
-            DefaultText text = createText(addText.getTextName());
+            DefaultText text = createText(finalTextName);
             assets.add(text);
 
             fillTextData(text, addText.getTextData());
             if (addText.getTextData().getLayout() == null) {
                 layoutNewAsset(text);
-                ((TextData) addText.getTextData()).setLayout(new LayoutImpl(text.getLayout()));
             }
-            getWorkbook().onTextCreated(text);
+            getWorkbook().onAssetUpdate(text);
+            addText.setTextData(text);
             return text;
         });
     }
@@ -350,7 +357,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             if (updateText.getTextData().getLayout() == null) {
                 ((TextData) updateText.getTextData()).setLayout(new LayoutImpl(text.getLayout()));
             }
-            getWorkbook().onTextUpdated(text);
+            getWorkbook().onAssetUpdate(text);
             return text;
         });
     }
@@ -365,6 +372,67 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         }
         if (data.getLayout() != null) {
             text.getLayout().copy(data.getLayout());
+        }
+    }
+
+    protected DefaultForm addForm(Form form) {
+        return handleAction(new AddForm(getName(), form));
+    }
+
+    DefaultForm handleAction(AddForm addForm) {
+        String formName = addForm.getFormData().getName();
+        if (formName == null || formName.isEmpty()) {
+            formName = UUIDGen.generate().toString();
+        }
+        if (getAsset(formName) != null) {
+            throw new IllegalArgumentException("Duplicated name: " + formName);
+        }
+        final String finalFormName = formName;
+        return publicly(addForm, () -> {
+            DefaultForm form = createForm(finalFormName);
+            assets.add(form);
+
+            fillFormData(form, addForm.getFormData());
+            if (addForm.getFormData().getLayout() == null) {
+                layoutNewAsset(form);
+            }
+
+            getWorkbook().onAssetUpdate(form);
+            addForm.setFormData(form);
+            return form;
+        });
+    }
+
+    DefaultForm createForm(String name) {
+        return new DefaultForm(name, this);
+    }
+
+    public DefaultForm updateForm(Form form) {
+        return handleAction(new UpdateForm(getName(), form.getName(), form));
+    }
+
+    DefaultForm handleAction(UpdateForm updateForm) {
+        if (getAsset(updateForm.getFormName()) == null) {
+            throw new IllegalArgumentException("There is no form with name: " + updateForm.getFormName());
+        }
+        return publicly(updateForm, () -> {
+            DefaultForm form = getAsset(updateForm.getFormName());
+            fillFormData(form, updateForm.getFormData());
+            getWorkbook().onAssetUpdate(form);
+            updateForm.setFormData(form);
+            return form;
+        });
+    }
+
+    void fillFormData(DefaultForm form, Form data) {
+        form.clearFields();
+        for (FormField field : data) {
+            DefaultFormField defaultField = new DefaultFormField(field.getName(), form);
+            defaultField.fillFieldData(field);
+            form.addField(defaultField);
+        }
+        if (data.getLayout() != null) {
+            form.getLayout().copy(data.getLayout());
         }
     }
 

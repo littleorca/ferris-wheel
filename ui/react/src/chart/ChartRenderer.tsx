@@ -22,6 +22,7 @@ interface ChartData {
 interface ChartRendererProps extends React.ClassAttributes<any> {
     data: ChartData;
     className?: string;
+    style?: React.CSSProperties;
 }
 
 type ChartRenderer = React.SFC<ChartRendererProps>;

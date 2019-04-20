@@ -22,7 +22,7 @@ abstract class AssetNode implements Asset {
 
     protected AssetNode(AssetNode parent) {
         this(parent.getAssetManager());
-        parent.bindChild(this);
+        // parent.bindChild(this); // bind should be proceed while it is added to parent.
     }
 
     @Override

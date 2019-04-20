@@ -1,10 +1,10 @@
 import QueryTemplate from "./QueryTemplate";
-import NamedValue from "./NamedValue";
+import Parameter from "./Parameter";
 import DataQuery from "./DataQuery";
 
 class QueryAutomaton {
     public template: QueryTemplate;
-    public params: NamedValue[];
+    public params: Parameter[];
     public query: DataQuery;
 
     public static deserialize(input: any): QueryAutomaton {
@@ -13,7 +13,7 @@ class QueryAutomaton {
         const params = [];
         if (typeof input.params !== 'undefined' && input.params !== null) {
             for (const param of input.params) {
-                params.push(NamedValue.deserialize(param));
+                params.push(Parameter.deserialize(param));
             }
         }
         const query = typeof input.query !== 'undefined' ?
@@ -23,7 +23,7 @@ class QueryAutomaton {
 
     constructor(
         template: QueryTemplate = new QueryTemplate(),
-        params: NamedValue[] = [],
+        params: Parameter[] = [],
         query: DataQuery = new DataQuery()) {
 
         this.template = template;

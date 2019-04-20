@@ -1,11 +1,13 @@
 package com.ctrip.ferriswheel.core.formula.eval;
 
 import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.SheetAsset;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.core.asset.DefaultTable;
+import com.ctrip.ferriswheel.core.asset.Asset;
+import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
-import com.ctrip.ferriswheel.core.formula.SimpleReferenceElement;
+import com.ctrip.ferriswheel.core.formula.NameReferenceElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.Stack;
 public class FormulaEvaluator {
     private ReferenceResolver resolver;
     private Sheet currentSheet;
-    private Table currentTable;
+    private SheetAsset currentAsset;
 
     public FormulaEvaluator(ReferenceResolver resolver) {
         this.resolver = resolver;
@@ -48,15 +50,15 @@ public class FormulaEvaluator {
         this.currentSheet = currentSheet;
     }
 
-    public Table getCurrentTable() {
-        return currentTable;
+    public SheetAsset getCurrentAsset() {
+        return currentAsset;
     }
 
-    public void setCurrentTable(Table currentTable) {
-        this.currentTable = currentTable;
-        if (currentTable != null) {
+    public void setCurrentAsset(SheetAsset currentAsset) {
+        this.currentAsset = currentAsset;
+        if (currentAsset != null) {
             // TODO review this cast
-            setCurrentSheet(((DefaultTable) currentTable).getSheet());
+            setCurrentSheet((Sheet) ((Asset) currentAsset).getParent());
         }
     }
 
@@ -69,8 +71,8 @@ public class FormulaEvaluator {
         }
 
         @Override
-        public Table getCurrentTable() {
-            return currentTable;
+        public SheetAsset getCurrentAsset() {
+            return currentAsset;
         }
 
         @Override
@@ -92,7 +94,12 @@ public class FormulaEvaluator {
         }
 
         @Override
-        public Variant resolveReference(SimpleReferenceElement referenceElement) {
+        public Variant resolveReference(CellReferenceElement referenceElement) {
+            return resolver.resolve(referenceElement, this);
+        }
+
+        @Override
+        public Variant resolveReference(NameReferenceElement referenceElement) {
             return resolver.resolve(referenceElement, this);
         }
 

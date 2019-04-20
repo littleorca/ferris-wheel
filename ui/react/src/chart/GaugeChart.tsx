@@ -3,6 +3,7 @@ import { ChartRendererProps } from "./ChartRenderer";
 import Formatter from "../util/Formatter";
 import Values from "../model/Values";
 import Color, { floatToInt8 } from "../model/Color";
+import numbro from "numbro";
 
 function GaugeChart(props: ChartRendererProps) {
     if (props.data.series.length < 1 ||
@@ -11,7 +12,7 @@ function GaugeChart(props: ChartRendererProps) {
     }
     const series = props.data.series[0];
     const value = series.yValues[0];
-    const formattedVal = Formatter.format(Values.auto(value), props.data.yAxis.format);
+    const formattedVal = _format(value, props.data.yAxis.format);
     let min = Number.MAX_VALUE,
         max = Number.MIN_VALUE,
         color = null,
@@ -50,23 +51,21 @@ function GaugeChart(props: ChartRendererProps) {
         green = floatToInt8(color.green),
         blue = floatToInt8(color.blue),
         alpha = floatToInt8(color.alpha);
-    const formattedMin = Formatter.format(Values.auto(min), props.data.yAxis.format);
-    const formattedMax = Formatter.format(Values.auto(max), props.data.yAxis.format);
+    const formattedMin = _format(min, props.data.yAxis.format);
+    const formattedMax = _format(max, props.data.yAxis.format);
 
     const axisTitle = props.data.yAxis.title;
 
     return (
         <svg
-            viewBox="-50 -50 100 100"
-            style={{
-                width: "100%",
-                height: "100%",
-            }}>
+            className={props.className}
+            viewBox="-50 -50 100 105"
+            style={props.style}>
             <path
                 d="M -45,0 A 45,45 0 1 1 0,45"
                 strokeLinecap="round"
                 stroke="#eee"
-                strokeWidth="8"
+                strokeWidth="9"
                 fillOpacity="0"
                 transform="rotate(-45,0,0)"
             />
@@ -74,7 +73,7 @@ function GaugeChart(props: ChartRendererProps) {
                 d="M -45,0 A 45,45 0 1 1 0,45"
                 strokeLinecap="round"
                 stroke={`rgba(${red}, ${green}, ${blue}, ${alpha})`}
-                strokeWidth="8"
+                strokeWidth="9"
                 fillOpacity="0"
                 transform="rotate(-45,0,0)"
                 style={{
@@ -98,7 +97,7 @@ function GaugeChart(props: ChartRendererProps) {
                 dominantBaseline="middle"
                 textAnchor="middle"
                 fontSize="9"
-                fill="#666">
+                fill={value >= min ? "#666" : "#e00"}>
                 {formattedMin}
             </text>
             <text
@@ -107,7 +106,7 @@ function GaugeChart(props: ChartRendererProps) {
                 dominantBaseline="middle"
                 textAnchor="middle"
                 fontSize="9"
-                fill="#666">
+                fill={value <= max ? "#666" : "#e00"}>
                 {formattedMax}
             </text>
             <text
@@ -121,6 +120,12 @@ function GaugeChart(props: ChartRendererProps) {
             </text>
         </svg>
     );
+}
+
+function _format(value: number, format: string) {
+    return format === "" ?
+        numbro(value).format({ average: true, totalLength: 3 }) :
+        Formatter.format(Values.auto(value), format);
 }
 
 export default GaugeChart;

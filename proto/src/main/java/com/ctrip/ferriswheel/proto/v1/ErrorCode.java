@@ -13,25 +13,37 @@ public enum ErrorCode
    */
   EC_UNSET(0),
   /**
-   * <code>EC_OK = 1;</code>
+   * <code>EC_NULL = 1;</code>
    */
-  EC_OK(1),
+  EC_NULL(1),
   /**
-   * <code>EC_UNKNOWN = 2;</code>
+   * <code>EC_DIV = 2;</code>
    */
-  EC_UNKNOWN(2),
+  EC_DIV(2),
   /**
-   * <code>EC_ILLEGAL_REF = 3;</code>
+   * <code>EC_VALUE = 3;</code>
    */
-  EC_ILLEGAL_REF(3),
+  EC_VALUE(3),
   /**
-   * <code>EC_ILLEGAL_VALUE = 4;</code>
+   * <code>EC_REF = 4;</code>
    */
-  EC_ILLEGAL_VALUE(4),
+  EC_REF(4),
   /**
-   * <code>EC_DIV_0 = 5;</code>
+   * <code>EC_NAME = 5;</code>
    */
-  EC_DIV_0(5),
+  EC_NAME(5),
+  /**
+   * <code>EC_NUM = 6;</code>
+   */
+  EC_NUM(6),
+  /**
+   * <code>EC_NA = 7;</code>
+   */
+  EC_NA(7),
+  /**
+   * <code>EC_GETTING_DATA = 8;</code>
+   */
+  EC_GETTING_DATA(8),
   UNRECOGNIZED(-1),
   ;
 
@@ -40,25 +52,37 @@ public enum ErrorCode
    */
   public static final int EC_UNSET_VALUE = 0;
   /**
-   * <code>EC_OK = 1;</code>
+   * <code>EC_NULL = 1;</code>
    */
-  public static final int EC_OK_VALUE = 1;
+  public static final int EC_NULL_VALUE = 1;
   /**
-   * <code>EC_UNKNOWN = 2;</code>
+   * <code>EC_DIV = 2;</code>
    */
-  public static final int EC_UNKNOWN_VALUE = 2;
+  public static final int EC_DIV_VALUE = 2;
   /**
-   * <code>EC_ILLEGAL_REF = 3;</code>
+   * <code>EC_VALUE = 3;</code>
    */
-  public static final int EC_ILLEGAL_REF_VALUE = 3;
+  public static final int EC_VALUE_VALUE = 3;
   /**
-   * <code>EC_ILLEGAL_VALUE = 4;</code>
+   * <code>EC_REF = 4;</code>
    */
-  public static final int EC_ILLEGAL_VALUE_VALUE = 4;
+  public static final int EC_REF_VALUE = 4;
   /**
-   * <code>EC_DIV_0 = 5;</code>
+   * <code>EC_NAME = 5;</code>
    */
-  public static final int EC_DIV_0_VALUE = 5;
+  public static final int EC_NAME_VALUE = 5;
+  /**
+   * <code>EC_NUM = 6;</code>
+   */
+  public static final int EC_NUM_VALUE = 6;
+  /**
+   * <code>EC_NA = 7;</code>
+   */
+  public static final int EC_NA_VALUE = 7;
+  /**
+   * <code>EC_GETTING_DATA = 8;</code>
+   */
+  public static final int EC_GETTING_DATA_VALUE = 8;
 
 
   public final int getNumber() {
@@ -80,11 +104,14 @@ public enum ErrorCode
   public static ErrorCode forNumber(int value) {
     switch (value) {
       case 0: return EC_UNSET;
-      case 1: return EC_OK;
-      case 2: return EC_UNKNOWN;
-      case 3: return EC_ILLEGAL_REF;
-      case 4: return EC_ILLEGAL_VALUE;
-      case 5: return EC_DIV_0;
+      case 1: return EC_NULL;
+      case 2: return EC_DIV;
+      case 3: return EC_VALUE;
+      case 4: return EC_REF;
+      case 5: return EC_NAME;
+      case 6: return EC_NUM;
+      case 7: return EC_NA;
+      case 8: return EC_GETTING_DATA;
       default: return null;
     }
   }

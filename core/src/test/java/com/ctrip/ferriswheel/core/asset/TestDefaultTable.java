@@ -46,8 +46,9 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         // set 0, 0
         Variant old = table.setCellValue(0, 0, createIntValue(11));
         assertTrue(old.isBlank());
-        assertEquals(1, table.getRowCount());
-        assertEquals(1, table.getColumnCount());
+        // update: blank cells won't be trimmed.
+        assertEquals(2, table.getRowCount());
+        assertEquals(2, table.getColumnCount());
 
         // set 1, 1
         old = table.setCellValue(1, 1, createIntValue(2020));
@@ -233,8 +234,9 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         assertEquals(5, sheet.getColumnCount());
 
         sheet.eraseRows(1, 2);
-        assertEquals(1, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
+        // update: blank cells won't be trimmed.
+        assertEquals(3, sheet.getRowCount());
+        assertEquals(5, sheet.getColumnCount());
     }
 
     public void testRemoveRows() {
@@ -293,12 +295,14 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         assertEquals(3, sheet.getColumnCount());
 
         sheet.eraseColumns(2, 1);
-        assertEquals(2, sheet.getRowCount());
-        assertEquals(2, sheet.getColumnCount());
+        // update: blank cells won't be trimmed.
+        assertEquals(3, sheet.getRowCount());
+        assertEquals(3, sheet.getColumnCount());
 
+        // update: blank cells won't be trimmed.
         sheet.eraseColumns(1, 1);
-        assertEquals(0, sheet.getRowCount());
-        assertEquals(0, sheet.getColumnCount());
+        assertEquals(3, sheet.getRowCount());
+        assertEquals(3, sheet.getColumnCount());
     }
 
     public void testRemoveColumns() {
@@ -314,7 +318,7 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         assertEquals(3, sheet.getColumnCount());
         sheet.removeColumns(2, 1);
         assertEquals(3, sheet.getRowCount());
-        assertEquals(1, sheet.getColumnCount());
+        assertEquals(2, sheet.getColumnCount()); // update: blank cells won't be trimmed.
     }
 
     public void testEraseCell() {
@@ -327,15 +331,17 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
         sheet.eraseCell(5, 6);
         assertEquals(7, sheet.getRowCount());
-        assertEquals(6, sheet.getColumnCount());
+        assertEquals(7, sheet.getColumnCount()); // update: blank cells won't be trimmed.
 
         sheet.eraseCell(6, 5);
-        assertEquals(6, sheet.getRowCount());
-        assertEquals(6, sheet.getColumnCount());
+        // update: blank cells won't be trimmed.
+        assertEquals(7, sheet.getRowCount());
+        assertEquals(7, sheet.getColumnCount());
 
+        // update: blank cells won't be trimmed.
         sheet.eraseCell(5, 5);
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
+        assertEquals(7, sheet.getRowCount());
+        assertEquals(7, sheet.getColumnCount());
     }
 
     public void testAddChart() {

@@ -14,6 +14,10 @@ public class EscapeHelper {
         if (p.matcher(str).matches()) {
             return str;
         }
+        return escapeName(str);
+    }
+
+    public static String escapeName(String str) {
         StringBuilder sb = new StringBuilder(STR_SINGLE_QUOTE);
         int offset = 0, pos;
         while ((pos = str.indexOf(CHAR_SINGLE_QUOTE, offset)) != -1) {

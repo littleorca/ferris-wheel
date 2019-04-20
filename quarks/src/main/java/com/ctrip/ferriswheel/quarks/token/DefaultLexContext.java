@@ -65,11 +65,11 @@ public class DefaultLexContext implements LexContext {
     }
 
     @Override
-    public boolean isIdentifierPart(char ch) {
-        if (isIdentifierStart(ch))
+    public boolean isIdentifierPart(char pendingChar, char identifierStart) {
+        if (isIdentifierStart(pendingChar))
             return true;
 
-        return (ch >= '0' && ch <= '9');
+        return (pendingChar >= '0' && pendingChar <= '9');
     }
 
     @Override

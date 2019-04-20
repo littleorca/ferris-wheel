@@ -1,27 +1,28 @@
 package com.ctrip.ferriswheel.core.util;
 
 import com.ctrip.ferriswheel.common.variant.ErrorCodes;
-import com.ctrip.ferriswheel.core.ref.CellRef;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.NameReference;
 import com.ctrip.ferriswheel.core.ref.PositionRef;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 
 public class References {
     /**
-     * Parse cell reference such as 'A1' or '$A$1'
+     * Parse position reference such as 'A1' or '$A$1'
      *
      * @param refStr
      * @return
      */
-    public static CellRef parseSimpleCellRef(String refStr) {
-        CellRef cellRef = parseRangeEndRef(refStr);
+    public static PositionRef parsePositionRef(String refStr) {
+        PositionRef positionRef = parseRangeEndRef(refStr);
 
-        if (cellRef.getRowIndex() == -1 || cellRef.getColumnIndex() == -1) {
-            cellRef.setValid(false);
-            cellRef.setRowIndex(-1);
-            cellRef.setColumnIndex(-1);
+        if (positionRef.getRowIndex() == -1 || positionRef.getColumnIndex() == -1) {
+//            positionRef.setValid(false);
+            positionRef.setRowIndex(-1);
+            positionRef.setColumnIndex(-1);
         }
 
-        return cellRef;
+        return positionRef;
     }
 
     /**
@@ -30,8 +31,8 @@ public class References {
      * @param refStr
      * @return
      */
-    public static CellRef parseRangeEndRef(String refStr) {
-        CellRef cellRef = new CellRef();
+    public static PositionRef parseRangeEndRef(String refStr) {
+        PositionRef posRef = new PositionRef();
         int pos = 0;
 
         int col = -1;
@@ -41,7 +42,7 @@ public class References {
                 if (col != -1) {
                     break;
                 }
-                cellRef.setColumnAbsolute(true);
+                posRef.setColumnAbsolute(true);
             } else if (ch >= 'A' && ch <= 'Z') {
                 col = col == -1 ? (ch - 'A' + 1) : col * 26 + (ch - 'A' + 1);
             } else {
@@ -50,7 +51,7 @@ public class References {
         }
 
         if (col == -1) {
-            cellRef.setColumnAbsolute(false); // clear
+            posRef.setColumnAbsolute(false); // clear
             pos = 0;
         }
 
@@ -61,7 +62,7 @@ public class References {
                 if (row != -1) {
                     break;
                 }
-                cellRef.setRowAbsolute(true);
+                posRef.setRowAbsolute(true);
             } else if (ch >= '0' && ch <= '9') {
                 row = row == -1 ? (ch - '0') : row * 10 + (ch - '0');
             } else {
@@ -69,14 +70,14 @@ public class References {
             }
         }
 
-        cellRef.setColumnIndex(col == -1 ? col : col - 1);
-        cellRef.setRowIndex(row == -1 ? row : row - 1);
+        posRef.setColumnIndex(col == -1 ? col : col - 1);
+        posRef.setRowIndex(row == -1 ? row : row - 1);
 
-        return cellRef;
+        return posRef;
     }
 
-    public static CellRef shift(CellRef originRef, int rowDrift, int columnDrift) {
-        CellRef newRef = new CellRef(originRef);
+    public static PositionRef shift(PositionRef originRef, int rowDrift, int columnDrift) {
+        PositionRef newRef = new PositionRef(originRef);
         if (!originRef.isRowAbsolute()) {
             newRef.setRowIndex(originRef.getRowIndex() + rowDrift);
         }
@@ -86,10 +87,10 @@ public class References {
         return newRef;
     }
 
-    public static RangeRef shift(RangeRef originRef, int nShiftRows, int nShiftCols) {
-        CellRef newUpperLeft = shift(originRef.getUpperLeft(), nShiftRows, nShiftCols);
-        CellRef newLowerRight = shift(originRef.getLowerRight(), nShiftRows, nShiftCols);
-        return new RangeRef(newUpperLeft, newLowerRight);
+    public static RangeReference shift(RangeReference originRef, int nShiftRows, int nShiftCols) {
+        PositionRef newUpperLeft = shift(originRef.getUpperLeftRef(), nShiftRows, nShiftCols);
+        PositionRef newLowerRight = shift(originRef.getLowerRightRef(), nShiftRows, nShiftCols);
+        return new RangeReference(originRef.getSheetName(), originRef.getAssetName(), newUpperLeft, newLowerRight);
     }
 
     public static String toColumnCode(int columnIndex) {
@@ -111,7 +112,7 @@ public class References {
     }
 
     public static int toColumnIndex(String columnCode) {
-        CellRef ref = parseRangeEndRef(columnCode);
+        PositionRef ref = parseRangeEndRef(columnCode);
         return ref.getColumnIndex();
     }
 
@@ -122,50 +123,56 @@ public class References {
         return String.valueOf(rowIndex + 1);
     }
 
-    public static String toFormula(CellRef cellRef) {
-        return toFormula(cellRef, 0, 0);
-    }
-
-    public static String toFormula(CellRef cellRef, int nShiftRows, int nShiftCols) {
-        if (!cellRef.isValid()) {
-            return ErrorCodes.ILLEGAL_REF.getFullName();
-        }
-
+    public static String toFormula(PositionRef positionRef) {
         StringBuilder sb = new StringBuilder();
-        appendQualifier(sb, cellRef.getSheetName(), cellRef.getTableName());
-        appendPosition(sb, cellRef, nShiftRows, nShiftCols);
+        appendPosition(sb, positionRef, 0, 0);
         return sb.toString();
     }
 
-    public static String toFormula(RangeRef rangeRef) {
-        return toFormula(rangeRef, 0, 0);
+    public static String toFormula(CellReference cellReference) {
+        return toFormula(cellReference, 0, 0);
     }
 
-    public static String toFormula(RangeRef rangeRef, int nShiftRows, int nShiftCols) {
-        if (!rangeRef.isValid()) {
-            return ErrorCodes.ILLEGAL_REF.getFullName();
-
-        } else if (rangeRef.getTop() == -1 && rangeRef.getLeft() == -1) {
-            throw new IllegalArgumentException();
-
-        } else if (rangeRef.getTop() == -1) {
-            if (rangeRef.getBottom() != -1 || rangeRef.getRight() == -1) {
-                throw new IllegalArgumentException();
-            }
-
-        } else if (rangeRef.getLeft() == -1) {
-            if (rangeRef.getRight() != -1 || rangeRef.getBottom() == -1) {
-                throw new IllegalArgumentException();
-            }
-
-        } else if (rangeRef.getRight() == -1 || rangeRef.getBottom() == -1) {
-            throw new IllegalArgumentException();
+    public static String toFormula(CellReference cellReference, int nShiftRows, int nShiftCols) {
+        if (!cellReference.isValid()) {
+            return ErrorCodes.REF.getName();
         }
-        // TODO above check could be move to RangeRef itself.
 
         StringBuilder sb = new StringBuilder();
-        CellRef upperLeft = rangeRef.getUpperLeft();
-        CellRef lowerRight = rangeRef.getLowerRight();
+        appendQualifier(sb, cellReference.getSheetName(), cellReference.getAssetName());
+        appendPosition(sb, cellReference.getPositionRef(), nShiftRows, nShiftCols);
+        return sb.toString();
+    }
+
+    public static String toFormula(RangeReference rangeReference) {
+        return toFormula(rangeReference, 0, 0);
+    }
+
+    public static String toFormula(RangeReference rangeReference, int nShiftRows, int nShiftCols) {
+        if (!rangeReference.isValid()) {
+            return ErrorCodes.REF.getName();
+
+        } else if (rangeReference.getTop() == -1 && rangeReference.getLeft() == -1) {
+            throw new IllegalArgumentException();
+
+        } else if (rangeReference.getTop() == -1) {
+            if (rangeReference.getBottom() != -1 || rangeReference.getRight() == -1) {
+                throw new IllegalArgumentException();
+            }
+
+        } else if (rangeReference.getLeft() == -1) {
+            if (rangeReference.getRight() != -1 || rangeReference.getBottom() == -1) {
+                throw new IllegalArgumentException();
+            }
+
+        } else if (rangeReference.getRight() == -1 || rangeReference.getBottom() == -1) {
+            throw new IllegalArgumentException();
+        }
+        // TODO above check could be move to RangeReference itself.
+
+        StringBuilder sb = new StringBuilder();
+        PositionRef upperLeft = rangeReference.getUpperLeftRef();
+        PositionRef lowerRight = rangeReference.getLowerRightRef();
 
         if ((upperLeft.getRowIndex() == -1 && upperLeft.getColumnIndex() == -1)
                 || (lowerRight.getRowIndex() == -1 && lowerRight.getColumnIndex() == -1)) {
@@ -176,10 +183,21 @@ public class References {
 
         }
 
-        appendQualifier(sb, upperLeft.getSheetName(), upperLeft.getTableName());
+        appendQualifier(sb, rangeReference.getSheetName(), rangeReference.getAssetName());
         appendPosition(sb, upperLeft, nShiftRows, nShiftCols, true);
         sb.append(":");
         appendPosition(sb, lowerRight, nShiftRows, nShiftCols, true);
+        return sb.toString();
+    }
+
+    public static String toFormula(NameReference nameReference) {
+        if (!nameReference.isValid()) {
+            return ErrorCodes.REF.getName();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        appendQualifier(sb, nameReference.getSheetName(), nameReference.getAssetName());
+        sb.append(EscapeHelper.escapeName(nameReference.getTargetName()));
         return sb.toString();
     }
 
@@ -198,11 +216,11 @@ public class References {
     }
 
     static StringBuilder appendPosition(StringBuilder sb, PositionRef positionRef, int nShiftRows, int nShiftCols, boolean allowPartial) {
-        if (positionRef instanceof CellRef &&
-                !((CellRef) positionRef).isValid()) {
-            sb.append("#REF!");
-            return sb;
-        }
+//        if (positionRef instanceof CellReference &&
+//                !((CellReference) positionRef).isValid()) {
+//            sb.append("#REF!");
+//            return sb;
+//        }
 
         if (positionRef.getColumnIndex() == -1 && positionRef.getRowIndex() == -1) {
             throw new IllegalArgumentException();

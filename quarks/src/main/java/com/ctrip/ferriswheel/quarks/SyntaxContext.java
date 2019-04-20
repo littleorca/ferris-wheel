@@ -12,6 +12,8 @@ public interface SyntaxContext extends Serializable {
 
     Symbol getIdentifierSymbol();
 
+    Symbol getQuotedIdentifierSymbol();
+
     Symbol getTerminatorSymbol();
 
 }

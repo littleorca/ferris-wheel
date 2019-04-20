@@ -36,6 +36,10 @@ public interface SparseArray<E> {
 
     E get(int index);
 
+    E first();
+
+    E last();
+
     E remove(int index);
 
     int size();

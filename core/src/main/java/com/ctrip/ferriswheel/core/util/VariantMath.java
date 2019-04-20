@@ -22,7 +22,7 @@ public class VariantMath {
                         .doubleValue());
             case ERROR:
             default:
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
         }
     }
 
@@ -39,7 +39,7 @@ public class VariantMath {
                         .doubleValue());
             case ERROR:
             default:
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
         }
     }
 
@@ -57,7 +57,7 @@ public class VariantMath {
                         .doubleValue());
             case ERROR:
             default:
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
         }
     }
 
@@ -68,14 +68,14 @@ public class VariantMath {
             case BLANK:
             case DECIMAL:
                 if (BigDecimal.ZERO.equals(op2.decimalValue())) {
-                    return Value.err(ErrorCodes.DIV_0);
+                    return Value.err(ErrorCodes.DIV);
                 } else {
                     return Value.dec(op1.decimalValue()
                             .divide(op2.decimalValue(), Value.DecimalValue.mathContext));
                 }
             case DATE:
                 if (BigDecimal.ZERO.equals(op2.decimalValue())) {
-                    return Value.err(ErrorCodes.DIV_0);
+                    return Value.err(ErrorCodes.DIV);
                 } else {
                     return Value.date(op1.decimalValue()
                             .divide(op2.decimalValue(), Value.DecimalValue.mathContext)
@@ -83,7 +83,7 @@ public class VariantMath {
                 }
             case ERROR:
             default:
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
         }
     }
 
@@ -98,7 +98,7 @@ public class VariantMath {
                 return dec.pow(op2);
             case ERROR:
             default:
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
         }
     }
 

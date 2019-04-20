@@ -12,6 +12,7 @@ import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.DataSetMetaData;
 import com.ctrip.ferriswheel.common.util.StylizedVariant;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
+import com.ctrip.ferriswheel.common.variant.Parameter;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
@@ -38,8 +39,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
     private Map<Range, Set<Long>> rangeToNodes = new HashMap<>();
     private Map<Long, Set<Range>> nodeToRanges = new HashMap<>();
 
-    DefaultTable(String name, AssetManager assetManager) {
-        super(name, assetManager);
+    DefaultTable(String name, DefaultSheet sheet) {
+        super(name, sheet);
         this.rows = new SparseAssetArray<>(this);
     }
 
@@ -512,8 +513,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
             bindChild(queryAutomaton);
             this.automaton = queryAutomaton;
             for (String name : queryAutomaton.getTemplate().getBuiltinParamNames()) {
-                ValueNode param = queryAutomaton.getTemplate().getBuiltinParam(name);
-                queryAutomaton.addDependency(param);
+                Parameter param = queryAutomaton.getTemplate().getBuiltinParam(name);
+                queryAutomaton.addDependency((ValueNode) param.getValue());
             }
             this.addDependency(queryAutomaton);
             return queryAutomaton;
@@ -551,7 +552,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
         row.setRowIndex(index);
         rows.set(index, row);
         if (row.getCellCount() > getColumnCount()) {
-            setColumnCount(rows.size());
+            setColumnCount(row.getCellCount());
         }
         return oldRow;
     }
@@ -587,6 +588,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
             // cell.addDependency(this); // TODO review if it is needed
             if (getAutomaton() != null) {
                 cell.setEphemeral(true);
+            }
+            if (columnIndex >= getColumnCount()) {
+                setColumnCount(columnIndex + 1);
             }
         }
         return cell;
@@ -638,13 +642,14 @@ public class DefaultTable extends SheetAssetNode implements Table {
 
     @Override
     public int getRowCount() {
-        for (int i = rows.size() - 1; i >= 0; i--) {
-            Row row = rows.get(i);
-            if (row != null && !row.isBlank()) {
-                return i + 1;
-            }
-        }
-        return 0;
+        return rows.isEmpty() ? 0 : rows.last().getRowIndex() + 1;
+//        for (int i = rows.size() - 1; i >= 0; i--) {
+//            Row row = rows.get(i);
+//            if (row != null && !row.isBlank()) {
+//                return i + 1;
+//            }
+//        }
+//        return 0;
     }
 
     @Override

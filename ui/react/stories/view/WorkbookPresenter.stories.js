@@ -23,10 +23,37 @@ import {
     QueryAutomaton,
     ParamRule,
     EditResponse,
-    ChangeList
+    ChangeList,
+    Grid,
+    Span,
+    Display,
 } from '../../src';
+import Form from "../../src/model/Form";
+import FormField from "../../src/model/FormField";
+import FormFieldBinding from "../../src/model/FormFieldBinding";
 import { action } from '@storybook/addon-actions';
 
+const form = new Form("test_form",
+    [
+        new FormField("f1", VariantType.STRING, Values.str("foo"),
+            false, false, "Foo", "Input foo!",
+            undefined,
+            [
+                new FormFieldBinding("t1!'param1'")
+            ]),
+        new FormField("f2", VariantType.STRING, Values.list([Values.str("bar1"), Values.str("bar2")]),
+            false, true, "Bar", "Input bar!",
+            Values.list([
+                Values.str("bar0"),
+                Values.str("bar1"),
+                Values.str("bar2"),
+                Values.str("bar3"),
+            ]),
+            [
+                new FormFieldBinding("t1!'param1'")
+            ]),
+    ],
+    new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(1, 13), new Span(1, 3))));
 const text = new Text('test_text', Values.str('hello\n\tworld!'));
 const table = new Table('test_table', []);
 table.rows.push(new Row(0,
@@ -43,19 +70,19 @@ table.rows.push(new Row(1,
     ]));
 
 const queryAutomaton = new QueryAutomaton();
-queryAutomaton.template.userParamRules.push(new ParamRule('bool', VariantType.BOOL, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('decimal', VariantType.DECIMAL, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('string', VariantType.STRING, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('date', VariantType.DATE, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('list', VariantType.LIST, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('select str', VariantType.STRING, false, [
-    Values.str('foo'),
-    Values.str('bar')
-]));
-queryAutomaton.template.userParamRules.push(new ParamRule('select dec', VariantType.DECIMAL, false, [
-    Values.dec(1024),
-    Values.dec(4096)
-]));
+// queryAutomaton.template.userParamRules.push(new ParamRule('bool', VariantType.BOOL, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('decimal', VariantType.DECIMAL, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('string', VariantType.STRING, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('date', VariantType.DATE, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('list', VariantType.LIST, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('select str', VariantType.STRING, false, [
+//     Values.str('foo'),
+//     Values.str('bar')
+// ]));
+// queryAutomaton.template.userParamRules.push(new ParamRule('select dec', VariantType.DECIMAL, false, [
+//     Values.dec(1024),
+//     Values.dec(4096)
+// ]));
 
 const tableWithQueryAutomaton = new Table(
     'test_table_with_query_automaton',
@@ -143,10 +170,9 @@ const gaugeChart = new Chart(
     ),
 );
 
-const sheetAsset = new SheetAsset(undefined, undefined, text);
-const sheet = new Sheet();
-sheet.name = 'test_sheet';
-sheet.assets.push(sheetAsset);
+const sheet = new Sheet("test_sheet", undefined, new Layout(Display.GRID, 800, undefined, undefined, undefined, new Grid(12)));
+sheet.assets.push(new SheetAsset(undefined, undefined, undefined, form));
+sheet.assets.push(new SheetAsset(undefined, undefined, text));
 sheet.assets.push(new SheetAsset(table));
 sheet.assets.push(new SheetAsset(tableWithQueryAutomaton));
 sheet.assets.push(new SheetAsset(undefined, undefined,

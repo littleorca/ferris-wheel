@@ -1,38 +1,41 @@
 import * as React from 'react';
+import InputCtrl, { InputCtrlProps } from './InputCtrl';
+import SelectOption from "./SelectOption";
+import classnames from "classnames";
 
-interface SelectOption {
+interface SelectProps extends InputCtrlProps<string> {
     value: string;
-    label: string;
-}
-
-interface SelectProps extends React.ClassAttributes<Select> {
     options: SelectOption[];
-    value: string;
-    name?: string;
-    className?: string;
-    afterChange: (value: string) => void;
 }
 
-class Select extends React.Component<SelectProps> {
+class Select extends InputCtrl<string, SelectProps> {
+    constructor(props: SelectProps) {
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
+    }
 
     protected handleChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        const value = event.currentTarget.value;
-        this.props.afterChange(value);
+        const newValue = event.currentTarget.value;
+        this.afterChange(newValue);
     }
 
     public render() {
+        const className = classnames("select", this.props.className);
+
         return (
             <select
+                className={className}
+                style={this.props.style}
                 name={this.props.name}
                 value={this.props.value}
-                className={this.props.className}
                 onChange={this.handleChange}>
-                {this.props.options.map((e, i) => {
+                {this.props.options.map((opt, i) => {
+                    const label = typeof opt.label !== "undefined" ? opt.label : opt.value;
                     return (
                         <option
-                            key={e.value}
-                            value={e.value}>
-                            {e.label}
+                            key={i + ":" + opt.value}
+                            value={opt.value}>
+                            {label}
                         </option>
                     );
                 })}
@@ -42,4 +45,4 @@ class Select extends React.Component<SelectProps> {
 }
 
 export default Select;
-export { SelectOption, SelectProps };
+export { SelectProps };

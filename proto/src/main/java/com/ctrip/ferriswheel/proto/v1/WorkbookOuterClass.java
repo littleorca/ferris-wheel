@@ -100,15 +100,10 @@ public final class WorkbookOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ferriswheel_v1_PivotValue_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_ferriswheel_v1_NamedValue_descriptor;
+    internal_static_ferriswheel_v1_Parameter_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_ferriswheel_v1_NamedValue_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_ferriswheel_v1_ParamRule_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_ferriswheel_v1_ParamRule_fieldAccessorTable;
+      internal_static_ferriswheel_v1_Parameter_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ferriswheel_v1_Chart_descriptor;
   static final 
@@ -164,6 +159,21 @@ public final class WorkbookOuterClass {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ferriswheel_v1_Text_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ferriswheel_v1_Form_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ferriswheel_v1_Form_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ferriswheel_v1_FormField_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ferriswheel_v1_FormField_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ferriswheel_v1_FormFieldBinding_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ferriswheel_v1_FormFieldBinding_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -182,55 +192,53 @@ public final class WorkbookOuterClass {
       "ts\030\004 \003(\0132\025.ferriswheel.v1.Sheet\"i\n\005Sheet" +
       "\022\014\n\004name\030\001 \001(\t\022*\n\006assets\030\002 \003(\0132\032.ferrisw" +
       "heel.v1.SheetAsset\022&\n\006layout\030\003 \001(\0132\026.fer" +
-      "riswheel.v1.Layout\"\213\001\n\nSheetAsset\022&\n\005tab" +
+      "riswheel.v1.Layout\"\261\001\n\nSheetAsset\022&\n\005tab" +
       "le\030\001 \001(\0132\025.ferriswheel.v1.TableH\000\022&\n\005cha" +
       "rt\030\002 \001(\0132\025.ferriswheel.v1.ChartH\000\022$\n\004tex" +
-      "t\030\003 \001(\0132\024.ferriswheel.v1.TextH\000B\007\n\005asset" +
-      "\"\223\001\n\005Table\022\014\n\004name\030\001 \001(\t\022!\n\004rows\030\002 \003(\0132\023" +
-      ".ferriswheel.v1.Row\0221\n\tautomaton\030\003 \001(\0132\036" +
-      ".ferriswheel.v1.TableAutomaton\022&\n\006layout" +
-      "\030\004 \001(\0132\026.ferriswheel.v1.Layout\"=\n\003Row\022\021\n" +
-      "\trow_index\030\001 \001(\005\022#\n\005cells\030\002 \003(\0132\024.ferris" +
-      "wheel.v1.Cell\"W\n\004Cell\022\024\n\014column_index\030\001 " +
-      "\001(\005\022)\n\005value\030\002 \001(\0132\032.ferriswheel.v1.Unio" +
-      "nValue\022\016\n\006format\030\003 \001(\t\"\350\001\n\nUnionValue\022\026\n" +
-      "\016formula_string\030\001 \001(\t\022*\n\005error\030\002 \001(\0162\031.f" +
-      "erriswheel.v1.ErrorCodeH\000\022\021\n\007decimal\030\003 \001" +
-      "(\tH\000\022\021\n\007boolean\030\004 \001(\010H\000\022*\n\004date\030\005 \001(\0132\032." +
-      "google.protobuf.TimestampH\000\022\020\n\006string\030\006 " +
-      "\001(\tH\000\022)\n\004list\030\007 \001(\0132\031.ferriswheel.v1.Lis" +
-      "tValueH\000B\007\n\005value\"G\n\tListValue\022)\n\005items\030" +
-      "\001 \003(\0132\032.ferriswheel.v1.UnionValue\022\017\n\007col" +
-      "umns\030\002 \001(\005\"\223\001\n\016TableAutomaton\0229\n\017query_a" +
-      "utomaton\030\001 \001(\0132\036.ferriswheel.v1.QueryAut" +
-      "omatonH\000\0229\n\017pivot_automaton\030\002 \001(\0132\036.ferr" +
-      "iswheel.v1.PivotAutomatonH\000B\013\n\tautomaton" +
-      "\"\227\001\n\016QueryAutomaton\022/\n\010template\030\001 \001(\0132\035." +
-      "ferriswheel.v1.QueryTemplate\022*\n\006params\030\002" +
-      " \003(\0132\032.ferriswheel.v1.NamedValue\022(\n\005quer" +
-      "y\030\003 \001(\0132\031.ferriswheel.v1.DataQuery\"\210\001\n\rQ" +
-      "ueryTemplate\022\016\n\006scheme\030\001 \001(\t\0222\n\016builtin_" +
-      "params\030\002 \003(\0132\032.ferriswheel.v1.NamedValue" +
-      "\0223\n\020user_param_rules\030\003 \003(\0132\031.ferriswheel" +
-      ".v1.ParamRule\"G\n\tDataQuery\022\016\n\006scheme\030\001 \001" +
-      "(\t\022*\n\006params\030\002 \003(\0132\032.ferriswheel.v1.Name" +
-      "dValue\"\353\001\n\016PivotAutomaton\022(\n\004data\030\001 \001(\0132" +
-      "\032.ferriswheel.v1.UnionValue\022,\n\007filters\030\002" +
-      " \003(\0132\033.ferriswheel.v1.PivotFilter\022(\n\004row" +
-      "s\030\003 \003(\0132\032.ferriswheel.v1.PivotField\022+\n\007c" +
-      "olumns\030\004 \003(\0132\032.ferriswheel.v1.PivotField" +
-      "\022*\n\006values\030\005 \003(\0132\032.ferriswheel.v1.PivotV" +
-      "alue\"\034\n\013PivotFilter\022\r\n\005field\030\001 \001(\t\"+\n\nPi" +
-      "votField\022\r\n\005field\030\001 \001(\t\022\016\n\006format\030\002 \001(\t\"" +
-      "q\n\nPivotValue\022\r\n\005field\030\001 \001(\t\0225\n\016aggregat" +
-      "e_type\030\002 \001(\0162\035.ferriswheel.v1.AggregateT" +
-      "ype\022\r\n\005label\030\003 \001(\t\022\016\n\006format\030\004 \001(\t\"E\n\nNa" +
-      "medValue\022\014\n\004name\030\001 \001(\t\022)\n\005value\030\002 \001(\0132\032." +
-      "ferriswheel.v1.UnionValue\"\212\001\n\tParamRule\022" +
-      "\014\n\004name\030\001 \001(\t\022)\n\004type\030\002 \001(\0162\033.ferriswhee" +
-      "l.v1.VariantType\022\020\n\010nullable\030\003 \001(\010\0222\n\016al" +
-      "lowed_values\030\004 \003(\0132\032.ferriswheel.v1.Unio" +
-      "nValue\"\355\002\n\005Chart\022\014\n\004name\030\001 \001(\t\022\014\n\004type\030\002" +
+      "t\030\003 \001(\0132\024.ferriswheel.v1.TextH\000\022$\n\004form\030" +
+      "\004 \001(\0132\024.ferriswheel.v1.FormH\000B\007\n\005asset\"\223" +
+      "\001\n\005Table\022\014\n\004name\030\001 \001(\t\022!\n\004rows\030\002 \003(\0132\023.f" +
+      "erriswheel.v1.Row\0221\n\tautomaton\030\003 \001(\0132\036.f" +
+      "erriswheel.v1.TableAutomaton\022&\n\006layout\030\004" +
+      " \001(\0132\026.ferriswheel.v1.Layout\"=\n\003Row\022\021\n\tr" +
+      "ow_index\030\001 \001(\005\022#\n\005cells\030\002 \003(\0132\024.ferriswh" +
+      "eel.v1.Cell\"W\n\004Cell\022\024\n\014column_index\030\001 \001(" +
+      "\005\022)\n\005value\030\002 \001(\0132\032.ferriswheel.v1.UnionV" +
+      "alue\022\016\n\006format\030\003 \001(\t\"\350\001\n\nUnionValue\022\026\n\016f" +
+      "ormula_string\030\001 \001(\t\022*\n\005error\030\002 \001(\0162\031.fer" +
+      "riswheel.v1.ErrorCodeH\000\022\021\n\007decimal\030\003 \001(\t" +
+      "H\000\022\021\n\007boolean\030\004 \001(\010H\000\022*\n\004date\030\005 \001(\0132\032.go" +
+      "ogle.protobuf.TimestampH\000\022\020\n\006string\030\006 \001(" +
+      "\tH\000\022)\n\004list\030\007 \001(\0132\031.ferriswheel.v1.ListV" +
+      "alueH\000B\007\n\005value\"G\n\tListValue\022)\n\005items\030\001 " +
+      "\003(\0132\032.ferriswheel.v1.UnionValue\022\017\n\007colum" +
+      "ns\030\002 \001(\005\"\223\001\n\016TableAutomaton\0229\n\017query_aut" +
+      "omaton\030\001 \001(\0132\036.ferriswheel.v1.QueryAutom" +
+      "atonH\000\0229\n\017pivot_automaton\030\002 \001(\0132\036.ferris" +
+      "wheel.v1.PivotAutomatonH\000B\013\n\tautomaton\"\226" +
+      "\001\n\016QueryAutomaton\022/\n\010template\030\001 \001(\0132\035.fe" +
+      "rriswheel.v1.QueryTemplate\022)\n\006params\030\002 \003" +
+      "(\0132\031.ferriswheel.v1.Parameter\022(\n\005query\030\003" +
+      " \001(\0132\031.ferriswheel.v1.DataQuery\"R\n\rQuery" +
+      "Template\022\016\n\006scheme\030\001 \001(\t\0221\n\016builtin_para" +
+      "ms\030\002 \003(\0132\031.ferriswheel.v1.Parameter\"F\n\tD" +
+      "ataQuery\022\016\n\006scheme\030\001 \001(\t\022)\n\006params\030\002 \003(\013" +
+      "2\031.ferriswheel.v1.Parameter\"\353\001\n\016PivotAut" +
+      "omaton\022(\n\004data\030\001 \001(\0132\032.ferriswheel.v1.Un" +
+      "ionValue\022,\n\007filters\030\002 \003(\0132\033.ferriswheel." +
+      "v1.PivotFilter\022(\n\004rows\030\003 \003(\0132\032.ferriswhe" +
+      "el.v1.PivotField\022+\n\007columns\030\004 \003(\0132\032.ferr" +
+      "iswheel.v1.PivotField\022*\n\006values\030\005 \003(\0132\032." +
+      "ferriswheel.v1.PivotValue\"\034\n\013PivotFilter" +
+      "\022\r\n\005field\030\001 \001(\t\"+\n\nPivotField\022\r\n\005field\030\001" +
+      " \001(\t\022\016\n\006format\030\002 \001(\t\"q\n\nPivotValue\022\r\n\005fi" +
+      "eld\030\001 \001(\t\0225\n\016aggregate_type\030\002 \001(\0162\035.ferr" +
+      "iswheel.v1.AggregateType\022\r\n\005label\030\003 \001(\t\022" +
+      "\016\n\006format\030\004 \001(\t\"\224\001\n\tParameter\022\014\n\004name\030\001 " +
+      "\001(\t\022)\n\005value\030\002 \001(\0132\032.ferriswheel.v1.Unio" +
+      "nValue\022)\n\004type\030\003 \001(\0162\033.ferriswheel.v1.Va" +
+      "riantType\022\021\n\tmandatory\030\004 \001(\010\022\020\n\010multiple" +
+      "\030\005 \001(\010\"\355\002\n\005Chart\022\014\n\004name\030\001 \001(\t\022\014\n\004type\030\002" +
       " \001(\t\022)\n\005title\030\003 \001(\0132\032.ferriswheel.v1.Uni" +
       "onValue\022.\n\ncategories\030\004 \001(\0132\032.ferriswhee" +
       "l.v1.UnionValue\022&\n\006series\030\005 \003(\0132\026.ferris" +
@@ -272,30 +280,41 @@ public final class WorkbookOuterClass {
       "\030\001 \001(\002\022\r\n\005green\030\002 \001(\002\022\014\n\004blue\030\003 \001(\002\022\r\n\005a" +
       "lpha\030\004 \001(\002\"i\n\004Text\022\014\n\004name\030\001 \001(\t\022+\n\007cont" +
       "ent\030\002 \001(\0132\032.ferriswheel.v1.UnionValue\022&\n" +
-      "\006layout\030\003 \001(\0132\026.ferriswheel.v1.Layout*l\n" +
-      "\tErrorCode\022\014\n\010EC_UNSET\020\000\022\t\n\005EC_OK\020\001\022\016\n\nE" +
-      "C_UNKNOWN\020\002\022\022\n\016EC_ILLEGAL_REF\020\003\022\024\n\020EC_IL" +
-      "LEGAL_VALUE\020\004\022\014\n\010EC_DIV_0\020\005*\223\002\n\rAggregat" +
-      "eType\022\014\n\010AT_UNSET\020\000\022\016\n\nAT_SUMMARY\020\001\022\014\n\010A" +
-      "T_COUNT\020\002\022\016\n\nAT_AVERAGE\020\003\022\016\n\nAT_MAXIMUM\020" +
-      "\004\022\016\n\nAT_MINIMUM\020\005\022\016\n\nAT_PRODUCT\020\006\022\031\n\025AT_" +
-      "DECIMAL_ONLY_COUNT\020\007\022\031\n\025AT_STANDARD_DEVI" +
-      "ATION\020\010\022$\n AT_STANDARD_DEVIATION_POPULAT" +
-      "ION\020\t\022\017\n\013AT_VARIANCE\020\n\022\032\n\026AT_VARIANCE_PO" +
-      "PULATION\020\013\022\r\n\tAT_CUSTOM\020\014*}\n\013VariantType" +
-      "\022\014\n\010VT_UNSET\020\000\022\014\n\010VT_ERROR\020\001\022\014\n\010VT_BLANK" +
-      "\020\002\022\016\n\nVT_DECIMAL\020\003\022\013\n\007VT_BOOL\020\004\022\013\n\007VT_DA" +
-      "TE\020\005\022\r\n\tVT_STRING\020\006\022\013\n\007VT_LIST\020\007*G\n\007Disp" +
-      "lay\022\016\n\nDISP_UNSET\020\000\022\r\n\tDISP_NONE\020\001\022\016\n\nDI" +
-      "SP_BLOCK\020\002\022\r\n\tDISP_GRID\020\005*K\n\013Orientation" +
-      "\022\020\n\014ORIENT_UNSET\020\000\022\025\n\021ORIENT_HORIZONTAL\020" +
-      "\001\022\023\n\017ORIENT_VERTICAL\020\002*p\n\tPlacement\022\017\n\013P" +
-      "LCMT_UNSET\020\000\022\016\n\nPLCMT_LEFT\020\001\022\r\n\tPLCMT_TO" +
-      "P\020\002\022\017\n\013PLCMT_RIGHT\020\003\022\020\n\014PLCMT_BOTTOM\020\004\022\020" +
-      "\n\014PLCMT_CENTER\020\005*K\n\010Stacking\022\022\n\016STACKING" +
-      "_UNSET\020\000\022\025\n\021STACKING_ABSOLUTE\020\001\022\024\n\020STACK" +
-      "ING_PERCENT\020\002B\"\n\036com.ctrip.ferriswheel.p" +
-      "roto.v1P\001b\006proto3"
+      "\006layout\030\003 \001(\0132\026.ferriswheel.v1.Layout\"g\n" +
+      "\004Form\022\014\n\004name\030\001 \001(\t\022)\n\006fields\030\002 \003(\0132\031.fe" +
+      "rriswheel.v1.FormField\022&\n\006layout\030\003 \001(\0132\026" +
+      ".ferriswheel.v1.Layout\"\222\002\n\tFormField\022\014\n\004" +
+      "name\030\001 \001(\t\022)\n\004type\030\002 \001(\0162\033.ferriswheel.v" +
+      "1.VariantType\022)\n\005value\030\003 \001(\0132\032.ferriswhe" +
+      "el.v1.UnionValue\022\021\n\tmandatory\030\004 \001(\010\022\020\n\010m" +
+      "ultiple\030\005 \001(\010\022\r\n\005label\030\006 \001(\t\022\014\n\004tips\030\007 \001" +
+      "(\t\022+\n\007options\030\010 \001(\0132\032.ferriswheel.v1.Uni" +
+      "onValue\0222\n\010bindings\030\t \003(\0132 .ferriswheel." +
+      "v1.FormFieldBinding\"\"\n\020FormFieldBinding\022" +
+      "\016\n\006target\030\001 \001(\t*\205\001\n\tErrorCode\022\014\n\010EC_UNSE" +
+      "T\020\000\022\013\n\007EC_NULL\020\001\022\n\n\006EC_DIV\020\002\022\014\n\010EC_VALUE" +
+      "\020\003\022\n\n\006EC_REF\020\004\022\013\n\007EC_NAME\020\005\022\n\n\006EC_NUM\020\006\022" +
+      "\t\n\005EC_NA\020\007\022\023\n\017EC_GETTING_DATA\020\010*\223\002\n\rAggr" +
+      "egateType\022\014\n\010AT_UNSET\020\000\022\016\n\nAT_SUMMARY\020\001\022" +
+      "\014\n\010AT_COUNT\020\002\022\016\n\nAT_AVERAGE\020\003\022\016\n\nAT_MAXI" +
+      "MUM\020\004\022\016\n\nAT_MINIMUM\020\005\022\016\n\nAT_PRODUCT\020\006\022\031\n" +
+      "\025AT_DECIMAL_ONLY_COUNT\020\007\022\031\n\025AT_STANDARD_" +
+      "DEVIATION\020\010\022$\n AT_STANDARD_DEVIATION_POP" +
+      "ULATION\020\t\022\017\n\013AT_VARIANCE\020\n\022\032\n\026AT_VARIANC" +
+      "E_POPULATION\020\013\022\r\n\tAT_CUSTOM\020\014*}\n\013Variant" +
+      "Type\022\014\n\010VT_UNSET\020\000\022\014\n\010VT_ERROR\020\001\022\014\n\010VT_B" +
+      "LANK\020\002\022\016\n\nVT_DECIMAL\020\003\022\013\n\007VT_BOOL\020\004\022\013\n\007V" +
+      "T_DATE\020\005\022\r\n\tVT_STRING\020\006\022\013\n\007VT_LIST\020\007*G\n\007" +
+      "Display\022\016\n\nDISP_UNSET\020\000\022\r\n\tDISP_NONE\020\001\022\016" +
+      "\n\nDISP_BLOCK\020\002\022\r\n\tDISP_GRID\020\005*K\n\013Orienta" +
+      "tion\022\020\n\014ORIENT_UNSET\020\000\022\025\n\021ORIENT_HORIZON" +
+      "TAL\020\001\022\023\n\017ORIENT_VERTICAL\020\002*p\n\tPlacement\022" +
+      "\017\n\013PLCMT_UNSET\020\000\022\016\n\nPLCMT_LEFT\020\001\022\r\n\tPLCM" +
+      "T_TOP\020\002\022\017\n\013PLCMT_RIGHT\020\003\022\020\n\014PLCMT_BOTTOM" +
+      "\020\004\022\020\n\014PLCMT_CENTER\020\005*K\n\010Stacking\022\022\n\016STAC" +
+      "KING_UNSET\020\000\022\025\n\021STACKING_ABSOLUTE\020\001\022\024\n\020S" +
+      "TACKING_PERCENT\020\002B\"\n\036com.ctrip.ferriswhe" +
+      "el.proto.v1P\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -333,7 +352,7 @@ public final class WorkbookOuterClass {
     internal_static_ferriswheel_v1_SheetAsset_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_SheetAsset_descriptor,
-        new java.lang.String[] { "Table", "Chart", "Text", "Asset", });
+        new java.lang.String[] { "Table", "Chart", "Text", "Form", "Asset", });
     internal_static_ferriswheel_v1_Table_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_ferriswheel_v1_Table_fieldAccessorTable = new
@@ -381,7 +400,7 @@ public final class WorkbookOuterClass {
     internal_static_ferriswheel_v1_QueryTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_QueryTemplate_descriptor,
-        new java.lang.String[] { "Scheme", "BuiltinParams", "UserParamRules", });
+        new java.lang.String[] { "Scheme", "BuiltinParams", });
     internal_static_ferriswheel_v1_DataQuery_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_ferriswheel_v1_DataQuery_fieldAccessorTable = new
@@ -412,84 +431,96 @@ public final class WorkbookOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_PivotValue_descriptor,
         new java.lang.String[] { "Field", "AggregateType", "Label", "Format", });
-    internal_static_ferriswheel_v1_NamedValue_descriptor =
+    internal_static_ferriswheel_v1_Parameter_descriptor =
       getDescriptor().getMessageTypes().get(17);
-    internal_static_ferriswheel_v1_NamedValue_fieldAccessorTable = new
+    internal_static_ferriswheel_v1_Parameter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_ferriswheel_v1_NamedValue_descriptor,
-        new java.lang.String[] { "Name", "Value", });
-    internal_static_ferriswheel_v1_ParamRule_descriptor =
-      getDescriptor().getMessageTypes().get(18);
-    internal_static_ferriswheel_v1_ParamRule_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_ferriswheel_v1_ParamRule_descriptor,
-        new java.lang.String[] { "Name", "Type", "Nullable", "AllowedValues", });
+        internal_static_ferriswheel_v1_Parameter_descriptor,
+        new java.lang.String[] { "Name", "Value", "Type", "Mandatory", "Multiple", });
     internal_static_ferriswheel_v1_Chart_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_ferriswheel_v1_Chart_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Chart_descriptor,
         new java.lang.String[] { "Name", "Type", "Title", "Categories", "Series", "Layout", "Binder", "XAxis", "YAxis", "ZAxis", });
     internal_static_ferriswheel_v1_Series_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_ferriswheel_v1_Series_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Series_descriptor,
         new java.lang.String[] { "Name", "XValues", "YValues", "ZValues", });
     internal_static_ferriswheel_v1_Layout_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_ferriswheel_v1_Layout_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Layout_descriptor,
         new java.lang.String[] { "Display", "Width", "Height", "Align", "VerticalAlign", "Grid", });
     internal_static_ferriswheel_v1_Grid_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_ferriswheel_v1_Grid_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Grid_descriptor,
         new java.lang.String[] { "Columns", "Rows", "Column", "Row", });
     internal_static_ferriswheel_v1_Span_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_ferriswheel_v1_Span_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Span_descriptor,
         new java.lang.String[] { "Start", "End", });
     internal_static_ferriswheel_v1_ChartBinder_descriptor =
-      getDescriptor().getMessageTypes().get(24);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_ferriswheel_v1_ChartBinder_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_ChartBinder_descriptor,
         new java.lang.String[] { "Data", "Orientation", "CategoriesPlacement", "SeriesNamePlacement", });
     internal_static_ferriswheel_v1_Axis_descriptor =
-      getDescriptor().getMessageTypes().get(25);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_ferriswheel_v1_Axis_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Axis_descriptor,
         new java.lang.String[] { "Title", "Label", "Placement", "Reversed", "Interval", "Bands", "Stacking", "Format", });
     internal_static_ferriswheel_v1_Interval_descriptor =
-      getDescriptor().getMessageTypes().get(26);
+      getDescriptor().getMessageTypes().get(25);
     internal_static_ferriswheel_v1_Interval_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Interval_descriptor,
         new java.lang.String[] { "From", "To", });
     internal_static_ferriswheel_v1_AxisBand_descriptor =
-      getDescriptor().getMessageTypes().get(27);
+      getDescriptor().getMessageTypes().get(26);
     internal_static_ferriswheel_v1_AxisBand_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_AxisBand_descriptor,
         new java.lang.String[] { "Interval", "Label", "Color", });
     internal_static_ferriswheel_v1_Color_descriptor =
-      getDescriptor().getMessageTypes().get(28);
+      getDescriptor().getMessageTypes().get(27);
     internal_static_ferriswheel_v1_Color_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Color_descriptor,
         new java.lang.String[] { "Red", "Green", "Blue", "Alpha", });
     internal_static_ferriswheel_v1_Text_descriptor =
-      getDescriptor().getMessageTypes().get(29);
+      getDescriptor().getMessageTypes().get(28);
     internal_static_ferriswheel_v1_Text_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Text_descriptor,
         new java.lang.String[] { "Name", "Content", "Layout", });
+    internal_static_ferriswheel_v1_Form_descriptor =
+      getDescriptor().getMessageTypes().get(29);
+    internal_static_ferriswheel_v1_Form_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ferriswheel_v1_Form_descriptor,
+        new java.lang.String[] { "Name", "Fields", "Layout", });
+    internal_static_ferriswheel_v1_FormField_descriptor =
+      getDescriptor().getMessageTypes().get(30);
+    internal_static_ferriswheel_v1_FormField_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ferriswheel_v1_FormField_descriptor,
+        new java.lang.String[] { "Name", "Type", "Value", "Mandatory", "Multiple", "Label", "Tips", "Options", "Bindings", });
+    internal_static_ferriswheel_v1_FormFieldBinding_descriptor =
+      getDescriptor().getMessageTypes().get(31);
+    internal_static_ferriswheel_v1_FormFieldBinding_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ferriswheel_v1_FormFieldBinding_descriptor,
+        new java.lang.String[] { "Target", });
     com.google.protobuf.TimestampProto.getDescriptor();
   }
 

@@ -18,50 +18,26 @@ public interface QueryTemplateOrBuilder extends
       getSchemeBytes();
 
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> 
+  java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter> 
       getBuiltinParamsList();
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  com.ctrip.ferriswheel.proto.v1.NamedValue getBuiltinParams(int index);
+  com.ctrip.ferriswheel.proto.v1.Parameter getBuiltinParams(int index);
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
   int getBuiltinParamsCount();
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder> 
+  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder> 
       getBuiltinParamsOrBuilderList();
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder getBuiltinParamsOrBuilder(
-      int index);
-
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  java.util.List<com.ctrip.ferriswheel.proto.v1.ParamRule> 
-      getUserParamRulesList();
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  com.ctrip.ferriswheel.proto.v1.ParamRule getUserParamRules(int index);
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  int getUserParamRulesCount();
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder> 
-      getUserParamRulesOrBuilderList();
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder getUserParamRulesOrBuilder(
+  com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder getBuiltinParamsOrBuilder(
       int index);
 }

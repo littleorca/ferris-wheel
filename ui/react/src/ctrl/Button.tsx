@@ -4,6 +4,7 @@ import './Button.css';
 
 interface ButtonProps extends React.ClassAttributes<any> {
     name: string;
+    type?: "button" | "submit";
     onClick?: (name: string, event: React.MouseEvent<HTMLButtonElement>) => void;
     label?: string;
     tips?: string;
@@ -43,7 +44,7 @@ function Button(props: ButtonProps) {
     } else {
         return (
             <button
-                type="button"
+                type={props.type || "button"}
                 name={props.name}
                 title={tips}
                 onClick={handleClick}

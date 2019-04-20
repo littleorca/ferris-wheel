@@ -33,5 +33,5 @@ import java.io.Serializable;
 public interface ErrorCode extends Serializable {
     int getCode();
 
-    String getFullName();
+    String getName();
 }

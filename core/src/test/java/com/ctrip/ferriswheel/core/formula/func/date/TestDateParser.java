@@ -47,7 +47,7 @@ public class TestDateParser extends TestCase {
         dv.evaluate(null, context);
         ret = context.getOperands().pop();
         assertEquals(VariantType.ERROR, ret.valueType());
-        assertEquals(ErrorCodes.ILLEGAL_VALUE, ret.errorValue());
+        assertEquals(ErrorCodes.VALUE, ret.errorValue());
     }
 
     public void testTimeValue() {
@@ -86,6 +86,6 @@ public class TestDateParser extends TestCase {
         tv.evaluate(null, context);
         ret = context.getOperands().pop();
         assertEquals(VariantType.ERROR, ret.valueType());
-        assertEquals(ErrorCodes.ILLEGAL_VALUE, ret.errorValue());
+        assertEquals(ErrorCodes.VALUE, ret.errorValue());
     }
 }

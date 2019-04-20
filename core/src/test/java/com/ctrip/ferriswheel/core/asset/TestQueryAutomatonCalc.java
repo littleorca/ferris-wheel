@@ -6,18 +6,16 @@ import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.DefaultParameter;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
+import com.ctrip.ferriswheel.common.variant.Parameter;
 import com.ctrip.ferriswheel.common.variant.Value;
-import com.ctrip.ferriswheel.common.variant.VariantRule;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import junit.framework.TestCase;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TestQueryAutomatonCalc extends TestCase {
     private DefaultWorkbook workbook;
@@ -39,20 +37,17 @@ public class TestQueryAutomatonCalc extends TestCase {
     }
 
     public void testCalcThroughQueryAutomaton() {
-        HashMap<String, DynamicVariant> builtinParams = new HashMap<>();
+        HashMap<String, Parameter> builtinParams = new HashMap<>();
 
-        builtinParams.put("p1", Value.str("this is parameter 1").dynamic());
-        builtinParams.put("p2", new DynamicValue("normal!A1"));
-
-        Map<String, VariantRule> userParamRules = Collections.emptyMap();
+        builtinParams.put("p1", new DefaultParameter("p1", Value.str("this is parameter 1").dynamic()));
+        builtinParams.put("p2", new DefaultParameter("p2", new DynamicValue("normal!A1")));
 
         normalTable.setCellValue(0, 0, Value.str("Cell A1"));
         normalTable.setCellFormula(0, 1, "auto!A1");
         autoTable.automate(new TableAutomatonInfo.QueryAutomatonInfo(
                 new TableAutomatonInfo.QueryTemplateInfo(
                         TestQueryAutomatonCalc.class.getName(),
-                        builtinParams,
-                        userParamRules),
+                        builtinParams),
                 null, null));
 
         System.out.println(workbook);

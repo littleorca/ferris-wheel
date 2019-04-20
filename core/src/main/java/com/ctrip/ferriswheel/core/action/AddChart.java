@@ -4,15 +4,13 @@ import com.ctrip.ferriswheel.common.action.Action;
 import com.ctrip.ferriswheel.common.chart.Chart;
 
 public final class AddChart extends SheetAction implements Action {
-    private String chartName;
     private Chart chartData;
 
     public AddChart() {
     }
 
-    public AddChart(String sheetName, String chartName, Chart chartData) {
+    public AddChart(String sheetName, Chart chartData) {
         super(sheetName);
-        this.chartName = chartName;
         this.chartData = chartData;
     }
 
@@ -20,17 +18,8 @@ public final class AddChart extends SheetAction implements Action {
     public String toString() {
         return "AddChart{" +
                 "sheetName='" + getSheetName() + '\'' +
-                ", chartName='" + chartName + '\'' +
                 ", chartData=" + chartData +
                 '}';
-    }
-
-    public String getChartName() {
-        return chartName;
-    }
-
-    public void setChartName(String chartName) {
-        this.chartName = chartName;
     }
 
     public Chart getChartData() {

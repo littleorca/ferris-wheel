@@ -101,37 +101,26 @@ public abstract class TableAutomatonInfo implements AutomateConfiguration, Seria
 
     public static class QueryTemplateInfo implements QueryTemplate, Serializable {
         private String scheme;
-        private Map<String, DynamicVariant> builtinParams;
-        private Map<String, VariantRule> userParamRules;
+        private Map<String, Parameter> builtinParams;
 
         public QueryTemplateInfo() {
         }
 
         public QueryTemplateInfo(String scheme,
-                                 Map<String, DynamicVariant> builtinParams,
-                                 Map<String, VariantRule> userParamRules) {
+                                 Map<String, Parameter> builtinParams) {
             this.scheme = scheme;
             this.builtinParams = builtinParams;
-            this.userParamRules = userParamRules;
         }
 
         public QueryTemplateInfo addBuiltinParam(String name, Value value) {
-            return addBuiltinParam(name, new DynamicValue(value));
+            return addBuiltinParam(name, new DefaultParameter(name, value.dynamic(), value.valueType(), false, false));
         }
 
-        public QueryTemplateInfo addBuiltinParam(String name, DynamicVariant dynamicValue) {
+        public QueryTemplateInfo addBuiltinParam(String name, Parameter parameter) {
             if (builtinParams == null) {
                 builtinParams = new LinkedHashMap<>();
             }
-            builtinParams.put(name, dynamicValue);
-            return this;
-        }
-
-        public QueryTemplateInfo addUserParamRule(String name, VariantRule rule) {
-            if (userParamRules == null) {
-                userParamRules = new LinkedHashMap<>();
-            }
-            userParamRules.put(name, rule);
+            builtinParams.put(name, parameter);
             return this;
         }
 
@@ -144,7 +133,7 @@ public abstract class TableAutomatonInfo implements AutomateConfiguration, Seria
         }
 
         @Override
-        public Variant getBuiltinParam(String name) {
+        public Parameter getBuiltinParam(String name) {
             return builtinParams == null ? null : builtinParams.get(name);
         }
 
@@ -153,30 +142,12 @@ public abstract class TableAutomatonInfo implements AutomateConfiguration, Seria
             return builtinParams == null ? null : builtinParams.keySet();
         }
 
-        public Map<String, DynamicVariant> getAllBuiltinParams() {
+        public Map<String, Parameter> getAllBuiltinParams() {
             return builtinParams;
         }
 
-        public void setAllBuiltinParams(Map<String, DynamicVariant> builtinParams) {
+        public void setAllBuiltinParams(Map<String, Parameter> builtinParams) {
             this.builtinParams = builtinParams;
-        }
-
-        @Override
-        public VariantRule getUserParamRule(String name) {
-            return userParamRules == null ? null : userParamRules.get(name);
-        }
-
-        @Override
-        public Set<String> getUserParamNames() {
-            return userParamRules == null ? null : userParamRules.keySet();
-        }
-
-        public Map<String, VariantRule> getAllUserParamRules() {
-            return userParamRules;
-        }
-
-        public void setAllUserParamRules(Map<String, VariantRule> userParamRules) {
-            this.userParamRules = userParamRules;
         }
     }
 

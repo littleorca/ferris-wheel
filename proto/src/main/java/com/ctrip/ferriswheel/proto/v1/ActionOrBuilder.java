@@ -437,14 +437,26 @@ public interface ActionOrBuilder extends
   com.ctrip.ferriswheel.proto.v1.UpdateTextOrBuilder getUpdateTextOrBuilder();
 
   /**
+   * <pre>
+   * deprecated
+   * </pre>
+   *
    * <code>.ferriswheel.v1.ExecuteQuery execute_query = 34;</code>
    */
   boolean hasExecuteQuery();
   /**
+   * <pre>
+   * deprecated
+   * </pre>
+   *
    * <code>.ferriswheel.v1.ExecuteQuery execute_query = 34;</code>
    */
   com.ctrip.ferriswheel.proto.v1.ExecuteQuery getExecuteQuery();
   /**
+   * <pre>
+   * deprecated
+   * </pre>
+   *
    * <code>.ferriswheel.v1.ExecuteQuery execute_query = 34;</code>
    */
   com.ctrip.ferriswheel.proto.v1.ExecuteQueryOrBuilder getExecuteQueryOrBuilder();
@@ -474,6 +486,45 @@ public interface ActionOrBuilder extends
    * <code>.ferriswheel.v1.SetCellsFormat set_cells_format = 36;</code>
    */
   com.ctrip.ferriswheel.proto.v1.SetCellsFormatOrBuilder getSetCellsFormatOrBuilder();
+
+  /**
+   * <code>.ferriswheel.v1.AddForm add_form = 37;</code>
+   */
+  boolean hasAddForm();
+  /**
+   * <code>.ferriswheel.v1.AddForm add_form = 37;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.AddForm getAddForm();
+  /**
+   * <code>.ferriswheel.v1.AddForm add_form = 37;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.AddFormOrBuilder getAddFormOrBuilder();
+
+  /**
+   * <code>.ferriswheel.v1.UpdateForm update_form = 38;</code>
+   */
+  boolean hasUpdateForm();
+  /**
+   * <code>.ferriswheel.v1.UpdateForm update_form = 38;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.UpdateForm getUpdateForm();
+  /**
+   * <code>.ferriswheel.v1.UpdateForm update_form = 38;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.UpdateFormOrBuilder getUpdateFormOrBuilder();
+
+  /**
+   * <code>.ferriswheel.v1.SubmitForm submit_form = 39;</code>
+   */
+  boolean hasSubmitForm();
+  /**
+   * <code>.ferriswheel.v1.SubmitForm submit_form = 39;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.SubmitForm getSubmitForm();
+  /**
+   * <code>.ferriswheel.v1.SubmitForm submit_form = 39;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.SubmitFormOrBuilder getSubmitFormOrBuilder();
 
   public com.ctrip.ferriswheel.proto.v1.Action.ActionCase getActionCase();
 }

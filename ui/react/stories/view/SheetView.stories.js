@@ -1,11 +1,38 @@
 import React, { Component } from 'react';
 import {
     SheetView,
-    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Color
+    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Color, Grid, Span
 } from '../../src';
+import Form from "../../src/model/Form";
+import FormField from '../../src/model/FormField';
+import FormFieldBinding from '../../src/model/FormFieldBinding';
 
-const text = new Text('test_text', Values.str('hello\n\tworld!'));
-const table = new Table('test_table', []);
+const form = new Form("test_form",
+    [
+        new FormField("f1", VariantType.STRING, Values.str("foo"),
+            false, false, "Foo", "Input foo!",
+            undefined,
+            [
+                new FormFieldBinding("t1!'param1'")
+            ]),
+        new FormField("f2", VariantType.STRING, Values.list([Values.str("bar1"), Values.str("bar2")]),
+            false, true, "Bar", "Input bar!",
+            Values.list([
+                Values.str("bar0"),
+                Values.str("bar1"),
+                Values.str("bar2"),
+                Values.str("bar3"),
+            ]),
+            [
+                new FormFieldBinding("t1!'param1'")
+            ]),
+    ],
+    new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(1, 13), new Span(1, 3))));
+const text = new Text('test_text',
+    Values.str('hello\n\tworld!'),
+    new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(1, 7), new Span(3, 9))));
+const table = new Table('test_table', [], undefined,
+    new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(7, 13), new Span(3, 9))));
 table.rows.push(new Row(0,
     [
         new Cell(0, Values.str('hello')),
@@ -41,6 +68,7 @@ const lineChart = new Chart(
             Values.auto([10, 16, 17, 14]),
         ),
     ],
+    new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(1, 7), new Span(9, 15))),
 );
 
 const gaugeChart = new Chart(
@@ -55,7 +83,7 @@ const gaugeChart = new Chart(
             Values.auto([80.1568376]),
         ),
     ],
-    new Layout(),
+    new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(7, 13), new Span(9, 15))),
     new Binder(),
     new Axis(),
     new Axis(
@@ -84,13 +112,14 @@ const gaugeChart = new Chart(
     ),
 );
 
-const sheet = new Sheet();
+const sheet = new Sheet(undefined, undefined, new Layout(undefined, 800, undefined, undefined, undefined, new Grid(12)));
 sheet.name = 'test_sheet';
+sheet.assets.push(new SheetAsset(undefined, undefined, undefined, form));
 sheet.assets.push(new SheetAsset(undefined, undefined, text));
 sheet.assets.push(new SheetAsset(table));
-sheet.assets.push(new SheetAsset(undefined, undefined,
-    new Text('test_text_2',
-        Values.str('foo\nbar'))));
+// sheet.assets.push(new SheetAsset(undefined, undefined,
+//     new Text('test_text_2',
+//         Values.str('foo\nbar'))));
 sheet.assets.push(new SheetAsset(undefined, lineChart));
 sheet.assets.push(new SheetAsset(undefined, gaugeChart));
 

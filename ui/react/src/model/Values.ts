@@ -114,7 +114,7 @@ class Values {
         }
     }
 
-    public static withType(type: VariantType, value: any, formula?: string) {
+    public static withType(type: VariantType, value: any, formula?: string): UnionValue {
         switch (type) {
             case VariantType.ERROR:
                 return this.error(value, formula);

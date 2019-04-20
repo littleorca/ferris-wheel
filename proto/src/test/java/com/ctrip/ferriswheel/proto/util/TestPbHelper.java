@@ -15,7 +15,6 @@ import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.core.bean.ValueRule;
 import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import com.google.protobuf.InvalidProtocolBufferException;
 import junit.framework.TestCase;
@@ -70,15 +69,10 @@ public class TestPbHelper extends TestCase {
         assertEquals(0, t.getRows(0).getRowIndex());
         assertEquals(2, t.getRows(1).getRowIndex());
 
-        Map<String, DynamicVariant> builtinParams = new LinkedHashMap<>();
-        builtinParams.put("Greeting", new DynamicValue("\"hello world\""));
-        builtinParams.put("Goodbye", new DynamicValue("\"bye!\""));
-        Map<String, VariantRule> userParamRules = new HashMap<>();
-        userParamRules.put("Name",
-                new ValueRule(VariantType.STRING,
-                        true,
-                        new LinkedHashSet<>(Arrays.asList(Value.str("Sand"), Value.str("Snow")))));
-        table.automate(new TableAutomatonInfo.QueryAutomatonInfo(new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams, userParamRules)));
+        Map<String, Parameter> builtinParams = new LinkedHashMap<>();
+        builtinParams.put("Greeting", new DefaultParameter("Greeting", new DynamicValue("\"hello world\"")));
+        builtinParams.put("Goodbye", new DefaultParameter("Goodbye", new DynamicValue("\"bye!\"")));
+        table.automate(new TableAutomatonInfo.QueryAutomatonInfo(new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams)));
         asset = PbHelper.pb(table);
         t = asset.getTable();
         assertTrue(t.hasAutomaton());
@@ -160,10 +154,10 @@ public class TestPbHelper extends TestCase {
     }
 
     public void testVariantToProto() {
-        com.ctrip.ferriswheel.proto.v1.UnionValue v = PbHelper.pb(Value.err(ErrorCodes.ILLEGAL_VALUE));
+        com.ctrip.ferriswheel.proto.v1.UnionValue v = PbHelper.pb(Value.err(ErrorCodes.VALUE));
         assertEquals("", v.getFormulaString());
         assertEquals(com.ctrip.ferriswheel.proto.v1.UnionValue.ValueCase.ERROR, v.getValueCase());
-        assertEquals(com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_ILLEGAL_VALUE.getNumber(), v.getError().getNumber());
+        assertEquals(com.ctrip.ferriswheel.proto.v1.ErrorCode.EC_VALUE.getNumber(), v.getError().getNumber());
 
         v = PbHelper.pb(Value.BLANK);
         assertEquals("", v.getFormulaString());
@@ -228,14 +222,9 @@ public class TestPbHelper extends TestCase {
         Table t1 = s1.addAsset(Table.class, "t1");
         Table t2 = s1.addAsset(Table.class, "t2");
 
-        Map<String, DynamicVariant> builtinParams = new HashMap<>();
-        builtinParams.put("Greeting", new DynamicValue("\"hello world\""));
-        Map<String, VariantRule> userParamRules = new HashMap<>();
-        userParamRules.put("Name",
-                new ValueRule(VariantType.STRING,
-                        true,
-                        new HashSet<>(Arrays.asList(Value.str("Sand"), Value.str("Snow")))));
-        t0.automate(new TableAutomatonInfo.QueryAutomatonInfo(new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams, userParamRules)));
+        Map<String, Parameter> builtinParams = new HashMap<>();
+        builtinParams.put("Greeting", new DefaultParameter("Greeting", new DynamicValue("\"hello world\"")));
+        t0.automate(new TableAutomatonInfo.QueryAutomatonInfo(new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams)));
 
         t1.setCellFormula(0, 0, "t2!A1^2");
         t1.setCellValue(0, 1, Value.str("foo"));
@@ -285,15 +274,8 @@ public class TestPbHelper extends TestCase {
         TableAutomatonInfo.QueryTemplateInfo template = auto.getQueryAutomatonInfo().getTemplate();
         assertEquals(scheme, template.getScheme());
         assertEquals(1, template.getAllBuiltinParams().size());
-        DynamicValue param = (DynamicValue) template.getAllBuiltinParams().get("Greeting");
-        assertEquals("\"hello world\"", param.getFormulaString());
-        assertEquals(1, template.getAllUserParamRules().size());
-        VariantRule rule = template.getAllUserParamRules().get("Name");
-        assertEquals(VariantType.STRING, rule.getType());
-        assertTrue(rule.isNullable());
-        assertEquals(2, rule.getAllowedValues().size());
-        assertTrue(rule.getAllowedValues().contains(Value.str("Sand")));
-        assertTrue(rule.getAllowedValues().contains(Value.str("Snow")));
+        Parameter param = template.getAllBuiltinParams().get("Greeting");
+        assertEquals("\"hello world\"", param.getValue().getFormulaString());
 
         assertEquals(3, t1.getRowCount());
         assertEquals(4, t1.getColumnCount());

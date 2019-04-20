@@ -2,10 +2,12 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
-import com.ctrip.ferriswheel.common.variant.*;
+import com.ctrip.ferriswheel.common.variant.DefaultParameter;
+import com.ctrip.ferriswheel.common.variant.Parameter;
+import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.bean.DefaultDataQuery;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.core.bean.ValueRule;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -14,21 +16,15 @@ import java.util.Set;
 
 public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     private String scheme;
-    private LinkedHashMap<String, ValueNode> builtinParams = new LinkedHashMap<>();
-    private LinkedHashMap<String, VariantRule> userParamRules = new LinkedHashMap<>();
+    private LinkedHashMap<String, ManagedParameter> builtinParams = new LinkedHashMap<>();
 
     DefaultQueryTemplate(AssetManager assetManager, QueryTemplate templateInfo) {
         super(assetManager);
         this.scheme = templateInfo.getScheme();
         if (templateInfo.getAllBuiltinParams() != null) {
-            templateInfo.getAllBuiltinParams().forEach((name, variable) -> {
-                ValueNode param = new ValueNode(getAssetManager(), variable);
+            templateInfo.getAllBuiltinParams().forEach((name, param) -> {
                 setBuiltinParam(name, param);
             });
-        }
-        if (templateInfo.getAllUserParamRules() != null) {
-            templateInfo.getAllUserParamRules().forEach((name, rule) ->
-                    userParamRules.put(name, new ValueRule(rule)));
         }
     }
 
@@ -42,13 +38,14 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     }
 
     @Override
-    public ValueNode getBuiltinParam(String name) {
+    public Parameter getBuiltinParam(String name) {
         return builtinParams.get(name);
     }
 
-    ValueNode setBuiltinParam(String name, ValueNode value) {
-        bindChild(value);
-        ValueNode old = builtinParams.put(name, value);
+    Parameter setBuiltinParam(String name, Parameter param) {
+        ManagedParameter managedParam = new ManagedParameter(getAssetManager(), param);
+        bindChild(managedParam);
+        ManagedParameter old = builtinParams.put(name, managedParam);
         if (old != null) {
             unbindChild(old);
         }
@@ -61,27 +58,8 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     }
 
     @Override
-    public Map<String, DynamicVariant> getAllBuiltinParams() {
+    public Map<String, Parameter> getAllBuiltinParams() {
         return Collections.unmodifiableMap(builtinParams);
-    }
-
-    @Override
-    public VariantRule getUserParamRule(String name) {
-        return userParamRules.get(name);
-    }
-
-    VariantRule setUserParamRule(String name, VariantRule rule) {
-        return userParamRules.put(name, rule);
-    }
-
-    @Override
-    public Set<String> getUserParamNames() {
-        return Collections.unmodifiableSet(userParamRules.keySet());
-    }
-
-    @Override
-    public Map<String, VariantRule> getAllUserParamRules() {
-        return Collections.unmodifiableMap(userParamRules);
     }
 
     public DataQuery renderQuery(Map<String, Variant> userParams) {
@@ -91,19 +69,16 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
         if (userParams == null) {
             userParams = Collections.emptyMap(); // Avoid NPE
         }
-        checkUserParameters(userParams);
         userParams = filterBlankValues(userParams);
 
         DefaultDataQuery query = new DefaultDataQuery();
         query.setScheme(scheme);
-        for (Map.Entry<String, ValueNode> entry : builtinParams.entrySet()) {
+        for (Map.Entry<String, ManagedParameter> entry : builtinParams.entrySet()) {
             if (userParams.containsKey(entry.getKey())) {
-                continue; // skip builtin parameter as user overrode it.
+                query.setParameter(entry.getKey(), filterVariantClass(userParams.get(entry.getKey())));
+            } else {
+                query.setParameter(entry.getKey(), filterVariantClass(entry.getValue().getValue()));
             }
-            query.setParameter(entry.getKey(), filterVariantClass(entry.getValue()));
-        }
-        for (Map.Entry<String, Variant> entry : userParams.entrySet()) {
-            query.setParameter(entry.getKey(), filterVariantClass(entry.getValue()));
         }
         return query;
     }
@@ -121,28 +96,6 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
         return map;
     }
 
-    private void checkUserParameters(Map<String, Variant> userParameters) {
-        for (Map.Entry<String, Variant> entry : userParameters.entrySet()) {
-            VariantRule rule = userParamRules.get(entry.getKey());
-            if (rule == null) {
-                throw new IllegalArgumentException("User parameter \""
-                        + entry.getKey() + "\" is not allowed.");
-            }
-            if (!rule.check(entry.getValue())) {
-                throw new IllegalArgumentException("User parameter \""
-                        + entry.getKey() + "\" violates the rule.");
-            }
-        }
-
-        // FIXME check mandatory params
-//        for (Map.Entry<String, VariantRule> entry : userParamRules.entrySet()) {
-//            if (!entry.getValue().isNullable() && userParameters.get(entry.getKey()) == null) {
-//                throw new IllegalArgumentException("User parameter \""
-//                        + entry.getKey() + "\" cannot be null.");
-//            }
-//        }
-    }
-
     Variant filterVariantClass(Variant var) {
         if (var instanceof Value) {
             return var;
@@ -151,11 +104,9 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     }
 
     public TableAutomatonInfo.QueryTemplateInfo getQueryTemplateInfo() {
-        Map<String, DynamicVariant> params = new LinkedHashMap<>(builtinParams.size());
-        builtinParams.forEach((name, param) -> params.put(name, new DynamicValue(param)));
-        Map<String, VariantRule> rules = new LinkedHashMap<>(userParamRules.size());
-        userParamRules.forEach((name, rule) -> rules.put(name, new ValueRule(rule)));
-        return new TableAutomatonInfo.QueryTemplateInfo(scheme, params, rules);
+        Map<String, Parameter> params = new LinkedHashMap<>(builtinParams.size());
+        builtinParams.forEach((name, param) -> params.put(name, new DefaultParameter(param)));
+        return new TableAutomatonInfo.QueryTemplateInfo(scheme, params);
     }
 
     @Override

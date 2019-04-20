@@ -19,19 +19,27 @@ const VariantTypeNames = Object.freeze({
 });
 
 enum ErrorCode {
-    OK = 'EC_OK',
-    UNKNOWN = 'EC_UNKNOWN',
-    ILLEGAL_REF = 'EC_ILLEGAL_REF',
-    ILLEGAL_VALUE = 'EC_ILLEGAL_VALUE',
-    DIV_0 = 'EC_DIV_0',
+    OK = "EC_UNSET",
+    NULL = "EC_NULL"                 /* = 1 */,
+    DIV = "EC_DIV"                   /* = 2 */,
+    VALUE = "EC_VALUE"               /* = 3 */,
+    REF = "EC_REF"                   /* = 4 */,
+    NAME = "EC_NAME"                 /* = 5 */,
+    NUM = "EC_NUM"                   /* = 6 */,
+    NA = "EC_NA"                     /* = 7 */,
+    GETTING_DATA = "EC_GETTING_DATA" /* = 8 */
 };
 
 const ErrorCodeNames = Object.freeze({
     [ErrorCode.OK]: '#OK!',
-    [ErrorCode.UNKNOWN]: '#UNKNOWN!',
-    [ErrorCode.ILLEGAL_REF]: '#REF!',
-    [ErrorCode.ILLEGAL_VALUE]: '#VALUE!',
-    [ErrorCode.DIV_0]: "#DIV/0!",
+    [ErrorCode.NULL]: '#NULL!',
+    [ErrorCode.DIV]: "#DIV/0!",
+    [ErrorCode.VALUE]: '#VALUE!',
+    [ErrorCode.REF]: '#REF!',
+    [ErrorCode.NAME]: '#NAME?',
+    [ErrorCode.NUM]: '#NUM!',
+    [ErrorCode.NA]: '#N/A',
+    [ErrorCode.GETTING_DATA]: '#GETTING_DATA',
 });
 
 interface Variant {

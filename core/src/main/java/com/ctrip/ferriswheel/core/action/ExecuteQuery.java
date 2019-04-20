@@ -4,6 +4,7 @@ import com.ctrip.ferriswheel.common.variant.Variant;
 
 import java.util.Map;
 
+@Deprecated
 public class ExecuteQuery extends TableAction {
     private Map<String, Variant> params;
 

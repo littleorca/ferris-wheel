@@ -32,6 +32,7 @@ message SheetAsset {
         Table table = 1;
         Chart chart = 2;
         Text text = 3;
+        Form form = 4;
     }
 }
 
@@ -67,11 +68,14 @@ message UnionValue {
 
 enum ErrorCode {
     EC_UNSET = 0;
-    EC_OK = 1;
-    EC_UNKNOWN = 2;
-    EC_ILLEGAL_REF = 3;
-    EC_ILLEGAL_VALUE = 4;
-    EC_DIV_0 = 5;
+    EC_NULL = 1;
+    EC_DIV = 2;
+    EC_VALUE = 3;
+    EC_REF = 4;
+    EC_NAME = 5;
+    EC_NUM = 6;
+    EC_NA = 7;
+    EC_GETTING_DATA = 8;
 }
 
 message ListValue {
@@ -88,19 +92,18 @@ message TableAutomaton {
 
 message QueryAutomaton {
     QueryTemplate template = 1;
-    repeated NamedValue params = 2;
+    repeated Parameter params = 2;
     DataQuery query = 3;
 }
 
 message QueryTemplate {
     string scheme = 1;
-    repeated NamedValue builtin_params = 2;
-    repeated ParamRule user_param_rules = 3;
+    repeated Parameter builtin_params = 2;
 }
 
 message DataQuery {
     string scheme = 1;
-    repeated NamedValue params = 2;
+    repeated Parameter params = 2;
 }
 
 message PivotAutomaton {
@@ -143,16 +146,12 @@ enum AggregateType {
     AT_CUSTOM = 12;
 }
 
-message NamedValue {
+message Parameter {
     string name = 1;
     UnionValue value = 2;
-}
-
-message ParamRule {
-    string name = 1;
-    VariantType type = 2;
-    bool nullable = 3;
-    repeated UnionValue allowed_values = 4;
+    VariantType type = 3;
+    bool mandatory = 4;
+    bool multiple = 5;
 }
 
 enum VariantType {
@@ -275,4 +274,26 @@ message Text {
     string name = 1;
     UnionValue content = 2;
     Layout layout = 3;
+}
+
+message Form {
+    string name = 1;
+    repeated FormField fields = 2;
+    Layout layout = 3;
+}
+
+message FormField {
+    string name = 1;
+    VariantType type = 2;
+    UnionValue value = 3;
+    bool mandatory = 4;
+    bool multiple = 5;
+    string label = 6;
+    string tips = 7;
+    UnionValue options = 8;
+    repeated FormFieldBinding bindings = 9;
+}
+
+message FormFieldBinding {
+    string target = 1;
 }

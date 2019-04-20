@@ -25,6 +25,7 @@
 
 .editable-list.vertical > .editor-container {
     padding-left: .75rem;
+    box-sizing: border-box;
 }
 
 .editable-list.horizontal {

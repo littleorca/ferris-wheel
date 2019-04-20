@@ -84,6 +84,20 @@ private static final long serialVersionUID = 0L;
             assetCase_ = 3;
             break;
           }
+          case 34: {
+            com.ctrip.ferriswheel.proto.v1.Form.Builder subBuilder = null;
+            if (assetCase_ == 4) {
+              subBuilder = ((com.ctrip.ferriswheel.proto.v1.Form) asset_).toBuilder();
+            }
+            asset_ =
+                input.readMessage(com.ctrip.ferriswheel.proto.v1.Form.parser(), extensionRegistry);
+            if (subBuilder != null) {
+              subBuilder.mergeFrom((com.ctrip.ferriswheel.proto.v1.Form) asset_);
+              asset_ = subBuilder.buildPartial();
+            }
+            assetCase_ = 4;
+            break;
+          }
           default: {
             if (!parseUnknownField(
                 input, unknownFields, extensionRegistry, tag)) {
@@ -123,6 +137,7 @@ private static final long serialVersionUID = 0L;
     TABLE(1),
     CHART(2),
     TEXT(3),
+    FORM(4),
     ASSET_NOT_SET(0);
     private final int value;
     private AssetCase(int value) {
@@ -141,6 +156,7 @@ private static final long serialVersionUID = 0L;
         case 1: return TABLE;
         case 2: return CHART;
         case 3: return TEXT;
+        case 4: return FORM;
         case 0: return ASSET_NOT_SET;
         default: return null;
       }
@@ -234,6 +250,32 @@ private static final long serialVersionUID = 0L;
     return com.ctrip.ferriswheel.proto.v1.Text.getDefaultInstance();
   }
 
+  public static final int FORM_FIELD_NUMBER = 4;
+  /**
+   * <code>.ferriswheel.v1.Form form = 4;</code>
+   */
+  public boolean hasForm() {
+    return assetCase_ == 4;
+  }
+  /**
+   * <code>.ferriswheel.v1.Form form = 4;</code>
+   */
+  public com.ctrip.ferriswheel.proto.v1.Form getForm() {
+    if (assetCase_ == 4) {
+       return (com.ctrip.ferriswheel.proto.v1.Form) asset_;
+    }
+    return com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance();
+  }
+  /**
+   * <code>.ferriswheel.v1.Form form = 4;</code>
+   */
+  public com.ctrip.ferriswheel.proto.v1.FormOrBuilder getFormOrBuilder() {
+    if (assetCase_ == 4) {
+       return (com.ctrip.ferriswheel.proto.v1.Form) asset_;
+    }
+    return com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance();
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -257,6 +299,9 @@ private static final long serialVersionUID = 0L;
     if (assetCase_ == 3) {
       output.writeMessage(3, (com.ctrip.ferriswheel.proto.v1.Text) asset_);
     }
+    if (assetCase_ == 4) {
+      output.writeMessage(4, (com.ctrip.ferriswheel.proto.v1.Form) asset_);
+    }
     unknownFields.writeTo(output);
   }
 
@@ -277,6 +322,10 @@ private static final long serialVersionUID = 0L;
     if (assetCase_ == 3) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, (com.ctrip.ferriswheel.proto.v1.Text) asset_);
+    }
+    if (assetCase_ == 4) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(4, (com.ctrip.ferriswheel.proto.v1.Form) asset_);
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -307,6 +356,10 @@ private static final long serialVersionUID = 0L;
         if (!getText()
             .equals(other.getText())) return false;
         break;
+      case 4:
+        if (!getForm()
+            .equals(other.getForm())) return false;
+        break;
       case 0:
       default:
     }
@@ -333,6 +386,10 @@ private static final long serialVersionUID = 0L;
       case 3:
         hash = (37 * hash) + TEXT_FIELD_NUMBER;
         hash = (53 * hash) + getText().hashCode();
+        break;
+      case 4:
+        hash = (37 * hash) + FORM_FIELD_NUMBER;
+        hash = (53 * hash) + getForm().hashCode();
         break;
       case 0:
       default:
@@ -519,6 +576,13 @@ private static final long serialVersionUID = 0L;
           result.asset_ = textBuilder_.build();
         }
       }
+      if (assetCase_ == 4) {
+        if (formBuilder_ == null) {
+          result.asset_ = asset_;
+        } else {
+          result.asset_ = formBuilder_.build();
+        }
+      }
       result.assetCase_ = assetCase_;
       onBuilt();
       return result;
@@ -579,6 +643,10 @@ private static final long serialVersionUID = 0L;
         }
         case TEXT: {
           mergeText(other.getText());
+          break;
+        }
+        case FORM: {
+          mergeForm(other.getForm());
           break;
         }
         case ASSET_NOT_SET: {
@@ -1035,6 +1103,142 @@ private static final long serialVersionUID = 0L;
       assetCase_ = 3;
       onChanged();;
       return textBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.ctrip.ferriswheel.proto.v1.Form, com.ctrip.ferriswheel.proto.v1.Form.Builder, com.ctrip.ferriswheel.proto.v1.FormOrBuilder> formBuilder_;
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public boolean hasForm() {
+      return assetCase_ == 4;
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public com.ctrip.ferriswheel.proto.v1.Form getForm() {
+      if (formBuilder_ == null) {
+        if (assetCase_ == 4) {
+          return (com.ctrip.ferriswheel.proto.v1.Form) asset_;
+        }
+        return com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance();
+      } else {
+        if (assetCase_ == 4) {
+          return formBuilder_.getMessage();
+        }
+        return com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public Builder setForm(com.ctrip.ferriswheel.proto.v1.Form value) {
+      if (formBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        asset_ = value;
+        onChanged();
+      } else {
+        formBuilder_.setMessage(value);
+      }
+      assetCase_ = 4;
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public Builder setForm(
+        com.ctrip.ferriswheel.proto.v1.Form.Builder builderForValue) {
+      if (formBuilder_ == null) {
+        asset_ = builderForValue.build();
+        onChanged();
+      } else {
+        formBuilder_.setMessage(builderForValue.build());
+      }
+      assetCase_ = 4;
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public Builder mergeForm(com.ctrip.ferriswheel.proto.v1.Form value) {
+      if (formBuilder_ == null) {
+        if (assetCase_ == 4 &&
+            asset_ != com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance()) {
+          asset_ = com.ctrip.ferriswheel.proto.v1.Form.newBuilder((com.ctrip.ferriswheel.proto.v1.Form) asset_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          asset_ = value;
+        }
+        onChanged();
+      } else {
+        if (assetCase_ == 4) {
+          formBuilder_.mergeFrom(value);
+        }
+        formBuilder_.setMessage(value);
+      }
+      assetCase_ = 4;
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public Builder clearForm() {
+      if (formBuilder_ == null) {
+        if (assetCase_ == 4) {
+          assetCase_ = 0;
+          asset_ = null;
+          onChanged();
+        }
+      } else {
+        if (assetCase_ == 4) {
+          assetCase_ = 0;
+          asset_ = null;
+        }
+        formBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public com.ctrip.ferriswheel.proto.v1.Form.Builder getFormBuilder() {
+      return getFormFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    public com.ctrip.ferriswheel.proto.v1.FormOrBuilder getFormOrBuilder() {
+      if ((assetCase_ == 4) && (formBuilder_ != null)) {
+        return formBuilder_.getMessageOrBuilder();
+      } else {
+        if (assetCase_ == 4) {
+          return (com.ctrip.ferriswheel.proto.v1.Form) asset_;
+        }
+        return com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.ferriswheel.v1.Form form = 4;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.ctrip.ferriswheel.proto.v1.Form, com.ctrip.ferriswheel.proto.v1.Form.Builder, com.ctrip.ferriswheel.proto.v1.FormOrBuilder> 
+        getFormFieldBuilder() {
+      if (formBuilder_ == null) {
+        if (!(assetCase_ == 4)) {
+          asset_ = com.ctrip.ferriswheel.proto.v1.Form.getDefaultInstance();
+        }
+        formBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.ctrip.ferriswheel.proto.v1.Form, com.ctrip.ferriswheel.proto.v1.Form.Builder, com.ctrip.ferriswheel.proto.v1.FormOrBuilder>(
+                (com.ctrip.ferriswheel.proto.v1.Form) asset_,
+                getParentForChildren(),
+                isClean());
+        asset_ = null;
+      }
+      assetCase_ = 4;
+      onChanged();;
+      return formBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

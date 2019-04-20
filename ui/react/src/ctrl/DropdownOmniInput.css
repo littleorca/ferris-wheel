@@ -1,0 +1,33 @@
+.dropdown-omni-input {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    min-width: 2em;
+    max-width: 100%;
+    min-height: 1em;
+    line-height: 1.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.dropdown-omni-input .dropdown-omni-input-value-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown-omni-input .dropdown-omni-input-value-item:not(:last-of-type)::after {
+    padding-right: .2em;
+    content: ",";
+    color: #999;
+}
+
+.dropdown-omni-input-popover {
+    z-index: 999;
+}
+
+.dropdown-omni-input-popover .omni-input {
+    border-radius: 3px;
+    box-shadow: 0 .25em 1em rgba(0, 0, 0, .2);
+}

@@ -27,10 +27,14 @@ package com.ctrip.ferriswheel.common.variant;
 
 public enum ErrorCodes implements ErrorCode {
     OK("OK"),
-    UNKNOWN("UNKNOWN"),
-    ILLEGAL_REF("REF"),
-    ILLEGAL_VALUE("VALUE"),
-    DIV_0("DIV/0");
+    NULL("#NULL!")                /* = 1 */,
+    DIV("#DIV/0!")                /* = 2 */,
+    VALUE("#VALUE!")              /* = 3 */,
+    REF("#REF!")                  /* = 4 */,
+    NAME("#NAME?")                /* = 5 */,
+    NUM("#NUM!")                  /* = 6 */,
+    NA("#N/A")                    /* = 7 */,
+    GETTING_DATA("#GETTING_DATA") /* = 8 */;
 
     public static ErrorCodes valueOf(int code) {
         if (code < 0 || code >= values().length) {
@@ -39,15 +43,15 @@ public enum ErrorCodes implements ErrorCode {
         return values()[code];
     }
 
-    private final String displayName;
+    private final String name;
 
-    ErrorCodes(String displayName) {
-        this.displayName = displayName;
+    ErrorCodes(String name) {
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return getFullName();
+        return getName();
     }
 
     @Override
@@ -55,11 +59,7 @@ public enum ErrorCodes implements ErrorCode {
         return ordinal();
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getFullName() {
-        return String.valueOf("#" + displayName + "!");
+    public String getName() {
+        return name;
     }
 }

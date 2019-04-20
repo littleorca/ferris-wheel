@@ -33,6 +33,9 @@ import SelectAsset from "./SelectAsset";
 import ActionMeta from "./ActionMeta";
 import ResetTable from "./ResetTable";
 import SetCellsFormat from "./SetCellsFormat";
+import AddForm from "./AddForm";
+import UpdateForm from "./UpdateForm";
+import SubmitForm from "./SubmitForm";
 
 class Action extends ActionMeta {
     /* actions defined in protobuf */
@@ -72,6 +75,9 @@ class Action extends ActionMeta {
     public executeQuery?: ExecuteQuery;
     public resetTable?: ResetTable;
     public setCellsFormat?: SetCellsFormat;
+    public addForm?: AddForm;
+    public updateForm?: UpdateForm;
+    public submitForm?: SubmitForm;
     /* extra actions for UI only */
     public selectAsset?: SelectAsset;
 
@@ -150,6 +156,12 @@ class Action extends ActionMeta {
             action.resetTable = ResetTable.deserialize(input.resetTable);
         } else if (typeof input.setCellsFormat !== 'undefined') {
             action.setCellsFormat = SetCellsFormat.deserialize(input.setCellsFormat);
+        } else if (typeof input.addForm !== 'undefined') {
+            action.addForm = AddForm.deserialize(input.addForm);
+        } else if (typeof input.updateForm !== 'undefined') {
+            action.updateForm = UpdateForm.deserialize(input.updateForm);
+        } else if (typeof input.submitForm !== 'undefined') {
+            action.submitForm = SubmitForm.deserialize(input.submitForm);
             // } else if (typeof input.selectAsset !== 'undefined') {
             //     action.selectAsset = SelectAsset.deserialize(input.selectAsset);
         } else {
@@ -231,6 +243,12 @@ class Action extends ActionMeta {
             return this.resetTable;
         } else if (typeof this.setCellsFormat !== 'undefined') {
             return this.setCellsFormat;
+        } else if (typeof this.addForm !== 'undefined') {
+            return this.addForm;
+        } else if (typeof this.updateForm !== 'undefined') {
+            return this.updateForm;
+        } else if (typeof this.submitForm !== 'undefined') {
+            return this.submitForm;
         } else if (typeof this.selectAsset !== 'undefined') {
             return this.selectAsset;
         } else {

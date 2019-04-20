@@ -30,7 +30,7 @@ public class Not implements Function {
             booleanValue = null;
         }
         context.pushOperand(booleanValue == null ?
-                Value.err(ErrorCodes.ILLEGAL_VALUE) : Value.bool(booleanValue));
+                Value.err(ErrorCodes.VALUE) : Value.bool(booleanValue));
     }
 
 }

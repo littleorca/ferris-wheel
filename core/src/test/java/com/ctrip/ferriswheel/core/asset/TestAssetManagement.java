@@ -7,6 +7,7 @@ import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.variant.DefaultParameter;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.core.bean.ChartData;
@@ -151,7 +152,7 @@ public class TestAssetManagement extends TestCase {
 
         TableAutomatonInfo.QueryTemplateInfo queryTemplateInfo = new TableAutomatonInfo.QueryTemplateInfo();
         queryTemplateInfo.setScheme("test");
-        queryTemplateInfo.addBuiltinParam("p1", new DynamicValue("NOW()"));
+        queryTemplateInfo.addBuiltinParam("p1", new DefaultParameter("p1", new DynamicValue("NOW()")));
         try {
             table.automate(new TableAutomatonInfo.QueryAutomatonInfo(queryTemplateInfo, null, null));
         } catch (RuntimeException e) {
@@ -318,7 +319,7 @@ public class TestAssetManagement extends TestCase {
             assertEquals(1, assetMap.get(template.getAssetId()).referenceCount.get());
 
             for (String name : template.getBuiltinParamNames()) {
-                ValueNode param = template.getBuiltinParam(name);
+                ValueNode param = (ValueNode) template.getBuiltinParam(name).getValue();
                 assertEquals(template, param.getParent());
                 assertTrue(pendingAssetIds.remove(param.getAssetId()));
                 assertEquals(1, assetMap.get(param.getAssetId()).referenceCount.get());

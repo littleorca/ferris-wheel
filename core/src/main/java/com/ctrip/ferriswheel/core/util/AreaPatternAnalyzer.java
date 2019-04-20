@@ -1,11 +1,11 @@
 package com.ctrip.ferriswheel.core.util;
 
 import com.ctrip.ferriswheel.core.asset.VariantNode;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 
 public class AreaPatternAnalyzer {
-    private RangeRef startArea = null;
-    private RangeRef endArea = null;
+    private RangeReference startArea = null;
+    private RangeReference endArea = null;
     private int rowDelta;
     private int columnDelta;
 
@@ -17,7 +17,7 @@ public class AreaPatternAnalyzer {
      */
     private int repeated = -1;
 
-    public int feed(RangeRef curArea) {
+    public int feed(RangeReference curArea) {
         if (repeated == -1) { // init (no last state, no pattern)
             startArea = curArea;
             repeated = 0; // has last state, but no pattern
@@ -58,11 +58,11 @@ public class AreaPatternAnalyzer {
         return repeated;
     }
 
-    public RangeRef predictNextArea() {
+    public RangeReference predictNextArea() {
         if (repeated <= 0) {
             return null;
         }
-        return new RangeRef(null,
+        return new RangeReference(null,
                 null,
                 getEndArea().getLeft() + getColumnDelta(),
                 getEndArea().getTop() + getRowDelta(),
@@ -76,19 +76,19 @@ public class AreaPatternAnalyzer {
         repeated = -1;
     }
 
-    public RangeRef getStartArea() {
+    public RangeReference getStartArea() {
         return startArea;
     }
 
-    protected void setStartArea(RangeRef startArea) {
+    protected void setStartArea(RangeReference startArea) {
         this.startArea = startArea;
     }
 
-    public RangeRef getEndArea() {
+    public RangeReference getEndArea() {
         return endArea;
     }
 
-    protected void setEndArea(RangeRef endArea) {
+    protected void setEndArea(RangeReference endArea) {
         this.endArea = endArea;
     }
 

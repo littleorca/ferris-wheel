@@ -28,26 +28,26 @@ public interface ExecuteQueryOrBuilder extends
       getTableNameBytes();
 
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue params = 3;</code>
+   * <code>repeated .ferriswheel.v1.Parameter params = 3;</code>
    */
-  java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> 
+  java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter> 
       getParamsList();
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue params = 3;</code>
+   * <code>repeated .ferriswheel.v1.Parameter params = 3;</code>
    */
-  com.ctrip.ferriswheel.proto.v1.NamedValue getParams(int index);
+  com.ctrip.ferriswheel.proto.v1.Parameter getParams(int index);
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue params = 3;</code>
+   * <code>repeated .ferriswheel.v1.Parameter params = 3;</code>
    */
   int getParamsCount();
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue params = 3;</code>
+   * <code>repeated .ferriswheel.v1.Parameter params = 3;</code>
    */
-  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder> 
+  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder> 
       getParamsOrBuilderList();
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue params = 3;</code>
+   * <code>repeated .ferriswheel.v1.Parameter params = 3;</code>
    */
-  com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder getParamsOrBuilder(
+  com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder getParamsOrBuilder(
       int index);
 }

@@ -12,7 +12,20 @@ public class FormulaLexContext implements LexContext {
             "%", "=", "<", "<=", ">=", ">", "<>", "&", "!", ":"};
     final String[] delimiters = new String[]{",", "(", ")"};
     final String[] keywords = new String[]{};
-    final String[] literals = new String[]{"true", "false", "null"};
+    final String[] literals = new String[]{
+            "true",
+            "false",
+            "null",
+            // error values
+            "#NULL!",
+            "#DIV/0!",
+            "#VALUE!",
+            "#REF!",
+            "#NAME?",
+            "#NUM!",
+            "#N/A",
+            "#GETTING_DATA",
+    };
     final TokenDecoder quotedIdentifierDecoder = new FormulaQuotedIdentifierDecoder();
     final TokenDecoder stringDecoder = new FormulaStringDecoder();
 
@@ -29,19 +42,34 @@ public class FormulaLexContext implements LexContext {
 
     @Override
     public boolean isIdentifierStart(char ch) {
-        if (ch == '$' || ch == '_' || (ch >= 'a' && ch <= 'z')
-                || (ch >= 'A' && ch <= 'Z'))
+        // '#' is used for parsing error values such as #REF!
+        if (ch == '$'
+                || ch == '_'
+                || (ch >= 'a' && ch <= 'z')
+                || (ch >= 'A' && ch <= 'Z')
+                || ch == '#') {
             return true;
 
-        return false;
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public boolean isIdentifierPart(char ch) {
-        if (isIdentifierStart(ch))
-            return true;
+    public boolean isIdentifierPart(char pendingChar, char identifierStart) {
+        if (identifierStart == '#') {
+            return (pendingChar == '/'
+                    || pendingChar == '!'
+                    || pendingChar >= 'a' && pendingChar <= 'z'
+                    || pendingChar >= 'A' && pendingChar <= 'Z'
+                    || pendingChar >= '0' && pendingChar <= '9');
 
-        return (ch >= '0' && ch <= '9');
+        } else {
+            if (isIdentifierStart(pendingChar))
+                return true;
+
+            return (pendingChar >= '0' && pendingChar <= '9');
+        }
     }
 
     @Override
@@ -92,15 +120,13 @@ public class FormulaLexContext implements LexContext {
     class FormulaQuotedIdentifierDecoder extends FormulaStringDecoder {
         @Override
         public boolean isStartChar(char ch) {
-            return ch == '\'' || ch == '#';
+            return ch == '\'';
         }
 
         @Override
         boolean isEndChar(char ch) {
             if (startQuote == '\'') {
                 return ch == startQuote;
-            } else if (startQuote == '#') {
-                return ch == '!';
             }
             return false;
         }

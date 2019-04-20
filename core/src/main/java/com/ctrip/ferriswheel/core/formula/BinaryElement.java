@@ -82,7 +82,7 @@ public abstract class BinaryElement extends FormulaElement {
         protected abstract boolean explain(int ret);
 
         protected Variant explainError(Exception e) {
-            return Value.err(ErrorCodes.ILLEGAL_VALUE);
+            return Value.err(ErrorCodes.VALUE);
         }
     }
 

@@ -5,6 +5,7 @@ import Sheet from '../model/Sheet';
 import SheetAsset from '../model/SheetAsset';
 import Chart from '../model/Chart';
 import Table from '../model/Table';
+import Form from "../model/Form";
 import Row from '../model/Row';
 import Cell from '../model/Cell';
 import Text from '../model/Text';
@@ -17,11 +18,12 @@ import QueryTemplate from '../model/QueryTemplate';
 import Stacking from '../model/Stacking';
 import Toolbar, { Group } from '../ctrl/Toolbar';
 import DropdownButton from '../ctrl/DropdownButton';
-import Button, { ButtonProps } from '../ctrl/Button'; 
+import Button, { ButtonProps } from '../ctrl/Button';
 import LayoutForm from '../form/LayoutForm';
 import QueryTemplateForm from '../form/QueryTemplateForm';
 import ChartForm from '../form/ChartForm';
 import PivotForm from '../form/PivotForm';
+import FormForm from "../form/FormForm";
 import GroupView, { GroupItem } from './GroupView';
 import FormatFormDialog from './FormatFormDialog';
 import Action from '../action/Action';
@@ -34,6 +36,8 @@ import RemoveAsset from '../action/RemoveAsset';
 import RemoveSheet from '../action/RemoveSheet';
 import AutomateTable from '../action/AutomateTable';
 import LayoutAsset from '../action/LayoutAsset';
+import AddForm from '../action/AddForm';
+import UpdateForm from '../action/UpdateForm';
 import UpdateChart from '../action/UpdateChart';
 import AddTable from '../action/AddTable';
 import AddChart from '../action/AddChart';
@@ -44,6 +48,8 @@ import RemoveColumns from '../action/RemoveColumns';
 import RemoveRows from '../action/RemoveRows';
 import SetCellsFormat from '../action/SetCellsFormat';
 import WorkbookOperation from '../action/WorkbookOperation';
+import { PendingField } from '../form/AddFormForm';
+import AddFormDialog from './AddFormDialog';
 import Extension, { QueryWizard } from '../extension/Extension';
 import Dialog from './Dialog';
 import Loading from 'react-loading';
@@ -105,6 +111,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.handleAddBubbleChart = this.handleAddBubbleChart.bind(this);
 
         this.handleAddText = this.handleAddText.bind(this);
+        this.handleAddForm = this.handleAddForm.bind(this);
 
         this.handleToggleSidebar = this.handleToggleSidebar.bind(this);
 
@@ -113,7 +120,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.onServiceError = this.onServiceError.bind(this);
         this.preventSubmit = this.preventSubmit.bind(this);
 
-        if(typeof this.props.extensions !== 'undefined') {
+        if (typeof this.props.extensions !== 'undefined') {
             this.props.extensions.forEach((value, index) => {
                 if (typeof value.queryWizard !== 'undefined') {
                     const name = 'add-query-table--' + value.queryWizard.name;
@@ -245,14 +252,14 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
             throw new Error('Wizard component not found: ' + name); // TODO review
         }
         Dialog.show(props => <wizard.component
-                onOk={queryTemplate => {
-                    props.close();
-                    this.handleQueryWizardOk(queryTemplate);
-                }}
-                onCancel={() => {
-                    props.close();
-                    this.handleQueryWizardCancelled();
-                }} />);
+            onOk={queryTemplate => {
+                props.close();
+                this.handleQueryWizardOk(queryTemplate);
+            }}
+            onCancel={() => {
+                props.close();
+                this.handleQueryWizardCancelled();
+            }} />);
     }
 
     protected handleQueryWizardOk(queryTemplate: QueryTemplate) {
@@ -425,6 +432,45 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.handleAction(addText.wrapper());
     }
 
+    // TODO consider initialize the form with all possible fields for convenience.
+    protected handleAddForm() {
+        if (typeof this.state.currentSheet === 'undefined') {
+            throw new Error('Unable to create form as current sheet is not defined!');
+        }
+
+        const pendingFields: PendingField[] = [];
+        this.props.workbook.sheets.forEach(s => {
+            s.assets.forEach(a => {
+                if (a.assetType() === "table") {
+                    const table = a.specific() as Table;
+                    if (typeof table.automaton.queryAutomaton !== "undefined") {
+                        const params = table.automaton.queryAutomaton.template.builtinParams;
+                        params.forEach(p => {
+                            pendingFields.push({
+                                sheetName: s.name,
+                                assetName: table.name,
+                                paramName: p.name,
+                                paramType: p.type,
+                                mandatory: p.mandatory,
+                                multiple: p.multiple,
+                            });
+                        })
+                    }
+                }
+            })
+        });
+
+        const doAddForm = (form: Form) => {
+            if (typeof this.state.currentSheet === 'undefined') {
+                throw new Error('Unable to create form as current sheet is not defined!!');
+            }
+            const addForm = new AddForm(this.state.currentSheet.name, form);
+            this.handleAction(addForm.wrapper());
+        }
+
+        AddFormDialog.show(pendingFields, doAddForm);
+    }
+
     protected handleToggleSidebar() {
         this.setState({
             showSidebar: !this.state.showSidebar,
@@ -523,6 +569,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
 
     protected preventSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        return false;
     }
 
     public render() {
@@ -704,6 +751,11 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         label="文本"
                         tips="添加文本块"
                         onClick={this.handleAddText} />
+                    <Button
+                        name="add-form"
+                        label="表单"
+                        tips="添加表单"
+                        onClick={this.handleAddForm} />
                 </Group>
                 <Group>
                     <Button
@@ -728,6 +780,8 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         return this.renderChartOption(asset as Chart);
                     case 'text':
                         return this.renderTextOption(asset as Text);
+                    case 'form':
+                        return this.renderFormOption(asset as Form);
                     default:
                         throw new Error('Invalid asset type!');
                 }
@@ -898,16 +952,16 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         const nonNullWizard = wizard;
         const openWizard = () => {
             Dialog.show(props => <nonNullWizard.component
-                    initialQueryTemplate={queryTemplate}
-                    onOk={(result) => {
-                        props.close();
-                        Object.assign(queryTemplate, result);
-                        handleAutomatonChange();
-                    }}
-                    onCancel={() => {
-                        props.close();
-                        this.handleQueryWizardCancelled();
-                    }} />);
+                initialQueryTemplate={queryTemplate}
+                onOk={(result) => {
+                    props.close();
+                    Object.assign(queryTemplate, result);
+                    handleAutomatonChange();
+                }}
+                onCancel={() => {
+                    props.close();
+                    this.handleQueryWizardCancelled();
+                }} />);
         }
         return (
             <div className="query-wizard-actions">
@@ -946,10 +1000,10 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
             }
             if (formatSet.size > 1) {
                 Dialog.confirm(
-                        "所选区域存在多种格式，是否继续以统一设置新的格式？",
-                        () => {
-                            FormatFormDialog.show("", submitCallback);
-                        });
+                    "所选区域存在多种格式，是否继续以统一设置新的格式？",
+                    () => {
+                        FormatFormDialog.show("", submitCallback);
+                    });
             } else {
                 FormatFormDialog.show(formatSet.values().next().value, submitCallback);
             }
@@ -1026,6 +1080,47 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                     <form onSubmit={this.preventSubmit}>
                         <LayoutForm
                             layout={text.layout}
+                            afterChange={handleLayoutChange} />
+                    </form>
+                </GroupItem>
+            </GroupView>
+        );
+    }
+
+    protected renderFormOption(form: Form) {
+        const sheet = this.state.currentSheet;
+        if (typeof sheet === 'undefined') {
+            throw new Error('Current sheet is undefined.');
+        }
+
+        const handleFormChange = () => {
+            const updateForm = new UpdateForm(sheet.name, form);
+            this.handleAction(updateForm.wrapper());
+        }
+
+        const handleLayoutChange = (layout: Layout) => {
+            const layoutAsset = new LayoutAsset(sheet.name, form.name, layout);
+            this.handleAction(layoutAsset.wrapper());
+        };
+
+        return (
+            <GroupView
+                className="realtime-edit form-option">
+                <GroupItem
+                    name="form"
+                    title="表单">
+                    <form onSubmit={this.preventSubmit}>
+                        <FormForm
+                            form={form}
+                            afterChange={handleFormChange} />
+                    </form>
+                </GroupItem>
+                <GroupItem
+                    name="layout"
+                    title="布局">
+                    <form onSubmit={this.preventSubmit}>
+                        <LayoutForm
+                            layout={form.layout}
                             afterChange={handleLayoutChange} />
                     </form>
                 </GroupItem>

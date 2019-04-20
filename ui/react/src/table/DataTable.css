@@ -1,0 +1,18 @@
+.fw-data-table table {
+    border-collapse: collapse;
+}
+
+.fw-data-table table,
+.fw-data-table table th,
+.fw-data-table table td {
+    border: 1px solid #ccc;
+}
+
+.fw-data-table table th,
+.fw-data-table table td {
+    padding: .25em .5em;
+}
+
+.fw-data-table table th {
+    background: #eee;
+}

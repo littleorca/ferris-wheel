@@ -28,6 +28,22 @@ public class TreeSparseArray<E> implements SparseArray<E>, Serializable {
         return holder.get(index);
     }
 
+    public E first() {
+        Map.Entry<Integer, E> entry = holder.firstEntry();
+        if (entry == null) {
+            return null;
+        }
+        return entry.getValue();
+    }
+
+    public E last() {
+        Map.Entry<Integer, E> entry = holder.lastEntry();
+        if (entry == null) {
+            return null;
+        }
+        return entry.getValue();
+    }
+
     public E move(int from, int to) {
         E element = holder.remove(from);
         if (element == null) {

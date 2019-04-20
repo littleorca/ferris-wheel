@@ -180,6 +180,21 @@ public final class ActionOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ferriswheel_v1_WorkbookOperation_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ferriswheel_v1_AddForm_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ferriswheel_v1_AddForm_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ferriswheel_v1_UpdateForm_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ferriswheel_v1_UpdateForm_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ferriswheel_v1_SubmitForm_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ferriswheel_v1_SubmitForm_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ferriswheel_v1_Action_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -278,75 +293,84 @@ public final class ActionOuterClass {
       "iswheel.v1.Layout\"A\n\007AddText\022\022\n\nsheet_na" +
       "me\030\001 \001(\t\022\"\n\004text\030\002 \001(\0132\024.ferriswheel.v1." +
       "Text\"D\n\nUpdateText\022\022\n\nsheet_name\030\001 \001(\t\022\"" +
-      "\n\004text\030\002 \001(\0132\024.ferriswheel.v1.Text\"b\n\014Ex" +
+      "\n\004text\030\002 \001(\0132\024.ferriswheel.v1.Text\"a\n\014Ex" +
       "ecuteQuery\022\022\n\nsheet_name\030\001 \001(\t\022\022\n\ntable_" +
-      "name\030\002 \001(\t\022*\n\006params\030\003 \003(\0132\032.ferriswheel" +
-      ".v1.NamedValue\"F\n\nResetTable\022\022\n\nsheet_na" +
-      "me\030\001 \001(\t\022$\n\005table\030\002 \001(\0132\025.ferriswheel.v1" +
-      ".Table\"\224\001\n\016SetCellsFormat\022\022\n\nsheet_name\030" +
-      "\001 \001(\t\022\022\n\ntable_name\030\002 \001(\t\022\021\n\trow_index\030\003" +
-      " \001(\005\022\024\n\014column_index\030\004 \001(\005\022\016\n\006n_rows\030\005 \001" +
-      "(\005\022\021\n\tn_columns\030\006 \001(\005\022\016\n\006format\030\007 \001(\t\"%\n" +
-      "\021WorkbookOperation\022\020\n\010pathname\030\001 \001(\t\"\233\017\n" +
-      "\006Action\022-\n\tadd_chart\030\001 \001(\0132\030.ferriswheel" +
-      ".v1.AddChartH\000\022-\n\tadd_sheet\030\002 \001(\0132\030.ferr" +
-      "iswheel.v1.AddSheetH\000\022-\n\tadd_table\030\003 \001(\013" +
-      "2\030.ferriswheel.v1.AddTableH\000\0227\n\016automate" +
-      "_table\030\004 \001(\0132\035.ferriswheel.v1.AutomateTa" +
-      "bleH\000\0226\n\016set_cell_value\030\005 \001(\0132\034.ferriswh" +
-      "eel.v1.SetCellValueH\000\022:\n\020set_cell_formul" +
-      "a\030\006 \001(\0132\036.ferriswheel.v1.SetCellFormulaH" +
-      "\000\022>\n\022refresh_cell_value\030\007 \001(\0132 .ferriswh" +
-      "eel.v1.RefreshCellValueH\000\0225\n\rchart_consu" +
-      "lt\030\010 \001(\0132\034.ferriswheel.v1.ChartConsultH\000" +
-      "\0225\n\rerase_columns\030\t \001(\0132\034.ferriswheel.v1" +
-      ".EraseColumnsH\000\022/\n\nerase_rows\030\n \001(\0132\031.fe" +
-      "rriswheel.v1.EraseRowsH\000\022)\n\007fill_up\030\013 \001(" +
-      "\0132\026.ferriswheel.v1.FillUpH\000\022/\n\nfill_righ" +
-      "t\030\014 \001(\0132\031.ferriswheel.v1.FillRightH\000\022-\n\t" +
-      "fill_down\030\r \001(\0132\030.ferriswheel.v1.FillDow" +
-      "nH\000\022-\n\tfill_left\030\016 \001(\0132\030.ferriswheel.v1." +
-      "FillLeftH\000\0227\n\016insert_columns\030\017 \001(\0132\035.fer" +
-      "riswheel.v1.InsertColumnsH\000\0221\n\013insert_ro" +
-      "ws\030\020 \001(\0132\032.ferriswheel.v1.InsertRowsH\000\022/" +
-      "\n\nmove_sheet\030\021 \001(\0132\031.ferriswheel.v1.Move" +
-      "SheetH\000\0223\n\014remove_asset\030\022 \001(\0132\033.ferriswh" +
-      "eel.v1.RemoveAssetH\000\0227\n\016remove_columns\030\023" +
-      " \001(\0132\035.ferriswheel.v1.RemoveColumnsH\000\0221\n" +
-      "\013remove_rows\030\024 \001(\0132\032.ferriswheel.v1.Remo" +
-      "veRowsH\000\0223\n\014remove_sheet\030\025 \001(\0132\033.ferrisw" +
-      "heel.v1.RemoveSheetH\000\0223\n\014rename_asset\030\026 " +
-      "\001(\0132\033.ferriswheel.v1.RenameAssetH\000\0223\n\014re" +
-      "name_sheet\030\027 \001(\0132\033.ferriswheel.v1.Rename" +
-      "SheetH\000\0227\n\016transfer_asset\030\030 \001(\0132\035.ferris" +
-      "wheel.v1.TransferAssetH\000\022;\n\020update_autom" +
-      "aton\030\031 \001(\0132\037.ferriswheel.v1.UpdateAutoma" +
-      "tonH\000\0223\n\014update_chart\030\032 \001(\0132\033.ferriswhee" +
-      "l.v1.UpdateChartH\000\022<\n\017create_workbook\030\033 " +
-      "\001(\0132!.ferriswheel.v1.WorkbookOperationH\000" +
-      "\022:\n\ropen_workbook\030\034 \001(\0132!.ferriswheel.v1" +
-      ".WorkbookOperationH\000\022:\n\rsave_workbook\030\035 " +
-      "\001(\0132!.ferriswheel.v1.WorkbookOperationH\000" +
-      "\022;\n\016close_workbook\030\036 \001(\0132!.ferriswheel.v" +
-      "1.WorkbookOperationH\000\0223\n\014layout_asset\030\037 " +
-      "\001(\0132\033.ferriswheel.v1.LayoutAssetH\000\022+\n\010ad" +
-      "d_text\030  \001(\0132\027.ferriswheel.v1.AddTextH\000\022" +
-      "1\n\013update_text\030! \001(\0132\032.ferriswheel.v1.Up" +
-      "dateTextH\000\0225\n\rexecute_query\030\" \001(\0132\034.ferr" +
-      "iswheel.v1.ExecuteQueryH\000\0221\n\013reset_table" +
-      "\030# \001(\0132\032.ferriswheel.v1.ResetTableH\000\022:\n\020" +
-      "set_cells_format\030$ \001(\0132\036.ferriswheel.v1." +
-      "SetCellsFormatH\000B\010\n\006action\"D\n\013EditReques" +
-      "t\022\r\n\005tx_id\030\001 \001(\003\022&\n\006action\030\002 \001(\0132\026.ferri" +
-      "swheel.v1.Action\"5\n\nChangeList\022\'\n\007action" +
-      "s\030\001 \003(\0132\026.ferriswheel.v1.Action\"\336\001\n\014Edit" +
-      "Response\022\r\n\005tx_id\030\001 \001(\003\022\023\n\013status_code\030\002" +
-      " \001(\005\022\017\n\007message\030\003 \001(\t\022-\n\007changes\030\004 \001(\0132\032" +
-      ".ferriswheel.v1.ChangeListH\000\022,\n\010workbook" +
-      "\030\005 \001(\0132\030.ferriswheel.v1.WorkbookH\000\0220\n\017su" +
-      "ggested_chart\030\006 \001(\0132\025.ferriswheel.v1.Cha" +
-      "rtH\000B\n\n\010responseB\"\n\036com.ctrip.ferriswhee" +
-      "l.proto.v1P\001b\006proto3"
+      "name\030\002 \001(\t\022)\n\006params\030\003 \003(\0132\031.ferriswheel" +
+      ".v1.Parameter\"F\n\nResetTable\022\022\n\nsheet_nam" +
+      "e\030\001 \001(\t\022$\n\005table\030\002 \001(\0132\025.ferriswheel.v1." +
+      "Table\"\224\001\n\016SetCellsFormat\022\022\n\nsheet_name\030\001" +
+      " \001(\t\022\022\n\ntable_name\030\002 \001(\t\022\021\n\trow_index\030\003 " +
+      "\001(\005\022\024\n\014column_index\030\004 \001(\005\022\016\n\006n_rows\030\005 \001(" +
+      "\005\022\021\n\tn_columns\030\006 \001(\005\022\016\n\006format\030\007 \001(\t\"%\n\021" +
+      "WorkbookOperation\022\020\n\010pathname\030\001 \001(\t\"A\n\007A" +
+      "ddForm\022\022\n\nsheet_name\030\001 \001(\t\022\"\n\004form\030\002 \001(\013" +
+      "2\024.ferriswheel.v1.Form\"D\n\nUpdateForm\022\022\n\n" +
+      "sheet_name\030\001 \001(\t\022\"\n\004form\030\002 \001(\0132\024.ferrisw" +
+      "heel.v1.Form\"^\n\nSubmitForm\022\022\n\nsheet_name" +
+      "\030\001 \001(\t\022\021\n\tform_name\030\002 \001(\t\022)\n\006params\030\003 \003(" +
+      "\0132\031.ferriswheel.v1.Parameter\"\256\020\n\006Action\022" +
+      "-\n\tadd_chart\030\001 \001(\0132\030.ferriswheel.v1.AddC" +
+      "hartH\000\022-\n\tadd_sheet\030\002 \001(\0132\030.ferriswheel." +
+      "v1.AddSheetH\000\022-\n\tadd_table\030\003 \001(\0132\030.ferri" +
+      "swheel.v1.AddTableH\000\0227\n\016automate_table\030\004" +
+      " \001(\0132\035.ferriswheel.v1.AutomateTableH\000\0226\n" +
+      "\016set_cell_value\030\005 \001(\0132\034.ferriswheel.v1.S" +
+      "etCellValueH\000\022:\n\020set_cell_formula\030\006 \001(\0132" +
+      "\036.ferriswheel.v1.SetCellFormulaH\000\022>\n\022ref" +
+      "resh_cell_value\030\007 \001(\0132 .ferriswheel.v1.R" +
+      "efreshCellValueH\000\0225\n\rchart_consult\030\010 \001(\013" +
+      "2\034.ferriswheel.v1.ChartConsultH\000\0225\n\reras" +
+      "e_columns\030\t \001(\0132\034.ferriswheel.v1.EraseCo" +
+      "lumnsH\000\022/\n\nerase_rows\030\n \001(\0132\031.ferriswhee" +
+      "l.v1.EraseRowsH\000\022)\n\007fill_up\030\013 \001(\0132\026.ferr" +
+      "iswheel.v1.FillUpH\000\022/\n\nfill_right\030\014 \001(\0132" +
+      "\031.ferriswheel.v1.FillRightH\000\022-\n\tfill_dow" +
+      "n\030\r \001(\0132\030.ferriswheel.v1.FillDownH\000\022-\n\tf" +
+      "ill_left\030\016 \001(\0132\030.ferriswheel.v1.FillLeft" +
+      "H\000\0227\n\016insert_columns\030\017 \001(\0132\035.ferriswheel" +
+      ".v1.InsertColumnsH\000\0221\n\013insert_rows\030\020 \001(\013" +
+      "2\032.ferriswheel.v1.InsertRowsH\000\022/\n\nmove_s" +
+      "heet\030\021 \001(\0132\031.ferriswheel.v1.MoveSheetH\000\022" +
+      "3\n\014remove_asset\030\022 \001(\0132\033.ferriswheel.v1.R" +
+      "emoveAssetH\000\0227\n\016remove_columns\030\023 \001(\0132\035.f" +
+      "erriswheel.v1.RemoveColumnsH\000\0221\n\013remove_" +
+      "rows\030\024 \001(\0132\032.ferriswheel.v1.RemoveRowsH\000" +
+      "\0223\n\014remove_sheet\030\025 \001(\0132\033.ferriswheel.v1." +
+      "RemoveSheetH\000\0223\n\014rename_asset\030\026 \001(\0132\033.fe" +
+      "rriswheel.v1.RenameAssetH\000\0223\n\014rename_she" +
+      "et\030\027 \001(\0132\033.ferriswheel.v1.RenameSheetH\000\022" +
+      "7\n\016transfer_asset\030\030 \001(\0132\035.ferriswheel.v1" +
+      ".TransferAssetH\000\022;\n\020update_automaton\030\031 \001" +
+      "(\0132\037.ferriswheel.v1.UpdateAutomatonH\000\0223\n" +
+      "\014update_chart\030\032 \001(\0132\033.ferriswheel.v1.Upd" +
+      "ateChartH\000\022<\n\017create_workbook\030\033 \001(\0132!.fe" +
+      "rriswheel.v1.WorkbookOperationH\000\022:\n\ropen" +
+      "_workbook\030\034 \001(\0132!.ferriswheel.v1.Workboo" +
+      "kOperationH\000\022:\n\rsave_workbook\030\035 \001(\0132!.fe" +
+      "rriswheel.v1.WorkbookOperationH\000\022;\n\016clos" +
+      "e_workbook\030\036 \001(\0132!.ferriswheel.v1.Workbo" +
+      "okOperationH\000\0223\n\014layout_asset\030\037 \001(\0132\033.fe" +
+      "rriswheel.v1.LayoutAssetH\000\022+\n\010add_text\030 " +
+      " \001(\0132\027.ferriswheel.v1.AddTextH\000\0221\n\013updat" +
+      "e_text\030! \001(\0132\032.ferriswheel.v1.UpdateText" +
+      "H\000\0225\n\rexecute_query\030\" \001(\0132\034.ferriswheel." +
+      "v1.ExecuteQueryH\000\0221\n\013reset_table\030# \001(\0132\032" +
+      ".ferriswheel.v1.ResetTableH\000\022:\n\020set_cell" +
+      "s_format\030$ \001(\0132\036.ferriswheel.v1.SetCells" +
+      "FormatH\000\022+\n\010add_form\030% \001(\0132\027.ferriswheel" +
+      ".v1.AddFormH\000\0221\n\013update_form\030& \001(\0132\032.fer" +
+      "riswheel.v1.UpdateFormH\000\0221\n\013submit_form\030" +
+      "\' \001(\0132\032.ferriswheel.v1.SubmitFormH\000B\010\n\006a" +
+      "ction\"D\n\013EditRequest\022\r\n\005tx_id\030\001 \001(\003\022&\n\006a" +
+      "ction\030\002 \001(\0132\026.ferriswheel.v1.Action\"5\n\nC" +
+      "hangeList\022\'\n\007actions\030\001 \003(\0132\026.ferriswheel" +
+      ".v1.Action\"\336\001\n\014EditResponse\022\r\n\005tx_id\030\001 \001" +
+      "(\003\022\023\n\013status_code\030\002 \001(\005\022\017\n\007message\030\003 \001(\t" +
+      "\022-\n\007changes\030\004 \001(\0132\032.ferriswheel.v1.Chang" +
+      "eListH\000\022,\n\010workbook\030\005 \001(\0132\030.ferriswheel." +
+      "v1.WorkbookH\000\0220\n\017suggested_chart\030\006 \001(\0132\025" +
+      ".ferriswheel.v1.ChartH\000B\n\n\010responseB\"\n\036c" +
+      "om.ctrip.ferriswheel.proto.v1P\001b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -559,26 +583,44 @@ public final class ActionOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_WorkbookOperation_descriptor,
         new java.lang.String[] { "Pathname", });
-    internal_static_ferriswheel_v1_Action_descriptor =
+    internal_static_ferriswheel_v1_AddForm_descriptor =
       getDescriptor().getMessageTypes().get(33);
+    internal_static_ferriswheel_v1_AddForm_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ferriswheel_v1_AddForm_descriptor,
+        new java.lang.String[] { "SheetName", "Form", });
+    internal_static_ferriswheel_v1_UpdateForm_descriptor =
+      getDescriptor().getMessageTypes().get(34);
+    internal_static_ferriswheel_v1_UpdateForm_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ferriswheel_v1_UpdateForm_descriptor,
+        new java.lang.String[] { "SheetName", "Form", });
+    internal_static_ferriswheel_v1_SubmitForm_descriptor =
+      getDescriptor().getMessageTypes().get(35);
+    internal_static_ferriswheel_v1_SubmitForm_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ferriswheel_v1_SubmitForm_descriptor,
+        new java.lang.String[] { "SheetName", "FormName", "Params", });
+    internal_static_ferriswheel_v1_Action_descriptor =
+      getDescriptor().getMessageTypes().get(36);
     internal_static_ferriswheel_v1_Action_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_Action_descriptor,
-        new java.lang.String[] { "AddChart", "AddSheet", "AddTable", "AutomateTable", "SetCellValue", "SetCellFormula", "RefreshCellValue", "ChartConsult", "EraseColumns", "EraseRows", "FillUp", "FillRight", "FillDown", "FillLeft", "InsertColumns", "InsertRows", "MoveSheet", "RemoveAsset", "RemoveColumns", "RemoveRows", "RemoveSheet", "RenameAsset", "RenameSheet", "TransferAsset", "UpdateAutomaton", "UpdateChart", "CreateWorkbook", "OpenWorkbook", "SaveWorkbook", "CloseWorkbook", "LayoutAsset", "AddText", "UpdateText", "ExecuteQuery", "ResetTable", "SetCellsFormat", "Action", });
+        new java.lang.String[] { "AddChart", "AddSheet", "AddTable", "AutomateTable", "SetCellValue", "SetCellFormula", "RefreshCellValue", "ChartConsult", "EraseColumns", "EraseRows", "FillUp", "FillRight", "FillDown", "FillLeft", "InsertColumns", "InsertRows", "MoveSheet", "RemoveAsset", "RemoveColumns", "RemoveRows", "RemoveSheet", "RenameAsset", "RenameSheet", "TransferAsset", "UpdateAutomaton", "UpdateChart", "CreateWorkbook", "OpenWorkbook", "SaveWorkbook", "CloseWorkbook", "LayoutAsset", "AddText", "UpdateText", "ExecuteQuery", "ResetTable", "SetCellsFormat", "AddForm", "UpdateForm", "SubmitForm", "Action", });
     internal_static_ferriswheel_v1_EditRequest_descriptor =
-      getDescriptor().getMessageTypes().get(34);
+      getDescriptor().getMessageTypes().get(37);
     internal_static_ferriswheel_v1_EditRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_EditRequest_descriptor,
         new java.lang.String[] { "TxId", "Action", });
     internal_static_ferriswheel_v1_ChangeList_descriptor =
-      getDescriptor().getMessageTypes().get(35);
+      getDescriptor().getMessageTypes().get(38);
     internal_static_ferriswheel_v1_ChangeList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_ChangeList_descriptor,
         new java.lang.String[] { "Actions", });
     internal_static_ferriswheel_v1_EditResponse_descriptor =
-      getDescriptor().getMessageTypes().get(36);
+      getDescriptor().getMessageTypes().get(39);
     internal_static_ferriswheel_v1_EditResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ferriswheel_v1_EditResponse_descriptor,

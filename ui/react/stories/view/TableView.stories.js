@@ -19,19 +19,19 @@ table.rows.push(new Row(1,
     ]));
 
 const queryAutomaton = new QueryAutomaton();
-queryAutomaton.template.userParamRules.push(new ParamRule('bool', VariantType.BOOL, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('decimal', VariantType.DECIMAL, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('string', VariantType.STRING, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('date', VariantType.DATE, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('list', VariantType.LIST, false, []));
-queryAutomaton.template.userParamRules.push(new ParamRule('select str', VariantType.STRING, false, [
-    Values.str('foo'),
-    Values.str('bar')
-]));
-queryAutomaton.template.userParamRules.push(new ParamRule('select dec', VariantType.DECIMAL, false, [
-    Values.dec(1024),
-    Values.dec(4096)
-]));
+// queryAutomaton.template.userParamRules.push(new ParamRule('bool', VariantType.BOOL, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('decimal', VariantType.DECIMAL, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('string', VariantType.STRING, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('date', VariantType.DATE, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('list', VariantType.LIST, false, []));
+// queryAutomaton.template.userParamRules.push(new ParamRule('select str', VariantType.STRING, false, [
+//     Values.str('foo'),
+//     Values.str('bar')
+// ]));
+// queryAutomaton.template.userParamRules.push(new ParamRule('select dec', VariantType.DECIMAL, false, [
+//     Values.dec(1024),
+//     Values.dec(4096)
+// ]));
 
 const tableWithQueryAutomaton = new Table(
     'test_table_with_query_automaton',

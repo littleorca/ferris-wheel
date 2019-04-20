@@ -17,6 +17,8 @@ import {
 import GaugeChartStories from './chart/GaugeChart.stories';
 import PlotlyChartsStories from './chart/PlotlyCharts.stories';
 
+import CheckBoxStories from './ctrl/CheckBox.stories';
+import DateSelectStories from './ctrl/DateSelect.stories';
 import EditableListStories from './ctrl/EditableList.stories';
 import EditableTextStories from './ctrl/EditableText.stories';
 import EditableUnionValueStories from './ctrl/EditableUnionValue.stories';
@@ -26,20 +28,26 @@ import InlineEditableStories from './ctrl/InlineEditable.stories';
 import IntervalInputStories from './ctrl/IntervalInput.stories';
 import ManipulableListStories from './ctrl/ManipulableList.stories';
 import NumberInputStories from './ctrl/NumberInput.stories';
+import OmniInputStories from './ctrl/OmniInput.stories';
 import PlacementSelectorStories from './ctrl/PlacementSelector.stories';
+import RadioGroupStories from './ctrl/RadioGroup.stories';
+import SelectStories from './ctrl/Select.stories';
 import UnionValueEditStories from './ctrl/UnionValueEdit.stories';
 import UnionValueListEditStories from './ctrl/UnionValueListEdit.stories';
 import ColorInputStories from './ctrl/ColorInput.stories';
 
-import AutoFormStories from './form/AutoForm.stories';
-import AssetViewStories from './view/AssetView.stories';
+import AddFormFormStories from './form/AddFormForm.stories';
 import AxisFormStories from './form/AxisForm.stories';
 import BandFormStroies from './form/BandForm.stroies';
 import ChartFormStories from './form/ChartForm.stories';
 import DataBinderFormStories from './form/DataBinderForm.stories';
+import FieldStories from './form/Field.stories';
+import SmartFieldStories from "./form/SmartField.stories";
+import SmartFormStories from "./form/SmartForm.stories";
+import FormFieldFormStories from './form/FormFieldForm.stories';
+import FormFormStories from './form/FormForm.stories';
 import LayoutFormStories from './form/LayoutForm.stories';
-import NamedValueFormStories from './form/NamedValueForm.stories';
-import ParamRuleFormStories from './form/ParamRuleForm.stories';
+import ParameterFormStories from './form/ParameterForm.stories';
 import PivotFieldFormStories from './form/PivotFieldForm.stories';
 import PivotFilterFormStories from './form/PivotFilterForm.stories';
 import PivotFormStories from './form/PivotForm.stories';
@@ -47,7 +55,9 @@ import PivotValueFormStories from './form/PivotValueForm.stories';
 import QueryTemplateFormStories from './form/QueryTemplateForm.stories';
 import SeriesBinderFormStories from './form/SeriesBinderForm.stories';
 import SeriesFormStories from './form/SeriesForm.stories';
+import AssetViewStories from './view/AssetView.stories';
 import ChartViewStories from './view/ChartView.stories';
+import FormViewStories from './view/FormView.stories';
 import GroupViewStories from './view/GroupView.stories';
 import ModalStories from './view/Modal.stories';
 import SheetViewStories from './view/SheetView.stories';
@@ -58,6 +68,9 @@ import WorkbookPresenterStories from './view/WorkbookPresenter.stories'
 import WorkbookViewStories from './view/WorkbookView.stories';
 import QueryWizardStories from './view/QueryWizard.stories';
 import FormatFormStories from './ctrl/FormatForm.stories';
+import TableStories from './table/Table.stories';
+
+import DefaultThemeEditor from "./theme/DefaultThemeEditor.stories";
 
 // storiesOf('Welcome', module)
 //   .add('Example', () => <ExampleStories />);
@@ -87,8 +100,9 @@ storiesOf('Control', module)
         tips="A button style anchor"
         href="/" />
     </div>)
-  .add('CheckBox', () => <CheckBox />)
+  .add('CheckBox', () => <CheckBoxStories />)
   .add('ColorInput', () => <ColorInputStories />)
+  .add('DateSelect', () => <DateSelectStories />)
   .add('DropdownButton', () =>
     <div>
       <h3>DropdownButton</h3>
@@ -136,8 +150,10 @@ storiesOf('Control', module)
   .add('IntervalInput', () => <IntervalInputStories />)
   .add('ManipulableList', () => <ManipulableListStories />)
   .add('NumberInput', () => <NumberInputStories />)
+  .add('OmniInput', () => <OmniInputStories />)
   .add('PlacementSelector', () => <PlacementSelectorStories />)
-  .add('Select', () => <Select />)
+  .add('RadioGroup', () => <RadioGroupStories />)
+  .add('Select', () => <SelectStories />)
   .add('Toolbar', () =>
     <div>
       <h3>Toolbar</h3>
@@ -172,27 +188,36 @@ storiesOf('Control', module)
 
 
 storiesOf('Form', module)
-  .add('AutoForm', () => <AutoFormStories />)
+  .add('AddFormForm', () => <AddFormFormStories />)
   .add('AxisForm', () => <AxisFormStories />)
   .add('BandForm', () => <BandFormStroies />)
   .add('ChartForm', () => <ChartFormStories />)
   .add('DataBinderForm', () => <DataBinderFormStories />)
+  .add('Field', () => <FieldStories />)
   .add('FormatForm', () => <FormatFormStories />)
+  .add('FormFieldForm', () => <FormFieldFormStories />)
+  .add('FormForm', () => <FormFormStories />)
   .add('LayoutForm', () => <LayoutFormStories />)
-  .add('NamedValueForm', () => <NamedValueFormStories />)
-  .add('ParamRuleForm', () => <ParamRuleFormStories />)
+  .add('ParameterForm', () => <ParameterFormStories />)
   .add('PivotFieldForm', () => <PivotFieldFormStories />)
   .add('PivotFilterForm', () => <PivotFilterFormStories />)
   .add('PivotForm', () => <PivotFormStories />)
   .add('PivotValueForm', () => <PivotValueFormStories />)
   .add('QueryTemplateForm', () => <QueryTemplateFormStories />)
   .add('SeriesBinderForm', () => <SeriesBinderFormStories />)
-  .add('SeriesForm', () => <SeriesFormStories />);
+  .add('SeriesForm', () => <SeriesFormStories />)
+  .add('SmartField', () => <SmartFieldStories />)
+  .add('SmartForm', () => <SmartFormStories />);
+
+
+storiesOf('Table', module)
+  .add('Table', () => <TableStories />);
 
 
 storiesOf('View', module)
   .add('AssetView', () => <AssetViewStories />)
   .add('ChartView', () => <ChartViewStories />)
+  .add('FormView', () => <FormViewStories />)
   .add('GroupView', () => <GroupViewStories />)
   .add('Modal', () => <ModalStories />)
   .add('SheetView', () => <SheetViewStories />)
@@ -202,3 +227,7 @@ storiesOf('View', module)
   .add('WorkbookPresenter', () => <WorkbookPresenterStories />)
   .add('WorkbookView', () => <WorkbookViewStories />)
   .add('QueryWizard', () => <QueryWizardStories />);
+
+
+storiesOf("Theme", module)
+  .add('DefaultThemeEditor', () => <DefaultThemeEditor />);

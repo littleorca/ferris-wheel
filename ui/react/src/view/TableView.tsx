@@ -5,12 +5,11 @@ import { HotTable } from '@handsontable/react';
 import { GridSettings } from 'handsontable';
 import { VariantType } from '../model/Variant';
 import UnionValue from '../model/UnionValue';
-import NamedValue from '../model/NamedValue';
+import Parameter from '../model/Parameter';
 import Values from '../model/Values';
 import QueryAutomaton from '../model/QueryAutomaton';
 import { toEditableString, fromEditableString } from '../ctrl/UnionValueEdit';
 import EditableText from '../ctrl/EditableText';
-import AutoForm from '../form/AutoForm';
 import {
     ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue,
     SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns,
@@ -463,7 +462,7 @@ class TableView extends React.Component<TableViewProps>{
         }
     }
 
-    protected handleQuery(params: NamedValue[]) {
+    protected handleQuery(params: Parameter[]) {
         // console.log('query', params);
         // TODO send action
         if (typeof this.props.onAction !== 'undefined') {
@@ -630,8 +629,8 @@ class TableView extends React.Component<TableViewProps>{
         }
     }
 
-    protected mergeParams(out: NamedValue[], queryAutomaton: QueryAutomaton) {
-        const paramMap = new Map<string, NamedValue>();
+    protected mergeParams(out: Parameter[], queryAutomaton: QueryAutomaton) {
+        const paramMap = new Map<string, Parameter>();
         if (typeof queryAutomaton.template !== 'undefined' &&
             typeof queryAutomaton.template.builtinParams !== 'undefined') {
             for (const p of queryAutomaton.template.builtinParams) {
@@ -643,7 +642,7 @@ class TableView extends React.Component<TableViewProps>{
                 paramMap.set(p.name, p);
             }
         }
-        paramMap.forEach((value: NamedValue, key: string, map: Map<string, NamedValue>) => {
+        paramMap.forEach((value: Parameter, key: string, map: Map<string, Parameter>) => {
             out.push(value);
         });
     }
@@ -656,7 +655,7 @@ class TableView extends React.Component<TableViewProps>{
 
         const data = this.tableData.hotTableData;
         const auto = this.props.table.automaton;
-        const params: NamedValue[] = [];
+        const params: Parameter[] = [];
         if (typeof this.props.table.automaton.queryAutomaton !== 'undefined') {
             this.mergeParams(params, this.props.table.automaton.queryAutomaton);
         }
@@ -675,14 +674,14 @@ class TableView extends React.Component<TableViewProps>{
                             afterChange={this.handleNameChange} />
                     </h3>
                 </div>
-                <div className="action automaton">
+                {/* <div className="action automaton">
                     {auto && auto.queryAutomaton && (
                         <AutoForm
                             rules={auto.queryAutomaton.template.userParamRules}
                             params={params}
                             onSumbit={this.handleQuery} />
                     )}
-                </div>
+                </div> */}
                 <div className="content">
                     <HotTable
                         ref={this.hotTableRef}

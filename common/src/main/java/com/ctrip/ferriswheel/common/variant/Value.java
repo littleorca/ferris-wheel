@@ -374,7 +374,7 @@ public abstract class Value implements Variant {
 
         @Override
         public String strValue() {
-            return errorCode.getFullName();
+            return errorCode.getName();
         }
 
         @Override
@@ -562,11 +562,11 @@ public abstract class Value implements Variant {
             switch (type) {
                 case DECIMAL:
                     if (BigDecimal.ZERO.equals(v.decimalValue())) {
-                        return new ErrorValue(ErrorCodes.DIV_0);
+                        return new ErrorValue(ErrorCodes.DIV);
                     }
                     return new DecimalValue(decimalValue.divide(v.decimalValue(), mathContext));
                 default:
-                    return new ErrorValue(ErrorCodes.ILLEGAL_VALUE);
+                    return new ErrorValue(ErrorCodes.VALUE);
             }
         }
 
@@ -586,7 +586,7 @@ public abstract class Value implements Variant {
                         return new DecimalValue(Math.pow(decimalValue.doubleValue(), v.doubleValue()));
                     }
                 default:
-                    return new ErrorValue(ErrorCodes.ILLEGAL_VALUE);
+                    return new ErrorValue(ErrorCodes.VALUE);
             }
         }
 

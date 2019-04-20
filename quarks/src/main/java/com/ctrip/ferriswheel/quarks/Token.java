@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public interface Token {
 
     enum Type {
-        Identifier, Keyword, Literal, String, Number, Operator, Delimiter, Comment
+        Identifier, QuotedIdentifier, Keyword, Literal, String, Number, Operator, Delimiter, Comment
     }
 
     /**
@@ -37,6 +37,7 @@ public interface Token {
 
     /**
      * Get the line number
+     *
      * @return
      */
     int getLine();
@@ -102,4 +103,20 @@ public interface Token {
      */
     boolean equalsToIgnoreCase(String s, int from, int to);
 
+    /**
+     * Judge if the current token starts with the given string.
+     *
+     * @param s
+     * @return
+     */
+    boolean startsWith(String s);
+
+    /**
+     * Judge if the current token starts with the given string in case-sensitive
+     * mode.
+     *
+     * @param s
+     * @return
+     */
+    boolean startsWithIgnoreCase(String s);
 }

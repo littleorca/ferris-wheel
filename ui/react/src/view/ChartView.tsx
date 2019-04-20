@@ -7,16 +7,6 @@ import ChartRenderer, {
     ChartData,
     ChartRendererProps
 } from '../chart/ChartRenderer';
-// import {
-//     LineRenderer,
-//     BarRenderer,
-//     PieRenderer,
-//     RadarRenderer,
-//     ScatterRenderer,
-//     BubbleRenderer,
-    // GaugeRenderer,
-//     DoughnutRenderer
-// } from '../chart/ChartJsAdapter';
 import {
     PlotlyLineChart,
     PlotlyBarChart,
@@ -202,7 +192,7 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
                     <h3>{data.title}</h3>
                 </div>
                 <div className="content">
-                    <Renderer data={data} />
+                    <Renderer style={{flex:"1 1"}} data={data} />
                 </div>
             </div>
         );

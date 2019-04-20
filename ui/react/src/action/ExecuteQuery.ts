@@ -1,9 +1,9 @@
-import NamedValue from "../model/NamedValue";
+import Parameter from "../model/Parameter";
 import TableAction from "./TableAction";
 import Action from "./Action";
 
 class ExecuteQuery extends TableAction {
-    public params: NamedValue[];
+    public params: Parameter[];
 
     public static deserialize(input: any) {
         const sheetName: string = input.sheetName;
@@ -11,13 +11,13 @@ class ExecuteQuery extends TableAction {
         const params = [];
         if (typeof input.params !== 'undefined') {
             for (const param of input.params) {
-                params.push(NamedValue.deserialize(param));
+                params.push(Parameter.deserialize(param));
             }
         }
         return new ExecuteQuery(sheetName, tableName, params);
     }
 
-    constructor(sheetName: string, tableName: string, params: NamedValue[]) {
+    constructor(sheetName: string, tableName: string, params: Parameter[]) {
         super(sheetName, tableName);
         this.params = params;
     }

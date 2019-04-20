@@ -148,17 +148,18 @@
 }
 
 .workbook-editor > .editor-body > .sidebar .field > input[type="text"],
+.workbook-editor > .editor-body > .sidebar .field-control > input[type="text"],
 .workbook-editor > .editor-body > .sidebar .field > .interval-input {
     width: 100%;
     box-sizing: border-box;
 }
 
 .workbook-editor > .editor-body > .sidebar .editable-list.vertical .list-container {
-    width: 36%;
+    width: 32%;
 }
 
 .workbook-editor > .editor-body > .sidebar .editable-list.vertical .editor-container {
-    width: 64%;
+    width: 68%;
 }
 
 /* chart */
@@ -200,17 +201,12 @@
 }
 
 .workbook-editor > .editor-body > .sidebar .query-template-form .manipulable-list {
-    height: 10rem;
+    height: 12.5em;
 }
 
 .workbook-editor > .editor-body > .sidebar .query-template-form .union-value-list-edit .manipulable-list {
     width: 100%;
     height: 4rem;
-}
-
-.workbook-editor > .editor-body > .sidebar .query-template-form .rule-type .field-name {
-    display: inline-block;
-    margin-right: .5em;
 }
 
 /* pivot table */
@@ -232,6 +228,20 @@
 
 .workbook-editor > .editor-body > .sidebar .alter-table-actions button.danger {
     color: #900;
+}
+
+/* form */
+
+.workbook-editor > .editor-body > .sidebar .form-form .form-field-form .field-container:not(:last-of-type) {
+    margin-bottom: .25em;
+}
+
+.workbook-editor > .editor-body > .sidebar .form-form .form-field-form .option-list .manipulable-list {
+    height: 6em;
+}
+
+.workbook-editor > .editor-body > .sidebar .form-form .form-field-form .binding-list .manipulable-list {
+    height: 3em;
 }
 
 /* editor mask */

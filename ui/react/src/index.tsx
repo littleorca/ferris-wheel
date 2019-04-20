@@ -96,15 +96,15 @@ export { default as Extension } from "./extension/Extension";
 export * from "./extension/Extension";
 
 /* forms */
-export { default as AutoForm } from "./form/AutoForm";
 export { default as AxisForm } from "./form/AxisForm";
 export { default as BandForm } from "./form/BandForm";
 export { default as ChartForm } from "./form/ChartForm";
 export { default as DataBinderForm } from "./form/DataBinderForm";
 export { default as FormatForm } from "./form/FormatForm";
+export { default as FormFieldForm } from "./form/FormFieldForm";
+export { default as FormForm } from "./form/FormForm";
 export { default as LayoutForm } from "./form/LayoutForm";
-export { default as NamedValueForm } from "./form/NamedValueForm";
-export { default as ParamRuleForm } from "./form/ParamRuleForm";
+export { default as ParameterForm } from "./form/ParameterForm";
 export { default as PivotFieldForm } from "./form/PivotFieldForm";
 export { default as PivotFilterForm } from "./form/PivotFilterForm";
 export { default as PivotForm } from "./form/PivotForm";
@@ -113,15 +113,15 @@ export { default as QueryTemplateForm } from "./form/QueryTemplateForm";
 export { default as SeriesBinderForm } from "./form/SeriesBinderForm";
 export { default as SeriesForm } from "./form/SeriesForm";
 
-export * from "./form/AutoForm";
 export * from "./form/AxisForm";
 export * from "./form/BandForm";
 export * from "./form/ChartForm";
 export * from "./form/DataBinderForm";
 export * from "./form/FormatForm";
+export * from "./form/FormFieldForm";
+export * from "./form/FormForm";
 export * from "./form/LayoutForm";
-export * from "./form/NamedValueForm";
-export * from "./form/ParamRuleForm";
+export * from "./form/ParameterForm";
 export * from "./form/PivotFieldForm";
 export * from "./form/PivotFilterForm";
 export * from "./form/PivotForm";
@@ -149,9 +149,8 @@ export { default as Grid } from "./model/Grid";
 export { default as Interval } from "./model/Interval";
 export { default as Layout } from "./model/Layout";
 export { default as ListValue } from "./model/ListValue";
-export { default as NamedValue } from "./model/NamedValue";
+export { default as Parameter } from "./model/Parameter";
 export { default as Orientation } from "./model/Orientation";
-export { default as ParamRule } from "./model/ParamRule";
 export { default as PivotAutomaton } from "./model/PivotAutomaton";
 export { default as PivotField } from "./model/PivotField";
 export { default as PivotFilter } from "./model/PivotFilter";
@@ -178,6 +177,11 @@ export { default as Workbook } from "./model/Workbook";
 export * from "./model/AggregateType";
 export * from "./model/Color";
 export * from "./model/Variant";
+
+/* table */
+export { default as DataTable } from "./table/DataTable";
+
+export * from "./table/DataTable";
 
 /* utils */
 export { default as Formatter } from "./util/Formatter";

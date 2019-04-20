@@ -25,9 +25,7 @@
 
 package com.ctrip.ferriswheel.common.query;
 
-import com.ctrip.ferriswheel.common.variant.DynamicVariant;
-import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.common.variant.VariantRule;
+import com.ctrip.ferriswheel.common.variant.Parameter;
 
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +51,7 @@ public interface QueryTemplate {
      * @param name
      * @return
      */
-    Variant getBuiltinParam(String name);
+    Parameter getBuiltinParam(String name);
 
     /**
      * Get builtin parameter names.
@@ -67,27 +65,5 @@ public interface QueryTemplate {
      *
      * @return
      */
-    Map<String, DynamicVariant> getAllBuiltinParams();
-
-    /**
-     * Get user parameter rule.
-     *
-     * @param name
-     * @return
-     */
-    VariantRule getUserParamRule(String name);
-
-    /**
-     * Get user parameter names.
-     *
-     * @return
-     */
-    Set<String> getUserParamNames();
-
-    /**
-     * Get all user parameter rules.
-     *
-     * @return
-     */
-    Map<String, VariantRule> getAllUserParamRules();
+    Map<String, Parameter> getAllBuiltinParams();
 }

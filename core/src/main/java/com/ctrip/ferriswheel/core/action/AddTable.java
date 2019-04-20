@@ -4,15 +4,13 @@ import com.ctrip.ferriswheel.common.action.Action;
 import com.ctrip.ferriswheel.common.table.Table;
 
 public final class AddTable extends SheetAction implements Action {
-    private String tableName;
     private Table tableData;
 
     public AddTable() {
     }
 
-    public AddTable(String sheetName, String tableName, Table tableData) {
+    public AddTable(String sheetName, Table tableData) {
         super(sheetName);
-        this.tableName = tableName;
         this.tableData = tableData;
     }
 
@@ -20,17 +18,8 @@ public final class AddTable extends SheetAction implements Action {
     public String toString() {
         return "AddTable{" +
                 "sheetName='" + getSheetName() + '\'' +
-                ", tableName='" + tableName + '\'' +
                 ", tableData='" + tableData + '\'' +
                 '}';
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public Table getTableData() {

@@ -1,0 +1,100 @@
+.omni-input {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 0;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+}
+
+.omni-input .omni-input-title,
+.omni-input .omni-input-control,
+.omni-input .omni-input-options,
+.omni-input .omni-input-tips {
+    margin: 0;
+    padding: .25em .5em;
+}
+
+.omni-input .omni-input-title,
+.omni-input .omni-input-options,
+.omni-input .omni-input-tips {
+    flex: 0 0 auto;
+}
+
+.omni-input .omni-input-title {
+    background: #eee;
+    border-bottom: 1px solid #ddd;
+}
+
+.omni-input .omni-input-control {}
+
+.omni-input .omni-input-options {
+    flex: 1 0 auto;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+.omni-input .omni-input-tips {
+    font-size: .9em;
+    color: #555;
+}
+
+
+/* control */
+
+.omni-input .omni-input-control label span {
+    display: block;
+    padding-bottom: .2em;
+}
+
+.omni-input .omni-input-control label input {
+    width: 100%;
+    padding: 0 .25em;
+    line-height: 1.75em;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+/* options */
+
+.omni-input .omni-input-options .omni-input-options-actions {
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    padding-bottom: .2em;
+    font-size: .9em;
+}
+
+.omni-input .omni-input-options .omni-input-options-list {
+    flex: 1 0 6em;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ddd;
+    background: #fff;
+    list-style: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.omni-input .omni-input-options .omni-input-options-list .omni-input-options-item {
+    padding: 0 .5em;
+    line-height: 1.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.omni-input .omni-input-options .omni-input-options-list .omni-input-options-item input[type="checkbox"] {
+    margin-right: .5em;
+    visibility: hidden;
+}
+
+.omni-input .omni-input-options .omni-input-options-list .omni-input-options-item.selected input[type="checkbox"] {
+    visibility: visible;
+}

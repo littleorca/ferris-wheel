@@ -1,16 +1,16 @@
 package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.common.Sheet;
+import com.ctrip.ferriswheel.common.SheetAsset;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.ref.CellRef;
 
 import java.util.Stack;
 
 public class FakeEvalContext implements FormulaEvaluationContext {
     private Sheet currentSheet;
-    private Table currentTable;
+    private SheetAsset currentAsset;
     private Stack<Variant> operands = new Stack<>();
 
     @Override
@@ -23,12 +23,12 @@ public class FakeEvalContext implements FormulaEvaluationContext {
     }
 
     @Override
-    public Table getCurrentTable() {
-        return currentTable;
+    public SheetAsset getCurrentAsset() {
+        return currentAsset;
     }
 
-    public void setCurrentTable(Table currentTable) {
-        this.currentTable = currentTable;
+    public void setCurrentAsset(Table currentTable) {
+        this.currentAsset = currentAsset;
     }
 
     @Override
@@ -46,7 +46,12 @@ public class FakeEvalContext implements FormulaEvaluationContext {
     }
 
     @Override
-    public Variant resolveReference(SimpleReferenceElement referenceElement) {
+    public Variant resolveReference(CellReferenceElement referenceElement) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Variant resolveReference(NameReferenceElement referenceElement) {
         throw new UnsupportedOperationException();
     }
 

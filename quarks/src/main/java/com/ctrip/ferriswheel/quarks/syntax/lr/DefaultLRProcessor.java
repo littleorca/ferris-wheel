@@ -58,8 +58,7 @@ public class DefaultLRProcessor implements LRProcessor {
             if (instruction == null) {
                 StringBuilder sb = new StringBuilder("Illegal syntax!");
 
-                List<Closure.Item> rules = table.getAcceptableRules(states
-                        .peek());
+                List<Closure.Item> rules = table.getAcceptableRules(states.peek());
                 if (rules != null && rules.size() > 0) {
                     sb.append(" Acceptable rules:");
                     for (Closure.Item item : rules) {
@@ -127,6 +126,9 @@ public class DefaultLRProcessor implements LRProcessor {
                     break;
                 case Identifier:
                     input = syntaxContext.getIdentifierSymbol();
+                    break;
+                case QuotedIdentifier:
+                    input = syntaxContext.getQuotedIdentifierSymbol();
                     break;
                 default:
                     input = BNFSymbol.terminalSymbol(tokenizer.getString());

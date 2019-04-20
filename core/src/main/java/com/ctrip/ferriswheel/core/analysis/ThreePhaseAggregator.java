@@ -176,7 +176,12 @@ public class ThreePhaseAggregator implements Aggregator {
         }
 
         @Override
-        public Variant resolve(SimpleReferenceElement referenceElement, FormulaEvaluationContext context) {
+        public Variant resolve(CellReferenceElement referenceElement, FormulaEvaluationContext context) {
+            return sample.getValue(referenceElement.getTokenString());
+        }
+
+        @Override
+        public Variant resolve(NameReferenceElement referenceElement, FormulaEvaluationContext context) {
             return sample.getValue(referenceElement.getTokenString());
         }
 
@@ -188,7 +193,12 @@ public class ThreePhaseAggregator implements Aggregator {
 
     class DummyResolver implements ReferenceResolver {
         @Override
-        public Variant resolve(SimpleReferenceElement referenceElement, FormulaEvaluationContext context) {
+        public Variant resolve(CellReferenceElement referenceElement, FormulaEvaluationContext context) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Variant resolve(NameReferenceElement referenceElement, FormulaEvaluationContext context) {
             throw new UnsupportedOperationException();
         }
 

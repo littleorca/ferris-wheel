@@ -36,7 +36,7 @@ public class If implements Function {
             }
 
         } else {
-            context.pushOperand(Value.err(ErrorCodes.UNKNOWN)); // TODO error code
+            context.pushOperand(Value.err(ErrorCodes.VALUE)); // TODO review error code
         }
     }
 

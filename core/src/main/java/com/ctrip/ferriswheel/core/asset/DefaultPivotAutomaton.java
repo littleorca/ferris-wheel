@@ -16,7 +16,7 @@ import com.ctrip.ferriswheel.core.bean.PivotFieldImpl;
 import com.ctrip.ferriswheel.core.bean.PivotValueImpl;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 import com.ctrip.ferriswheel.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,15 +104,15 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 
     protected DataSet doExecute() {
         RangeReferenceElement rangeElement = (RangeReferenceElement) data.getFormulaElements()[0];
-        RangeRef rangeRef = rangeElement.getRangeRef();
+        RangeReference rangeReference = rangeElement.getRangeReference();
 
-        DefaultSheet sourceSheet = rangeRef.sheetName() == null ?
-                getTable().getSheet() : getTable().getWorkbook().getSheet(rangeRef.sheetName());
-        DefaultTable sourceTable = sourceSheet.getAsset(rangeRef.tableName());
-        final int left = rangeRef.getLeft() >= 0 ? rangeRef.getLeft() : 0;
-        final int top = rangeRef.getTop() >= 0 ? rangeRef.getTop() : 0;
-        final int right = rangeRef.getRight() >= 0 ? rangeRef.getRight() : sourceTable.getColumnCount() - 1;
-        final int bottom = rangeRef.getBottom() >= 0 ? rangeRef.getBottom() : sourceTable.getRowCount() - 1;
+        DefaultSheet sourceSheet = rangeReference.getSheetName() == null ?
+                getTable().getSheet() : getTable().getWorkbook().getSheet(rangeReference.getSheetName());
+        DefaultTable sourceTable = sourceSheet.getAsset(rangeReference.getAssetName());
+        final int left = rangeReference.getLeft() >= 0 ? rangeReference.getLeft() : 0;
+        final int top = rangeReference.getTop() >= 0 ? rangeReference.getTop() : 0;
+        final int right = rangeReference.getRight() >= 0 ? rangeReference.getRight() : sourceTable.getColumnCount() - 1;
+        final int bottom = rangeReference.getBottom() >= 0 ? rangeReference.getBottom() : sourceTable.getRowCount() - 1;
 
         DataSet dataSet;
 

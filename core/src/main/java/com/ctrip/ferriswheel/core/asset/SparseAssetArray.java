@@ -25,6 +25,14 @@ class SparseAssetArray<E extends AssetNode> implements Iterable<Map.Entry<Intege
         return sparseArray.get(index);
     }
 
+    public E first() {
+        return sparseArray.first();
+    }
+
+    public E last() {
+        return sparseArray.last();
+    }
+
     public E set(int index, E element) {
         E previous = sparseArray.set(index, element);
         owner.bindChild(element);

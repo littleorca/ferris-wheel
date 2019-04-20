@@ -5,37 +5,37 @@ import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class RangeReferenceElement extends ReferenceElement {
-    private RangeRef rangeRef;
+    private RangeReference rangeReference;
 
-    public RangeReferenceElement(RangeRef rangeRef) {
-        this.rangeRef = rangeRef;
+    public RangeReferenceElement(RangeReference rangeReference) {
+        this.rangeReference = rangeReference;
     }
 
 
     @Override
     public void evaluate(FormulaEvaluationContext context) {
-        if (!rangeRef.isValid()) {
-            context.pushOperand(Value.err(ErrorCodes.ILLEGAL_REF));
+        if (!rangeReference.isValid()) {
+            context.pushOperand(Value.err(ErrorCodes.REF));
             return;
         }
 
-        Table table = context.resolveTable(rangeRef.sheetName(), rangeRef.tableName());
+        Table table = context.resolveTable(rangeReference.getSheetName(), rangeReference.getAssetName());
 
         if (table == null) {
-            context.pushOperand(Value.err(ErrorCodes.ILLEGAL_REF));
+            context.pushOperand(Value.err(ErrorCodes.REF));
             return;
         }
 
-        final int top = rangeRef.getTop() == -1 ? 0 : rangeRef.getTop();
-        final int bottom = rangeRef.getBottom() == -1 ? table.getRowCount() - 1 : rangeRef.getBottom();
-        final int left = rangeRef.getLeft() == -1 ? 0 : rangeRef.getLeft();
-        final int right = rangeRef.getRight() == -1 ? table.getColumnCount() - 1 : rangeRef.getRight();
+        final int top = rangeReference.getTop() == -1 ? 0 : rangeReference.getTop();
+        final int bottom = rangeReference.getBottom() == -1 ? table.getRowCount() - 1 : rangeReference.getBottom();
+        final int left = rangeReference.getLeft() == -1 ? 0 : rangeReference.getLeft();
+        final int right = rangeReference.getRight() == -1 ? table.getColumnCount() - 1 : rangeReference.getRight();
         List<Variant> valueList = new LinkedList<>();
         for (int row = top; row <= bottom; row++) {
             for (int col = left; col <= right; col++) {
@@ -47,15 +47,15 @@ public class RangeReferenceElement extends ReferenceElement {
 
     @Override
     public String toString() {
-        return rangeRef.toString();
+        return rangeReference.toString();
     }
 
-    public RangeRef getRangeRef() {
-        return rangeRef;
+    public RangeReference getRangeReference() {
+        return rangeReference;
     }
 
-    void setRangeRef(RangeRef rangeRef) {
-        this.rangeRef = rangeRef;
+    void setRangeReference(RangeReference rangeReference) {
+        this.rangeReference = rangeReference;
     }
 
 }

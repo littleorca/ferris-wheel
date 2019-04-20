@@ -48,7 +48,7 @@ public class VLookup implements Function {
                 if (i > 0) {
                     result = tableArray.item(columnCount * (i - 1) + colIndexNum);
                 } else {
-                    result = Value.err(ErrorCodes.UNKNOWN); // #N/A!
+                    result = Value.err(ErrorCodes.NA); // #N/A!
                 }
                 break;
             }
@@ -57,7 +57,7 @@ public class VLookup implements Function {
             result = tableArray.item(columnCount * (rowCount - 1) + colIndexNum);
         }
         if (result == null) {
-            result = Value.err(ErrorCodes.UNKNOWN); // TODO #N/A! or #VALUE!?;
+            result = Value.err(ErrorCodes.NA); // TODO #N/A! or #VALUE!?;
         }
 
         context.pushOperand(result);

@@ -18,7 +18,6 @@ private static final long serialVersionUID = 0L;
   private QueryTemplate() {
     scheme_ = "";
     builtinParams_ = java.util.Collections.emptyList();
-    userParamRules_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -53,20 +52,11 @@ private static final long serialVersionUID = 0L;
           }
           case 18: {
             if (!((mutable_bitField0_ & 0x00000002) != 0)) {
-              builtinParams_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.NamedValue>();
+              builtinParams_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.Parameter>();
               mutable_bitField0_ |= 0x00000002;
             }
             builtinParams_.add(
-                input.readMessage(com.ctrip.ferriswheel.proto.v1.NamedValue.parser(), extensionRegistry));
-            break;
-          }
-          case 26: {
-            if (!((mutable_bitField0_ & 0x00000004) != 0)) {
-              userParamRules_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.ParamRule>();
-              mutable_bitField0_ |= 0x00000004;
-            }
-            userParamRules_.add(
-                input.readMessage(com.ctrip.ferriswheel.proto.v1.ParamRule.parser(), extensionRegistry));
+                input.readMessage(com.ctrip.ferriswheel.proto.v1.Parameter.parser(), extensionRegistry));
             break;
           }
           default: {
@@ -86,9 +76,6 @@ private static final long serialVersionUID = 0L;
     } finally {
       if (((mutable_bitField0_ & 0x00000002) != 0)) {
         builtinParams_ = java.util.Collections.unmodifiableList(builtinParams_);
-      }
-      if (((mutable_bitField0_ & 0x00000004) != 0)) {
-        userParamRules_ = java.util.Collections.unmodifiableList(userParamRules_);
       }
       this.unknownFields = unknownFields.build();
       makeExtensionsImmutable();
@@ -143,73 +130,38 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int BUILTIN_PARAMS_FIELD_NUMBER = 2;
-  private java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> builtinParams_;
+  private java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter> builtinParams_;
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  public java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> getBuiltinParamsList() {
+  public java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter> getBuiltinParamsList() {
     return builtinParams_;
   }
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  public java.util.List<? extends com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder> 
+  public java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder> 
       getBuiltinParamsOrBuilderList() {
     return builtinParams_;
   }
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
   public int getBuiltinParamsCount() {
     return builtinParams_.size();
   }
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  public com.ctrip.ferriswheel.proto.v1.NamedValue getBuiltinParams(int index) {
+  public com.ctrip.ferriswheel.proto.v1.Parameter getBuiltinParams(int index) {
     return builtinParams_.get(index);
   }
   /**
-   * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+   * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
    */
-  public com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder getBuiltinParamsOrBuilder(
+  public com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder getBuiltinParamsOrBuilder(
       int index) {
     return builtinParams_.get(index);
-  }
-
-  public static final int USER_PARAM_RULES_FIELD_NUMBER = 3;
-  private java.util.List<com.ctrip.ferriswheel.proto.v1.ParamRule> userParamRules_;
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  public java.util.List<com.ctrip.ferriswheel.proto.v1.ParamRule> getUserParamRulesList() {
-    return userParamRules_;
-  }
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  public java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder> 
-      getUserParamRulesOrBuilderList() {
-    return userParamRules_;
-  }
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  public int getUserParamRulesCount() {
-    return userParamRules_.size();
-  }
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  public com.ctrip.ferriswheel.proto.v1.ParamRule getUserParamRules(int index) {
-    return userParamRules_.get(index);
-  }
-  /**
-   * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-   */
-  public com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder getUserParamRulesOrBuilder(
-      int index) {
-    return userParamRules_.get(index);
   }
 
   private byte memoizedIsInitialized = -1;
@@ -232,9 +184,6 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < builtinParams_.size(); i++) {
       output.writeMessage(2, builtinParams_.get(i));
     }
-    for (int i = 0; i < userParamRules_.size(); i++) {
-      output.writeMessage(3, userParamRules_.get(i));
-    }
     unknownFields.writeTo(output);
   }
 
@@ -250,10 +199,6 @@ private static final long serialVersionUID = 0L;
     for (int i = 0; i < builtinParams_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, builtinParams_.get(i));
-    }
-    for (int i = 0; i < userParamRules_.size(); i++) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, userParamRules_.get(i));
     }
     size += unknownFields.getSerializedSize();
     memoizedSize = size;
@@ -274,8 +219,6 @@ private static final long serialVersionUID = 0L;
         .equals(other.getScheme())) return false;
     if (!getBuiltinParamsList()
         .equals(other.getBuiltinParamsList())) return false;
-    if (!getUserParamRulesList()
-        .equals(other.getUserParamRulesList())) return false;
     if (!unknownFields.equals(other.unknownFields)) return false;
     return true;
   }
@@ -292,10 +235,6 @@ private static final long serialVersionUID = 0L;
     if (getBuiltinParamsCount() > 0) {
       hash = (37 * hash) + BUILTIN_PARAMS_FIELD_NUMBER;
       hash = (53 * hash) + getBuiltinParamsList().hashCode();
-    }
-    if (getUserParamRulesCount() > 0) {
-      hash = (37 * hash) + USER_PARAM_RULES_FIELD_NUMBER;
-      hash = (53 * hash) + getUserParamRulesList().hashCode();
     }
     hash = (29 * hash) + unknownFields.hashCode();
     memoizedHashCode = hash;
@@ -426,7 +365,6 @@ private static final long serialVersionUID = 0L;
       if (com.google.protobuf.GeneratedMessageV3
               .alwaysUseFieldBuilders) {
         getBuiltinParamsFieldBuilder();
-        getUserParamRulesFieldBuilder();
       }
     }
     @java.lang.Override
@@ -439,12 +377,6 @@ private static final long serialVersionUID = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
       } else {
         builtinParamsBuilder_.clear();
-      }
-      if (userParamRulesBuilder_ == null) {
-        userParamRules_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-      } else {
-        userParamRulesBuilder_.clear();
       }
       return this;
     }
@@ -483,15 +415,6 @@ private static final long serialVersionUID = 0L;
         result.builtinParams_ = builtinParams_;
       } else {
         result.builtinParams_ = builtinParamsBuilder_.build();
-      }
-      if (userParamRulesBuilder_ == null) {
-        if (((bitField0_ & 0x00000004) != 0)) {
-          userParamRules_ = java.util.Collections.unmodifiableList(userParamRules_);
-          bitField0_ = (bitField0_ & ~0x00000004);
-        }
-        result.userParamRules_ = userParamRules_;
-      } else {
-        result.userParamRules_ = userParamRulesBuilder_.build();
       }
       result.bitField0_ = to_bitField0_;
       onBuilt();
@@ -569,32 +492,6 @@ private static final long serialVersionUID = 0L;
                  getBuiltinParamsFieldBuilder() : null;
           } else {
             builtinParamsBuilder_.addAllMessages(other.builtinParams_);
-          }
-        }
-      }
-      if (userParamRulesBuilder_ == null) {
-        if (!other.userParamRules_.isEmpty()) {
-          if (userParamRules_.isEmpty()) {
-            userParamRules_ = other.userParamRules_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-          } else {
-            ensureUserParamRulesIsMutable();
-            userParamRules_.addAll(other.userParamRules_);
-          }
-          onChanged();
-        }
-      } else {
-        if (!other.userParamRules_.isEmpty()) {
-          if (userParamRulesBuilder_.isEmpty()) {
-            userParamRulesBuilder_.dispose();
-            userParamRulesBuilder_ = null;
-            userParamRules_ = other.userParamRules_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-            userParamRulesBuilder_ = 
-              com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                 getUserParamRulesFieldBuilder() : null;
-          } else {
-            userParamRulesBuilder_.addAllMessages(other.userParamRules_);
           }
         }
       }
@@ -697,22 +594,22 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> builtinParams_ =
+    private java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter> builtinParams_ =
       java.util.Collections.emptyList();
     private void ensureBuiltinParamsIsMutable() {
       if (!((bitField0_ & 0x00000002) != 0)) {
-        builtinParams_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.NamedValue>(builtinParams_);
+        builtinParams_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.Parameter>(builtinParams_);
         bitField0_ |= 0x00000002;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.ctrip.ferriswheel.proto.v1.NamedValue, com.ctrip.ferriswheel.proto.v1.NamedValue.Builder, com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder> builtinParamsBuilder_;
+        com.ctrip.ferriswheel.proto.v1.Parameter, com.ctrip.ferriswheel.proto.v1.Parameter.Builder, com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder> builtinParamsBuilder_;
 
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue> getBuiltinParamsList() {
+    public java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter> getBuiltinParamsList() {
       if (builtinParamsBuilder_ == null) {
         return java.util.Collections.unmodifiableList(builtinParams_);
       } else {
@@ -720,7 +617,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public int getBuiltinParamsCount() {
       if (builtinParamsBuilder_ == null) {
@@ -730,9 +627,9 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public com.ctrip.ferriswheel.proto.v1.NamedValue getBuiltinParams(int index) {
+    public com.ctrip.ferriswheel.proto.v1.Parameter getBuiltinParams(int index) {
       if (builtinParamsBuilder_ == null) {
         return builtinParams_.get(index);
       } else {
@@ -740,10 +637,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder setBuiltinParams(
-        int index, com.ctrip.ferriswheel.proto.v1.NamedValue value) {
+        int index, com.ctrip.ferriswheel.proto.v1.Parameter value) {
       if (builtinParamsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -757,10 +654,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder setBuiltinParams(
-        int index, com.ctrip.ferriswheel.proto.v1.NamedValue.Builder builderForValue) {
+        int index, com.ctrip.ferriswheel.proto.v1.Parameter.Builder builderForValue) {
       if (builtinParamsBuilder_ == null) {
         ensureBuiltinParamsIsMutable();
         builtinParams_.set(index, builderForValue.build());
@@ -771,9 +668,9 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public Builder addBuiltinParams(com.ctrip.ferriswheel.proto.v1.NamedValue value) {
+    public Builder addBuiltinParams(com.ctrip.ferriswheel.proto.v1.Parameter value) {
       if (builtinParamsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -787,10 +684,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder addBuiltinParams(
-        int index, com.ctrip.ferriswheel.proto.v1.NamedValue value) {
+        int index, com.ctrip.ferriswheel.proto.v1.Parameter value) {
       if (builtinParamsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -804,10 +701,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder addBuiltinParams(
-        com.ctrip.ferriswheel.proto.v1.NamedValue.Builder builderForValue) {
+        com.ctrip.ferriswheel.proto.v1.Parameter.Builder builderForValue) {
       if (builtinParamsBuilder_ == null) {
         ensureBuiltinParamsIsMutable();
         builtinParams_.add(builderForValue.build());
@@ -818,10 +715,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder addBuiltinParams(
-        int index, com.ctrip.ferriswheel.proto.v1.NamedValue.Builder builderForValue) {
+        int index, com.ctrip.ferriswheel.proto.v1.Parameter.Builder builderForValue) {
       if (builtinParamsBuilder_ == null) {
         ensureBuiltinParamsIsMutable();
         builtinParams_.add(index, builderForValue.build());
@@ -832,10 +729,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder addAllBuiltinParams(
-        java.lang.Iterable<? extends com.ctrip.ferriswheel.proto.v1.NamedValue> values) {
+        java.lang.Iterable<? extends com.ctrip.ferriswheel.proto.v1.Parameter> values) {
       if (builtinParamsBuilder_ == null) {
         ensureBuiltinParamsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -847,7 +744,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder clearBuiltinParams() {
       if (builtinParamsBuilder_ == null) {
@@ -860,7 +757,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
     public Builder removeBuiltinParams(int index) {
       if (builtinParamsBuilder_ == null) {
@@ -873,16 +770,16 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public com.ctrip.ferriswheel.proto.v1.NamedValue.Builder getBuiltinParamsBuilder(
+    public com.ctrip.ferriswheel.proto.v1.Parameter.Builder getBuiltinParamsBuilder(
         int index) {
       return getBuiltinParamsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder getBuiltinParamsOrBuilder(
+    public com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder getBuiltinParamsOrBuilder(
         int index) {
       if (builtinParamsBuilder_ == null) {
         return builtinParams_.get(index);  } else {
@@ -890,9 +787,9 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public java.util.List<? extends com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder> 
+    public java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder> 
          getBuiltinParamsOrBuilderList() {
       if (builtinParamsBuilder_ != null) {
         return builtinParamsBuilder_.getMessageOrBuilderList();
@@ -901,33 +798,33 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public com.ctrip.ferriswheel.proto.v1.NamedValue.Builder addBuiltinParamsBuilder() {
+    public com.ctrip.ferriswheel.proto.v1.Parameter.Builder addBuiltinParamsBuilder() {
       return getBuiltinParamsFieldBuilder().addBuilder(
-          com.ctrip.ferriswheel.proto.v1.NamedValue.getDefaultInstance());
+          com.ctrip.ferriswheel.proto.v1.Parameter.getDefaultInstance());
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public com.ctrip.ferriswheel.proto.v1.NamedValue.Builder addBuiltinParamsBuilder(
+    public com.ctrip.ferriswheel.proto.v1.Parameter.Builder addBuiltinParamsBuilder(
         int index) {
       return getBuiltinParamsFieldBuilder().addBuilder(
-          index, com.ctrip.ferriswheel.proto.v1.NamedValue.getDefaultInstance());
+          index, com.ctrip.ferriswheel.proto.v1.Parameter.getDefaultInstance());
     }
     /**
-     * <code>repeated .ferriswheel.v1.NamedValue builtin_params = 2;</code>
+     * <code>repeated .ferriswheel.v1.Parameter builtin_params = 2;</code>
      */
-    public java.util.List<com.ctrip.ferriswheel.proto.v1.NamedValue.Builder> 
+    public java.util.List<com.ctrip.ferriswheel.proto.v1.Parameter.Builder> 
          getBuiltinParamsBuilderList() {
       return getBuiltinParamsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.ctrip.ferriswheel.proto.v1.NamedValue, com.ctrip.ferriswheel.proto.v1.NamedValue.Builder, com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder> 
+        com.ctrip.ferriswheel.proto.v1.Parameter, com.ctrip.ferriswheel.proto.v1.Parameter.Builder, com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder> 
         getBuiltinParamsFieldBuilder() {
       if (builtinParamsBuilder_ == null) {
         builtinParamsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            com.ctrip.ferriswheel.proto.v1.NamedValue, com.ctrip.ferriswheel.proto.v1.NamedValue.Builder, com.ctrip.ferriswheel.proto.v1.NamedValueOrBuilder>(
+            com.ctrip.ferriswheel.proto.v1.Parameter, com.ctrip.ferriswheel.proto.v1.Parameter.Builder, com.ctrip.ferriswheel.proto.v1.ParameterOrBuilder>(
                 builtinParams_,
                 ((bitField0_ & 0x00000002) != 0),
                 getParentForChildren(),
@@ -935,246 +832,6 @@ private static final long serialVersionUID = 0L;
         builtinParams_ = null;
       }
       return builtinParamsBuilder_;
-    }
-
-    private java.util.List<com.ctrip.ferriswheel.proto.v1.ParamRule> userParamRules_ =
-      java.util.Collections.emptyList();
-    private void ensureUserParamRulesIsMutable() {
-      if (!((bitField0_ & 0x00000004) != 0)) {
-        userParamRules_ = new java.util.ArrayList<com.ctrip.ferriswheel.proto.v1.ParamRule>(userParamRules_);
-        bitField0_ |= 0x00000004;
-       }
-    }
-
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.ctrip.ferriswheel.proto.v1.ParamRule, com.ctrip.ferriswheel.proto.v1.ParamRule.Builder, com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder> userParamRulesBuilder_;
-
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public java.util.List<com.ctrip.ferriswheel.proto.v1.ParamRule> getUserParamRulesList() {
-      if (userParamRulesBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(userParamRules_);
-      } else {
-        return userParamRulesBuilder_.getMessageList();
-      }
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public int getUserParamRulesCount() {
-      if (userParamRulesBuilder_ == null) {
-        return userParamRules_.size();
-      } else {
-        return userParamRulesBuilder_.getCount();
-      }
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public com.ctrip.ferriswheel.proto.v1.ParamRule getUserParamRules(int index) {
-      if (userParamRulesBuilder_ == null) {
-        return userParamRules_.get(index);
-      } else {
-        return userParamRulesBuilder_.getMessage(index);
-      }
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder setUserParamRules(
-        int index, com.ctrip.ferriswheel.proto.v1.ParamRule value) {
-      if (userParamRulesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureUserParamRulesIsMutable();
-        userParamRules_.set(index, value);
-        onChanged();
-      } else {
-        userParamRulesBuilder_.setMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder setUserParamRules(
-        int index, com.ctrip.ferriswheel.proto.v1.ParamRule.Builder builderForValue) {
-      if (userParamRulesBuilder_ == null) {
-        ensureUserParamRulesIsMutable();
-        userParamRules_.set(index, builderForValue.build());
-        onChanged();
-      } else {
-        userParamRulesBuilder_.setMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder addUserParamRules(com.ctrip.ferriswheel.proto.v1.ParamRule value) {
-      if (userParamRulesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureUserParamRulesIsMutable();
-        userParamRules_.add(value);
-        onChanged();
-      } else {
-        userParamRulesBuilder_.addMessage(value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder addUserParamRules(
-        int index, com.ctrip.ferriswheel.proto.v1.ParamRule value) {
-      if (userParamRulesBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureUserParamRulesIsMutable();
-        userParamRules_.add(index, value);
-        onChanged();
-      } else {
-        userParamRulesBuilder_.addMessage(index, value);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder addUserParamRules(
-        com.ctrip.ferriswheel.proto.v1.ParamRule.Builder builderForValue) {
-      if (userParamRulesBuilder_ == null) {
-        ensureUserParamRulesIsMutable();
-        userParamRules_.add(builderForValue.build());
-        onChanged();
-      } else {
-        userParamRulesBuilder_.addMessage(builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder addUserParamRules(
-        int index, com.ctrip.ferriswheel.proto.v1.ParamRule.Builder builderForValue) {
-      if (userParamRulesBuilder_ == null) {
-        ensureUserParamRulesIsMutable();
-        userParamRules_.add(index, builderForValue.build());
-        onChanged();
-      } else {
-        userParamRulesBuilder_.addMessage(index, builderForValue.build());
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder addAllUserParamRules(
-        java.lang.Iterable<? extends com.ctrip.ferriswheel.proto.v1.ParamRule> values) {
-      if (userParamRulesBuilder_ == null) {
-        ensureUserParamRulesIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, userParamRules_);
-        onChanged();
-      } else {
-        userParamRulesBuilder_.addAllMessages(values);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder clearUserParamRules() {
-      if (userParamRulesBuilder_ == null) {
-        userParamRules_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        onChanged();
-      } else {
-        userParamRulesBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public Builder removeUserParamRules(int index) {
-      if (userParamRulesBuilder_ == null) {
-        ensureUserParamRulesIsMutable();
-        userParamRules_.remove(index);
-        onChanged();
-      } else {
-        userParamRulesBuilder_.remove(index);
-      }
-      return this;
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public com.ctrip.ferriswheel.proto.v1.ParamRule.Builder getUserParamRulesBuilder(
-        int index) {
-      return getUserParamRulesFieldBuilder().getBuilder(index);
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder getUserParamRulesOrBuilder(
-        int index) {
-      if (userParamRulesBuilder_ == null) {
-        return userParamRules_.get(index);  } else {
-        return userParamRulesBuilder_.getMessageOrBuilder(index);
-      }
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public java.util.List<? extends com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder> 
-         getUserParamRulesOrBuilderList() {
-      if (userParamRulesBuilder_ != null) {
-        return userParamRulesBuilder_.getMessageOrBuilderList();
-      } else {
-        return java.util.Collections.unmodifiableList(userParamRules_);
-      }
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public com.ctrip.ferriswheel.proto.v1.ParamRule.Builder addUserParamRulesBuilder() {
-      return getUserParamRulesFieldBuilder().addBuilder(
-          com.ctrip.ferriswheel.proto.v1.ParamRule.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public com.ctrip.ferriswheel.proto.v1.ParamRule.Builder addUserParamRulesBuilder(
-        int index) {
-      return getUserParamRulesFieldBuilder().addBuilder(
-          index, com.ctrip.ferriswheel.proto.v1.ParamRule.getDefaultInstance());
-    }
-    /**
-     * <code>repeated .ferriswheel.v1.ParamRule user_param_rules = 3;</code>
-     */
-    public java.util.List<com.ctrip.ferriswheel.proto.v1.ParamRule.Builder> 
-         getUserParamRulesBuilderList() {
-      return getUserParamRulesFieldBuilder().getBuilderList();
-    }
-    private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.ctrip.ferriswheel.proto.v1.ParamRule, com.ctrip.ferriswheel.proto.v1.ParamRule.Builder, com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder> 
-        getUserParamRulesFieldBuilder() {
-      if (userParamRulesBuilder_ == null) {
-        userParamRulesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            com.ctrip.ferriswheel.proto.v1.ParamRule, com.ctrip.ferriswheel.proto.v1.ParamRule.Builder, com.ctrip.ferriswheel.proto.v1.ParamRuleOrBuilder>(
-                userParamRules_,
-                ((bitField0_ & 0x00000004) != 0),
-                getParentForChildren(),
-                isClean());
-        userParamRules_ = null;
-      }
-      return userParamRulesBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

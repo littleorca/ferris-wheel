@@ -42,7 +42,7 @@ public abstract class UnaryElement extends FormulaElement {
         @Override
         protected Variant evaluate(Variant operand) {
             if (operand.valueType() == VariantType.LIST) {
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
             } else {
                 return operand;
             }
@@ -65,7 +65,7 @@ public abstract class UnaryElement extends FormulaElement {
             if (type == VariantType.DECIMAL) {
                 return Value.dec(operand.decimalValue().negate());
             } else {
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
             }
         }
     }
@@ -86,7 +86,7 @@ public abstract class UnaryElement extends FormulaElement {
             if (type == VariantType.DECIMAL) {
                 return VariantMath.divide(operand, Value.dec(100));
             } else {
-                return Value.err(ErrorCodes.ILLEGAL_VALUE);
+                return Value.err(ErrorCodes.VALUE);
             }
         }
     }

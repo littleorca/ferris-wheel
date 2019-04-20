@@ -34,7 +34,7 @@ import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.*;
 import com.ctrip.ferriswheel.core.formula.CalcChain;
 import com.ctrip.ferriswheel.core.formula.DirectedAcyclicGraph;
-import com.ctrip.ferriswheel.core.ref.CellRef;
+import com.ctrip.ferriswheel.core.ref.CellReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +91,7 @@ public class GraphHelper {
             if (asset instanceof Cell) {
                 return id +
                         "\\n" +
-                        References.toFormula(new CellRef((DefaultCell) asset, false, false));
+                        References.toFormula(new CellReference((DefaultCell) asset, false, false));
             }
             if (asset instanceof Table) {
                 return id +

@@ -1,8 +1,8 @@
 package com.ctrip.ferriswheel.core.formula.symbol;
 
+import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.formula.*;
-import com.ctrip.ferriswheel.core.ref.CellRef;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.*;
 import com.ctrip.ferriswheel.core.util.References;
 import com.ctrip.ferriswheel.quarks.Symbol;
 import com.ctrip.ferriswheel.quarks.Token;
@@ -24,7 +24,8 @@ public class SymbolHandlers {
 
     static {
         r(new TransparentHandler());
-        r(new SimpleReferenceHandler());
+        r(new NameReferenceHandler());
+        r(new CellReferenceHandler());
         r(new RangeHandler());
         r(new ReferenceHandler());
         r(new PositiveHandler());
@@ -72,7 +73,7 @@ public class SymbolHandlers {
     }
 
     @Handle({"quarks", "expression", "cmp", "additive", "unary", "factor",
-            "qualifier", "local_reference", "term1", "term2", "term3"})
+            "qualifier", "local_reference", "term1", "term2", "term3", "error"})
     public static class TransparentHandler implements SymbolHandler {
         @Override
         public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
@@ -80,24 +81,33 @@ public class SymbolHandlers {
         }
     }
 
-    //<reference> ::= <qualifier> "!" <qualifier> "!" <local_reference>
-    //              | <qualifier> "!" <local_reference>
-    //              | <local_reference>
-    //<qualifier> ::= <identifier>
-    //              | <string>
-    //<local_reference> ::= <range_reference>
-    //                    | <cell_reference>
-    //<range_reference> ::= <identifier> ":" <identifier>
-    //                    | <number> ":" <number>
-    //<cell_reference> ::= <identifier>
-
-    @Handle("simple_reference")
-    public static class SimpleReferenceHandler implements SymbolHandler {
-        //<cell_reference> ::= <identifier>
+    @Handle("name_reference")
+    public static class NameReferenceHandler implements SymbolHandler {
         @Override
         public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
             FormulaElement identifier = stack.pop();
-            SimpleReferenceElement elem = new SimpleReferenceElement(References.parseSimpleCellRef(identifier.getTokenString()));
+            NameReferenceElement elem = new NameReferenceElement(new NameReference(
+                    null,
+                    null,
+                    identifier.getTokenString()));
+            elem.setSlices(1);
+            elem.setToken(identifier.getToken());
+            stack.push(elem);
+        }
+    }
+
+    @Handle("cell_reference")
+    public static class CellReferenceHandler implements SymbolHandler {
+        @Override
+        public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
+            FormulaElement identifier = stack.pop();
+            PositionRef positionRef = References.parsePositionRef(identifier.getTokenString());
+            CellReferenceElement elem = new CellReferenceElement(new CellReference(
+                    null,
+                    null,
+                    positionRef,
+                    Asset.UNSPECIFIED_ASSET_ID,
+                    positionRef.getRowIndex() != -1 && positionRef.getColumnIndex() != -1));
             elem.setSlices(1);
             elem.setToken(identifier.getToken());
             stack.push(elem);
@@ -106,41 +116,39 @@ public class SymbolHandlers {
 
     @Handle("range_reference")
     public static class RangeHandler implements SymbolHandler {
-        //<range_reference> ::= <identifier> ":" <identifier>
-        //                    | <number> ":" <number>
         @Override
         public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
             FormulaElement to = stack.pop();
             stack.pop(); // ":"
             FormulaElement from = stack.pop();
 
-            RangeRef rangeRef = new RangeRef();
+            RangeReference rangeReference = new RangeReference();
 
-            rangeRef.setUpperLeft(References.parseRangeEndRef(from.getTokenString()));
-            rangeRef.setLowerRight(References.parseRangeEndRef(to.getTokenString()));
+            rangeReference.setUpperLeftRef(References.parseRangeEndRef(from.getTokenString()));
+            rangeReference.setLowerRightRef(References.parseRangeEndRef(to.getTokenString()));
 
-            if (!rangeRef.isValid()) {
+            if (!rangeReference.isValid()) {
                 throw new FormulaParserException("Invalid range reference(1).");
             }
 
             // either of row or column index must be set
-            if (rangeRef.getLeft() == -1 && rangeRef.getTop() == -1) {
+            if (rangeReference.getLeft() == -1 && rangeReference.getTop() == -1) {
                 throw new FormulaParserException("Invalid range reference(2).");
             }
 
             // row count part
-            if ((rangeRef.getTop() == -1 && rangeRef.getBottom() != -1)
-                    || (rangeRef.getTop() != -1 && rangeRef.getBottom() == -1)) {
+            if ((rangeReference.getTop() == -1 && rangeReference.getBottom() != -1)
+                    || (rangeReference.getTop() != -1 && rangeReference.getBottom() == -1)) {
                 throw new FormulaParserException("Invalid range reference(3).");
             }
 
             // column count part
-            if ((rangeRef.getLeft() == -1 && rangeRef.getRight() != -1)
-                    || (rangeRef.getLeft() != -1 && rangeRef.getRight() == -1)) {
+            if ((rangeReference.getLeft() == -1 && rangeReference.getRight() != -1)
+                    || (rangeReference.getLeft() != -1 && rangeReference.getRight() == -1)) {
                 throw new FormulaParserException("Invalid range reference(4).");
             }
 
-            RangeReferenceElement elem = new RangeReferenceElement(rangeRef);
+            RangeReferenceElement elem = new RangeReferenceElement(rangeReference);
             elem.setSlices(1);
             elem.setToken(mergeToken(from.getToken(), to.getToken(), null, null));
             stack.push(elem);
@@ -149,16 +157,6 @@ public class SymbolHandlers {
 
     @Handle("reference")
     public static class ReferenceHandler implements SymbolHandler {
-        //<reference> ::= <qualifier> "!" <qualifier> "!" <local_reference>
-        //              | <qualifier> "!" <local_reference>
-        //              | <local_reference>
-        //<qualifier> ::= <identifier>
-        //              | <string>
-        //<local_reference> ::= <range_reference>
-        //                    | <cell_reference>
-        //<range_reference> ::= <identifier> ":" <identifier>
-        //                    | <number> ":" <number>
-        //<cell_reference> ::= <identifier>
         @Override
         public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
             FormulaElement q1 = null, q2 = null;
@@ -181,17 +179,22 @@ public class SymbolHandlers {
             String tableName = q2 == null ? null : q2.getTokenString();
             FormulaElement startElement = q1 != null ? q1 : q2 != null ? q2 : null;
 
-            if (elem instanceof SimpleReferenceElement) {
-                CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
-                cellRef.setSheetName(sheetName);
-                cellRef.setTableName(tableName);
+            AbstractReference abstractReference = null;
+
+            if (elem instanceof CellReferenceElement) {
+                abstractReference = ((CellReferenceElement) elem).getCellReference();
+            } else if (elem instanceof NameReferenceElement) {
+                abstractReference = ((NameReferenceElement) elem).getNameReference();
             } else if (elem instanceof RangeReferenceElement) {
-                RangeRef rangeRef = ((RangeReferenceElement) elem).getRangeRef();
-                rangeRef.getUpperLeft().setSheetName(sheetName);
-                rangeRef.getUpperLeft().setTableName(tableName);
-                rangeRef.getLowerRight().setSheetName(sheetName);
-                rangeRef.getLowerRight().setTableName(tableName);
+                abstractReference = ((RangeReferenceElement) elem).getRangeReference();
             }
+
+            if (abstractReference == null) {
+                throw new RuntimeException("Reference element unrecognizable: " + elem);
+            }
+
+            abstractReference.setSheetName(sheetName);
+            abstractReference.setAssetName(tableName);
 
             if (startElement != null) {
                 elem.setToken(mergeToken(startElement.getToken(), elem.getToken(), null, null));
@@ -200,45 +203,6 @@ public class SymbolHandlers {
             stack.push(elem);
         }
     }
-//
-//    @Handle("qualified_cell")
-//    public static class QualifiedCellHandler implements SymbolHandler {
-//        @Override
-//        public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
-//            if (sequence.size() == 1) {
-//                return; // <qualified_cell> ::= <cell>
-//            }
-//            CellReferenceElement cell = (CellReferenceElement) stack.pop();
-//            stack.pop(); // "!"
-//            FormulaElement qualifier = stack.pop();
-//            cell.getCellRef().setTableName(qualifier.getTokenString());
-//            if (sequence.size() == 5) {
-//                stack.pop(); // "!"
-//                qualifier = stack.pop();
-//                cell.getCellRef().setSheetName(qualifier.getTokenString());
-//            }
-//            cell.setToken(mergeToken(qualifier.getToken(), cell.getToken(), Token.Type.Identifier, null));
-//            cell.setSlices(1);
-//            stack.push(cell);
-//        }
-//    }
-//
-//    /**
-//     * <qualified_range> ::= <qualified_cell> ":" <cell>
-//     */
-//    @Handle("qualified_range")
-//    public static class QualifiedRangeHandler implements SymbolHandler {
-//        @Override
-//        public void reduce(Stack<FormulaElement> stack, Symbol handle, List<Symbol> sequence) {
-//            CellReferenceElement cell = (CellReferenceElement) stack.pop();
-//            stack.pop(); // ":"
-//            CellReferenceElement qualifiedCell = (CellReferenceElement) stack.pop();
-//            RangeReferenceElement range = new RangeReferenceElement(new RangeRef(qualifiedCell.getCellRef(), cell.getCellRef()));
-//            range.setSlices(1);
-//            range.setToken(mergeToken(qualifiedCell.getToken(), cell.getToken(), Token.Type.Identifier, null));
-//            stack.push(range);
-//        }
-//    }
 
     public static abstract class PrefixUnaryHandler implements SymbolHandler {
         @Override
@@ -417,8 +381,6 @@ public class SymbolHandlers {
         }
     }
 
-    //<function> ::= <identifier> "(" <params> ")"
-    //        | <identifier> "(" ")"
     @Handle("function")
     public static class FuncHandler implements SymbolHandler {
         @Override
@@ -442,33 +404,6 @@ public class SymbolHandlers {
                 stack.push(func);
             }
         }
-
-//        FuncElement createFunction(Token token, String name, FuncElement holder) {
-//            Class<? extends FuncElement> funcClass = FormulaParser.FUNCTIONS.get(name.toUpperCase()); //  FIXME
-//            if (funcClass == null) {
-//                throw new RuntimeException("Unsupported function: " + name);
-//            }
-//
-//            FuncElement func;
-//            try {
-//                func = funcClass.newInstance();
-//            } catch (InstantiationException e) {
-//                throw new RuntimeException(e);
-//            } catch (IllegalAccessException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            func.setToken(token);
-//            func.setTokenString(name);
-//            if (holder == null) { // <identifier> "(" ")"
-//                func.setArgc(0);
-//                func.setSlices(1);
-//            } else { // function with args
-//                func.setArgc(holder.getArgc());
-//                func.setSlices(holder.getSlices());
-//            }
-//            return func;
-//        }
     }
 
     private static DefaultToken mergeToken(Token first, Token second, Token.Type type, String tokenString) {

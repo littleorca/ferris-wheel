@@ -84,6 +84,6 @@ public class TestCompare extends TestCase {
         assertEquals(1, context.getOperands().size());
         Variant ret = context.popOperand();
         assertEquals(VariantType.ERROR, ret.valueType());
-        assertEquals(ErrorCodes.ILLEGAL_VALUE, ret.errorValue());
+        assertEquals(ErrorCodes.VALUE, ret.errorValue());
     }
 }

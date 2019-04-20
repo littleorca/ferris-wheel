@@ -133,7 +133,7 @@ public abstract class PlainAggregator implements Aggregator {
         }
 
         protected Variant calcResult() {
-            return count == 0 ? Value.err(ErrorCodes.DIV_0)
+            return count == 0 ? Value.err(ErrorCodes.DIV)
                     : Value.dec(summary.divide(new BigDecimal(count), DEFAULT_MC));
         }
     }
@@ -274,7 +274,7 @@ public abstract class PlainAggregator implements Aggregator {
             if (values.isEmpty()) {
                 return Value.BLANK;
             } else if (values.size() == 1) {
-                return Value.err(ErrorCodes.DIV_0);
+                return Value.err(ErrorCodes.DIV);
             }
             BigDecimal tmp = new BigDecimal(0);
             for (BigDecimal value : values) {

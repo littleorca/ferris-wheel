@@ -1,0 +1,64 @@
+.smart-field {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    height: 1.5em;
+    overflow: hidden;
+    border-radius: .25em;
+    border: 1px solid #ccc;
+    background: #eee;
+}
+
+.smart-field .field-label {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 .5em;
+    min-width: 1em;
+    max-width: 10em;
+    border-right: 1px solid #ccc;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.smart-field .field-control {
+    flex: 1 0 auto;
+    display: inline-flex;
+    align-items: stretch;
+    min-width: 2em;
+    max-width: 20em;
+    background: #fff;
+}
+
+.smart-field .field-control input[type="text"],
+.smart-field .field-control select,
+.smart-field .field-control .dropdown-omni-input,
+.smart-field .field-control .date-select,
+.smart-field .field-control .checkbox {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 .5em;
+    border: 0 none;
+    font-size: 1em;
+    background: #fff;
+}
+
+.smart-field .field-control input[type="text"],
+.smart-field .field-control select,
+.smart-field .field-control .dropdown-omni-input {
+    flex: 1 1 auto;
+}
+
+.smart-field .field-control .date-select {
+    flex: 0 0 auto;
+}
+
+.smart-field .field-control .dropdown-omni-input {
+    
+}
+
+.smart-field .field-tips,
+.smart-field .field-error {
+    display: none;
+}

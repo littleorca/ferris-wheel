@@ -1,23 +1,24 @@
 package com.ctrip.ferriswheel.core.asset;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 class NamedAssetList<E extends NamedAssetNode> implements Iterable<E> {
-    private LinkedHashMap<String, E> map = new LinkedHashMap<>();
-    private final AssetNode delegate;
+    private LinkedHashMap<String, E> delegate = new LinkedHashMap<>();
+    private final AssetNode owner;
 
-    NamedAssetList(AssetNode delegate) {
-        this.delegate = delegate;
+    NamedAssetList(AssetNode owner) {
+        this.owner = owner;
     }
 
     int size() {
-        return map.size();
+        return delegate.size();
     }
 
     E get(int index) {
-        Iterator<Map.Entry<String, E>> it = map.entrySet().iterator();
+        Iterator<Map.Entry<String, E>> it = delegate.entrySet().iterator();
         Map.Entry<String, E> entry = null;
         for (int i = 0; i <= index; i++) {
             if (it.hasNext()) {
@@ -30,30 +31,30 @@ class NamedAssetList<E extends NamedAssetNode> implements Iterable<E> {
     }
 
     E get(String name) {
-        return map.get(name);
+        return delegate.get(name);
     }
 
     E add(E namedAsset) {
-        E previous = map.put(namedAsset.getName(), namedAsset);
-        delegate.bindChild(namedAsset);
+        E previous = delegate.put(namedAsset.getName(), namedAsset);
+        owner.bindChild(namedAsset);
         if (previous != null) {
-            delegate.unbindChild(previous);
+            owner.unbindChild(previous);
         }
         return previous;
     }
 
     E add(int index, E namedAsset) {
         E old = insertElement(index, namedAsset);
-        delegate.bindChild(namedAsset);
+        owner.bindChild(namedAsset);
         if (old != null) {
-            delegate.unbindChild(old);
+            owner.unbindChild(old);
         }
         return old;
     }
 
     private E insertElement(int index, E namedAsset) {
         LinkedHashMap<String, E> newMap = new LinkedHashMap<>();
-        Iterator<Map.Entry<String, E>> it = map.entrySet().iterator();
+        Iterator<Map.Entry<String, E>> it = delegate.entrySet().iterator();
         for (int i = 0; i < index && it.hasNext(); i++) {
             Map.Entry<String, E> entry = it.next();
             newMap.put(entry.getKey(), entry.getValue());
@@ -63,16 +64,25 @@ class NamedAssetList<E extends NamedAssetNode> implements Iterable<E> {
             Map.Entry<String, E> entry = it.next();
             newMap.put(entry.getKey(), entry.getValue());
         }
-        map = newMap;
+        delegate = newMap;
         return old;
     }
 
     E remove(String name) {
-        E removed = map.remove(name);
+        E removed = delegate.remove(name);
         if (removed != null) {
-            delegate.unbindChild(removed);
+            owner.unbindChild(removed);
         }
         return removed;
+    }
+
+    void clear() {
+        for (E asset : delegate.values()) {
+            if (asset != null) {
+                owner.unbindChild(asset);
+            }
+        }
+        delegate = new LinkedHashMap<>();
     }
 
     boolean rename(String fromName, String toName) {
@@ -83,14 +93,14 @@ class NamedAssetList<E extends NamedAssetNode> implements Iterable<E> {
         if (indexOf(toName) != -1) {
             return false; // name conflicted
         }
-        E asset = map.remove(fromName);
+        E asset = delegate.remove(fromName);
         asset.setName(toName);
         insertElement(idx, asset);
         return true;
     }
 
     private int indexOf(String name) {
-        Iterator<String> it = map.keySet().iterator();
+        Iterator<String> it = delegate.keySet().iterator();
         int i = 0;
         while (it.hasNext()) {
             if (it.next().equals(name)) {
@@ -103,7 +113,10 @@ class NamedAssetList<E extends NamedAssetNode> implements Iterable<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return map.values().iterator();
+        return delegate.values().iterator();
     }
 
+    public Collection<E> values() {
+        return delegate.values();
+    }
 }

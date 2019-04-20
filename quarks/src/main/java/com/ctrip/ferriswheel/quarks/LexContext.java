@@ -24,10 +24,11 @@ public interface LexContext extends Serializable {
      * Determine if the given character is an acceptable character of
      * identifier.
      *
-     * @param ch
+     * @param pendingChar
+     * @param identifierStart
      * @return
      */
-    boolean isIdentifierPart(char ch);
+    boolean isIdentifierPart(char pendingChar, char identifierStart);
 
     /**
      * Get identifier decoder.

@@ -17,6 +17,7 @@ import ChartConsult from '../action/ChartConsult';
 import AddChart from '../action/AddChart';
 import AddTable from '../action/AddTable';
 import RemoveAsset from '../action/RemoveAsset';
+import AddForm from '../action/AddForm';
 import AddText from '../action/AddText';
 import RenameAsset from '../action/RenameAsset';
 import classnames from "classnames";
@@ -90,6 +91,8 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
             this.applyAddText(action.addText);
         } else if (typeof action.chartConsult !== 'undefined') {
             this.applyChartConsult(action.chartConsult);
+        } else if (typeof action.addForm !== 'undefined') {
+            this.applyAddForm(action.addForm);
         } else if (typeof action.removeAsset !== 'undefined') {
             this.applyRemoveAsset(action.removeAsset);
         } else if (typeof action.renameAsset !== 'undefined') {
@@ -112,6 +115,11 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
 
     protected applyAddText(addText: AddText) {
         this.doApplyAddAsset(new SheetAsset(undefined, undefined, addText.text));
+    }
+
+    protected applyAddForm(addForm: AddForm) {
+        console.log("addForm", addForm);
+        this.doApplyAddAsset(new SheetAsset(undefined, undefined, undefined, addForm.form));
     }
 
     protected doApplyAddAsset(asset: SheetAsset) {
@@ -306,7 +314,7 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
                     ref={this.layoutElement}
                     className="layout-container"
                     cols={layout.grid.columns || 12}
-                    rowHeight={30}
+                    rowHeight={20}
                     width={layout.width || 1200}
                     margin={[10, 10]}
                     useCSSTransforms={false} /* handsontable's column/row resize handler has a problem when work with css transform, refer: https://github.com/handsontable/handsontable/issues/2937 */
@@ -325,6 +333,7 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
                         const isSelected = (this.state.selected === arbitraryAsset);
                         const assetContainerClassName = classnames(
                             "asset-container",
+                            arbitraryAsset.assetType() + "-asset-container",
                             {
                                 "editable": this.props.editable,
                                 "selected": isSelected

@@ -5,8 +5,9 @@ import com.ctrip.ferriswheel.core.formula.func.date.*;
 import com.ctrip.ferriswheel.core.formula.func.text.StringFunctions;
 import com.ctrip.ferriswheel.core.formula.symbol.SymbolHandler;
 import com.ctrip.ferriswheel.core.formula.symbol.SymbolHandlers;
-import com.ctrip.ferriswheel.core.ref.CellRef;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.NameReference;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 import com.ctrip.ferriswheel.core.util.References;
 import com.ctrip.ferriswheel.quarks.LexContext;
 import com.ctrip.ferriswheel.quarks.Symbol;
@@ -152,13 +153,17 @@ public class FormulaParser {
                     newFormula.append(token.getSource(), pos, elem.getToken().getFrom());
                 }
 
-                if (elem instanceof SimpleReferenceElement) {
-                    CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
-                    newFormula.append(References.toFormula(cellRef, nShiftRows, nShiftCols));
+                if (elem instanceof CellReferenceElement) {
+                    CellReference cellReference = ((CellReferenceElement) elem).getCellReference();
+                    newFormula.append(References.toFormula(cellReference, nShiftRows, nShiftCols));
 
                 } else if (elem instanceof RangeReferenceElement) {
-                    RangeRef rangeRef = ((RangeReferenceElement) elem).getRangeRef();
-                    newFormula.append(References.toFormula(rangeRef, nShiftRows, nShiftCols));
+                    RangeReference rangeReference = ((RangeReferenceElement) elem).getRangeReference();
+                    newFormula.append(References.toFormula(rangeReference, nShiftRows, nShiftCols));
+
+                } else if (elem instanceof NameReferenceElement) {
+                    NameReference nameReference = ((NameReferenceElement) elem).getNameReference();
+                    newFormula.append(References.toFormula(nameReference));
                 }
 
                 pos = elem.getToken().getTo();
@@ -196,8 +201,13 @@ public class FormulaParser {
                 case Identifier:
                     element = new IdentifierElement(token, token.getString());
                     break;
+                case QuotedIdentifier:
+                    element = new IdentifierElement(token, token.getString()); // TODO add QuotedIdentifierElement?
+                    break;
                 case Literal:
-                    if (token.equalsToIgnoreCase(Boolean.TRUE.toString())) {
+                    if (token.startsWith("#")) {
+                        element = new ErrorElement(token, token.getString());
+                    } else if (token.equalsToIgnoreCase(Boolean.TRUE.toString())) {
                         element = new BooleanElement(token, true);
                     } else if (token.equalsToIgnoreCase(Boolean.FALSE.toString())) {
                         element = new BooleanElement(token, false);

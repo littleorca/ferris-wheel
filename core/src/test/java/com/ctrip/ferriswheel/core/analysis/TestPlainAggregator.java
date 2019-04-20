@@ -40,7 +40,7 @@ public class TestPlainAggregator extends TestCase {
         PlainAggregator agg = PlainAggregator.create(AggregateType.AVERAGE);
         assertTrue(agg instanceof PlainAggregator.AverageAggregator);
         assertTrue(AggregateType.AVERAGE.equals(agg.getType()));
-        assertEquals(Value.err(ErrorCodes.DIV_0), agg.getResult());
+        assertEquals(Value.err(ErrorCodes.DIV), agg.getResult());
         agg.feed(Value.dec(10));
         assertEquals(Value.dec(10), agg.getResult());
         agg.feed(Value.dec(15));
@@ -127,7 +127,7 @@ public class TestPlainAggregator extends TestCase {
         assertTrue(AggregateType.STANDARD_DEVIATION.equals(agg.getType()));
         assertEquals(Value.BLANK, agg.getResult());
         agg.feed(Value.dec(2));
-        assertEquals(Value.err(ErrorCodes.DIV_0), agg.getResult());
+        assertEquals(Value.err(ErrorCodes.DIV), agg.getResult());
         agg.feed(Value.dec(3));
         assertEquals(0.707106781, agg.getResult().doubleValue(), 0.000000001);
         agg.feed(Value.dec(5));
@@ -159,7 +159,7 @@ public class TestPlainAggregator extends TestCase {
         assertTrue(AggregateType.VARIANCE.equals(agg.getType()));
         assertEquals(Value.BLANK, agg.getResult());
         agg.feed(Value.dec(2));
-        assertEquals(Value.err(ErrorCodes.DIV_0), agg.getResult());
+        assertEquals(Value.err(ErrorCodes.DIV), agg.getResult());
         agg.feed(Value.dec(3));
         assertEquals(0.5, agg.getResult().decimalValue().doubleValue(), 0.000000001);
         agg.feed(Value.dec(5));

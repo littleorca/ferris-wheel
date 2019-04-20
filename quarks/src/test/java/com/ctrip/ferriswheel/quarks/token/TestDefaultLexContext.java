@@ -31,7 +31,7 @@ public class TestDefaultLexContext extends TestCase {
         for (int i = 0; i < s.length(); i++) {
             assertTrue("'" + s.charAt(i)
                             + "' is supposed to be a legal letter of identifier.",
-                    lex.isIdentifierPart(s.charAt(i)));
+                    lex.isIdentifierPart(s.charAt(i), s.charAt(0)));
         }
 
         s = "~`!@#%^&*()-=+[{]}\\|;:'\",<.>/?";
@@ -40,7 +40,7 @@ public class TestDefaultLexContext extends TestCase {
                     "'"
                             + s.charAt(i)
                             + "' is supposed to be an illegal leading letter of identifier.",
-                    lex.isIdentifierPart(s.charAt(i)));
+                    lex.isIdentifierPart(s.charAt(i), s.charAt(0)));
         }
     }
 

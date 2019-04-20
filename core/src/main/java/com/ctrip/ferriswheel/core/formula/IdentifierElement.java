@@ -11,6 +11,6 @@ public class IdentifierElement extends FormulaElement {
 
     @Override
     public void evaluate(FormulaEvaluationContext context) {
-        //TODO
+        throw new RuntimeException("Should not be called.");
     }
 }

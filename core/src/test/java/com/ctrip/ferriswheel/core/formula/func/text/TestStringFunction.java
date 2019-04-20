@@ -28,7 +28,7 @@ public class TestStringFunction extends TestCase {
         context.pushOperand(Value.dec(3));
         mid.evaluate(null, context);
         assertEquals(1, context.getOperands().size());
-        assertEquals(ErrorCodes.ILLEGAL_VALUE, context.popOperand().errorValue());
+        assertEquals(ErrorCodes.VALUE, context.popOperand().errorValue());
 
         context.getOperands().clear();
         context.pushOperand(Value.str("hello world"));
@@ -36,7 +36,7 @@ public class TestStringFunction extends TestCase {
         context.pushOperand(Value.dec(-3));
         mid.evaluate(null, context);
         assertEquals(1, context.getOperands().size());
-        assertEquals(ErrorCodes.ILLEGAL_VALUE, context.popOperand().errorValue());
+        assertEquals(ErrorCodes.VALUE, context.popOperand().errorValue());
 
         context.getOperands().clear();
         context.pushOperand(Value.str("hello world"));

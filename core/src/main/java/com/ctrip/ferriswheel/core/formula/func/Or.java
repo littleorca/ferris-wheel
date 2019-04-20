@@ -40,7 +40,7 @@ public class Or implements Function {
             }
         }
         context.pushOperand(result == null ?
-                Value.err(ErrorCodes.ILLEGAL_VALUE) : Value.bool(result));
+                Value.err(ErrorCodes.VALUE) : Value.bool(result));
     }
 
 }

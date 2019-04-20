@@ -33,7 +33,7 @@ public abstract class StringFunctions implements Function {
             int start = startNum.intValue();
             int num = numChars.intValue();
             if (start < 1 || num < 0) {
-                context.pushOperand(Value.err(ErrorCodes.ILLEGAL_VALUE));
+                context.pushOperand(Value.err(ErrorCodes.VALUE));
                 return;
             }
             if (start > str.length() || num == 0) {

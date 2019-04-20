@@ -31,6 +31,7 @@ import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.variant.DefaultParameter;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
@@ -79,14 +80,11 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
 
         t1.setCellValue(0, 0, Value.dec(0));
         t2.automate(new QueryAutomatonInfo(new QueryTemplateInfo("test-scheme-1",
-                Collections.singletonMap("val", new DynamicValue("t1!A1+1")),
-                Collections.emptyMap())));
+                Collections.singletonMap("val", new DefaultParameter("val", new DynamicValue("t1!A1+1"))))));
         t3.automate(new QueryAutomatonInfo(new QueryTemplateInfo("test-scheme-2",
-                Collections.singletonMap("val", new DynamicValue("t1!A1+1")),
-                Collections.emptyMap())));
+                Collections.singletonMap("val", new DefaultParameter("val", new DynamicValue("t1!A1+1"))))));
         t4.automate(new QueryAutomatonInfo(new QueryTemplateInfo("test-scheme-3",
-                Collections.singletonMap("val", new DynamicValue("t2!A1+t3!A1")),
-                Collections.emptyMap())));
+                Collections.singletonMap("val", new DefaultParameter("val", new DynamicValue("t2!A1+t3!A1"))))));
         t5.setCellFormula(0, 0, "t3!A1+1");
         System.out.println("## Initial workbook:");
         System.out.println(workbook);

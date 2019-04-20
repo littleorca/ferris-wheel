@@ -121,6 +121,11 @@
     color: #888;
 }
 
+.workbook-editor .toolbar button[name="add-form"]::before {
+    content: "\e92d";
+    color: #693;
+}
+
 .workbook-editor .toolbar button[name="toggle-sidebar"]::before {
     content: "\e9cc";
     color: #999;
@@ -198,30 +203,11 @@
     background: #f6f6f6;
 }
 
-.workbook-view .sheet-view .table-view .auto-form {
-    background: #fcfcfc;
-}
-
-.workbook-view .sheet-view .table-view .auto-form > .field {
-    padding: .25em .5em;
-    background: #e6ecec;
-    /* background: linear-gradient(#f8f9f9, #e0ece9); */
-}
-
-.workbook-view .sheet-view .table-view .auto-form > .field > .field-name {
-    color: #666;
-}
-
-.workbook-view .sheet-view .table-view .auto-form .button[name="query"] {
-    color: #fff;
-    border: 1px solid #688;
-    background: #699;
-}
-
-.workbook-view .sheet-view .table-view .auto-form .button[name="query"]::before {
-    margin-right: .25em;
-    content: "\e9c1";
-    font-family: "icomoon";
+.workbook-view .sheet-view .form-asset-container {
+    background: rgba(0, 0, 0, .03);
+    box-shadow: none;
+    border: 1px solid rgba(255,255,255,.5);
+    box-sizing: border-box;
 }
 
 .workbook-loading {

@@ -69,7 +69,7 @@ public class TestTableScout extends TestCase {
         Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         initTable33WithLables(table);
         table.eraseCell(1, 2);
-        table.setCellValue(2, 1, Value.err(ErrorCodes.DIV_0));
+        table.setCellValue(2, 1, Value.err(ErrorCodes.DIV));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(1, 2)));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(2, 1)));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(2, 2)));
@@ -80,7 +80,7 @@ public class TestTableScout extends TestCase {
         Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
         initTable33WithLables(table);
         table.eraseCell(1, 2);
-        table.setCellValue(2, 1, Value.err(ErrorCodes.DIV_0));
+        table.setCellValue(2, 1, Value.err(ErrorCodes.DIV));
         assertTrue(TableScout.isDecimalCompatible(table, 1, 1, 4, 4));
         assertFalse(TableScout.isDecimalCompatible(table, 0, 0, 3, 3));
     }

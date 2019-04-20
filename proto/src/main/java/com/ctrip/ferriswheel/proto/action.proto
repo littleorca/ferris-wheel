@@ -210,7 +210,7 @@ message UpdateText {
 message ExecuteQuery {
     string sheet_name = 1;
     string table_name = 2;
-    repeated NamedValue params = 3;
+    repeated Parameter params = 3;
 }
 
 message ResetTable {
@@ -231,6 +231,22 @@ message SetCellsFormat {
 // workbook operation
 message WorkbookOperation {
     string pathname = 1;
+}
+
+message AddForm {
+    string sheet_name = 1;
+    Form form = 2;
+}
+
+message UpdateForm {
+    string sheet_name = 1;
+    Form form = 2;
+}
+
+message SubmitForm {
+    string sheet_name = 1;
+    string form_name = 2;
+    repeated Parameter params = 3;
 }
 
 message Action {
@@ -268,9 +284,12 @@ message Action {
         LayoutAsset layout_asset = 31;
         AddText add_text = 32;
         UpdateText update_text = 33;
-        ExecuteQuery execute_query = 34;
+        ExecuteQuery execute_query = 34; // deprecated
         ResetTable reset_table = 35;
         SetCellsFormat set_cells_format = 36;
+        AddForm add_form = 37;
+        UpdateForm update_form = 38;
+        SubmitForm submit_form = 39;
     }
 }
 

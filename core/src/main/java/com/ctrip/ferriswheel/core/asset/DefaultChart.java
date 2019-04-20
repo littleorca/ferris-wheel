@@ -11,12 +11,12 @@ import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
 import com.ctrip.ferriswheel.core.bean.AxisImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
-import com.ctrip.ferriswheel.core.formula.SimpleReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.formula.ReferenceElement;
-import com.ctrip.ferriswheel.core.ref.CellRef;
-import com.ctrip.ferriswheel.core.ref.RangeRef;
+import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
@@ -36,8 +36,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     private DefaultChartBinder binder;
 
     DefaultChart(String name, String type, DefaultSheet sheet) {
-        super(name, sheet.getWorkbook().getAssetManager());
-        setSheet(sheet);
+        super(name, sheet);
         this.type = type;
         this.title = new ValueNode(getAssetManager(), Value.BLANK, null);
         this.categories = new ValueNode(getAssetManager(), Value.BLANK, null);
@@ -71,14 +70,6 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         return seriesList.get(i);
     }
 
-    public DefaultSheet getSheet() {
-        return (DefaultSheet) getParent();
-    }
-
-    void setSheet(DefaultSheet sheet) {
-        setParent(sheet);
-    }
-
     @Override
     public String getType() {
         return type;
@@ -88,6 +79,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         this.type = type;
     }
 
+    @Override
     public ValueNode getTitle() {
         return title;
     }
@@ -96,6 +88,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         this.title.setDynamicVariant(title);
     }
 
+    @Override
     public ValueNode getCategories() {
         return categories;
     }
@@ -104,6 +97,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         this.categories.setDynamicVariant(categories);
     }
 
+    @Override
     public List<DataSeries> getSeriesList() {
         return Collections.unmodifiableList(seriesList); // internal list is not allowed to modify directly.
     }
@@ -126,6 +120,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         seriesList.clear();
     }
 
+    @Override
     public AxisImpl getxAxis() {
         return xAxis;
     }
@@ -134,6 +129,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         this.xAxis = xAxis;
     }
 
+    @Override
     public AxisImpl getyAxis() {
         return yAxis;
     }
@@ -142,6 +138,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         this.yAxis = yAxis;
     }
 
+    @Override
     public AxisImpl getzAxis() {
         return zAxis;
     }
@@ -183,22 +180,22 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             throw new RuntimeException("Data area must be a formula with single reference element.");
         }
 
-        RangeRef rangeRef = null;
+        RangeReference rangeReference = null;
         FormulaElement elem = data.getFormulaElements()[0];
-        if (elem instanceof SimpleReferenceElement) {
-            CellRef cellRef = ((SimpleReferenceElement) elem).getCellRef();
-            rangeRef = new RangeRef(cellRef, cellRef);
+        if (elem instanceof CellReferenceElement) {
+            CellReference cellReference = ((CellReferenceElement) elem).getCellReference();
+            rangeReference = new RangeReference(cellReference, cellReference);
         } else if (elem instanceof RangeReferenceElement) {
-            rangeRef = ((RangeReferenceElement) elem).getRangeRef();
+            rangeReference = ((RangeReferenceElement) elem).getRangeReference();
         }
         DefaultSheet sheet = getSheet();
-        if (rangeRef.sheetName() != null) {
-            sheet = sheet.getWorkbook().getSheet(rangeRef.sheetName());
+        if (rangeReference.getSheetName() != null) {
+            sheet = sheet.getWorkbook().getSheet(rangeReference.getSheetName());
         }
         if (sheet == null) {
             throw new RuntimeException("Failed to get referred sheet.");
         }
-        DefaultTable table = sheet.getAsset(rangeRef.tableName());
+        DefaultTable table = sheet.getAsset(rangeReference.getAssetName());
         if (table == null) {
             clearData();
             getSheet().publicly(new UpdateChart(getSheet().getName(),
@@ -209,10 +206,10 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             return;
         }
 
-        int left = rangeRef.getLeft();
-        int top = rangeRef.getTop();
-        int right = rangeRef.getRight();
-        int bottom = rangeRef.getBottom();
+        int left = rangeReference.getLeft();
+        int top = rangeReference.getTop();
+        int right = rangeReference.getRight();
+        int bottom = rangeReference.getBottom();
 
         if (left == -1) {
             left = 0;

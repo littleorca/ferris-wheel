@@ -1,5 +1,6 @@
 package com.ctrip.ferriswheel.core.formula;
 
+import com.ctrip.ferriswheel.core.ref.NameReference;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -9,25 +10,25 @@ import static com.ctrip.ferriswheel.core.formula.BinaryElement.*;
 
 public class TestFormulaParser extends TestCase {
     public void testSimpleSum() {
-        FormulaElement[] el = FormulaParser.parse("SUM(\"table-1\"!A:B, 'a\" ''b'' c'!A:Z)");
+        FormulaElement[] el = FormulaParser.parse("SUM('table-1'!A:B, 'a\" ''b'' c'!A:Z)");
         assertEquals(3, el.length);
 
         assertTrue(el[0] instanceof RangeReferenceElement);
         RangeReferenceElement ref = (RangeReferenceElement) el[0];
-        assertEquals("table-1", ref.getRangeRef().tableName());
-        assertEquals(0, ref.getRangeRef().getLeft());
-        assertEquals(-1, ref.getRangeRef().getTop());
-        assertEquals(1, ref.getRangeRef().getRight());
-        assertEquals(-1, ref.getRangeRef().getBottom());
+        assertEquals("table-1", ref.getRangeReference().getAssetName());
+        assertEquals(0, ref.getRangeReference().getLeft());
+        assertEquals(-1, ref.getRangeReference().getTop());
+        assertEquals(1, ref.getRangeReference().getRight());
+        assertEquals(-1, ref.getRangeReference().getBottom());
         assertEquals(1, ref.getSlices());
 
         assertTrue(el[1] instanceof RangeReferenceElement);
         ref = (RangeReferenceElement) el[1];
-        assertEquals("a\" 'b' c", ref.getRangeRef().tableName());
-        assertEquals(0, ref.getRangeRef().getLeft());
-        assertEquals(-1, ref.getRangeRef().getTop());
-        assertEquals(25, ref.getRangeRef().getRight());
-        assertEquals(-1, ref.getRangeRef().getBottom());
+        assertEquals("a\" 'b' c", ref.getRangeReference().getAssetName());
+        assertEquals(0, ref.getRangeReference().getLeft());
+        assertEquals(-1, ref.getRangeReference().getTop());
+        assertEquals(25, ref.getRangeReference().getRight());
+        assertEquals(-1, ref.getRangeReference().getBottom());
         assertEquals(1, ref.getSlices());
 
         assertTrue(el[2] instanceof FuncElement);
@@ -40,7 +41,7 @@ public class TestFormulaParser extends TestCase {
     public void testCalculateFieldFormula() {
         FormulaElement[] el = FormulaParser.parse("foo + 'foo bar'*'比例'");
         assertEquals(5, el.length);
-        assertTrue(el[0]instanceof ReferenceElement);
+        assertTrue(el[0] instanceof ReferenceElement);
     }
 
     public void testErrorToken() {
@@ -81,6 +82,15 @@ public class TestFormulaParser extends TestCase {
         elements = FormulaParser.parse("table!$A$1");
         checkAndPrintElements("table!$A$1", elements);
 
+        elements = FormulaParser.parse("table!'foo'");
+        checkAndPrintElements("table!'foo", elements);
+        assertEquals(1, elements.length);
+        assertTrue(elements[0] instanceof NameReferenceElement);
+        NameReference nameReference = ((NameReferenceElement) elements[0]).getNameReference();
+        assertNull(nameReference.getSheetName());
+        assertEquals("table", nameReference.getAssetName());
+        assertEquals("foo", nameReference.getTargetName());
+
         elements = FormulaParser.parse("sheet!table!$A$1");
         checkAndPrintElements("sheet!table!$A$1", elements);
 
@@ -92,6 +102,15 @@ public class TestFormulaParser extends TestCase {
 
         elements = FormulaParser.parse("sheet!table!$A$1:$C$5");
         checkAndPrintElements("sheet!table!$A$1:$C$5", elements);
+
+        elements = FormulaParser.parse("sheet!table!'foo'");
+        checkAndPrintElements("sheet!table!'foo", elements);
+        assertEquals(1, elements.length);
+        assertTrue(elements[0] instanceof NameReferenceElement);
+        nameReference = ((NameReferenceElement) elements[0]).getNameReference();
+        assertEquals("sheet", nameReference.getSheetName());
+        assertEquals("table", nameReference.getAssetName());
+        assertEquals("foo", nameReference.getTargetName());
 
         elements = FormulaParser.parse("A1+B1*C1");
         checkAndPrintElements("A1+B1*C1", elements);
@@ -194,13 +213,13 @@ public class TestFormulaParser extends TestCase {
         RangeReferenceElement r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(9, r.getToken().getTo());
-        assertTrue(r.getRangeRef().isValid());
-        assertEquals(0, r.getRangeRef().getLeft());
-        assertEquals(1, r.getRangeRef().getRight());
-        assertEquals(-1, r.getRangeRef().getTop());
-        assertEquals(-1, r.getRangeRef().getBottom());
-        assertEquals("table", r.getRangeRef().tableName());
-        assertNull(r.getRangeRef().sheetName());
+        assertTrue(r.getRangeReference().isValid());
+        assertEquals(0, r.getRangeReference().getLeft());
+        assertEquals(1, r.getRangeReference().getRight());
+        assertEquals(-1, r.getRangeReference().getTop());
+        assertEquals(-1, r.getRangeReference().getBottom());
+        assertEquals("table", r.getRangeReference().getAssetName());
+        assertNull(r.getRangeReference().getSheetName());
 
         f = FormulaParser.parse("table!1:3");
         assertEquals(1, f.length);
@@ -208,13 +227,13 @@ public class TestFormulaParser extends TestCase {
         r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(9, r.getToken().getTo());
-        assertTrue(r.getRangeRef().isValid());
-        assertEquals(-1, r.getRangeRef().getLeft());
-        assertEquals(-1, r.getRangeRef().getRight());
-        assertEquals(0, r.getRangeRef().getTop());
-        assertEquals(2, r.getRangeRef().getBottom());
-        assertEquals("table", r.getRangeRef().tableName());
-        assertNull(r.getRangeRef().sheetName());
+        assertTrue(r.getRangeReference().isValid());
+        assertEquals(-1, r.getRangeReference().getLeft());
+        assertEquals(-1, r.getRangeReference().getRight());
+        assertEquals(0, r.getRangeReference().getTop());
+        assertEquals(2, r.getRangeReference().getBottom());
+        assertEquals("table", r.getRangeReference().getAssetName());
+        assertNull(r.getRangeReference().getSheetName());
 
         f = FormulaParser.parse("A:B");
         assertEquals(1, f.length);
@@ -222,13 +241,13 @@ public class TestFormulaParser extends TestCase {
         r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(3, r.getToken().getTo());
-        assertTrue(r.getRangeRef().isValid());
-        assertEquals(0, r.getRangeRef().getLeft());
-        assertEquals(1, r.getRangeRef().getRight());
-        assertEquals(-1, r.getRangeRef().getTop());
-        assertEquals(-1, r.getRangeRef().getBottom());
-        assertNull(r.getRangeRef().tableName());
-        assertNull(r.getRangeRef().sheetName());
+        assertTrue(r.getRangeReference().isValid());
+        assertEquals(0, r.getRangeReference().getLeft());
+        assertEquals(1, r.getRangeReference().getRight());
+        assertEquals(-1, r.getRangeReference().getTop());
+        assertEquals(-1, r.getRangeReference().getBottom());
+        assertNull(r.getRangeReference().getAssetName());
+        assertNull(r.getRangeReference().getSheetName());
 
         f = FormulaParser.parse("1:3");
         assertEquals(1, f.length);
@@ -236,13 +255,13 @@ public class TestFormulaParser extends TestCase {
         r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(3, r.getToken().getTo());
-        assertTrue(r.getRangeRef().isValid());
-        assertEquals(-1, r.getRangeRef().getLeft());
-        assertEquals(-1, r.getRangeRef().getRight());
-        assertEquals(0, r.getRangeRef().getTop());
-        assertEquals(2, r.getRangeRef().getBottom());
-        assertNull(r.getRangeRef().tableName());
-        assertNull(r.getRangeRef().sheetName());
+        assertTrue(r.getRangeReference().isValid());
+        assertEquals(-1, r.getRangeReference().getLeft());
+        assertEquals(-1, r.getRangeReference().getRight());
+        assertEquals(0, r.getRangeReference().getTop());
+        assertEquals(2, r.getRangeReference().getBottom());
+        assertNull(r.getRangeReference().getAssetName());
+        assertNull(r.getRangeReference().getSheetName());
     }
 
     public void testParseIllegalFormula() {

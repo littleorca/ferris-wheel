@@ -17,6 +17,8 @@ public class DefaultSyntaxContext implements SyntaxContext {
             .terminalSymbol(BuiltinSymbols.STRING);
     public static final Symbol IdentifierSymbol = BNFSymbol
             .terminalSymbol(BuiltinSymbols.IDENTIFIER);
+    public static final Symbol QuotedIdentifierSymbol = BNFSymbol
+            .terminalSymbol(BuiltinSymbols.QUOTED_IDENTIFIER);
     public static final Symbol TerminatorSymbol = BNFSymbol.terminator();
 
     public static SyntaxContext getDefaultInstance() {
@@ -41,6 +43,11 @@ public class DefaultSyntaxContext implements SyntaxContext {
     @Override
     public Symbol getIdentifierSymbol() {
         return IdentifierSymbol;
+    }
+
+    @Override
+    public Symbol getQuotedIdentifierSymbol() {
+        return QuotedIdentifierSymbol;
     }
 
     @Override

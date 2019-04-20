@@ -81,7 +81,9 @@ public class BNFParser {
                         || tokenizer.equalsTo(syntaxContext.getStringSymbol()
                                 .getSymbol())
                         || tokenizer.equalsTo(syntaxContext
-                                .getIdentifierSymbol().getSymbol())) {
+                                .getIdentifierSymbol().getSymbol())
+                        || tokenizer.equalsTo(syntaxContext
+                                .getQuotedIdentifierSymbol().getSymbol())) {
                     symbols.add(BNFSymbol.terminalSymbol(tokenizer.getString()));
 
                 } else {
