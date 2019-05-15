@@ -3,6 +3,7 @@ package com.ctrip.ferriswheel.core.asset;
 import com.ctrip.ferriswheel.common.action.Action;
 import com.ctrip.ferriswheel.common.action.ActionListener;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
+import com.ctrip.ferriswheel.core.action.UpdateForm;
 
 import java.util.*;
 
@@ -51,11 +52,20 @@ public class ReviseCollector implements ActionListener {
         List<Action> filteredActions = new ArrayList<>(rawActions.size());
         Map<String, Integer> occurrences = new HashMap<>();
         for (Action action : rawActions) {
-            if (action instanceof UpdateChart) {
+            if (action instanceof UpdateChart ||
+                    action instanceof UpdateForm) {
+                // those actions only need the last one.
                 // fixme key may not unique if some of the names contains $ or !
-                String key = action.getActionCode() + "$"
-                        + ((UpdateChart) action).getSheetName() + "!"
-                        + ((UpdateChart) action).getChartName();
+                String key = null;
+                if (action instanceof UpdateChart) {
+                    key = action.getActionCode() + "$"
+                            + ((UpdateChart) action).getSheetName() + "!"
+                            + ((UpdateChart) action).getChartName();
+                } else if (action instanceof UpdateForm) {
+                    key = action.getActionCode() + "$"
+                            + ((UpdateForm) action).getSheetName() + "!"
+                            + ((UpdateForm) action).getFormName();
+                }
                 Integer pos = occurrences.get(key);
                 if (pos != null) {
                     filteredActions.set(pos, action); // remove former duplicated action

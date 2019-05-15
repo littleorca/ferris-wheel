@@ -1097,7 +1097,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                                 boolean stubborn) {
         boolean modified = false;
         CellReference upperLeftRef = new CellReference(rangeReference.getSheetName(),
-                null,
+                rangeReference.getAssetName(),
                 rangeReference.getUpperLeftRef(),
                 rangeReference.getUpperLeftTargetId(),
                 rangeReference.isValid());

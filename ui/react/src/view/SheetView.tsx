@@ -118,7 +118,6 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
     }
 
     protected applyAddForm(addForm: AddForm) {
-        console.log("addForm", addForm);
         this.doApplyAddAsset(new SheetAsset(undefined, undefined, undefined, addForm.form));
     }
 

@@ -44,7 +44,6 @@ class DateSelect extends InputCtrl<Date, DateSelectProps, DateSelectState> {
         const className = classnames("date-select", props.className);
         const dt = props.value;
         const format = "YYYY-MM-DD HH:mm";
-        console.log("DateSelect", dt);
 
         return (
             <Popover
