@@ -130,10 +130,6 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         return dataSet;
     }
 
-    DefaultTable getTable() {
-        return (DefaultTable) getParent();
-    }
-
     /**
      * TODO values should be able to present as either pivot column or row, and users should
      * be allowed to change values' level among other pivot fields. For now value is hardcoded

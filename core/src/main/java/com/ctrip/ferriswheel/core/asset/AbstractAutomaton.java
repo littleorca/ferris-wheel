@@ -17,4 +17,9 @@ public abstract class AbstractAutomaton extends AssetNode implements Automaton {
     public void destroy() {
         // dummy
     }
+
+    DefaultTable getTable() {
+        return (DefaultTable) getParent();
+    }
+
 }

@@ -426,6 +426,14 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         } else if (parent instanceof DefaultChartBinder) {
             ((DefaultChartBinder) parent).getChart().rebindIfPossible();
 
+        } else if (parent instanceof DefaultFormField) {
+            // field options
+            DefaultForm form = (DefaultForm) parent.getParent();
+            UpdateForm updateForm = new UpdateForm(form.getSheet().getName(), form.getName(), form);
+            listenerChain.publicly(updateForm, () -> {
+                node.setValue(newValue);
+            });
+
         } else if (parent instanceof DefaultFormFieldBinding) {
             DefaultFormField ff = parent.parent(DefaultFormField.class);
             // at present there is no need to set node's value as it only purposed to track reference
@@ -989,15 +997,18 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             DefaultText text = (DefaultText) node.getParent();
             text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
 
-        } else if (node.getParent() instanceof DefaultQueryAutomaton) {
-            node.setDynamicVariant(new DynamicValue(newFormula));
-            DefaultQueryAutomaton auto = (DefaultQueryAutomaton) node.getParent();
-            auto.getTable().automate(auto.getQueryAutomatonInfo());
-
-        } else if (node.getParent() instanceof DefaultPivotAutomaton) {
-            node.setDynamicVariant(new DynamicValue(newFormula));
-            DefaultPivotAutomaton auto = (DefaultPivotAutomaton) node.getParent();
-            auto.getTable().automate(auto.getPivotAutomatonInfo());
+        } else if (node.getParent() instanceof DefaultQueryAutomaton
+                || node.getParent() instanceof DefaultPivotAutomaton) {
+            AbstractAutomaton auto = (AbstractAutomaton) node.getParent();
+            AutomateTable automateTable = new AutomateTable(auto.getTable().getSheet().getName(),
+                    auto.getTable().getName(), null);
+            listenerChain.publicly(automateTable, () -> {
+                node.setDynamicVariant(new DynamicValue(newFormula));
+                onValueNodeUpdate(node);
+                automateTable.setSolution(auto instanceof DefaultQueryAutomaton ?
+                        ((DefaultQueryAutomaton) auto).getQueryAutomatonInfo() :
+                        ((DefaultPivotAutomaton) auto).getPivotAutomatonInfo());
+            });
 
         } else if (node.getParent() instanceof DefaultFormField
                 || node.getParent() instanceof DefaultFormFieldBinding) {

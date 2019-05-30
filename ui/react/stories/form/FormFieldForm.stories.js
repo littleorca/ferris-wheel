@@ -35,7 +35,11 @@ class FormFieldFormStories extends Component {
         return <div>
             <div>
                 <h3>Form Field Form: string</h3>
-                <FormFieldForm field={field} />
+                <FormFieldForm
+                    field={field}
+                    afterChange={f => {
+                        console.log("afterChange: ", f);
+                    }} />
             </div>
         </div>
     }

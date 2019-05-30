@@ -26,9 +26,7 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.form.FormField;
 import com.ctrip.ferriswheel.common.form.FormFieldBinding;
-import com.ctrip.ferriswheel.common.variant.Value;
-import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.common.variant.VariantType;
+import com.ctrip.ferriswheel.common.variant.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -128,7 +126,11 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
     }
 
     public void setOptions(Variant options) {
-        this.options.setValue(options);
+        if (options instanceof DynamicVariant) {
+            this.options.setDynamicVariant((DynamicVariant) options);
+        } else {
+            this.options.setDynamicVariant(new DynamicValue(null, Value.from(options)));
+        }
     }
 
     @Override

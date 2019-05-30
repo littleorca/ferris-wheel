@@ -1098,7 +1098,7 @@ public class PbHelper {
         if (!pb.getTips().isEmpty()) {
             field.setTips(pb.getTips());
         }
-        field.setOptions(toValue(pb.getOptions()));
+        field.setOptions(toDynamicValue(pb.getOptions()));
         List<FormFieldBinding> bindings = new ArrayList<>(pb.getBindingsCount());
         for (int i = 0; i < pb.getBindingsCount(); i++) {
             bindings.add(bean(pb.getBindings(i)));

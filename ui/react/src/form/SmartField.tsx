@@ -163,11 +163,7 @@ class SmartField extends React.PureComponent<SmartFieldProps> {
 
     // type = decimal or string
     protected renderSingleSelect(field: FormField) {
-        const options: SelectOption[] = [];
-        for (let i = 0; i < field.options.itemCount(); i++) {
-            const value = this.toOptionValue(field.type, field.options.item(i));
-            options.push({ value });
-        }
+        const options: SelectOption[] = this.toOptionList(field.type, field.options);
         const value = this.toOptionValue(field.type, field.value);
         return (
             <Select
@@ -184,17 +180,13 @@ class SmartField extends React.PureComponent<SmartFieldProps> {
     // type = decimal or string
     protected renderMultipleSelect(field: FormField) {
         const selected: string[] = [];
-        const options: SelectOption[] = [];
+        const options: SelectOption[] = this.toOptionList(field.type, field.options);
         if (field.value.valueType() === VariantType.LIST) {
             for (let i = 0; i < field.value.itemCount(); i++) {
                 selected.push(this.toOptionValue(field.type, field.value.item(i)));
             }
         } else if (!field.value.isBlank()) {
             selected.push(this.toOptionValue(field.type, field.value));
-        }
-        for (let i = 0; i < field.options.itemCount(); i++) {
-            const value = this.toOptionValue(field.type, field.options.item(i));
-            options.push({ value });
         }
         return (
             <DropdownOmniInput
@@ -214,7 +206,22 @@ class SmartField extends React.PureComponent<SmartFieldProps> {
         );
     }
 
-    protected toOptionValue = (type: VariantType, value: Variant) => {
+    protected toOptionList(type: VariantType, options: UnionValue): SelectOption[] {
+        const result: SelectOption[] = [];
+        if (options.valueType() === VariantType.LIST) {
+            for (let i = 0; i < options.itemCount(); i++) {
+                const value = this.toOptionValue(type, options.item(i));
+                result.push({ value });
+            }
+
+        } else {
+            const value = this.toOptionValue(type, options);
+            result.push({ value });
+        }
+        return result;
+    }
+
+    protected toOptionValue(type: VariantType, value: Variant) {
         if (type === VariantType.DECIMAL) {
             return value.isBlank() ? "" : value.decimalValue();
         } else if (type === VariantType.STRING) {

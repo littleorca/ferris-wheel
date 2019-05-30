@@ -11,7 +11,10 @@ class FormFormStories extends Component {
             <div>
                 <h3>Form Form</h3>
                 <FormForm
-                    form={form} />
+                    form={form}
+                    afterChange={f => {
+                        console.log("afterChange: ", f);
+                    }} />
             </div>
         </div>
     }

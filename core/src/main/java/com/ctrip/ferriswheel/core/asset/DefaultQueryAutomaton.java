@@ -59,10 +59,6 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
         });
     }
 
-    DefaultTable getTable() {
-        return (DefaultTable) getParent();
-    }
-
     /**
      * Do not call this method manually. this method exists for workbook
      */

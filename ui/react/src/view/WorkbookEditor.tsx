@@ -495,6 +495,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         }
     }
 
+    // FIXME setState is not synchronize, txId may duplicate
     protected handleRemoteAction(action: Action) {
         const request = new EditRequest(this.state.txId + 1, action);
         this.setState({
