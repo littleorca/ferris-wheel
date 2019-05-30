@@ -9,6 +9,16 @@
     font-style: normal;
 }  
 
+.smart-form .field-control > input[type="text"],
+.dropdown-omni-input {
+    width: 10em;
+}
+
+.dropdown-omni-input-popover .omni-input {
+    width: 15em;
+    height: 20em;
+}
+
 .workbook-editor,
 .workbook-view {
     font-family: Arial, Helvetica, sans-serif;

@@ -1,11 +1,13 @@
 import * as React from 'react';
-import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
+import UnionValueEdit from '../ctrl/UnionValueEdit';
 import Parameter from '../model/Parameter';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import { VariantType } from '../model/Variant';
+import UnionValue from "../model/UnionValue";
+import EditBox from '../ctrl/EditBox';
+import ValueChange from "../ctrl/ValueChange";
 import Field from './Field';
 import Select from '../ctrl/Select';
 import CheckBox from '../ctrl/CheckBox';
-import { VariantType } from '../model/Variant';
 
 interface ParameterFormProps extends React.ClassAttributes<ParameterForm> {
     parameter: Parameter,
@@ -22,22 +24,22 @@ class ParameterForm extends React.Component<ParameterFormProps> {
         this.handleTypeChange = this.handleTypeChange.bind(this);
     }
 
-    protected handleNameChange(change: EditBoxChange) {
+    protected handleNameChange(change: ValueChange<string>) {
         if (change.type !== 'commit') {
             return;
         }
         const param = this.props.parameter;
-        const value = change.nextValue;
+        const value = change.toValue;
         param.name = value;
         this.onUpdate();
     }
 
-    protected handleValueChange(change: UnionValueChange) {
+    protected handleValueChange(change: ValueChange<UnionValue>) {
         if (change.type !== 'commit') {
             return;
         }
         const param = this.props.parameter;
-        param.value = change.newValue;
+        param.value = change.toValue;
         this.onUpdate();
     }
 

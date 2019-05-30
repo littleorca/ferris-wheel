@@ -1,4 +1,10 @@
+.union-value-list-edit {
+    display: flex;
+    flex-flow: column;
+}
+
 .union-value-list-edit > .manipulable-list {
+    flex: 1 0 4em;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -13,4 +19,8 @@
     width: 100%;
     height: 100%;
     box-sizing: border-box;
+}
+
+.union-value-list-edit > .actions {
+    flex: 0 0 auto;
 }

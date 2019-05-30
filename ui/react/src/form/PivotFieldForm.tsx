@@ -1,7 +1,8 @@
 import * as React from 'react';
 import PivotField from '../model/PivotField';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import EditBox from '../ctrl/EditBox';
+import ValueChange from "../ctrl/ValueChange";
 
 interface PivotFieldFormProps extends React.ClassAttributes<PivotFieldForm> {
     fields: PivotField[];
@@ -11,12 +12,12 @@ interface PivotFieldFormProps extends React.ClassAttributes<PivotFieldForm> {
 const PivotFieldEditor = (props: EditorProps<PivotField>) => {
     const pivotValue = props.value;
 
-    const handleChange = (change: EditBoxChange) => {
+    const handleChange = (change: ValueChange<string>) => {
         if (change.type !== 'commit') {
             return;
         }
         const name = change.name;
-        const value = change.nextValue;
+        const value = change.toValue;
         if (typeof name !== 'undefined') { // should always be true
             pivotValue[name] = value;
         }

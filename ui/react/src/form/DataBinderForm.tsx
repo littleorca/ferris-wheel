@@ -2,7 +2,9 @@ import * as React from 'react';
 import Binder from '../model/Binder';
 import Orientation from '../model/Orientation';
 import Placement from '../model/Placement';
-import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
+import UnionValue from "../model/UnionValue";
+import UnionValueEdit from '../ctrl/UnionValueEdit';
+import ValueChange from "../ctrl/ValueChange";
 import PlacementSelector, { PlacementItem } from '../ctrl/PlacementSelector';
 import classnames from "classnames";
 
@@ -28,13 +30,13 @@ class DataBinderForm extends React.Component<DataBinderFormProps> {
         this.togglePlacementSelection = this.togglePlacementSelection.bind(this);
     }
 
-    protected handleAreaChange(change: UnionValueChange) {
+    protected handleAreaChange(change: ValueChange<UnionValue>) {
         if (change.type !== 'commit') {
             return;
         }
 
         const binder = this.props.binder;
-        binder.data = change.newValue;
+        binder.data = change.toValue;
 
         this.onUpdate();
     }
@@ -144,6 +146,7 @@ class DataBinderForm extends React.Component<DataBinderFormProps> {
                         <span className="field-name">区域</span>
                         <UnionValueEdit
                             value={binder.data}
+                            modes={["formula"]}
                             afterChange={this.handleAreaChange} />
                     </label>
                 </div>

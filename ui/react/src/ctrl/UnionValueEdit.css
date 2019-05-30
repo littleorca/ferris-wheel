@@ -1,3 +1,98 @@
 .union-value-edit {
-    background: #f3fcff; /* TODO customize union value edit style */
+    display: inline-block;
+    position: relative;
+    min-width: 3em;
+    min-height: 1em;
+    /* height: 1.5em; */
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.union-value-edit.active {
+    z-index: 999;
+    overflow: visible;
+}
+
+.union-value-edit > textarea {
+    display: block;
+    margin: 0;
+    padding: 0 .25em;
+    width: 100%;
+    min-height: 100%;
+    height: 1.5em;
+    line-height: 1.5em;
+    border: 0 none;
+    box-sizing: border-box;
+    /* background: #f3fcff; */
+    font-size: 1em;
+    resize: none;
+    outline: 0 none;
+}
+
+.union-value-edit.active > textarea {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+}
+
+.union-value-edit.invalid {
+    box-shadow: 0 0 7px rgba(255, 255, 0, 0.5);
+}
+
+.union-value-edit.invalid > textarea {
+    background: #ffe;
+}
+
+.union-value-edit > .union-value-edit-mode {
+    position: absolute;
+    left: 0;
+    top: auto;
+    right: auto;
+    bottom: 100%;
+    padding: 0;
+    transform-origin: bottom left;
+    transform: scale(.6);
+    overflow: hidden;
+    opacity: 0;
+    visibility: visible;
+    transition: all .25s;
+}
+
+.union-value-edit.active > .union-value-edit-mode {
+    opacity: .9;
+    transform-origin: bottom left;
+    transform: scale(.75);
+    visibility: visible;
+}
+
+.union-value-edit > .union-value-edit-mode .tool-group:first-child {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.union-value-edit > .union-value-edit-mode .tool-group:last-child {
+    margin-right: 0;
+    padding-right: 0;
+}
+
+.union-value-edit > .union-value-edit-mode button.button {
+    padding: 0 .4em;
+    height: 1.5em;
+    font-weight: bold;
+    /* text-shadow: -1px -1px 3px #fff; */
+    background: #aaa;
+    color:#fff;
+    border-color: #fff;
+}
+
+.union-value-edit > .union-value-edit-mode button.mode-current {
+    background: #555;
+}
+
+.union-value-edit-aux .union-value-list-edit {
+    padding: .5em;
+    width: 10em;
+    height: 8em;
+    background: #f9f9f9;
+    border-radius: .25em;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, .25);
 }

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import EditBox, { EditBoxChange } from './EditBox';
+import EditBox from './EditBox';
+import ValueChange from "./ValueChange";
 import classnames from 'classnames';
 import './NumberInput.css';
 
@@ -65,23 +66,23 @@ class NumberInput extends React.Component<NumberInputProps, NumberInputState> {
         return true;
     }
 
-    protected checkChange(change: EditBoxChange) {
+    protected checkChange(change: ValueChange<string>) {
         if (change.type !== 'commit') {
             return true;
         }
-        return this.validateStr(change.nextValue);
+        return this.validateStr(change.toValue);
     }
 
-    protected handleChange(change: EditBoxChange) {
+    protected handleChange(change: ValueChange<string>) {
         switch (change.type) {
             case 'edit':
                 this.setState({
-                    isValid: this.validateStr(change.nextValue),
+                    isValid: this.validateStr(change.toValue),
                 });
                 break;
             case 'commit':
                 if (this.state.isValid) {
-                    const value = Number(change.nextValue);
+                    const value = Number(change.toValue);
                     if (value !== this.props.value) {
                         this.props.afterChange(value);
                     }

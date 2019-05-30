@@ -14,7 +14,7 @@
 
 .format-input-popover {
     fill: #ccc;
-    z-index: 1;
+    z-index: 999;
 }
 
 .format-input-popover .format-form {

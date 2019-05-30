@@ -3,13 +3,13 @@ import UnionValue from '../model/UnionValue';
 import ManipulableList, { ItemRendererProps } from './ManipulableList';
 import Values from '../model/Values';
 import EditableUnionValue from './EditableUnionValue';
-import { VariantType } from '../model/Variant';
+import { UnionValueEditMode } from './UnionValueEdit';
 import classnames from "classnames";
 import './UnionValueListEdit.css';
 
 interface UnionValueListEditProps extends React.ClassAttributes<UnionValueListEdit> {
     list: UnionValue[],
-    type?: VariantType, // TODO add type restraction.
+    modes?: UnionValueEditMode[];
     readOnly?: boolean,
     className?: string,
     hideActions?: boolean,
@@ -97,9 +97,29 @@ class UnionValueListEdit extends React.Component<UnionValueListEditProps> {
             this.pendingNewItem = null;
         }
 
+        const filteredModes: UnionValueEditMode[] = [];
+        if (typeof this.props.modes !== "undefined") {
+            this.props.modes.forEach(m => {
+                if (m !== "formula" && m !== "list") {
+                    filteredModes.push(m);
+                }
+            });
+        } else {
+            filteredModes.push("decimal");
+            filteredModes.push("boolean");
+            filteredModes.push("date");
+            filteredModes.push("string");
+        }
+
+        if (filteredModes.length === 0) {
+            throw new Error("Invalid mode setting.");
+        }
+
         return (
             <EditableUnionValue
                 value={props.value}
+                modes={filteredModes}
+                aux="none"
                 editMode={editMode}
                 afterChange={afterChange} />
         );

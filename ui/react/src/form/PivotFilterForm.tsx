@@ -1,7 +1,8 @@
 import * as React from 'react';
 import PivotFilter from '../model/PivotFilter';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import EditBox from '../ctrl/EditBox';
+import ValueChange from "../ctrl/ValueChange";
 
 interface PivotFilterFormProps extends React.ClassAttributes<PivotFilterForm> {
     filters: PivotFilter[];
@@ -11,12 +12,12 @@ interface PivotFilterFormProps extends React.ClassAttributes<PivotFilterForm> {
 const PivotFilterEditor = (props: EditorProps<PivotFilter>) => {
     const pivotFilter = props.value;
 
-    const handleChange = (change: EditBoxChange) => {
+    const handleChange = (change: ValueChange<string>) => {
         if (change.type !== 'commit') {
             return;
         }
         const name = change.name;
-        const value = change.nextValue;
+        const value = change.toValue;
         if (typeof name !== 'undefined') { // should always be ture
             pivotFilter[name] = value;
         }

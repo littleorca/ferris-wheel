@@ -1,7 +1,9 @@
 import * as React from 'react';
 import Series from '../model/Series';
 import Values from '../model/Values';
-import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
+import UnionValueEdit from '../ctrl/UnionValueEdit';
+import ValueChange from '../ctrl/ValueChange';
+import UnionValue from '../model/UnionValue';
 
 interface SeriesFormProps extends React.ClassAttributes<SeriesForm> {
     series: Series,
@@ -16,13 +18,13 @@ class SeriesForm extends React.Component<SeriesFormProps> {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    protected handleChange(change: UnionValueChange) {
+    protected handleChange(change: ValueChange<UnionValue>) {
         if (change.type !== 'commit') {
             return;
         }
         const series = this.props.series;
         if (change.name) {
-            series[change.name] = change.newValue;
+            series[change.name] = change.toValue;
         }
         if (typeof this.props.afterChange !== 'undefined') {
             this.props.afterChange(series);
@@ -38,6 +40,7 @@ class SeriesForm extends React.Component<SeriesFormProps> {
                     <UnionValueEdit
                         name="name"
                         value={series.name}
+                        modes={["formula", "string"]}
                         afterChange={this.handleChange} />
                 </label>
                 <label className="field x-values">
@@ -45,6 +48,7 @@ class SeriesForm extends React.Component<SeriesFormProps> {
                     <UnionValueEdit
                         name="xValues"
                         value={series.xValues.isFormula() ? series.xValues : Values.blank()}
+                        modes={["formula"]}
                         afterChange={this.handleChange} />
                 </label>
                 <label className="field y-values">
@@ -52,6 +56,7 @@ class SeriesForm extends React.Component<SeriesFormProps> {
                     <UnionValueEdit
                         name="yValues"
                         value={series.yValues.isFormula() ? series.yValues : Values.blank()}
+                        modes={["formula"]}
                         afterChange={this.handleChange} />
                 </label>
                 <label className="field z-values">
@@ -59,6 +64,7 @@ class SeriesForm extends React.Component<SeriesFormProps> {
                     <UnionValueEdit
                         name="zValues"
                         value={series.zValues.isFormula() ? series.zValues : Values.blank()}
+                        modes={["formula"]}
                         afterChange={this.handleChange} />
                 </label>
             </div>

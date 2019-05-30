@@ -4,9 +4,8 @@ import FormFieldBinding from "../model/FormFieldBinding";
 import { VariantType } from "../model/Variant";
 import EditableList from "../ctrl/EditableList";
 import FormFieldBindingForm from "./FormFieldBindingForm";
-import UnionValueListEdit from "../ctrl/UnionValueListEdit";
+import UnionValueEdit from "../ctrl/UnionValueEdit";
 import EditBox from "../ctrl/EditBox";
-import Values from "../model/Values";
 import Field from "./Field";
 import CheckBox from "../ctrl/CheckBox";
 import classnames from "classnames";
@@ -49,7 +48,7 @@ class FormFieldForm extends React.Component<FormFieldFormProps> {
                         value={field.name}
                         afterChange={change => {
                             if (change.type === "commit") {
-                                field.name = change.nextValue;
+                                field.name = change.toValue;
                                 this.afterChange();
                             }
                         }} />
@@ -83,7 +82,7 @@ class FormFieldForm extends React.Component<FormFieldFormProps> {
                         value={field.label}
                         afterChange={change => {
                             if (change.type === "commit") {
-                                field.label = change.nextValue;
+                                field.label = change.toValue;
                                 this.afterChange();
                             }
                         }} />
@@ -98,7 +97,7 @@ class FormFieldForm extends React.Component<FormFieldFormProps> {
                         value={field.tips}
                         afterChange={change => {
                             if (change.type === "commit") {
-                                field.tips = change.nextValue;
+                                field.tips = change.toValue;
                                 this.afterChange();
                             }
                         }} />
@@ -120,12 +119,14 @@ class FormFieldForm extends React.Component<FormFieldFormProps> {
                     className="field-options"
                     name="options"
                     label="候选值">
-                    <UnionValueListEdit
+                    <UnionValueEdit
                         className="option-list"
-                        list={field.options.isBlank() ? [] : field.options.listValue()}
-                        afterChange={list => {
-                            field.options = Values.list(list);
-                            this.afterChange();
+                        value={field.options}
+                        afterChange={change => {
+                            if (change.type === "commit") {
+                                field.options = change.toValue;
+                                this.afterChange();
+                            }
                         }} />
                 </Field>
                 <Field

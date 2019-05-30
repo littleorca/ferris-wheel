@@ -1,13 +1,22 @@
 import * as React from 'react';
 import UnionValue from '../model/UnionValue';
 import InlineEditable, { InlineEditorProps } from './InlineEditable';
-import UnionValueEdit, { UnionValueChange } from './UnionValueEdit';
+import UnionValueEdit, { UnionValueEditMode, UnionValueEditAux } from './UnionValueEdit';
+import ValueChange from "./ValueChange";
 
 export interface EditableUnionValueProps extends React.ClassAttributes<EditableUnionValue> {
     value: UnionValue,
-    multiline?: boolean,
+    id?: string;
+    name?: string;
+    placeholder?: string;
+    className?: string;
+    style?: React.CSSProperties;
+    disableCommitOnEnter?: boolean;
+    autoExpand?: boolean;
+    disabled?: boolean;
+    modes?: UnionValueEditMode[];
+    aux?: UnionValueEditAux;
     readOnly?: boolean,
-    className?: string,
     displayClassName?: string,
     editClassName?: string,
     editMode?: boolean,
@@ -21,7 +30,6 @@ const unionValueToDisplayText = (value: UnionValue) => {
 
 class EditableUnionValue extends React.Component<EditableUnionValueProps> {
     protected static defaultProps: Partial<EditableUnionValueProps> = {
-        multiline: false,
         readOnly: false,
     }
 
@@ -32,9 +40,9 @@ class EditableUnionValue extends React.Component<EditableUnionValueProps> {
     }
 
     protected inlineEditor(props: InlineEditorProps<UnionValue>) {
-        const afterChange = (change: UnionValueChange) => {
+        const afterChange = (change: ValueChange<UnionValue>) => {
             if (change.type === 'commit') {
-                props.onSubmit(change.newValue);
+                props.onSubmit(change.toValue);
             } else if (change.type === 'rollback') {
                 props.onCancel();
             }
@@ -47,10 +55,17 @@ class EditableUnionValue extends React.Component<EditableUnionValueProps> {
         return (
             <UnionValueEdit
                 value={props.value}
-                multiline={this.props.multiline}
                 className={props.className}
                 style={props.style}
+                id={this.props.id}
+                name={this.props.name}
+                placeholder={this.props.placeholder}
+                disableCommitOnEnter={this.props.disableCommitOnEnter}
+                autoExpand={this.props.autoExpand}
+                aux={this.props.aux}
                 focusByDefault={true}
+                disabled={this.props.disabled}
+                modes={this.props.modes}
                 afterChange={afterChange}
                 afterEndEdit={afterEndEdit} />
         );

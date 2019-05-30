@@ -1,6 +1,7 @@
 import * as React from 'react';
 import InlineEditable, { InlineEditorProps } from './InlineEditable';
-import EditBox, { EditBoxChange } from './EditBox';
+import EditBox from './EditBox';
+import ValueChange from "./ValueChange";
 
 export interface EditableTextProps extends React.ClassAttributes<EditableText> {
     value: string,
@@ -30,9 +31,9 @@ class EditableText extends React.Component<EditableTextProps> {
     }
 
     protected inlineEditor(props: InlineEditorProps<string>) {
-        const afterChange = (change: EditBoxChange) => {
+        const afterChange = (change: ValueChange<string>) => {
             if (change.type === 'commit') {
-                props.onSubmit(change.nextValue);
+                props.onSubmit(change.toValue);
             } else if (change.type === 'rollback') {
                 // no need to deal the value after rollback as the dirty value 
                 // is not commited. here we leave edit mode after rollback.
@@ -50,7 +51,7 @@ class EditableText extends React.Component<EditableTextProps> {
                 multiline={this.props.multiline}
                 className={props.className}
                 style={props.style}
-                focused={true}
+                focusByDefault={true}
                 afterChange={afterChange}
                 afterEndEdit={afterEndEdit} />
         );

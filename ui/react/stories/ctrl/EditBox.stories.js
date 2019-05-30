@@ -39,13 +39,15 @@ class EditBoxStories extends Component {
             <div>
                 <h3>Single Line</h3>
                 <EditBox
-                    id="e-b-id"
+                    id="e-b-id-1"
                     value={this.text}
                     placeholder="holder"
                     beforeChange={this.beforeChange}
                     afterBeginEdit={this.afterBeginEdit}
                     afterChange={this.afterChange}
                     afterEndEdit={this.afterEndEdit} />
+                <input type="text" defaultValue="Reference(input)" />
+                <label>Reference(label)</label>
                 <h3>Multiple Lines</h3>
                 <EditBox
                     id="e-b-id-2"
@@ -58,7 +60,7 @@ class EditBoxStories extends Component {
                     afterEndEdit={this.afterEndEdit} />
                 <h3>Single Line, select on focus</h3>
                 <EditBox
-                    id="e-b-id"
+                    id="e-b-id-3"
                     value={this.text}
                     selectOnFocus={true}
                     placeholder="holder"
@@ -68,10 +70,33 @@ class EditBoxStories extends Component {
                     afterEndEdit={this.afterEndEdit} />
                 <h3>Multiple Lines, select on focus</h3>
                 <EditBox
-                    id="e-b-id-2"
+                    id="e-b-id-4"
                     value={this.text}
                     multiline={true}
                     selectOnFocus={true}
+                    placeholder="holder"
+                    beforeChange={this.beforeChange}
+                    afterBeginEdit={this.afterBeginEdit}
+                    afterChange={this.afterChange}
+                    afterEndEdit={this.afterEndEdit} />
+                <h3>Multiple Lines, forceCommitOnEnter</h3>
+                <EditBox
+                    id="e-b-id-5"
+                    value={this.text}
+                    multiline={true}
+                    forceCommitOnEnter={true}
+                    placeholder="holder"
+                    beforeChange={this.beforeChange}
+                    afterBeginEdit={this.afterBeginEdit}
+                    afterChange={this.afterChange}
+                    afterEndEdit={this.afterEndEdit} />
+                <h3>Multiple Lines, forceCommitOnEnter &amp; autoExpand</h3>
+                <EditBox
+                    id="e-b-id-5"
+                    value={this.text}
+                    multiline={true}
+                    forceCommitOnEnter={true}
+                    autoExpand={true}
                     placeholder="holder"
                     beforeChange={this.beforeChange}
                     afterBeginEdit={this.afterBeginEdit}

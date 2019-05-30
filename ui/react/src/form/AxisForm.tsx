@@ -7,8 +7,9 @@ import Stacking from '../model/Stacking';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
 import IntervalInput from '../ctrl/IntervalInput';
 import BandForm from './BandForm';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import EditBox from '../ctrl/EditBox';
 import FormatInput from '../ctrl/FormatInput';
+import ValueChange from "../ctrl/ValueChange";
 
 interface AxisFormProps extends React.ClassAttributes<AxisForm> {
     axis: Axis,
@@ -54,12 +55,12 @@ class AxisForm extends React.Component<AxisFormProps> {
         this.onUpdate();
     }
 
-    protected handleEditBoxChange(change: EditBoxChange) {
+    protected handleEditBoxChange(change: ValueChange<string>) {
         if (change.type !== 'commit') {
             return;
         }
         const name = change.name;
-        const value = change.nextValue;
+        const value = change.toValue;
         const axis = this.props.axis;
 
         if (typeof name !== 'undefined') { // sould always be true

@@ -12,3 +12,8 @@
     height: inherit;
     white-space: pre-wrap;
 }
+
+.text-view .union-value-edit textarea {
+    line-height: inherit;
+    font: inherit;
+}

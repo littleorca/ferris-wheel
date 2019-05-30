@@ -1,6 +1,8 @@
 import * as React from 'react';
 import PivotAutomaton from '../model/PivotAutomaton';
-import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
+import UnionValue from "../model/UnionValue";
+import UnionValueEdit from '../ctrl/UnionValueEdit';
+import ValueChange from "../ctrl/ValueChange";
 import PivotFilterForm from './PivotFilterForm';
 import PivotFieldForm from './PivotFieldForm';
 import PivotValueForm from './PivotValueForm';
@@ -25,10 +27,10 @@ class PivotForm extends React.Component<PivotFormProps> {
         this.handleValueChange = this.handleValueChange.bind(this);
     }
 
-    protected handleDataChange(change: UnionValueChange) {
+    protected handleDataChange(change: ValueChange<UnionValue>) {
         const pivot = this.props.pivot;
         if (change.type === 'commit') {
-            pivot.data = change.newValue;
+            pivot.data = change.toValue;
             this.onUpdate();
         }
     }
@@ -65,6 +67,7 @@ class PivotForm extends React.Component<PivotFormProps> {
                         <span className="field-name">区域</span>
                         <UnionValueEdit
                             value={pivot.data}
+                            modes={["formula"]}
                             afterChange={this.handleDataChange} />
                     </label>
                 </div>

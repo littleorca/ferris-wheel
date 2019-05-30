@@ -2,8 +2,9 @@ import * as React from 'react';
 import PivotValue from '../model/PivotValue';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
 import { AggregateTypeNames, AggregateTypeList } from '../model/AggregateType';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import EditBox from '../ctrl/EditBox';
 import FormatInput from '../ctrl/FormatInput';
+import ValueChange from "../ctrl/ValueChange";
 
 interface PivotValueFormProps extends React.ClassAttributes<PivotValueForm> {
     values: PivotValue[];
@@ -22,12 +23,12 @@ const PivotValueEditor = (props: EditorProps<PivotValue>) => {
         props.onSubmit(pivotValue);
     };
 
-    const handleEditBoxChange = (change: EditBoxChange) => {
+    const handleEditBoxChange = (change: ValueChange<string>) => {
         if (change.type !== 'commit') {
             return;
         }
         const name = change.name;
-        const value = change.nextValue;
+        const value = change.toValue;
         if (typeof name !== 'undefined') { // should always be true
             pivotValue[name] = value;
         }

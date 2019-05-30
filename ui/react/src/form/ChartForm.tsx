@@ -2,13 +2,15 @@ import * as React from 'react';
 import Chart from '../model/Chart';
 import Binder from '../model/Binder';
 import Series from '../model/Series';
-import UnionValueEdit, { UnionValueChange } from '../ctrl/UnionValueEdit';
+import UnionValueEdit from '../ctrl/UnionValueEdit';
+import ValueChange from "../ctrl/ValueChange";
 import EditableList, { EditorProps } from '../ctrl/EditableList';
 import AxisForm from './AxisForm';
 import DataBinderForm from './DataBinderForm';
 import SeriesBinderForm from './SeriesBinderForm';
 import Axis from '../model/Axis'
 import Values from '../model/Values';
+import UnionValue from 'src/model/UnionValue';
 import './ChartForm.css';
 
 interface ChartFormProps extends React.ClassAttributes<ChartForm> {
@@ -56,8 +58,8 @@ class ChartForm extends React.Component<ChartFormProps, ChartFormState> {
         ];
         const hasBinder = chart.binder.data.isFormula();
         const hasData = chart.categories.isFormula() ||
-                        !chart.categories.isBlank() ||
-                        chart.series.length > 0
+            !chart.categories.isBlank() ||
+            chart.series.length > 0
         return {
             useBinder: hasBinder || !hasData,
             namedAxes,
@@ -74,13 +76,13 @@ class ChartForm extends React.Component<ChartFormProps, ChartFormState> {
         this.onUpdate();
     }
 
-    protected handleVariantChange(change: UnionValueChange) {
+    protected handleVariantChange(change: ValueChange<UnionValue>) {
         if (change.type !== 'commit') {
             return;
         }
         const chart = this.props.chart;
         if (change.name) {
-            chart[change.name] = change.newValue;
+            chart[change.name] = change.toValue;
         } // else throw new Error();
         this.onUpdate();
     }
@@ -142,6 +144,7 @@ class ChartForm extends React.Component<ChartFormProps, ChartFormState> {
                             name="title"
                             placeholder="输入图表标题，支持公式。"
                             value={chart.title}
+                            modes={["formula", "string"]}
                             afterChange={this.handleVariantChange} />
                     </label>
                     <label className="field auto-bind">
@@ -171,6 +174,7 @@ class ChartForm extends React.Component<ChartFormProps, ChartFormState> {
                                         <UnionValueEdit
                                             name="categories"
                                             value={chart.categories.isFormula() ? chart.categories : Values.blank()}
+                                            modes={["formula"]}
                                             afterChange={this.handleVariantChange} />
                                     </label>
                                 </div>

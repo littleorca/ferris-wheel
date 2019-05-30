@@ -1,0 +1,11 @@
+textarea.edit-box {
+    border: 1px solid #ccc;
+    font-size: inherit;
+}
+
+textarea.edit-box.singleline {
+    vertical-align: middle;
+    resize: none;
+    white-space: nowrap;
+    overflow: hidden;
+}

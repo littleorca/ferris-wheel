@@ -1,7 +1,8 @@
 import * as React from "react";
+import Values from "../model/Values";
 import FormFieldBinding from "../model/FormFieldBinding";
 import Field from "./Field";
-import EditBox from "../ctrl/EditBox";
+import UnionValueEdit from "../ctrl/UnionValueEdit";
 import classnames from "classnames";
 
 interface FormFieldBindingFormProps extends React.ClassAttributes<FormFieldBindingForm> {
@@ -33,13 +34,14 @@ class FormFieldBindingForm extends React.Component<FormFieldBindingFormProps>{
                     className="form-field-binding-form-target"
                     name="target"
                     label="目标">
-                    <EditBox
+                    <UnionValueEdit
                         name="target"
                         placeholder="输入目标引用"
-                        value={binding.target}
+                        modes={["formula"]}
+                        value={Values.formula(binding.target)}
                         afterChange={change => {
                             if (change.type === "commit") {
-                                binding.target = change.nextValue;
+                                binding.target = change.toValue.getFormulaString();
                                 this.afterChange();
                             }
                         }} />

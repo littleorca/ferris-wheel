@@ -15,3 +15,4 @@ interface Service {
 }
 
 export default Service;
+export { OkCallback, ErrorCallback }

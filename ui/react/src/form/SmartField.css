@@ -32,6 +32,7 @@
 }
 
 .smart-field .field-control input[type="text"],
+.smart-field .field-control textarea,
 .smart-field .field-control select,
 .smart-field .field-control .dropdown-omni-input,
 .smart-field .field-control .date-select,
@@ -45,6 +46,7 @@
 }
 
 .smart-field .field-control input[type="text"],
+.smart-field .field-control textarea,
 .smart-field .field-control select,
 .smart-field .field-control .dropdown-omni-input {
     flex: 1 1 auto;

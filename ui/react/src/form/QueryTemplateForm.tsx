@@ -3,7 +3,8 @@ import ParameterForm from './ParameterForm';
 import EditableList, { EditorProps } from '../ctrl/EditableList';
 import Parameter from '../model/Parameter';
 import QueryTemplate from '../model/QueryTemplate';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import EditBox from '../ctrl/EditBox';
+import ValueChange from "../ctrl/ValueChange";
 
 const BuiltinParamEditor = (props: EditorProps<Parameter>) => {
     return (
@@ -33,11 +34,11 @@ class QueryTemplateForm extends React.Component<QueryTemplateFormProps> {
         this.handleBuiltinParamsChange = this.handleBuiltinParamsChange.bind(this);
     }
 
-    protected handleSchemeChange(change: EditBoxChange) {
+    protected handleSchemeChange(change: ValueChange<string>) {
         if (change.type !== 'commit') {
             return;
         }
-        this.props.queryTemplate.scheme = change.nextValue;
+        this.props.queryTemplate.scheme = change.toValue;
         this.forceUpdate();
         this.onUpdate();
     }

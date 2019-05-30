@@ -77,7 +77,7 @@ class TextView extends React.Component<TextViewProps> {
             <div className={className}>
                 <EditableUnionValue
                     value={text.content}
-                    multiline={true}
+                    disableCommitOnEnter={true}
                     readOnly={!this.props.editable}
                     afterChange={this.afterChange} />
             </div>

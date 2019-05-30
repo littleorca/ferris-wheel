@@ -75,15 +75,10 @@
 }
 
 .add-form-form .form-field-form .field-options,
-.add-form-form .form-field-form .field-options > .field-control,
-.add-form-form .form-field-form .field-options > .field-control > .option-list {
+.add-form-form .form-field-form .field-options > .field-control {
     flex: 1 1 auto;
     display: flex;
     flex-flow: column nowrap;
-}
-
-.add-form-form .form-field-form .field-options > .field-control > .option-list > .manipulable-list {
-    flex: 1 1 auto;
 }
 
 .add-form-form .form-field-form .field-bindings {

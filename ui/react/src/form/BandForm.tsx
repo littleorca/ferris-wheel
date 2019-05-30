@@ -4,7 +4,8 @@ import ColorInput from '../ctrl/ColorInput';
 import Color from '../model/Color';
 import IntervalInput from '../ctrl/IntervalInput';
 import Interval from '../model/Interval';
-import EditBox, { EditBoxChange } from '../ctrl/EditBox';
+import EditBox from '../ctrl/EditBox';
+import ValueChange from "../ctrl/ValueChange";
 
 export interface BandFormProps extends React.ClassAttributes<BandForm> {
     band: AxisBand,
@@ -20,11 +21,11 @@ class BandForm extends React.Component<BandFormProps> {
         this.handleColorChange = this.handleColorChange.bind(this);
     }
 
-    protected handleLabelChange(change: EditBoxChange) {
+    protected handleLabelChange(change: ValueChange<string>) {
         if (change.type !== 'commit') {
             return;
         }
-        const value = change.nextValue;
+        const value = change.toValue;
         const band = this.props.band;
         band.label = value;
         this.forceUpdate();
