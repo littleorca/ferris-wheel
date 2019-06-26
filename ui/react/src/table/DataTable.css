@@ -1,18 +1,68 @@
-.fw-data-table table {
-    border-collapse: collapse;
-}
-
-.fw-data-table table,
-.fw-data-table table th,
-.fw-data-table table td {
+.fw-data-table {
     border: 1px solid #ccc;
+    background: #f9f9f9;
+    user-select: none;
 }
 
-.fw-data-table table th,
-.fw-data-table table td {
-    padding: .25em .5em;
+.fw-data-table .cell {
+    padding: 0 .4em;
+    line-height: 1.5;
+    border-width: 0 1px 1px 0;
+    border-style: solid;
+    border-color: #ddd;
+    text-overflow: ellipsis;
+    background: #fff;
 }
 
-.fw-data-table table th {
-    background: #eee;
+.fw-data-table .cell.header-cell {
+    min-width: 2em;
+    text-align: center;
+    font-weight: normal;
+    color: #333;
+    background: #f3f3f3;
+    border-width: 0 1px 1px 0;
+    border-style: solid;
+    border-color: #ccc;
+    cursor: default;
+}
+
+.fw-data-table.focused .cell.header-cell.highlight {
+    background: #dfdfdf;
+}
+
+.fw-data-table.focused .cell.header-cell.selected {
+    background: #8eb0e6;
+}
+
+.fw-data-table .align-center {
+    text-align: center;
+}
+
+.fw-data-table .align-right {
+    text-align: right;
+}
+
+.fw-data-table .corner-overlay {
+    background: #f3f3f3;
+    /* border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc; */
+}
+
+.fw-data-table .resize-handle {
+    background: transparent;
+}
+
+/* .fw-data-table .resize-handle:hover {
+    background: #39f;
+} */
+
+.fw-data-table .selection-border,
+.fw-data-table .column-resize-helper {
+    border-width: 0;
+    outline: thin solid #ccc;
+}
+
+.fw-data-table.focused .selection-border,
+.fw-data-table.focused .column-resize-helper {
+    outline: thin solid #39f;
 }

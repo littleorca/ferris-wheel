@@ -59,6 +59,7 @@ public abstract class RestfulProviderBase implements DataProvider {
     private volatile int readTimeoutInMillis = DEFAULT_READ_TIMEOUT_IN_MILLIS;
 
     // TODO use LRU cache instead
+    // TODO cache should be expired after a certain duration.
     private transient LinkedHashMap<RestfulRequest, String> cachedResponse = new LinkedHashMap<>();
 
     @Override

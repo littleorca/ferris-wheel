@@ -15,6 +15,7 @@ import {
     SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns,
     InsertColumns, ResetTable, SetCellsFormat, Cell, Formatter
 } from '..';
+import DataTable from '../table/DataTable';
 import classnames from "classnames";
 import 'handsontable/dist/handsontable.full.css';
 import './TableView.css';
@@ -683,44 +684,56 @@ class TableView extends React.Component<TableViewProps>{
                     )}
                 </div> */}
                 <div className="content">
-                    <HotTable
-                        ref={this.hotTableRef}
-                        data={data}
-                        cells={this.getCellProperties}
-                        readOnly={readOnly}
-                        colHeaders={true}
-                        rowHeaders={true}
-                        columnSorting={false}
-                        // width="auto"
-                        stretchH="all"
-                        manualColumnResize={true}
-                        manualRowResize={true}
-                        outsideClickDeselects={this.shouldDeselectOnOutsideClick}
-                        fillHandle={{ autoInsertRow: false }}
-                        contextMenu={false}
-                        copyable={true}
-                        copyPaste={true} // paste are disabled by beforePaste hook
-                        // afterBeginEdting={this.afterBeginEditing}
-                        // beforeChange={this.beforeChange}
-                        // afterChange={this.afterChange}
-                        afterColumnSort={this.afterColumnSort}
-                        afterCreateCol={this.afterCreateCol}
-                        afterCreateRow={this.afterCreateRow}
-                        afterDeselect={this.afterDeselect}
-                        afterRemoveCol={this.afterRemoveCol}
-                        afterRemoveRow={this.afterRemoveRow}
-                        afterSelectionEnd={this.afterSelectionEnd}
-                        afterSetDataAtCell={this.afterSetDataAtCell}
-                        afterSetDataAtRowProp={this.afterSetDataAtCell}
-                        beforeColumnSort={this.beforeColumnSort}
-                        beforeCreateCol={this.beforeCreateCol}
-                        beforeCreateRow={this.beforeCreateRow}
-                        // beforeCut={this.beforeCut}
-                        beforePaste={this.beforePaste}
-                        beforeRemoveCol={this.beforeRemoveCol}
-                        beforeRemoveRow={this.beforeRemoveRow}
-                        beforeValueRender={this.beforeValueRender}
-                        modifyData={this.modifyData} />
+                    {readOnly ?
+                        (
+                            <DataTable
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                }}
+                                data={this.props.table} />
+                        )
+                        :
+                        (
+                            <HotTable
+                                ref={this.hotTableRef}
+                                data={data}
+                                cells={this.getCellProperties}
+                                readOnly={readOnly}
+                                colHeaders={true}
+                                rowHeaders={true}
+                                columnSorting={false}
+                                // width="auto"
+                                stretchH="all"
+                                manualColumnResize={true}
+                                manualRowResize={true}
+                                outsideClickDeselects={this.shouldDeselectOnOutsideClick}
+                                fillHandle={{ autoInsertRow: false }}
+                                contextMenu={false}
+                                copyable={true}
+                                copyPaste={true} // paste are disabled by beforePaste hook
+                                // afterBeginEdting={this.afterBeginEditing}
+                                // beforeChange={this.beforeChange}
+                                // afterChange={this.afterChange}
+                                afterColumnSort={this.afterColumnSort}
+                                afterCreateCol={this.afterCreateCol}
+                                afterCreateRow={this.afterCreateRow}
+                                afterDeselect={this.afterDeselect}
+                                afterRemoveCol={this.afterRemoveCol}
+                                afterRemoveRow={this.afterRemoveRow}
+                                afterSelectionEnd={this.afterSelectionEnd}
+                                afterSetDataAtCell={this.afterSetDataAtCell}
+                                afterSetDataAtRowProp={this.afterSetDataAtCell}
+                                beforeColumnSort={this.beforeColumnSort}
+                                beforeCreateCol={this.beforeCreateCol}
+                                beforeCreateRow={this.beforeCreateRow}
+                                // beforeCut={this.beforeCut}
+                                beforePaste={this.beforePaste}
+                                beforeRemoveCol={this.beforeRemoveCol}
+                                beforeRemoveRow={this.beforeRemoveRow}
+                                beforeValueRender={this.beforeValueRender}
+                                modifyData={this.modifyData} />
+                        )}
                 </div>
             </div>
         );

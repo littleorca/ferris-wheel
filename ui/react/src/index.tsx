@@ -213,8 +213,10 @@ export * from "./model/Variant";
 
 /* table */
 export { default as DataTable } from "./table/DataTable";
+export { default as TableData } from "./table/TableData";
 
 export * from "./table/DataTable";
+export * from "./table/TableData";
 
 /* utils */
 export { default as EscapeHelper } from "./util/EscapeHelper";

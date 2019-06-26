@@ -41,10 +41,15 @@ class Formatter {
         if (value.isBlank()) {
             return "";
         }
-        const formatOption =
+        let formatOption =
             typeof format === "string"
                 ? this.parseFormat(format)
                 : (format as FormatOption);
+        if (typeof formatOption.type === "undefined") {
+            if (value.valueType() === VariantType.DATE) {
+                formatOption = this.parseFormat(this.DEFAULT_DATETIME_FORMAT);
+            }
+        }
         if (formatOption.type === "decimal") {
             if (value.valueType() !== VariantType.DECIMAL) {
                 return value.toString();

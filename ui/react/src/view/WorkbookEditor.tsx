@@ -59,8 +59,11 @@ import './WorkbookEditor.css';
 interface WorkbookEditorProps extends React.ClassAttributes<WorkbookEditor> {
     workbook: Workbook;
     service: Service;
+    defaultSheet?: string;
     className?: string;
     extensions?: Extension[];
+    beforeAction?: (action: Action) => boolean;
+    afterAction?: (action: Action) => void;
 }
 
 interface WorkbookEditorState {
@@ -479,10 +482,20 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
 
     protected handleAction(action: Action) {
         // console.log('handleAction', action);
+        if (typeof this.props.beforeAction !== "undefined") {
+            if (!this.props.beforeAction(action)) {
+                return;
+            }
+        }
+
         if (action.isLocalAction()) {
             this.handleLocalAction(action);
         } else {
             this.handleRemoteAction(action);
+        }
+
+        if (typeof this.props.afterAction !== "undefined") {
+            this.props.afterAction(action);
         }
     }
 
@@ -593,6 +606,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                 <div className="editor-body">
                     <WorkbookView
                         workbook={this.props.workbook}
+                        defaultSheet={this.props.defaultSheet}
                         editable={true}
                         onAction={this.handleAction}
                         herald={this} />

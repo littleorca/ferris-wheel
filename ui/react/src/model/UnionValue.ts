@@ -54,7 +54,7 @@ abstract class UnionValue implements Variant {
                 if (date === null) {
                     throw new Error();
                 }
-                return moment(date).utc().format();
+                return moment(date).format("YYYY-MM-DD HH:mm:ss");
             case VariantType.STRING:
                 const str = this.strValue();
                 if (str === null) {

@@ -13,7 +13,10 @@ import './WorkbookPresenter.css';
 interface WorkbookPresenterProps extends React.ClassAttributes<WorkbookPresenter> {
     workbook: Workbook;
     service: Service;
+    defaultSheet?: string;
     className?: string;
+    beforeAction?: (action: Action) => boolean;
+    afterAction?: (action: Action) => void;
 }
 
 interface WorkbookPresenterState {
@@ -50,6 +53,20 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
     }
 
     protected handleAction(action: Action) {
+        if (typeof this.props.beforeAction !== "undefined") {
+            if (!this.props.beforeAction(action)) {
+                return;
+            }
+        }
+
+        this.doHandleAction(action);
+
+        if (typeof this.props.afterAction !== "undefined") {
+            this.props.afterAction(action);
+        }
+    }
+
+    private doHandleAction(action: Action) {
         // console.log('handleAction', action);
         // ignore local actions such as asset been selected.
         if (action.isLocalAction()) {
@@ -108,6 +125,7 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
                 <WorkbookView
                     className={this.props.className}
                     workbook={this.props.workbook}
+                    defaultSheet={this.props.defaultSheet}
                     editable={false}
                     onAction={this.handleAction}
                     herald={this} />

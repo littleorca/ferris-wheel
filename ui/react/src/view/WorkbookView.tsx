@@ -21,8 +21,9 @@ import classnames from "classnames";
 import './WorkbookView.css';
 
 interface WorkbookViewProps extends SharedViewProps<WorkbookView> {
-    workbook: Workbook,
-    className?: string,
+    workbook: Workbook;
+    className?: string;
+    defaultSheet?: string;
 }
 
 interface WorkbookViewState {
@@ -41,10 +42,10 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
         super(props);
 
         this.state = {
-            selected: props.workbook.sheets[0],
+            selected: this.determineInitiallySelectedSheet(props),
             lastSelectedSheetAsset: new Map<Sheet, SheetAsset>(),
         };
-        this.sendSelectSheetAction(props.workbook.sheets[0]);
+        this.sendSelectSheetAction(this.state.selected);
 
         this.onApplyAction = this.onApplyAction.bind(this);
         this.getTabItemLabel = this.getTabItemLabel.bind(this);
@@ -57,9 +58,24 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
         this.handleSheetAction = this.handleSheetAction.bind(this);
     }
 
+    protected determineInitiallySelectedSheet(props: WorkbookViewProps): Sheet | undefined {
+        let selected = undefined;
+        if (typeof props.defaultSheet !== "undefined") {
+            for (let i = 0; i < props.workbook.sheets.length; i++) {
+                if (props.defaultSheet === props.workbook.sheets[i].name) {
+                    selected = props.workbook.sheets[i];
+                }
+            }
+        }
+        if (selected === undefined && props.workbook.sheets.length > 0) {
+            selected = props.workbook.sheets[0];
+        }
+        return selected;
+    }
+
     public componentDidUpdate(prevProps: WorkbookViewProps) {
         if (this.props.workbook !== prevProps.workbook) {
-            this.onSelectSheet(this.props.workbook.sheets[0]);
+            this.onSelectSheet(this.determineInitiallySelectedSheet(this.props));
         }
     }
 
@@ -327,6 +343,13 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
             this.props.className);
 
         const sheets = this.props.workbook.sheets;
+        let defaultSheetIndex = undefined;
+        for (let i = 0; i < sheets.length; i++) {
+            if (sheets[i] === this.state.selected) {
+                defaultSheetIndex = i;
+                break;
+            }
+        }
 
         return (
             <div className={className}>
@@ -344,6 +367,7 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
                         sortHelperClass="sheet-tab-sort-helper"
                         horizontal={true}
                         list={sheets}
+                        initialSelect={defaultSheetIndex}
                         addible={false} // disable ManipulableList's default behavior
                         sortable={this.props.editable}
                         removable={false} // disable ManipulableList's default behavior

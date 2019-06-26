@@ -50,6 +50,43 @@ class EscapeHelper {
         return sb;
     }
 
+    /**
+     * Escape special chars for CSV field.
+     * 
+     * Fields containing line breaks (CRLF), double quotes, and commas
+     * should be enclosed in double-quotes.
+     * 
+     * If double-quotes are used to enclose fields, then a double-quote
+     * appearing inside a field must be escaped by preceding it with
+     * another double quote.
+     * 
+     * @see https://tools.ietf.org/html/rfc4180
+     */
+    public static escapeForCSV(str: string) {
+        if (!/[\r\n",]/.test(str)) {
+            return str;
+        }
+        return "\"" + str.replace("\"", "\"\"") + "\"";
+    }
+
+    /**
+     * "	&quot;
+     * '	&apos;
+     * <	&lt;
+     * >	&gt;
+     * &	&amp;
+     */
+    public static escapeForHtml(str: string) {
+        if (!/["'<>&]/.test(str)) {
+            return str;
+        }
+
+        return str.replace("&", "&amp;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
+    }
 }
 
 export default EscapeHelper;

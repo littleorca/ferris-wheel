@@ -68,7 +68,9 @@ import WorkbookPresenterStories from './view/WorkbookPresenter.stories'
 import WorkbookViewStories from './view/WorkbookView.stories';
 import QueryWizardStories from './view/QueryWizard.stories';
 import FormatFormStories from './ctrl/FormatForm.stories';
-import TableStories from './table/Table.stories';
+import TableLayoutStories from './table/TableLayout.stories';
+import TableManipulateStories from './table/TableManipulate.stories';
+import TableDataTypesStories from './table/TableDataTypes.stories';
 
 import DefaultThemeEditor from "./theme/DefaultThemeEditor.stories";
 
@@ -210,8 +212,10 @@ storiesOf('Form', module)
   .add('SmartForm', () => <SmartFormStories />);
 
 
-storiesOf('Table', module)
-  .add('Table', () => <TableStories />);
+storiesOf('DataTable', module)
+  .add('Table Layout', () => <TableLayoutStories />)
+  .add('Table Manipulate', () => <TableManipulateStories />)
+  .add('Table DataTypes', () => <TableDataTypesStories />);
 
 
 storiesOf('View', module)
