@@ -67,8 +67,8 @@ public class TestTableScout extends TestCase {
 
     public void testIsDecimalCompatibleCell() {
         Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
-        initTable33WithLables(table);
-        table.eraseCell(1, 2);
+        initTable(table);
+        table.eraseCells(1, 2, 1, 2);
         table.setCellValue(2, 1, Value.err(ErrorCodes.DIV));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(1, 2)));
         assertTrue(TableScout.isDecimalCompatible(table.getCell(2, 1)));
@@ -78,16 +78,18 @@ public class TestTableScout extends TestCase {
 
     public void testIsDecimalCompatibleCells() {
         Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
-        initTable33WithLables(table);
-        table.eraseCell(1, 2);
+        initTable(table);
+        table.eraseCells(1, 2, 1, 2);
         table.setCellValue(2, 1, Value.err(ErrorCodes.DIV));
+        table.addRows(1);
+        table.addColumns(1);
         assertTrue(TableScout.isDecimalCompatible(table, 1, 1, 4, 4));
         assertFalse(TableScout.isDecimalCompatible(table, 0, 0, 3, 3));
     }
 
     public void testGetBiggestDecimalRectangleFromBottomRight() {
         Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
-        initTable33WithLables(table);
+        initTable(table);
 
         Rectangle rc = TableScout.getBiggestDecimalRectangleFromBottomRight(table, 0, 0, 3, 3);
         assertRectangle(1, 1, 3, 3, rc);
@@ -161,7 +163,9 @@ public class TestTableScout extends TestCase {
         assertEquals(expectedBottom, actual.getBottom());
     }
 
-    private void initTable33WithLables(Table table) {
+    private void initTable(Table table) {
+        table.addRows(4);
+        table.addColumns(4);
         table.setCellValue(0, 0, new Value.StrValue("test"));
         table.setCellValue(0, 1, new Value.StrValue("a"));
         table.setCellValue(0, 2, new Value.StrValue("b"));

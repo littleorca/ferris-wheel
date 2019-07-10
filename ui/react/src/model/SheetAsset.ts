@@ -61,6 +61,14 @@ class SheetAsset {
 
         throw new Error('Illegal asset.');
     }
+
+    clone() {
+        return new SheetAsset(
+            this.table ? this.table.clone() : undefined,
+            this.chart ? this.chart.clone() : undefined,
+            this.text ? this.text.clone() : undefined,
+            this.form ? this.form.clone() : undefined);
+    }
 }
 
 export default SheetAsset;

@@ -1,23 +1,41 @@
 import React, { Component } from 'react';
-import {
-    WorkbookView,
-    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Workbook, Version, Color
-} from '../../src';
+import Text from "../../src/model/Text";
+import Table from "../../src/model/Table";
+import Row from "../../src/model/Row";
+import Cell from "../../src/model/Cell";
+import GridData from "../../src/model/GridData";
+import GridCell from "../../src/model/GridCell";
+import Chart from "../../src/model/Chart";
+import Values from "../../src/model/Values";
+import { VariantType } from "../../src/model/Variant";
+import Series from "../../src/model/Series";
+import Layout from "../../src/model/Layout";
+import Binder from "../../src/model/Binder";
+import Axis from "../../src/model/Axis";
+import Placement from "../../src/model/Placement";
+import Interval from "../../src/model/Interval";
+import AxisBand from "../../src/model/AxisBand";
+import Color from "../../src/model/Color";
+import SheetAsset from "../../src/model/SheetAsset";
+import Sheet from "../../src/model/Sheet";
+import Workbook from "../../src/model/Workbook";
+import Version from "../../src/model/Version";
+import WorkbookView from "../../src/view/WorkbookView";
+import GridCellImpl from '../../src/model/GridCellImpl';
 
 const text = new Text('test_text', Values.str('hello\n\tworld!'));
-const table = new Table('test_table', []);
-table.rows.push(new Row(0,
+const table = new Table('test_table',
     [
-        new Cell(0, Values.str('hello')),
-        new Cell(1, Values.str('world')),
-        new Cell(2, Values.str('~!')),
-    ]));
-table.rows.push(new Row(1,
-    [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(15)),
-        new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2")),
-    ]));
+        [
+            new GridCellImpl(new Cell(0, Values.str('hello'))),
+            new GridCellImpl(new Cell(1, Values.str('world'))),
+            new GridCellImpl(new Cell(2, Values.str('~!'))),
+        ], [
+            new GridCellImpl(new Cell(0, Values.dec(10))),
+            new GridCellImpl(new Cell(1, Values.dec(15))),
+            new GridCellImpl(new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2"))),
+        ]
+    ]);
 
 const lineChart = new Chart(
     'c1',

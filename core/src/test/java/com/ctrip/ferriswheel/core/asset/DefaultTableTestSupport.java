@@ -15,6 +15,8 @@ public abstract class DefaultTableTestSupport extends TestCase {
 
     protected DefaultTable createTable33() {
         DefaultTable table = (DefaultTable) workbook.addSheet("sheet1").addAsset(Table.class, "table1");
+        table.addColumns(0, 3);
+        table.addRows(0, 3);
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 table.setCellValue(i, j, new Value.DecimalValue((i + 1) * 10 + j + 1));

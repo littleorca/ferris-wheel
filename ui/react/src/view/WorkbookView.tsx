@@ -41,12 +41,6 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
     constructor(props: WorkbookViewProps) {
         super(props);
 
-        this.state = {
-            selected: this.determineInitiallySelectedSheet(props),
-            lastSelectedSheetAsset: new Map<Sheet, SheetAsset>(),
-        };
-        this.sendSelectSheetAction(this.state.selected);
-
         this.onApplyAction = this.onApplyAction.bind(this);
         this.getTabItemLabel = this.getTabItemLabel.bind(this);
         this.handleClickAddSheet = this.handleClickAddSheet.bind(this);
@@ -56,6 +50,15 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
         this.handleMoveSheet = this.handleMoveSheet.bind(this);
         this.handleSelectSheet = this.handleSelectSheet.bind(this);
         this.handleSheetAction = this.handleSheetAction.bind(this);
+
+        this.state = {
+            selected: this.determineInitiallySelectedSheet(props),
+            lastSelectedSheetAsset: new Map<Sheet, SheetAsset>(),
+        };
+        if (typeof this.props.herald !== 'undefined') {
+            this.props.herald.subscribe(this.onApplyAction);
+        }
+        this.sendSelectSheetAction(this.state.selected);
     }
 
     protected determineInitiallySelectedSheet(props: WorkbookViewProps): Sheet | undefined {
@@ -76,12 +79,6 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
     public componentDidUpdate(prevProps: WorkbookViewProps) {
         if (this.props.workbook !== prevProps.workbook) {
             this.onSelectSheet(this.determineInitiallySelectedSheet(this.props));
-        }
-    }
-
-    public componentDidMount() {
-        if (typeof this.props.herald !== 'undefined') {
-            this.props.herald.subscribe(this.onApplyAction);
         }
     }
 
@@ -385,10 +382,13 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
                         <SheetView
                             key={sheet.name}
                             sheet={sheet}
-                            className={(this.state.selected === sheet) ? "active" : "inactive"}
+                            className={(this.state.selected === sheet) ?
+                                "active" : "inactive"}
                             editable={this.props.editable}
                             onAction={this.handleSheetAction}
-                            herald={this} />
+                            herald={this}
+                            controlPortal={this.state.selected === sheet ?
+                                this.props.controlPortal : undefined} />
                     )}
                 </div>
             </div>

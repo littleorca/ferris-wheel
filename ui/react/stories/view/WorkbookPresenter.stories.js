@@ -1,37 +1,35 @@
 import React, { Component } from 'react';
-import {
-    WorkbookPresenter,
-    Text,
-    Chart,
-    Table,
-    Values,
-    Row,
-    Cell,
-    VariantType,
-    Series,
-    Axis,
-    Layout,
-    Binder,
-    Placement,
-    Interval,
-    AxisBand,
-    Sheet,
-    SheetAsset,
-    Workbook,
-    Version,
-    Color,
-    QueryAutomaton,
-    ParamRule,
-    EditResponse,
-    ChangeList,
-    Grid,
-    Span,
-    Display,
-} from '../../src';
+import { WorkbookPresenter } from '../../src';
+import Text from "../../src/model/Text"
+import Chart from "../../src/model/Chart"
+import Table from "../../src/model/Table"
+import Values from "../../src/model/Values"
+import Row from "../../src/model/Row"
+import Cell from "../../src/model/Cell"
+import { VariantType } from "../../src/model/Variant"
+import Series from "../../src/model/Series"
+import Axis from "../../src/model/Axis"
+import Layout from "../../src/model/Layout"
+import Binder from "../../src/model/Binder"
+import Placement from "../../src/model/Placement"
+import Interval from "../../src/model/Interval"
+import AxisBand from "../../src/model/AxisBand"
+import Sheet from "../../src/model/Sheet"
+import SheetAsset from "../../src/model/SheetAsset"
+import Workbook from "../../src/model/Workbook"
+import Version from "../../src/model/Version"
+import Color from "../../src/model/Color"
+import QueryAutomaton from "../../src/model/QueryAutomaton"
+import EditResponse from "../../src/action/EditResponse"
+import ChangeList from "../../src/action/ChangeList"
+import Grid from "../../src/model/Grid"
+import Span from "../../src/model/Span"
+import Display from "../../src/model/Display"
 import Form from "../../src/model/Form";
 import FormField from "../../src/model/FormField";
 import FormFieldBinding from "../../src/model/FormFieldBinding";
 import { action } from '@storybook/addon-actions';
+import GridCellImpl from '../../src/model/GridCellImpl';
 
 const form = new Form("test_form",
     [
@@ -55,19 +53,18 @@ const form = new Form("test_form",
     ],
     new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(1, 13), new Span(1, 3))));
 const text = new Text('test_text', Values.str('hello\n\tworld!'));
-const table = new Table('test_table', []);
-table.rows.push(new Row(0,
+const table = new Table('test_table',
     [
-        new Cell(0, Values.str('hello')),
-        new Cell(1, Values.str('world')),
-        new Cell(2, Values.str('~!')),
-    ]));
-table.rows.push(new Row(1,
-    [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(15)),
-        new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2")),
-    ]));
+        [
+            new GridCellImpl(new Cell(0, Values.str('hello'))),
+            new GridCellImpl(new Cell(1, Values.str('world'))),
+            new GridCellImpl(new Cell(2, Values.str('~!'))),
+        ], [
+            new GridCellImpl(new Cell(0, Values.dec(10))),
+            new GridCellImpl(new Cell(1, Values.dec(15))),
+            new GridCellImpl(new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2"))),
+        ],
+    ]);
 
 const queryAutomaton = new QueryAutomaton();
 // queryAutomaton.template.userParamRules.push(new ParamRule('bool', VariantType.BOOL, false, []));
@@ -86,18 +83,17 @@ const queryAutomaton = new QueryAutomaton();
 
 const tableWithQueryAutomaton = new Table(
     'test_table_with_query_automaton',
-    [],
+    [
+        [
+            new GridCellImpl(new Cell(0, Values.str('foo'))),
+            new GridCellImpl(new Cell(1, Values.str('bar'))),
+        ], [
+            new GridCellImpl(new Cell(0, Values.dec(10))),
+            new GridCellImpl(new Cell(1, Values.dec(24))),
+        ]
+    ],
+    undefined, undefined,
     { queryAutomaton });
-tableWithQueryAutomaton.rows.push(new Row(0,
-    [
-        new Cell(0, Values.str('foo')),
-        new Cell(1, Values.str('bar')),
-    ]));
-tableWithQueryAutomaton.rows.push(new Row(1,
-    [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(24)),
-    ]));
 
 const lineChart = new Chart(
     'c1',

@@ -184,6 +184,12 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
 
             notifier.privately(() -> {
                 Table td = addTable.getTableData();
+                if (td.getColumnCount() > 0) {
+                    table.addColumns(td.getColumnCount());
+                }
+                if (td.getRowCount() > 0) {
+                    table.addRows(td.getRowCount());
+                }
                 for (int rowIndex = 0; rowIndex < td.getRowCount(); rowIndex++) {
                     Row row = td.getRow(rowIndex);
                     // TODO skip empty rows/cells.

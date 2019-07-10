@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class CellReference extends AbstractReference implements Serializable {
     private PositionRef positionRef;
     private long cellId = Asset.UNSPECIFIED_ASSET_ID;
-    private boolean valid = true;
+    private boolean alive = true;
 
     public CellReference() {
         super(null, null);
@@ -26,11 +26,11 @@ public class CellReference extends AbstractReference implements Serializable {
                          String assetName,
                          PositionRef positionRef,
                          long cellId,
-                         boolean valid) {
+                         boolean alive) {
         super(sheetName, assetName);
         this.positionRef = positionRef;
         this.cellId = cellId;
-        this.valid = valid;
+        this.alive = alive;
     }
 
     public PositionRef getPositionRef() {
@@ -49,12 +49,15 @@ public class CellReference extends AbstractReference implements Serializable {
         this.cellId = cellId;
     }
 
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
     public boolean isValid() {
-        return valid;
+        return alive && cellId != Asset.UNSPECIFIED_ASSET_ID;
     }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
-
 }

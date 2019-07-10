@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { ManipulableList, InlineEditable, EditableText, EditBox } from '../../src';
+import ManipulableList from "../../src/ctrl/ManipulableList";
+import InlineEditable from "../../src/ctrl/InlineEditable";
+import EditableText from "../../src/ctrl/EditableText";
+import EditBox from "../../src/ctrl/EditBox";
 import { action } from '@storybook/addon-actions';
 
 class ManipulableListStories extends Component {
@@ -85,17 +88,21 @@ function createItem() {
 function InlineEditor(props) {
     const afterChange = (change) => {
         if (change.type === 'commit') {
-            props.onSubmit(change.nextValue);
+            props.onSubmit(change.toValue);
         } else if (change.type === 'rollback') {
-            props.onSubmit(change.originValue);
+            props.onCancel();
         }
+    }
+    const afterEndEdit = () => {
+        props.onCancel();
     }
     return (
         <EditBox
             {...props}
             value={props.value}
-            focused={true}
-            afterChange={afterChange} />
+            focusByDefault={true}
+            afterChange={afterChange}
+            afterEndEdit={afterEndEdit} />
     );
 };
 

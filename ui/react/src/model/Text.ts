@@ -26,6 +26,10 @@ class Text {
         this.content = content;
         this.layout = layout;
     }
+
+    clone() {
+        return Text.deserialize(this);
+    }
 }
 
 export default Text;

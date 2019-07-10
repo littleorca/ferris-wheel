@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { InlineEditable, EditBox } from '../../src';
+import InlineEditable from '../../src/ctrl/InlineEditable';
+import EditBox from '../../src/ctrl/EditBox';
 import { action } from '@storybook/addon-actions';
 
 class InlineEditableStories extends Component {
@@ -47,7 +48,7 @@ class InlineEditableStories extends Component {
 function InlineEditor(props) {
     const afterChange = (change) => {
         if (change.type === 'commit') {
-            props.onSubmit(change.nextValue);
+            props.onSubmit(change.toValue);
         } else if (change.type === 'rollback') {
             endEdit();
         }

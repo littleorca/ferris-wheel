@@ -41,6 +41,12 @@ message Table {
     repeated Row rows = 2;
     TableAutomaton automaton = 3;
     Layout layout = 4;
+    repeated Header column_headers = 5;
+    repeated Header row_headers = 6;
+}
+
+message Header {
+    // TBD
 }
 
 message Row {

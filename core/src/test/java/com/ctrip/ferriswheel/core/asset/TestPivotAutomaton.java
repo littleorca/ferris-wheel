@@ -30,6 +30,9 @@ public class TestPivotAutomaton extends TestCase {
     }
 
     public void testSimpleCase() {
+        normalTable.addColumns(0, 3);
+        normalTable.addRows(0, 6);
+
         int row = 0;
         normalTable.setCellValue(row, 0, Value.str("a"));
         normalTable.setCellValue(row, 1, Value.str("b"));
@@ -166,6 +169,9 @@ public class TestPivotAutomaton extends TestCase {
     }
 
     private void prepareSampleData(DefaultTable table) {
+        table.addColumns(0, 6);
+        table.addRows(0, 13);
+
         int row = 0;
 
         table.setCellValue(row, 0, Value.str("f1"));

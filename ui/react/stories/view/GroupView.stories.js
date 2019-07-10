@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { GroupView, GroupItem } from '../../src';
+import GroupView, { GroupItem } from '../../src/view/GroupView';
 import { action } from '@storybook/addon-actions'
 
 class GroupViewStories extends Component {

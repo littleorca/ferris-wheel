@@ -41,7 +41,7 @@ class FormForm extends React.Component<FormFormProps> {
                         placeholder={"输入表单名称"}
                         afterChange={change => {
                             if (change.type === "commit") {
-                                form.name = change.nextValue;
+                                form.name = change.toValue;
                                 this.afterChange();
                             }
                         }} />

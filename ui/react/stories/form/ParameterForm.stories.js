@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { ParameterForm, Parameter, Values } from '../../src';
+import ParameterForm from '../../src/form/ParameterForm';
+import Parameter from '../../src/model/Parameter';
+import Values from '../../src/model/Values';
 import { action } from '@storybook/addon-actions';
 
 class ParameterFormStories extends Component {

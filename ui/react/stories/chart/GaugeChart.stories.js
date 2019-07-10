@@ -1,11 +1,9 @@
 import * as React from "react";
-import {
-    GaugeChart,
-    Axis,
-    AxisBand,
-    Interval,
-    Color,
-} from "../../src";
+import GaugeChart from "../../src/chart/GaugeChart";
+import Axis from "../../src/model/Axis";
+import AxisBand from "../../src/model/AxisBand";
+import Interval from "../../src/model/Interval";
+import Color from "../../src/model/Color";
 
 function createGauge(title, value) {
     return {

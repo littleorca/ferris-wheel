@@ -24,6 +24,10 @@ public class TestDefaultChartWithBinder extends TestCase {
         DefaultWorkbook wb = new DefaultWorkbook(environment);
         DefaultSheet s1 = wb.addSheet("s1");
         table = (DefaultTable) s1.addAsset(Table.class, "t1");
+
+        table.addColumns(0,3);
+        table.addRows(0, 3);
+
         table.setCellValue(0, 1, Value.str("foo"));
         table.setCellValue(0, 2, Value.str("bar"));
         table.setCellValue(1, 0, Value.str("alpha"));
@@ -80,8 +84,8 @@ public class TestDefaultChartWithBinder extends TestCase {
                 null
         ));
 
-        t1.insertRows(3, 1);
-        t1.insertColumns(3, 1);
+        t1.addRows(3, 1);
+        t1.addColumns(3, 1);
 
         t1.setCellValue(0, 3, Value.str("foobar"));
         t1.setCellValue(1, 3, Value.dec(5));
@@ -179,8 +183,8 @@ public class TestDefaultChartWithBinder extends TestCase {
                 null
         ));
 
-        t1.insertRows(3, 1);
-        t1.insertColumns(3, 1);
+        t1.addRows(3, 1);
+        t1.addColumns(3, 1);
 
         t1.setCellValue(0, 3, Value.str("foobar"));
         t1.setCellValue(1, 3, Value.dec(5));

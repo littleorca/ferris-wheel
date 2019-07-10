@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { VariantType, Values } from "../../src";
+import { VariantType } from "../../src/model/Variant";
+import Values from "../../src/model/Values";
 import SmartForm from "../../src/form/SmartForm";
 import FormField from "../../src/model/FormField";
 

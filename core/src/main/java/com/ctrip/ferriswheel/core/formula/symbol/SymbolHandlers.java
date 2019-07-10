@@ -127,7 +127,7 @@ public class SymbolHandlers {
             rangeReference.setUpperLeftRef(References.parseRangeEndRef(from.getTokenString()));
             rangeReference.setLowerRightRef(References.parseRangeEndRef(to.getTokenString()));
 
-            if (!rangeReference.isValid()) {
+            if (!rangeReference.isAlive()) {
                 throw new FormulaParserException("Invalid range reference(1).");
             }
 

@@ -58,6 +58,8 @@ public class TestPbHelper extends TestCase {
                 .build();
 
         Table table = new FilingClerk(env).createWorkbook("test-workbook").addSheet("sheet1").addAsset(Table.class, "table1");
+        table.addRows(3);
+        table.addColumns(1);
         table.setCellFormula(0, 0, "2^10");
         table.setCellFormula(2, 0, "A1*4");
         com.ctrip.ferriswheel.proto.v1.SheetAsset asset = PbHelper.pb(table);
@@ -98,6 +100,8 @@ public class TestPbHelper extends TestCase {
         Sheet sheet1 = new FilingClerk(new DefaultEnvironment.Builder().build())
                 .createWorkbook("test-workbook").addSheet("sheet1");
         Table table1 = sheet1.addAsset(Table.class, "table1");
+        table1.addRows(1);
+        table1.addColumns(3);
         table1.setCellValue(0, 0, Value.str("foobar"));
         table1.setCellValue(0, 1, Value.dec(2));
         table1.setCellValue(0, 2, Value.dec(3));
@@ -130,6 +134,8 @@ public class TestPbHelper extends TestCase {
     public void testRowToProto() {
         Table table = new FilingClerk(new DefaultEnvironment.Builder().build())
                 .createWorkbook("test-workbook").addSheet("sheet1").addAsset(Table.class, "table1");
+        table.addRows(3);
+        table.addColumns(3);
         table.setCellFormula(2, 0, "2^10");
         table.setCellFormula(2, 2, "A3*4");
         com.ctrip.ferriswheel.proto.v1.Row row = PbHelper.pb(table.getRow(2), 2);
@@ -144,6 +150,8 @@ public class TestPbHelper extends TestCase {
     public void testCellToProto() {
         Table table = new FilingClerk(new DefaultEnvironment.Builder().build())
                 .createWorkbook("test-workbook").addSheet("sheet1").addAsset(Table.class, "table1");
+        table.addRows(3);
+        table.addColumns(3);
         table.setCellFormula(2, 2, "2^10");
         com.ctrip.ferriswheel.proto.v1.Cell cell = PbHelper.pb(table.getCell(2, 2), 2);
         assertEquals(2, cell.getColumnIndex());
@@ -226,6 +234,9 @@ public class TestPbHelper extends TestCase {
         builtinParams.put("Greeting", new DefaultParameter("Greeting", new DynamicValue("\"hello world\"")));
         t0.automate(new TableAutomatonInfo.QueryAutomatonInfo(new TableAutomatonInfo.QueryTemplateInfo(scheme, builtinParams)));
 
+        t1.addRows(3);
+        t1.addColumns(4);
+
         t1.setCellFormula(0, 0, "t2!A1^2");
         t1.setCellValue(0, 1, Value.str("foo"));
         t1.setCellValue(0, 2, Value.str("bar"));
@@ -251,6 +262,9 @@ public class TestPbHelper extends TestCase {
                                 null,
                                 new DynamicValue("t1!B3:D3"))
                 )));
+
+        t2.addRows(1);
+        t2.addColumns(1);
         t2.setCellValue(0, 0, Value.dec(2));
 
         com.ctrip.ferriswheel.proto.v1.Workbook proto = PbHelper.pb(wb);
@@ -327,6 +341,8 @@ public class TestPbHelper extends TestCase {
         Workbook wb = new FilingClerk(new DefaultEnvironment.Builder().build()).createWorkbook("test-workbook");
         Sheet s1 = wb.addSheet("sheet1");
         Table t1 = s1.addAsset(Table.class, "table1");
+        t1.addRows(3);
+        t1.addColumns(3);
         t1.setCellValue(0, 1, Value.str("foo"));
         t1.setCellValue(0, 2, Value.str("bar"));
         t1.setCellValue(1, 0, Value.str("a"));

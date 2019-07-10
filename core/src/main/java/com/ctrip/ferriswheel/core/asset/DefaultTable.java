@@ -4,10 +4,7 @@ import com.ctrip.ferriswheel.common.action.Action;
 import com.ctrip.ferriswheel.common.automaton.Automaton;
 import com.ctrip.ferriswheel.common.automaton.PivotConfiguration;
 import com.ctrip.ferriswheel.common.automaton.QueryConfiguration;
-import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
-import com.ctrip.ferriswheel.common.table.Cell;
-import com.ctrip.ferriswheel.common.table.Row;
-import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.table.*;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.util.DataSetMetaData;
 import com.ctrip.ferriswheel.common.util.StylizedVariant;
@@ -16,6 +13,7 @@ import com.ctrip.ferriswheel.common.variant.Parameter;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
+import com.ctrip.ferriswheel.core.bean.HeaderInfo;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.util.References;
@@ -31,8 +29,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
     static final int MAX_ROWS = 65535;
     static final int MAX_COLUMNS = 255;
 
+    private List<Header> rowHeaders = new ArrayList<>();
+    private List<Header> columnHeaders = new ArrayList<>();
     private final SparseAssetArray<DefaultRow> rows;
-    private int columnCount;
     private boolean readOnly = false;
     private final TableLayout layout = new TableLayout();
     private Automaton automaton;
@@ -73,7 +72,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
         checkForUpdate(rowIndex, columnIndex);
 
         return publicly(setCellValue, () -> {
-            int oldRowSize = getOrCreateRow(rowIndex).getCellCount();
+            getOrCreateRow(rowIndex).getCellCount();
             DefaultCell cell = getOrCreateCell(rowIndex, columnIndex);
             if (cell.isFormula()) {
                 cell.setFormula(null);
@@ -82,12 +81,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             // Think about remove the return value?
             Variant oldValue = new DynamicValue(cell.getData());
             cell.setValue(value);
-            int newRowSize = cell.getRow().getCellCount();
-            if (newRowSize > getColumnCount()) {
-                setColumnCount(newRowSize);
-            } else if (oldRowSize == getColumnCount() && newRowSize < getColumnCount()) {
-                fixColumnCount();
-            }
+            cell.getRow().getCellCount();
             getWorkbook().onCellUpdate(cell);
             return oldValue;
         });
@@ -115,17 +109,11 @@ public class DefaultTable extends SheetAssetNode implements Table {
         checkForUpdate(rowIndex, columnIndex);
 
         return publicly(setCellFormula, () -> {
-            int oldRowSize = getOrCreateRow(rowIndex).getCellCount();
+            getOrCreateRow(rowIndex).getCellCount();
             DefaultCell cell = getOrCreateCell(rowIndex, columnIndex);
             Formula oldFormula = cell.getFormula();
             cell.setFormula(formula == null ? null : new Formula(formula));
             cell.setValue(Value.BLANK); // wipe old value
-            int newRowSize = cell.getRow().getCellCount();
-            if (newRowSize > getColumnCount()) {
-                setColumnCount(newRowSize);
-            } else if (oldRowSize == getColumnCount() && newRowSize < getColumnCount()) {
-                fixColumnCount();
-            }
             getWorkbook().onCellUpdate(cell);
             return oldFormula;
         });
@@ -272,16 +260,43 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     @Override
-    public void eraseCell(int rowIndex, int colIndex) {
-        checkForUpdate(rowIndex, colIndex);
-        DefaultCell cell = getCell(rowIndex, colIndex);
-        if (!cell.isBlank()) {
-            setCellValue(rowIndex, colIndex, Value.BLANK);
+    public void eraseCells(int top, int right, int bottom, int left) {
+        handleAction(new EraseCells(getSheet().getName(), getName(), top, right, bottom, left));
+    }
+
+    void handleAction(EraseCells eraseCells) {
+        checkReadOnly(false);
+        final int top = eraseCells.getTop();
+        final int right = eraseCells.getRight();
+        final int bottom = eraseCells.getBottom();
+        final int left = eraseCells.getLeft();
+        if (top < 0 || left < 0 ||
+                left > right || right >= getColumnCount() ||
+                top > bottom || bottom >= getRowCount()) {
+            throw new IllegalArgumentException();
         }
+        publicly(eraseCells, () -> {
+            for (int r = top; r <= bottom; r++) {
+                DefaultRow row = getRow(r);
+                if (row == null) {
+                    continue;
+                }
+                for (int c = left; c <= right; c++) {
+                    DefaultCell cell = row.getCell(c);
+                    if (cell != null) {
+                        cell.erase();
+                    }
+                }
+            }
+//            if (colIndex + nCols == getColumnCount()) {
+//                fixColumnCount();
+//            }
+            getWorkbook().onCellsErased(this, top, right, bottom, left);
+        });
     }
 
     @Override
-    public void insertRows(int rowIndex, int nRows) {
+    public void addRows(int rowIndex, int nRows) {
         handleAction(new InsertRows(getSheet().getName(), getName(), rowIndex, nRows));
     }
 
@@ -289,11 +304,17 @@ public class DefaultTable extends SheetAssetNode implements Table {
         checkReadOnly(false);
         final int rowIndex = insertRows.getRowIndex();
         final int nRows = insertRows.getnRows();
-        checkRowIndex(rowIndex);
+        checkRowIndexForInsert(rowIndex);
         if (nRows <= 0) {
             throw new IllegalArgumentException();
         }
         publicly(insertRows, () -> {
+            // insert headers
+            List<HeaderInfo> newRowHeaders = new ArrayList<>(nRows);
+            for (int i = 0; i < nRows; i++) {
+                newRowHeaders.add(new HeaderInfo(/* TBD */));
+            }
+            rowHeaders.addAll(rowIndex, newRowHeaders);
             // just move rows to make room for new rows.
             for (int i = getRowCount() - 1; i >= rowIndex; i--) {
                 DefaultRow row = rows.get(i);
@@ -305,36 +326,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
             }
             // no need to createWorkbook new rows, it will be done the first time they are really used.
             getWorkbook().onRowsInserted(this, rowIndex, nRows);
-        });
-    }
-
-    @Override
-    public void eraseRows(int rowIndex, int nRows) {
-        handleAction(new EraseRows(getSheet().getName(), getName(), rowIndex, nRows));
-    }
-
-    void handleAction(EraseRows eraseRows) {
-        checkReadOnly(false);
-        final int rowIndex = eraseRows.getRowIndex();
-        final int nRows = eraseRows.getnRows();
-        if (rowIndex < 0 || nRows <= 0 || rowIndex + nRows > getRowCount()) {
-            throw new IllegalArgumentException();
-        }
-        publicly(eraseRows, () -> {
-            boolean needFixColumnCount = false;
-            for (int i = rowIndex; i < rowIndex + nRows; i++) {
-                DefaultRow row = getRow(i);
-                if (row != null) {
-                    if (!needFixColumnCount && row.getCellCount() == getColumnCount()) {
-                        needFixColumnCount = true;
-                    }
-                    row.erase();
-                }
-            }
-            if (needFixColumnCount) {
-                fixColumnCount();
-            }
-            getWorkbook().onRowsErased(this, rowIndex, nRows);
         });
     }
 
@@ -372,14 +363,14 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     removedRows.add(oldRow);
                 }
             }
-            fixColumnCount(); // TODO this can be optimized
+            rowHeaders.subList(rowIndex, rowIndex + nRows).clear();
             getWorkbook().onRowsRemoved(this, rowIndex, nRows, removedRows);
             return removedRows;
         });
     }
 
     @Override
-    public void insertColumns(int colIndex, int nCols) {
+    public void addColumns(int colIndex, int nCols) {
         handleAction(new InsertColumns(getSheet().getName(), getName(), colIndex, nCols));
     }
 
@@ -387,55 +378,27 @@ public class DefaultTable extends SheetAssetNode implements Table {
         checkReadOnly(false);
         final int colIndex = insertColumns.getColumnIndex();
         final int nCols = insertColumns.getnColumns();
-        checkColumnIndex(colIndex);
+        checkColumnIndexForInsert(colIndex);
         if (nCols <= 0) {
             throw new IllegalArgumentException();
         }
         publicly(insertColumns, () -> {
-            final int columns = getColumnCount();
+            final int oldColumnCount = getColumnCount();
+            List<Header> newColumnHeaders = new ArrayList<>(nCols);
+            for (int i = 0; i < nCols; i++) {
+                newColumnHeaders.add(new HeaderInfo(/* TBD */));
+            }
+            columnHeaders.addAll(colIndex, newColumnHeaders);
             for (int r = 0; r < getRowCount(); r++) {
                 DefaultRow row = getRow(r);
                 if (row == null) {
                     continue;
                 }
-                for (int c = columns - 1; c >= colIndex; c--) {
+                for (int c = oldColumnCount - 1; c >= colIndex; c--) {
                     row.moveCell(c, c + nCols);
                 }
             }
-            fixColumnCount();
             getWorkbook().onColumnsInserted(this, colIndex, nCols);
-        });
-    }
-
-    @Override
-    public void eraseColumns(int colIndex, int nCols) {
-        handleAction(new EraseColumns(getSheet().getName(), getName(), colIndex, nCols));
-    }
-
-    void handleAction(EraseColumns eraseColumns) {
-        checkReadOnly(false);
-        final int colIndex = eraseColumns.getColumnIndex();
-        final int nCols = eraseColumns.getnColumns();
-        if (colIndex < 0 || nCols <= 0 || colIndex + nCols > getColumnCount()) {
-            throw new IllegalArgumentException();
-        }
-        publicly(eraseColumns, () -> {
-            for (int r = 0; r < getRowCount(); r++) {
-                DefaultRow row = getRow(r);
-                if (row == null) {
-                    continue;
-                }
-                for (int c = colIndex; c < colIndex + nCols; c++) {
-                    DefaultCell cell = row.getCell(c);
-                    if (cell != null) {
-                        cell.erase();
-                    }
-                }
-            }
-            if (colIndex + nCols == getColumnCount()) {
-                fixColumnCount();
-            }
-            getWorkbook().onColumnsErased(this, colIndex, nCols);
         });
     }
 
@@ -475,7 +438,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     }
                 }
             }
-            fixColumnCount();
+            columnHeaders.subList(colIndex, colIndex + nCols).clear();
             getWorkbook().onColumnsRemoved(this, colIndex, nCols, removedCells);
             return removedCells;
         });
@@ -548,22 +511,17 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     private DefaultRow setRow(int index, DefaultRow row) {
+        if (row.getCellCount() > getColumnCount()) {
+            throw new IllegalArgumentException("Row size exceed column count of the table.");
+        }
         DefaultRow oldRow = removeRow(index);
         row.setRowIndex(index);
         rows.set(index, row);
-        if (row.getCellCount() > getColumnCount()) {
-            setColumnCount(row.getCellCount());
-        }
         return oldRow;
     }
 
     private DefaultRow removeRow(int rowIndex) {
         DefaultRow row = rows.remove(rowIndex);
-        if (row != null) {
-            if (row.getCellCount() == getColumnCount()) {
-                fixColumnCount();
-            }
-        }
         return row;
     }
 
@@ -580,6 +538,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     DefaultCell getOrCreateCell(int rowIndex, int columnIndex) {
+        checkRowIndex(rowIndex);
+        checkColumnIndex(columnIndex);
         DefaultRow row = getOrCreateRow(rowIndex);
         DefaultCell cell = row.getCell(columnIndex);
         if (cell == null) {
@@ -589,23 +549,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
             if (getAutomaton() != null) {
                 cell.setEphemeral(true);
             }
-            if (columnIndex >= getColumnCount()) {
-                setColumnCount(columnIndex + 1);
-            }
         }
         return cell;
-    }
-
-    protected void fixColumnCount() {
-        int maxColumnCount = 0;
-        Iterator<Map.Entry<Integer, DefaultRow>> it = rows.iterator();
-        while (it.hasNext()) {
-            DefaultRow row = it.next().getValue();
-            if (maxColumnCount < row.getCellCount()) {
-                maxColumnCount = row.getCellCount();
-            }
-        }
-        setColumnCount(maxColumnCount);
     }
 
     private void checkForUpdate(int rowIndex, int columnIndex) {
@@ -623,13 +568,25 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     private void checkRowIndex(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= MAX_ROWS) {
+        if (rowIndex < 0 || rowIndex >= getRowCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    private void checkRowIndexForInsert(int rowIndex) {
+        if (rowIndex < 0 || rowIndex > getRowCount()) {
             throw new IndexOutOfBoundsException();
         }
     }
 
     private void checkColumnIndex(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= MAX_COLUMNS) {
+        if (columnIndex < 0 || columnIndex >= getColumnCount()) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
+    private void checkColumnIndexForInsert(int columnIndex) {
+        if (columnIndex < 0 || columnIndex > getColumnCount()) {
             throw new IndexOutOfBoundsException();
         }
     }
@@ -642,14 +599,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
 
     @Override
     public int getRowCount() {
-        return rows.isEmpty() ? 0 : rows.last().getRowIndex() + 1;
-//        for (int i = rows.size() - 1; i >= 0; i--) {
-//            Row row = rows.get(i);
-//            if (row != null && !row.isBlank()) {
-//                return i + 1;
-//            }
-//        }
-//        return 0;
+        return rowHeaders == null ? 0 : rowHeaders.size();
+    }
+
+    @Override
+    public Header getRowHeader(int rowIndex) {
+        return rowHeaders.get(rowIndex);
     }
 
     @Override
@@ -659,11 +614,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
 
     @Override
     public int getColumnCount() {
-        return columnCount;
+        return columnHeaders == null ? 0 : columnHeaders.size();
     }
 
-    protected void setColumnCount(int columnCount) {
-        this.columnCount = columnCount;
+    @Override
+    public Header getColumnHeader(int columnIndex) {
+        return columnHeaders.get(columnIndex);
     }
 
     public boolean isReadOnly() {
@@ -868,6 +824,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 } else {
                     doClearTable();
                 }
+                getWorkbook().onTableUpdate(this);
             }));
         } finally {
             setReadOnly(true);
@@ -877,22 +834,27 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     void doFillTable(DataSet dataSet) {
-        if (dataSet.isReusable()) {
-            dataSet.rewind(); // make sure rewind pointer to the beginning.
-        }
         DataSetMetaData setMeta = dataSet.getMetaData();
-        int row = 0;
+        int rowCount = 0;
 
-        //table.eraseRows(0, table.getRowCount());
+        columnHeaders = new ArrayList<>(setMeta.getColumnCount());
+        rowHeaders = new ArrayList<>();
 
         if (setMeta.hasColumnMeta()) {
+            rowHeaders.add(new HeaderInfo(/* TBD */));
             for (int col = 0; col < setMeta.getColumnCount(); col++) {
-                refreshCellValue(row, col, Value.str(setMeta.getColumnMeta(col).getName()));
+                columnHeaders.add(new HeaderInfo(/* TBD */));
+                refreshCellValue(rowCount, col, Value.str(setMeta.getColumnMeta(col).getName()));
             }
-            row++;
+            rowCount++;
+        } else {
+            for (int col = 0; col < setMeta.getColumnCount(); col++) {
+                columnHeaders.add(new HeaderInfo(/* TBD */));
+            }
         }
         dataSet.rewind();
         while (dataSet.next()) {
+            rowHeaders.add(new HeaderInfo(/* TBD */));
             for (int col = 0; col < setMeta.getColumnCount(); col++) {
                 StylizedVariant stylizedVariant = dataSet.getColumn(col);
                 Variant value = stylizedVariant.getValue();
@@ -901,25 +863,31 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 }
                 String format = stylizedVariant.getFormat();
 //                refreshCellValue(row, col, Value.from(value));
-                DefaultCell cell = getOrCreateCell(row, col);
+                DefaultCell cell = getOrCreateCell(rowCount, col);
                 cell.setValue(value);
                 if (format != null) {
                     cell.setFormat(format);
                 }
             }
-            row++;
+            rowCount++;
         }
 
         // trim rows/columns if needed
-        if (getRowCount() > row) {
-            removeRows(row, getRowCount() - row);
+        Iterator<Map.Entry<Integer, DefaultRow>> rowIter = rows.iterator();
+        while (rowIter.hasNext()) {
+            Map.Entry<Integer, DefaultRow> row = rowIter.next();
+            if (row.getKey() >= getRowCount()) {
+                rowIter.remove();
+            } else {
+                Iterator<Map.Entry<Integer, Cell>> colIter = row.getValue().iterator();
+                while (colIter.hasNext()) {
+                    Map.Entry<Integer, Cell> col = colIter.next();
+                    if (col.getKey() >= getColumnCount()) {
+                        colIter.remove();
+                    }
+                }
+            }
         }
-        if (getColumnCount() > setMeta.getColumnCount()) {
-            removeColumns(setMeta.getColumnCount(),
-                    getColumnCount() - setMeta.getColumnCount());
-        }
-
-        fixColumnCount();
     }
 
     void refreshCellValue(int rowIndex, int columnIndex, Value newValue) {
@@ -932,6 +900,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
     void doClearTable() {
         if (getRowCount() > 0) {
             removeRows(0, getRowCount());
+        }
+        if (this.rowHeaders != null) {
+            this.rowHeaders.clear();
+        }
+        if (this.columnHeaders != null) {
+            this.columnHeaders.clear();
         }
     }
 

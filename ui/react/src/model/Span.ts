@@ -19,6 +19,10 @@ class Span {
         this.start = start;
         this.end = end;
     }
+
+    clone() {
+        return new Span(this.start, this.end);
+    }
 }
 
 export default Span;

@@ -1,6 +1,5 @@
 import * as React from "react";
-import classnames from "classnames";
-import moment from "moment";
+import * as moment from "moment";
 import NumberInput from "../ctrl/NumberInput";
 import UnionValue from "../model/UnionValue";
 import Values from "../model/Values";
@@ -10,6 +9,7 @@ import Formatter, {
     DecimalFormatOption,
     DateTimeFormatOption
 } from "../util/Formatter";
+import classnames from "classnames";
 import "./FormatForm.css";
 
 export interface FormatFormProps extends React.ClassAttributes<FormatForm> {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { EditBox } from '../../src';
+import EditBox from '../../src/ctrl/EditBox';
 import { action } from '@storybook/addon-actions';
 
 class EditBoxStories extends Component {
@@ -25,7 +25,7 @@ class EditBoxStories extends Component {
     afterChange(change) {
         action('EditBox afterChange')(change);
         if (change.type === 'commit') {
-            this.text = change.nextValue;
+            this.text = change.toValue;
             this.forceUpdate();
         }
     }

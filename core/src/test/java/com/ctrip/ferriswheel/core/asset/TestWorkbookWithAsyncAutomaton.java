@@ -78,13 +78,20 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
         t4 = (DefaultTable) s1.addAsset(Table.class, "t4");
         t5 = (DefaultTable) s1.addAsset(Table.class, "t5");
 
+        t1.addRows(1);
+        t1.addColumns(1);
         t1.setCellValue(0, 0, Value.dec(0));
         t2.automate(new QueryAutomatonInfo(new QueryTemplateInfo("test-scheme-1",
-                Collections.singletonMap("val", new DefaultParameter("val", new DynamicValue("t1!A1+1"))))));
+                Collections.singletonMap("val",
+                        new DefaultParameter("val", new DynamicValue("t1!A1+1"))))));
         t3.automate(new QueryAutomatonInfo(new QueryTemplateInfo("test-scheme-2",
-                Collections.singletonMap("val", new DefaultParameter("val", new DynamicValue("t1!A1+1"))))));
+                Collections.singletonMap("val",
+                        new DefaultParameter("val", new DynamicValue("t1!A1+1"))))));
         t4.automate(new QueryAutomatonInfo(new QueryTemplateInfo("test-scheme-3",
-                Collections.singletonMap("val", new DefaultParameter("val", new DynamicValue("t2!A1+t3!A1"))))));
+                Collections.singletonMap("val",
+                        new DefaultParameter("val", new DynamicValue("t2!A1+t3!A1"))))));
+        t5.addRows(1);
+        t5.addColumns(1);
         t5.setCellFormula(0, 0, "t3!A1+1");
         System.out.println("## Initial workbook:");
         System.out.println(workbook);
@@ -101,7 +108,7 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
     public void testException() {
         provider.beforeExecute = (q) -> {
             if ("test-scheme-1".equals(q.getScheme())) {
-                throw new RuntimeException("test");
+                throw new RuntimeException("test"); // t2
             }
             return null;
         };
@@ -111,7 +118,7 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
 
         provider.beforeExecute = (q) -> {
             if ("test-scheme-3".equals(q.getScheme())) {
-                throw new RuntimeException("test");
+                throw new RuntimeException("test"); // t4
             }
             return null;
         };
@@ -119,7 +126,7 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
         assertEquals(2, t1.getCell(0, 0).intValue());
         assertEquals(3, t2.getCell(0, 0).intValue());
         assertEquals(3, t3.getCell(0, 0).intValue());
-        // assertEquals(4, t5.getCell(0, 0).intValue());
+        assertEquals(4, t5.getCell(0, 0).intValue());
 
         provider.beforeExecute = null;
         workbook.refresh();

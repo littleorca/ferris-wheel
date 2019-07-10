@@ -72,9 +72,9 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
             // CHARTCONSULT(8):
             new ChartConsultHandler(),
             // ERASECOLUMNS(9):
-            new EraseColumnsHandler(),
+            new EraseCellsHandler(),
             // ERASEROWS(10):
-            new EraseRowsHandler(),
+            new DummyHandler(),
             // FILLUP(11):
             new FillUpHandler(),
             // FILLRIGHT(12):
@@ -142,7 +142,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
 
         try { // parse request
             com.ctrip.ferriswheel.proto.v1.EditRequest.Builder requestBuilder = com.ctrip.ferriswheel.proto.v1.EditRequest.newBuilder();
-            JsonFormat.parser().merge(message.getPayload(), requestBuilder);
+            JsonFormat.parser().ignoringUnknownFields().merge(message.getPayload(), requestBuilder);
             request = requestBuilder.build();
         } catch (Throwable t) {
             LOG.warn("Failed to parse request.", t);
@@ -178,7 +178,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
     @Override
     public com.ctrip.ferriswheel.proto.v1.EditResponse handle(com.ctrip.ferriswheel.proto.v1.EditRequest request,
                                                               WorkContext workContext) {
-        if (request.getTxId() < 0 || workContext == null) {
+        if (request.getTxId() < -1 || workContext == null) {
             throw new IllegalArgumentException();
         }
         com.ctrip.ferriswheel.proto.v1.Action action = request.getAction();
@@ -397,25 +397,17 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         }
     }
 
-    class EraseColumnsHandler extends WorkbookActionHandler {
+    class EraseCellsHandler extends WorkbookActionHandler {
 
         @Override
         public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
-            com.ctrip.ferriswheel.proto.v1.EraseColumns eraseColumns = action.getEraseColumns();
-            ((Table) workbook.getSheet(eraseColumns.getSheetName())
-                    .getAsset(eraseColumns.getTableName()))
-                    .eraseColumns(eraseColumns.getColumnIndex(), eraseColumns.getNColumns());
-        }
-    }
-
-    class EraseRowsHandler extends WorkbookActionHandler {
-
-        @Override
-        public void handle(long txId, com.ctrip.ferriswheel.proto.v1.Action action, Workbook workbook) {
-            com.ctrip.ferriswheel.proto.v1.EraseRows eraseRows = action.getEraseRows();
-            ((Table) workbook.getSheet(eraseRows.getSheetName())
-                    .getAsset(eraseRows.getTableName()))
-                    .eraseRows(eraseRows.getRowIndex(), eraseRows.getNRows());
+            com.ctrip.ferriswheel.proto.v1.EraseCells eraseCells = action.getEraseCells();
+            ((Table) workbook.getSheet(eraseCells.getSheetName())
+                    .getAsset(eraseCells.getTableName()))
+                    .eraseCells(eraseCells.getTop(),
+                            eraseCells.getRight(),
+                            eraseCells.getBottom(),
+                            eraseCells.getLeft());
         }
     }
 
@@ -482,7 +474,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
             com.ctrip.ferriswheel.proto.v1.InsertColumns insertColumns = action.getInsertColumns();
             ((Table) workbook.getSheet(insertColumns.getSheetName())
                     .getAsset(insertColumns.getTableName()))
-                    .insertColumns(insertColumns.getColumnIndex(), insertColumns.getNColumns());
+                    .addColumns(insertColumns.getColumnIndex(), insertColumns.getNColumns());
         }
     }
 
@@ -493,7 +485,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
             com.ctrip.ferriswheel.proto.v1.InsertRows insertRows = action.getInsertRows();
             ((Table) workbook.getSheet(insertRows.getSheetName())
                     .getAsset(insertRows.getTableName()))
-                    .insertRows(insertRows.getRowIndex(), insertRows.getNRows());
+                    .addRows(insertRows.getRowIndex(), insertRows.getNRows());
         }
     }
 

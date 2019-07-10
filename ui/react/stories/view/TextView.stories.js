@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import {
-    TextView,
-    Text,
-    Values
-} from '../../src';
+import TextView from "../../src/view/TextView";
+import Text from "../../src/model/Text";
+import Values from '../../src/model/Values';
 import { action } from '@storybook/addon-actions';
 
 class TextViewStories extends Component {

@@ -15,8 +15,7 @@ abstract class UnionValue implements Variant {
     }
 
     public isFormula() {
-        return (typeof this.formulaString === 'string' &&
-            this.formulaString !== '');
+        return typeof this.formulaString === 'string';
     }
     public getFormulaString() {
         return typeof this.formulaString === 'string' ?

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import Form from "../../src/model/Form";
 import AddFormForm from "../../src/form/AddFormForm";
-import { Layout, VariantType } from "../../src";
+import Layout from "../../src/model/Layout";
+import { VariantType } from "../../src/model/Variant";
 
 const form = new Form("test-add-form", [], new Layout());
 const pendingFields = [{

@@ -1,8 +1,9 @@
 import * as React from "react";
+import Axis from "../../src/model/Axis"
 import {
-    Axis,
-    PlotlyPieChart, PlotlyRadarChart
-} from "../../src";
+    PlotlyPieChart,
+    PlotlyRadarChart
+} from "../../src/chart/PlotlyCharts"
 
 const emptyPie = {
     type: "Pie",

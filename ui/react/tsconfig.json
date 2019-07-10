@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "src",
     "outDir": "lib",
     "module": "esnext",
     "target": "es6",
@@ -21,7 +21,7 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "allowSyntheticDefaultImports": true // handsontable use default imports
+    "allowSyntheticDefaultImports": false
   },
   "exclude": [
     "node_modules",

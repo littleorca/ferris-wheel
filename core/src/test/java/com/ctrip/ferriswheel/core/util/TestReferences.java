@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 public class TestReferences extends TestCase {
     public void testParseSimpleCellRef() {
         PositionRef ref = References.parsePositionRef("$A$1");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -19,7 +19,7 @@ public class TestReferences extends TestCase {
         assertTrue(ref.isColumnAbsolute());
 
         ref = References.parsePositionRef("$Z9");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -29,7 +29,7 @@ public class TestReferences extends TestCase {
         assertTrue(ref.isColumnAbsolute());
 
         ref = References.parsePositionRef("AA$11");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -40,7 +40,7 @@ public class TestReferences extends TestCase {
 
 
         ref = References.parsePositionRef("AZ19");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -50,7 +50,7 @@ public class TestReferences extends TestCase {
         assertFalse(ref.isColumnAbsolute());
 
         ref = References.parsePositionRef("AZ");
-//        assertFalse(ref.isValid());
+//        assertFalse(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -60,7 +60,7 @@ public class TestReferences extends TestCase {
         assertFalse(ref.isColumnAbsolute());
 
         ref = References.parsePositionRef("19");
-//        assertFalse(ref.isValid());
+//        assertFalse(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -72,7 +72,7 @@ public class TestReferences extends TestCase {
 
     public void testParseRangeEndRef() {
         PositionRef ref = References.parseRangeEndRef("$A$1");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -82,7 +82,7 @@ public class TestReferences extends TestCase {
         assertTrue(ref.isColumnAbsolute());
 
         ref = References.parseRangeEndRef("A1");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -92,7 +92,7 @@ public class TestReferences extends TestCase {
         assertFalse(ref.isColumnAbsolute());
 
         ref = References.parseRangeEndRef("$A");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -102,7 +102,7 @@ public class TestReferences extends TestCase {
         assertTrue(ref.isColumnAbsolute());
 
         ref = References.parseRangeEndRef("Z");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -112,7 +112,7 @@ public class TestReferences extends TestCase {
         assertFalse(ref.isColumnAbsolute());
 
         ref = References.parseRangeEndRef("$1");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());
@@ -122,7 +122,7 @@ public class TestReferences extends TestCase {
         assertFalse(ref.isColumnAbsolute());
 
         ref = References.parseRangeEndRef("9");
-//        assertTrue(ref.isValid());
+//        assertTrue(ref.isAlive());
 //        assertNull(ref.getSheetName());
 //        assertNull(ref.getAssetName());
 //        assertEquals(Asset.UNSPECIFIED_ASSET_ID, ref.getCellId());

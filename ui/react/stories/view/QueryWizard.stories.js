@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import {
-    WorkbookEditor,
-    Sheet, SheetAsset, Workbook, Version, Values,
-    EditResponse, ChangeList
-} from '../../src';
+import { WorkbookEditor } from '../../src';
+import Sheet from "../../src/model/Sheet"
+import Workbook from "../../src/model/Workbook"
+import Version from "../../src/model/Version"
+import Values from "../../src/model/Values"
+import EditResponse from "../../src/action/EditResponse"
+import ChangeList from "../../src/action/ChangeList"
+
 
 const sheet = new Sheet();
 sheet.name = 'test_sheet';
@@ -50,17 +53,17 @@ class QueryWizardStories extends Component {
                                 component: (props) => <div>
                                     <h3>查询测试1</h3>
                                     <p>Demo 1</p>
-                                    <button onClick={()=>props.onOk({
+                                    <button onClick={() => props.onOk({
                                         scheme: 'provider-1',
                                         builtinParams: [{
                                             name: 'var1',
                                             value: Values.formula('TODAY()')
                                         }]
                                     })}>Ok</button>
-                                    <button onClick={()=>props.onCancel()}>Cancel</button>
+                                    <button onClick={() => props.onCancel()}>Cancel</button>
                                 </div>
                             }
-                        },{
+                        }, {
                             queryWizard: {
                                 name: 'test-query-2',
                                 title: '查询测试2',
@@ -71,7 +74,7 @@ class QueryWizardStories extends Component {
                                 component: (props) => <div>
                                     <h1>hello world</h1>
                                     <p>Demo 2</p>
-                                    <button onClick={()=>props.onOk({
+                                    <button onClick={() => props.onOk({
                                         scheme: 'provider-2',
                                         builtinParams: [{
                                             name: 'p1',
@@ -81,7 +84,7 @@ class QueryWizardStories extends Component {
                                             value: Values.dec('3.14')
                                         }]
                                     })}>Ok</button>
-                                    <button onClick={()=>props.onCancel()}>Cancel</button>
+                                    <button onClick={() => props.onCancel()}>Cancel</button>
                                 </div>
                             }
                         }]} />

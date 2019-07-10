@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Form from "../../src/model/Form";
 import FormForm from "../../src/form/FormForm";
-import { Layout } from "../../src";
+import Layout from "../../src/model/Layout";
 
 const form = new Form("test-form", [], new Layout());
 

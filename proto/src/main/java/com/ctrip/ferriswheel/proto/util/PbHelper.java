@@ -12,6 +12,7 @@ import com.ctrip.ferriswheel.common.form.FormField;
 import com.ctrip.ferriswheel.common.form.FormFieldBinding;
 import com.ctrip.ferriswheel.common.query.QueryTemplate;
 import com.ctrip.ferriswheel.common.table.Cell;
+import com.ctrip.ferriswheel.common.table.Header;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.text.Text;
@@ -131,6 +132,14 @@ public class PbHelper {
             builder.setAutomaton(auto);
         }
         builder.setLayout(pb(tableData.getLayout()));
+        for (int rowIndex = 0; rowIndex < tableData.getRowCount(); rowIndex++) {
+            Header header = tableData.getRowHeader(rowIndex);
+            builder.addRowHeaders(pb(header));
+        }
+        for (int columnIndex = 0; columnIndex < tableData.getColumnCount(); columnIndex++) {
+            Header header = tableData.getColumnHeader(columnIndex);
+            builder.addColumnHeaders(pb(header));
+        }
         return com.ctrip.ferriswheel.proto.v1.SheetAsset.newBuilder().setTable(builder).build();
     }
 
@@ -155,7 +164,29 @@ public class PbHelper {
             }
             fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
         }
+        List<Header> rowHeaders = new ArrayList<>(proto.getRowHeadersCount());
+        for (int rowIndex = 0; rowIndex < proto.getRowHeadersCount(); rowIndex++) {
+            rowHeaders.add(bean(proto.getRowHeaders(rowIndex)));
+        }
+        table.setRowHeaders(rowHeaders);
+
+        List<Header> columnHeaders = new ArrayList<>(proto.getColumnHeadersCount());
+        for (int columnIndex = 0; columnIndex < proto.getColumnHeadersCount(); columnIndex++) {
+            columnHeaders.add(bean(proto.getColumnHeaders(columnIndex)));
+        }
+        table.setColumnHeaders(columnHeaders);
         return table;
+    }
+
+    public static com.ctrip.ferriswheel.proto.v1.Header pb(Header bean) {
+        com.ctrip.ferriswheel.proto.v1.Header.Builder builder = com.ctrip.ferriswheel.proto.v1.Header.newBuilder();
+        // TBD
+        return builder.build();
+    }
+
+    public static Header bean(com.ctrip.ferriswheel.proto.v1.Header pb) {
+        // TBD
+        return new HeaderInfo();
     }
 
     public static RowData bean(com.ctrip.ferriswheel.proto.v1.Row proto) {
@@ -191,6 +222,12 @@ public class PbHelper {
     public static com.ctrip.ferriswheel.proto.v1.SheetAsset pb(Table bean) {
         com.ctrip.ferriswheel.proto.v1.Table.Builder builder = com.ctrip.ferriswheel.proto.v1.Table.newBuilder();
         builder.setName(bean.getName());
+        for (int i = 0; i < bean.getRowCount(); i++) {
+            builder.addRowHeaders(pb(bean.getRowHeader(i)));
+        }
+        for (int j = 0; j < bean.getColumnCount(); j++) {
+            builder.addColumnHeaders(pb(bean.getColumnHeader(j)));
+        }
         for (Map.Entry<Integer, Row> rowEntry : bean) {
             builder.addRows(pb(rowEntry.getValue(), rowEntry.getKey()));
         }
@@ -202,6 +239,7 @@ public class PbHelper {
     }
 
     static Table bean(Table table, com.ctrip.ferriswheel.proto.v1.Table proto) {
+        fixTableSize(table, proto);
         for (int i = 0; i < proto.getRowsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Row rowProto = proto.getRows(i);
             int rowIndex = rowProto.getRowIndex();
@@ -230,6 +268,36 @@ public class PbHelper {
             fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
         }
         return table;
+    }
+
+    private static void fixTableSize(Table table, com.ctrip.ferriswheel.proto.v1.Table proto) {
+        if (table.getColumnCount() != 0 || table.getRowCount() != 0) {
+            throw new IllegalArgumentException();
+        }
+        int rowCount = proto.getRowHeadersCount();
+        int columnCount = proto.getColumnHeadersCount();
+
+        // for compatibility as headers are added later.
+        if (rowCount == 0 && proto.getRowsCount() > 0) {
+            rowCount = proto.getRows(proto.getRowsCount() - 1).getRowIndex() + 1;
+        }
+        if (columnCount == 0) {
+            for (int i = 0; i < proto.getRowsCount(); i++) {
+                com.ctrip.ferriswheel.proto.v1.Row r = proto.getRows(i);
+                if (r.getCellsCount() > 0) {
+                    com.ctrip.ferriswheel.proto.v1.Cell c = r.getCells(r.getCellsCount() - 1);
+                    if (columnCount < c.getColumnIndex() + 1) {
+                        columnCount = c.getColumnIndex() + 1;
+                    }
+                }
+            }
+        }
+        if (columnCount > 0) {
+            table.addColumns(columnCount);
+        }
+        if (rowCount > 0) {
+            table.addRows(rowCount);
+        }
     }
 
     public static com.ctrip.ferriswheel.proto.v1.Row pb(Row row, int index) {

@@ -62,6 +62,8 @@ public class TestDefaultForm extends TestCase {
         workbook = new FilingClerk(environment).createWorkbook("workbook");
         sheet = workbook.addSheet("sheet");
         table = (DefaultTable) sheet.addAsset(Table.class, "table");
+        table.addColumns(0, 3);
+        table.addRows(0, 3);
         form = (DefaultForm) sheet.addAsset(Form.class, "form");
     }
 
@@ -83,8 +85,8 @@ public class TestDefaultForm extends TestCase {
     public void testBindToCellWhichHasMovedAfter() {
         form.addField(new FormFieldData("foobar", VariantType.STRING, Value.str("Foobar"), false, false,
                 "Foo Bar", "Foo and bar.", null, Arrays.asList(new FormFieldBindingData("table!A1"))));
-        table.insertRows(0, 1);
-        table.insertColumns(0, 1);
+        table.addRows(0, 1);
+        table.addColumns(0, 1);
 
         HashMap<String, Variant> params = new HashMap<>();
         params.put("foobar", Value.str("foo+bar"));

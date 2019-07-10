@@ -66,4 +66,52 @@ public interface TableOrBuilder extends
    * <code>.ferriswheel.v1.Layout layout = 4;</code>
    */
   com.ctrip.ferriswheel.proto.v1.LayoutOrBuilder getLayoutOrBuilder();
+
+  /**
+   * <code>repeated .ferriswheel.v1.Header row_headers = 5;</code>
+   */
+  java.util.List<com.ctrip.ferriswheel.proto.v1.Header> 
+      getRowHeadersList();
+  /**
+   * <code>repeated .ferriswheel.v1.Header row_headers = 5;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.Header getRowHeaders(int index);
+  /**
+   * <code>repeated .ferriswheel.v1.Header row_headers = 5;</code>
+   */
+  int getRowHeadersCount();
+  /**
+   * <code>repeated .ferriswheel.v1.Header row_headers = 5;</code>
+   */
+  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.HeaderOrBuilder> 
+      getRowHeadersOrBuilderList();
+  /**
+   * <code>repeated .ferriswheel.v1.Header row_headers = 5;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.HeaderOrBuilder getRowHeadersOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .ferriswheel.v1.Header column_headers = 6;</code>
+   */
+  java.util.List<com.ctrip.ferriswheel.proto.v1.Header> 
+      getColumnHeadersList();
+  /**
+   * <code>repeated .ferriswheel.v1.Header column_headers = 6;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.Header getColumnHeaders(int index);
+  /**
+   * <code>repeated .ferriswheel.v1.Header column_headers = 6;</code>
+   */
+  int getColumnHeadersCount();
+  /**
+   * <code>repeated .ferriswheel.v1.Header column_headers = 6;</code>
+   */
+  java.util.List<? extends com.ctrip.ferriswheel.proto.v1.HeaderOrBuilder> 
+      getColumnHeadersOrBuilderList();
+  /**
+   * <code>repeated .ferriswheel.v1.Header column_headers = 6;</code>
+   */
+  com.ctrip.ferriswheel.proto.v1.HeaderOrBuilder getColumnHeadersOrBuilder(
+      int index);
 }

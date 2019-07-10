@@ -213,7 +213,7 @@ public class TestFormulaParser extends TestCase {
         RangeReferenceElement r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(9, r.getToken().getTo());
-        assertTrue(r.getRangeReference().isValid());
+        assertTrue(r.getRangeReference().isAlive());
         assertEquals(0, r.getRangeReference().getLeft());
         assertEquals(1, r.getRangeReference().getRight());
         assertEquals(-1, r.getRangeReference().getTop());
@@ -227,7 +227,7 @@ public class TestFormulaParser extends TestCase {
         r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(9, r.getToken().getTo());
-        assertTrue(r.getRangeReference().isValid());
+        assertTrue(r.getRangeReference().isAlive());
         assertEquals(-1, r.getRangeReference().getLeft());
         assertEquals(-1, r.getRangeReference().getRight());
         assertEquals(0, r.getRangeReference().getTop());
@@ -241,7 +241,7 @@ public class TestFormulaParser extends TestCase {
         r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(3, r.getToken().getTo());
-        assertTrue(r.getRangeReference().isValid());
+        assertTrue(r.getRangeReference().isAlive());
         assertEquals(0, r.getRangeReference().getLeft());
         assertEquals(1, r.getRangeReference().getRight());
         assertEquals(-1, r.getRangeReference().getTop());
@@ -255,7 +255,7 @@ public class TestFormulaParser extends TestCase {
         r = (RangeReferenceElement) f[0];
         assertEquals(0, r.getToken().getFrom());
         assertEquals(3, r.getToken().getTo());
-        assertTrue(r.getRangeReference().isValid());
+        assertTrue(r.getRangeReference().isAlive());
         assertEquals(-1, r.getRangeReference().getLeft());
         assertEquals(-1, r.getRangeReference().getRight());
         assertEquals(0, r.getRangeReference().getTop());

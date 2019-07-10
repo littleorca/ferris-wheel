@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { ChartForm, Chart } from '../../src';
+import ChartForm from '../../src/form/ChartForm';
+import Chart from '../../src/model/Chart';
 import { action } from '@storybook/addon-actions';
 
 class ChartFormStories extends Component {

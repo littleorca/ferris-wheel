@@ -10,7 +10,7 @@ public class RangeReference extends AbstractReference implements Serializable {
 
     private long upperLeftTargetId = Asset.UNSPECIFIED_ASSET_ID;
     private long lowerRightTargetId = Asset.UNSPECIFIED_ASSET_ID;
-    private boolean valid = true;
+    private boolean alive = true;
 
     public RangeReference() {
         super(null, null);
@@ -26,7 +26,7 @@ public class RangeReference extends AbstractReference implements Serializable {
         this.lowerRightRef = lowerRight.getPositionRef();
         this.upperLeftTargetId = upperLeft.getCellId();
         this.lowerRightTargetId = lowerRight.getCellId();
-        this.valid = upperLeft.isValid() && lowerRight.isValid();
+        this.alive = upperLeft.isAlive() && lowerRight.isAlive();
     }
 
     public RangeReference(String sheetName, String assetName, PositionRef upperLeftPos, PositionRef lowerRightPos) {
@@ -76,13 +76,13 @@ public class RangeReference extends AbstractReference implements Serializable {
                           PositionRef lowerRightRef,
                           long upperLeftTargetId,
                           long lowerRightTargetId,
-                          boolean valid) {
+                          boolean alive) {
         super(sheetName, assetName);
         this.upperLeftRef = upperLeftRef;
         this.lowerRightRef = lowerRightRef;
         this.upperLeftTargetId = upperLeftTargetId;
         this.lowerRightTargetId = lowerRightTargetId;
-        this.valid = valid;
+        this.alive = alive;
     }
 
     @Override
@@ -150,11 +150,17 @@ public class RangeReference extends AbstractReference implements Serializable {
         this.lowerRightTargetId = lowerRightTargetId;
     }
 
-    public boolean isValid() {
-        return valid;
+    public boolean isAlive() {
+        return alive;
     }
 
-    public void setValid(boolean valid) {
-        this.valid = valid;
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public boolean isValid() {
+        return isAlive() &&
+                upperLeftTargetId != Asset.UNSPECIFIED_ASSET_ID &&
+                lowerRightTargetId != Asset.UNSPECIFIED_ASSET_ID;
     }
 }

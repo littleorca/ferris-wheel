@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { CheckBox } from "../../src";
+import CheckBox from "../../src/ctrl/CheckBox";
 import Field from "../../src/form/Field";
 
 let testValue = true;

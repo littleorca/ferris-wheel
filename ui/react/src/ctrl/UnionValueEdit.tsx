@@ -4,7 +4,7 @@ import UnionValue from '../model/UnionValue';
 import EditBox from './EditBox';
 import Values from '../model/Values';
 import { VariantType } from '../model/Variant';
-import Popover from "react-popover";
+import * as Popover from "react-popover";
 import DatePicker from "react-datepicker";
 import * as moment from 'moment';
 import Toolbar, { Group } from './Toolbar';
@@ -18,8 +18,9 @@ type UnionValueEditMode = "formula" | "decimal" | "boolean" | "date" | "string" 
 
 type UnionValueEditAux = "outside" | "none"; // TODO not really implemented.
 
-interface UninValueEditProps extends React.ClassAttributes<UnionValueEdit> {
+interface UnionValueEditProps extends React.ClassAttributes<UnionValueEdit> {
     value: UnionValue;
+    initialUpdate?: UnionValue;
     id?: string;
     name?: string;
     placeholder?: string;
@@ -38,26 +39,89 @@ interface UninValueEditProps extends React.ClassAttributes<UnionValueEdit> {
 
 interface UnionValueEditState {
     active: boolean;
+    originValue: UnionValue;
+    originModes?: UnionValueEditMode[];
     allowedModes: Set<UnionValueEditMode>;
     currentMode?: UnionValueEditMode;
-    pendingValue: UnionValue;
+    currentValue: UnionValue;
     valid: boolean;
 }
 
-class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditState> {
+class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEditState> {
     private editBoxRef = React.createRef<EditBox>();
     private toolbarRef = React.createRef<Toolbar>();
     private auxRef = React.createRef<HTMLDivElement>();
 
-    constructor(props: UninValueEditProps) {
+    protected static getDerivedStateFromProps(nextProps: UnionValueEditProps, prevState: UnionValueEditState) {
+        if (nextProps.value !== prevState.originValue || nextProps.modes !== prevState.originModes) {
+            const allowedModes = UnionValueEdit.getAllowedModes();
+            const currentMode = UnionValueEdit.getLegalEditMode(nextProps.value, allowedModes);
+            return {
+                ...prevState,
+                originValue: nextProps.value,
+                originModes: nextProps.modes,
+                allowedModes,
+                currentMode,
+                pendingValue: nextProps.value,
+                valid: typeof currentMode !== "undefined",
+            };
+
+        } else {
+            return null;
+        }
+    }
+
+    protected static getAllowedModes(modes?: UnionValueEditMode[]) {
+        const allowedModes = new Set<UnionValueEditMode>();
+        if (typeof modes !== "undefined") {
+            modes.forEach(m => allowedModes.add(m));
+        } else {
+            allowedModes.add("formula");
+            allowedModes.add("decimal");
+            allowedModes.add("boolean");
+            allowedModes.add("date");
+            allowedModes.add("string");
+            allowedModes.add("list");
+        }
+        return allowedModes;
+    }
+
+    protected static getLegalEditMode(value: UnionValue, allowedModes: Set<UnionValueEditMode>): UnionValueEditMode | undefined {
+        const mode = UnionValueEdit.getEditModeByValue(value);
+        if (typeof mode === "undefined" || !allowedModes.has(mode)) {
+            return undefined;
+        }
+        return mode;
+    }
+
+    protected static getEditModeByValue(value: UnionValue): UnionValueEditMode | undefined {
+        if (value.isFormula()) {
+            return "formula";
+        }
+
+        switch (value.valueType()) {
+            case VariantType.LIST: return "list";
+            case VariantType.DECIMAL: return "decimal";
+            case VariantType.BOOL: return "boolean";
+            case VariantType.DATE: return "date";
+            case VariantType.STRING: return "string";
+            default: return undefined;
+        }
+    }
+
+    constructor(props: UnionValueEditProps) {
         super(props);
-        const allowedModes = this.getAllowedModes();
-        const currentMode = this.getLegalEditMode(props.value, allowedModes);
+        const allowedModes = UnionValueEdit.getAllowedModes();
+        const currentValue = (typeof props.initialUpdate !== "undefined") ?
+            props.initialUpdate : props.value;
+        const currentMode = UnionValueEdit.getLegalEditMode(currentValue, allowedModes);
         this.state = {
             active: false,
+            originValue: props.value,
+            originModes: props.modes,
             allowedModes,
             currentMode,
-            pendingValue: props.value,
+            currentValue,
             valid: typeof currentMode !== "undefined",
         };
 
@@ -107,13 +171,13 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
         }
         if (this.state.currentMode === "list") {
             event.stopImmediatePropagation();
-            if (this.props.value === this.state.pendingValue) {
+            if (this.props.value === this.state.currentValue) {
                 this.setState({ active: false });
             } else {
                 const change: ValueChange<UnionValue> = {
                     id: this.props.id,
                     name: this.props.name,
-                    fromValue: this.state.pendingValue,
+                    fromValue: this.state.currentValue,
                     toValue: this.props.value,
                     type: "rollback",
                 };
@@ -125,19 +189,6 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
     public componentWillUnmount() {
         document.removeEventListener("mousedown", this.handleGlobalMouseDown);
         document.removeEventListener("keydown", this.handleGlobalKeyDown);
-    }
-
-    public componentDidUpdate(prevProps: UninValueEditProps) {
-        if (this.props.value !== prevProps.value || this.props.modes !== prevProps.modes) {
-            const allowedModes = this.getAllowedModes();
-            const currentMode = this.getLegalEditMode(this.props.value, allowedModes);
-            this.setState({
-                allowedModes,
-                currentMode,
-                pendingValue: this.props.value,
-                valid: typeof currentMode !== "undefined",
-            });
-        }
     }
 
     protected handleEditBoxBeginEdit() {
@@ -155,21 +206,21 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
         this.setState({ active: false });
         // since we keep sync pending value to EditBox, EditBox won't fire the final(after blur)
         // commit/rollback as it is not dirty. UnionValueEdit should deal this.
-        if (this.props.value !== this.state.pendingValue) {
+        if (this.props.value !== this.state.currentValue) {
             let change: ValueChange<UnionValue>;
             if (this.state.valid) {
                 change = {
                     id: this.props.id,
                     name: this.props.name,
                     fromValue: this.props.value,
-                    toValue: this.state.pendingValue,
+                    toValue: this.state.currentValue,
                     type: "commit",
                 };
             } else {
                 change = {
                     id: this.props.id,
                     name: this.props.name,
-                    fromValue: this.state.pendingValue,
+                    fromValue: this.state.currentValue,
                     toValue: this.props.value,
                     type: "rollback",
                 };
@@ -186,7 +237,7 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
             return true;
         }
         const newValue = fromEditableString(change.toValue);
-        const mode = this.getLegalEditMode(newValue, this.state.allowedModes);
+        const mode = UnionValueEdit.getLegalEditMode(newValue, this.state.allowedModes);
         if (typeof mode !== "undefined") {
             return true;
         }
@@ -205,25 +256,25 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
                 }
                 break;
             case "decimal":
-                // if (change.nextValue.startsWith("'") && !isNaN(Number(change.nextValue.substring(1)))) {
-                //     change.nextValue = change.nextValue.substring(1);
+                // if (change.toValue.startsWith("'") && !isNaN(Number(change.toValue.substring(1)))) {
+                //     change.toValue = change.toValue.substring(1);
                 //     return true;
                 // }
                 break;
             case "boolean":
-                // if (change.nextValue.toLowerCase() === "'true") {
-                //     change.nextValue = "true";
+                // if (change.toValue.toLowerCase() === "'true") {
+                //     change.toValue = "true";
                 //     return true;
-                // } else if (change.nextValue.toLowerCase() === "'false") {
-                //     change.nextValue = "false";
+                // } else if (change.toValue.toLowerCase() === "'false") {
+                //     change.toValue = "false";
                 //     return true;
                 // }
                 break;
             case "date":
-                // if (change.nextValue.startsWith("'")) {
-                //     const m = moment(change.nextValue.substring(1), moment.ISO_8601);
+                // if (change.toValue.startsWith("'")) {
+                //     const m = moment(change.toValue.substring(1), moment.ISO_8601);
                 //     if (m.isValid()) {
-                //         change.nextValue = change.nextValue.substring(1);
+                //         change.toValue = change.toValue.substring(1);
                 //         return true;
                 //     }
                 // }
@@ -236,7 +287,7 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
     }
 
     protected afterEditBoxChange(change: ValueChange<string>) {
-        let fromValue = this.state.pendingValue;
+        let fromValue = this.state.currentValue;
         let toValue = fromEditableString(change.toValue);
         if (change.type === "rollback") {
             toValue = this.props.value;
@@ -250,44 +301,6 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
             toValue,
             type: change.type,
         });
-    }
-
-    protected getAllowedModes() {
-        const allowedModes = new Set<UnionValueEditMode>();
-        if (typeof this.props.modes !== "undefined") {
-            this.props.modes.forEach(m => allowedModes.add(m));
-        } else {
-            allowedModes.add("formula");
-            allowedModes.add("decimal");
-            allowedModes.add("boolean");
-            allowedModes.add("date");
-            allowedModes.add("string");
-            allowedModes.add("list");
-        }
-        return allowedModes;
-    }
-
-    protected getLegalEditMode(value: UnionValue, allowedModes: Set<UnionValueEditMode>): UnionValueEditMode | undefined {
-        const mode = this.getEditModeByValue(value);
-        if (typeof mode === "undefined" || !allowedModes.has(mode)) {
-            return undefined;
-        }
-        return mode;
-    }
-
-    protected getEditModeByValue(value: UnionValue): UnionValueEditMode | undefined {
-        if (value.isFormula()) {
-            return "formula";
-        }
-
-        switch (value.valueType()) {
-            case VariantType.LIST: return "list";
-            case VariantType.DECIMAL: return "decimal";
-            case VariantType.BOOL: return "boolean";
-            case VariantType.DATE: return "date";
-            case VariantType.STRING: return "string";
-            default: return undefined;
-        }
     }
 
     protected handleEditBoxClick() {
@@ -326,6 +339,7 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
 
     protected createDefaultValue(mode: UnionValueEditMode): UnionValue {
         switch (mode) {
+            case "formula": return Values.formula("");
             case "decimal": return Values.dec(0);
             case "boolean": return Values.bool(false);
             case "date": return Values.date(new Date());
@@ -340,7 +354,8 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
             mode = this.state.allowedModes.keys().next().value;
         }
         let editableString: string;
-        if (value.valueType() === VariantType.LIST) {
+        // FIXME actually list value cannot be edit at present, should either raise exception or make it editable.
+        if (!value.isFormula() && value.valueType() === VariantType.LIST) {
             editableString = "[";
             value.listValue().forEach(v => {
                 if (editableString.length > 1) {
@@ -386,25 +401,25 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
 
     protected handleCloseAux(event: Event) {
         this.setState({ active: false });
-        if (this.state.pendingValue === this.props.value) {
+        if (this.state.currentValue === this.props.value) {
             return;
         }
         const change: ValueChange<UnionValue> = {
             id: this.props.id,
             name: this.props.name,
             fromValue: this.props.value,
-            toValue: this.state.pendingValue,
+            toValue: this.state.currentValue,
             type: "commit"
         };
         this.processChange(change);
     }
 
     protected processChange(change: ValueChange<UnionValue>, forceFocus: boolean = false) {
-        const mode = this.getLegalEditMode(change.toValue, this.state.allowedModes);
+        const mode = UnionValueEdit.getLegalEditMode(change.toValue, this.state.allowedModes);
         const valid = typeof mode !== "undefined";
         this.setState({
             currentMode: mode,
-            pendingValue: change.toValue,
+            currentValue: change.toValue,
             valid
         }, () => {
             if (forceFocus && mode !== "list" && this.editBoxRef.current) {
@@ -447,7 +462,7 @@ class UnionValueEdit extends React.Component<UninValueEditProps, UnionValueEditS
                 "disabled": this.props.disabled,
             }
         );
-        const value = this.state.pendingValue;
+        const value = this.state.currentValue;
         const editableString = this.createDefaultEditableString(value, this.state.currentMode);
         const editable = !this.props.readOnly && !this.props.disabled;
         // const allowMultiline = typeof this.props.modes === "undefined" ||
@@ -654,7 +669,7 @@ export default UnionValueEdit;
 export {
     UnionValueEditMode,
     UnionValueEditAux,
-    UninValueEditProps,
+    UnionValueEditProps as UninValueEditProps,
     fromEditableString,
     toEditableString
 }

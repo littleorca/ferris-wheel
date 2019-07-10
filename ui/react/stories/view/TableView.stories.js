@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
-import {
-    TableView, Table, Row, Cell, Values, VariantType, QueryAutomaton, ParamRule,
-    Button,
-    RefreshCellValue, SetCellValue, SetCellFormula
-} from '../../src';
-const table = new Table('test_table', []);
-table.rows.push(new Row(0,
+import TableView from "../../src/view/TableView"
+import Table from "../../src/model/Table"
+import Row from "../../src/model/Row"
+import Cell from "../../src/model/Cell"
+import Values from "../../src/model/Values"
+import { VariantType } from "../../src/model/Variant"
+import QueryAutomaton from "../../src/model/QueryAutomaton"
+import Button from "../../src/ctrl/Button"
+import RefreshCellValue from "../../src/action/RefreshCellValue"
+import SetCellValue from "../../src/action/SetCellValue"
+import SetCellFormula from "../../src/action/SetCellFormula"
+import Header from '../../src/model/Header';
+import GridCellImpl from '../../src/model/GridCellImpl';
+
+const table = new Table('test_table',
     [
-        new Cell(0, Values.str('hello')),
-        new Cell(1, Values.str('world')),
-        new Cell(2, Values.str('~!')),
-    ]));
-table.rows.push(new Row(1,
-    [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(15)),
-        new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2")),
-    ]));
+        [
+            new GridCellImpl(new Cell(0, Values.str('hello'))),
+            new GridCellImpl(new Cell(1, Values.str('world'))),
+            new GridCellImpl(new Cell(2, Values.str('~!'))),
+        ], [
+            new GridCellImpl(new Cell(0, Values.dec(10))),
+            new GridCellImpl(new Cell(1, Values.dec(15))),
+            new GridCellImpl(new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2"))),
+        ]
+    ]);
 
 const queryAutomaton = new QueryAutomaton();
 // queryAutomaton.template.userParamRules.push(new ParamRule('bool', VariantType.BOOL, false, []));
@@ -35,18 +43,17 @@ const queryAutomaton = new QueryAutomaton();
 
 const tableWithQueryAutomaton = new Table(
     'test_table_with_query_automaton',
-    [],
+    [
+        [
+            new GridCellImpl(new Cell(0, Values.str('foo'))),
+            new GridCellImpl(new Cell(1, Values.str('bar'))),
+        ], [
+            new GridCellImpl(new Cell(0, Values.dec(10))),
+            new GridCellImpl(new Cell(1, Values.dec(24))),
+        ]
+    ],
+    undefined, undefined,
     { queryAutomaton });
-tableWithQueryAutomaton.rows.push(new Row(0,
-    [
-        new Cell(0, Values.str('foo')),
-        new Cell(1, Values.str('bar')),
-    ]));
-tableWithQueryAutomaton.rows.push(new Row(1,
-    [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(24)),
-    ]));
 
 class TableViewStories extends Component {
     render() {

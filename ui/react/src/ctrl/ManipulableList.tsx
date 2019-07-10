@@ -132,7 +132,7 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
         if (typeof this.props.getItemLabel !== 'undefined') {
             return this.props.getItemLabel(item, index);
         }
-        return item.toString();
+        return String(item);
     }
 
     protected handleKeyDown(event: React.KeyboardEvent) {

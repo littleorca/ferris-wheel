@@ -36,6 +36,15 @@ class Layout {
         this.verticalAlign = verticalAlign;
         this.grid = grid;
     }
+
+    clone() {
+        return new Layout(this.display,
+            this.width,
+            this.height,
+            this.align,
+            this.verticalAlign,
+            this.grid.clone());
+    }
 }
 
 export default Layout;

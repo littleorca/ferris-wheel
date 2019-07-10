@@ -47,6 +47,14 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
     int getRowCount();
 
     /**
+     * Get row header by index.
+     *
+     * @param rowIndex
+     * @return
+     */
+    Header getRowHeader(int rowIndex);
+
+    /**
      * Get row by index.
      *
      * @param rowIndex
@@ -60,6 +68,14 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      * @return
      */
     int getColumnCount();
+
+    /**
+     * Get column header by index.
+     *
+     * @param columnIndex
+     * @return
+     */
+    Header getColumnHeader(int columnIndex);
 
     /**
      * Get cell at the specified position.
@@ -218,28 +234,33 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
     void setCellsFormat(int rowIndex, int columnIndex, int nRows, int nColumns, String format);
 
     /**
-     * Erase cell without remove cell object.
+     * Erase cells' values without remove themselves.
      *
-     * @param rowIndex
-     * @param columnIndex
+     * @param top
+     * @param right
+     * @param bottom
+     * @param left
      */
-    void eraseCell(int rowIndex, int columnIndex);
+    void eraseCells(int top, int right, int bottom, int left);
 
     /**
-     * Insert rows at specified position.
+     * Add rows to the bottom.
+     *
+     * @param nRows positive number of rows to insert.
+     * @see #addRows(int, int)
+     */
+    default void addRows(int nRows) {
+        addRows(getRowCount(), nRows);
+    }
+
+    /**
+     * Add rows at specified position.
      *
      * @param rowIndex row index begin with 0, where to insert new rows.
      * @param nRows    positive number of rows to insert.
+     * @see #addRows(int)
      */
-    void insertRows(int rowIndex, int nRows);
-
-    /**
-     * Erase rows without remove there spaces.
-     *
-     * @param rowIndex row index begin with 0, first row to erase.
-     * @param nRows    positive number of rows to erase.
-     */
-    void eraseRows(int rowIndex, int nRows);
+    void addRows(int rowIndex, int nRows);
 
     /**
      * Remove rows and shrink spaces.
@@ -250,20 +271,23 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
     void removeRows(int rowIndex, int nRows);
 
     /**
-     * Insert columns at specified position.
+     * Add columns to the right.
+     *
+     * @param nCols positive number of columns to insert.
+     * @see #addColumns(int, int)
+     */
+    default void addColumns(int nCols) {
+        addColumns(getColumnCount(), nCols);
+    }
+
+    /**
+     * Add columns at specified position.
      *
      * @param colIndex column index begin with 0, where to insert new columns.
      * @param nCols    positive number of columns to insert.
+     * @see #addColumns(int)
      */
-    void insertColumns(int colIndex, int nCols);
-
-    /**
-     * Erase columns without remove there spaces.
-     *
-     * @param colIndex column index begin with 0, first column to erase.
-     * @param nCols    positive number of columns to erase.
-     */
-    void eraseColumns(int colIndex, int nCols);
+    void addColumns(int colIndex, int nCols);
 
     /**
      * Remove columns and shrink spaces.
@@ -286,7 +310,6 @@ public interface Table extends Iterable<Map.Entry<Integer, Row>>, Displayable, S
      * @return correlated table automaton, or null if this table is not automated.
      */
     Automaton getAutomaton();
-
 
     /**
      * Get automate configuration.

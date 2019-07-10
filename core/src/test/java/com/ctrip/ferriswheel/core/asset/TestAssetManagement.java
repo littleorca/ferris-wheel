@@ -84,12 +84,10 @@ public class TestAssetManagement extends TestCase {
         DefaultTable table = (DefaultTable) wb.addSheet("sheet1").addAsset(Table.class, "table1");
         checkAssetMap(wb);
 
-        // the following ops are not really effective
-
-        table.insertRows(0, 1);
+        table.addRows(0, 7);
         checkAssetMap(wb);
 
-        table.insertColumns(0, 1);
+        table.addColumns(0, 7);
         checkAssetMap(wb);
 
         // do something really effects
@@ -109,27 +107,27 @@ public class TestAssetManagement extends TestCase {
         table.setCellValue(6, 6, new Value.StrValue("blah.."));
         checkAssetMap(wb);
 
-        table.insertRows(4, 2);
+        table.addRows(4, 2);
         checkAssetMap(wb);
 
         table.setCellValue(4, 4, new Value.StrValue("new"));
         table.setCellValue(5, 5, new Value.StrValue("new"));
         checkAssetMap(wb);
 
-        table.eraseRows(1, 2);
+        table.eraseCells(1, 2, 1, 2);
         checkAssetMap(wb);
 
         table.removeRows(1, 2);
         checkAssetMap(wb);
 
-        table.insertColumns(4, 1);
+        table.addColumns(4, 1);
         checkAssetMap(wb);
 
         table.setCellValue(4, 4, new Value.StrValue("new"));
         table.setCellValue(5, 5, new Value.StrValue("new"));
         checkAssetMap(wb);
 
-        table.eraseColumns(1, 2);
+        table.eraseCells(0, 3, 5, 1);
         checkAssetMap(wb);
 
         table.removeColumns(1, 2);
@@ -141,7 +139,7 @@ public class TestAssetManagement extends TestCase {
         table.setCellFormula(3, 3, "C3");
         checkAssetMap(wb);
 
-        table.eraseCell(2, 2);
+        table.eraseCells(2, 2, 2, 2);
         checkAssetMap(wb);
     }
 
@@ -168,6 +166,9 @@ public class TestAssetManagement extends TestCase {
         checkAssetMap(wb);
 
         DefaultTable t1 = (DefaultTable) s1.addAsset(Table.class, "table1");
+
+        t1.addColumns(0, 4);
+        t1.addRows(0, 4);
 
         t1.setCellValue(0, 1, new Value.StrValue("foo"));
         checkAssetMap(wb);

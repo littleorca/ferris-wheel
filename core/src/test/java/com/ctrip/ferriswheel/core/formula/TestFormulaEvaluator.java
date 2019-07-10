@@ -27,6 +27,8 @@ public class TestFormulaEvaluator extends TestCase {
     public void testEvaluator() {
         Workbook book = new FilingClerk(environment).createWorkbook("test-workbook");
         Table table = book.addSheet("sheet1").addAsset(Table.class, "test");
+        table.addRows(2);
+        table.addColumns(2);
         ResolverMock resolver = new ResolverMock(book);
         FormulaEvaluator evaluator = new FormulaEvaluator(resolver);
 

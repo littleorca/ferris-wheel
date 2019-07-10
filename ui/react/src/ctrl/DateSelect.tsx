@@ -1,8 +1,8 @@
 import * as React from "react";
 import InputCtrl, { InputCtrlProps } from "./InputCtrl";
 import DatePicker from "react-datepicker";
-import Popover from "react-popover";
-import moment from "moment";
+import * as Popover from "react-popover";
+import * as moment from "moment";
 import classnames from "classnames";
 import "react-datepicker/dist/react-datepicker.css";
 

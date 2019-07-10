@@ -4,13 +4,12 @@ import Workbook from '../model/Workbook';
 import Sheet from '../model/Sheet';
 import SheetAsset from '../model/SheetAsset';
 import Chart from '../model/Chart';
+import GridCellImpl from '../model/GridCellImpl';
 import Table from '../model/Table';
 import Form from "../model/Form";
-import Row from '../model/Row';
 import Cell from '../model/Cell';
 import Text from '../model/Text';
 import Values from '../model/Values';
-import Layout from '../model/Layout';
 import TableAutomaton from '../model/TableAutomaton';
 import PivotAutomaton from '../model/PivotAutomaton';
 import QueryAutomaton from '../model/QueryAutomaton';
@@ -19,13 +18,6 @@ import Stacking from '../model/Stacking';
 import Toolbar, { Group } from '../ctrl/Toolbar';
 import DropdownButton from '../ctrl/DropdownButton';
 import Button, { ButtonProps } from '../ctrl/Button';
-import LayoutForm from '../form/LayoutForm';
-import QueryTemplateForm from '../form/QueryTemplateForm';
-import ChartForm from '../form/ChartForm';
-import PivotForm from '../form/PivotForm';
-import FormForm from "../form/FormForm";
-import GroupView, { GroupItem } from './GroupView';
-import FormatFormDialog from './FormatFormDialog';
 import Action from '../action/Action';
 import ActionHandler from '../action/ActionHandler';
 import ActionHerald from '../action/ActionHerald';
@@ -34,19 +26,10 @@ import EditRequest from '../action/EditRequest';
 import EditResponse from '../action/EditResponse';
 import RemoveAsset from '../action/RemoveAsset';
 import RemoveSheet from '../action/RemoveSheet';
-import AutomateTable from '../action/AutomateTable';
-import LayoutAsset from '../action/LayoutAsset';
 import AddForm from '../action/AddForm';
-import UpdateForm from '../action/UpdateForm';
-import UpdateChart from '../action/UpdateChart';
 import AddTable from '../action/AddTable';
 import AddChart from '../action/AddChart';
 import AddText from '../action/AddText';
-import InsertRows from '../action/InsertRows';
-import InsertColumns from '../action/InsertColumns';
-import RemoveColumns from '../action/RemoveColumns';
-import RemoveRows from '../action/RemoveRows';
-import SetCellsFormat from '../action/SetCellsFormat';
 import WorkbookOperation from '../action/WorkbookOperation';
 import { PendingField } from '../form/AddFormForm';
 import AddFormDialog from './AddFormDialog';
@@ -67,7 +50,7 @@ interface WorkbookEditorProps extends React.ClassAttributes<WorkbookEditor> {
 }
 
 interface WorkbookEditorState {
-    txId: number;
+    respTxId: number;
     currentSheet?: Sheet;
     currentAsset?: SheetAsset;
     clipBoard?: Sheet | SheetAsset;
@@ -78,14 +61,16 @@ interface WorkbookEditorState {
 }
 
 class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditorState> implements ActionHerald {
+    private sideBarRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private sideBarPortalNode: HTMLDivElement;
+    private reqTxId = 0;
+
     private listeners: Set<ActionHandler> = new Set();
     private queryWizardButtons = new Array<ButtonProps>();
     private queryWizardMap: Map<string, QueryWizard> = new Map();
 
     constructor(props: WorkbookEditorProps) {
         super(props);
-
-        this.state = this.createInitialState(props);
 
         this.handleSave = this.handleSave.bind(this);
 
@@ -99,8 +84,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.handleQueryWizardCancelled = this.handleQueryWizardCancelled.bind(this);
         this.handleAddQueryTable = this.handleAddQueryTable.bind(this);
         this.handleAddPivotTable = this.handleAddPivotTable.bind(this);
-        this.handleAlterTable = this.handleAlterTable.bind(this);
-        this.handleFormatCell = this.handleFormatCell.bind(this);
 
         this.handleAddLineChart = this.handleAddLineChart.bind(this);
         this.handleAddStackedLineChart = this.handleAddStackedLineChart.bind(this);
@@ -122,6 +105,11 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         this.onServiceOk = this.onServiceOk.bind(this);
         this.onServiceError = this.onServiceError.bind(this);
         this.preventSubmit = this.preventSubmit.bind(this);
+
+        this.state = this.createInitialState(props);
+
+        this.sideBarPortalNode = document.createElement("div");
+        this.sideBarPortalNode.className = "realtime-edit";
 
         if (typeof this.props.extensions !== 'undefined') {
             this.props.extensions.forEach((value, index) => {
@@ -147,12 +135,20 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
 
     protected createInitialState(props: WorkbookEditorProps): WorkbookEditorState {
         return {
-            txId: 0,
+            respTxId: 0,
             showSidebar: true,
             message: "编辑文档",
             serviceStatus: "就绪",
             showMask: false,
         };
+    }
+
+    componentDidMount() {
+        const sideBar = this.sideBarRef.current;
+        if (!sideBar) {
+            throw Error("Missing sidebar!");
+        }
+        sideBar.appendChild(this.sideBarPortalNode);
     }
 
     public subscribe(handler: ActionHandler) {
@@ -175,13 +171,13 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         if (typeof this.state.currentAsset !== 'undefined') {
             // copy asset
             this.setState({
-                clipBoard: SheetAsset.deserialize(this.state.currentAsset)
+                clipBoard: this.state.currentAsset.clone()
             });
 
         } else {
             // copy sheet
             this.setState({
-                clipBoard: Sheet.deserialize(this.state.currentSheet)
+                clipBoard: this.state.currentSheet.clone()
             });
         }
     }
@@ -201,19 +197,19 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
             let action: Action | null = null;
 
             if (specificAsset instanceof Chart) {
-                const chart = Chart.deserialize(specificAsset); // copy
+                const chart = specificAsset.clone(); // copy
                 const addChart = new AddChart(sheet.name, chart);
                 chart.name = this.newAssetName(sheet, chart.name + ' (copy)');
                 action = addChart.wrapper();
 
             } else if (specificAsset instanceof Table) {
-                const table = Table.deserialize(specificAsset); // copy
+                const table = specificAsset.clone(); // copy
                 const addTable = new AddTable(sheet.name, table);
                 table.name = this.newAssetName(sheet, table.name + ' (copy)');
                 action = addTable.wrapper();
 
             } else if (specificAsset instanceof Text) {
-                const text = Text.deserialize(specificAsset); // copy
+                const text = specificAsset.clone(); // copy
                 const addText = new AddText(sheet.name, text);
                 text.name = this.newAssetName(sheet, text.name + ' (copy)');
                 action = addText.wrapper();
@@ -244,7 +240,10 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
             throw new Error('Illegal state, current sheet is not defined!');
         }
         const tableName = this.newAssetName(this.state.currentSheet, 'table');
-        const table = new Table(tableName, [new Row(0, [new Cell(0, Values.blank())])]);
+        const table = new Table(tableName,
+            [[
+                new GridCellImpl<Cell>(new Cell(0, Values.blank()))
+            ]]);
         const addTable = new AddTable(this.state.currentSheet.name, table);
         this.handleAction(addTable.wrapper());
     }
@@ -282,7 +281,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         }
         const tableName = this.newAssetName(this.state.currentSheet, 'table');
         const queryAutomaton = new QueryAutomaton(queryTemplate);
-        const table = new Table(tableName, [], new TableAutomaton(queryAutomaton));
+        const table = new Table(tableName, [], [], [], new TableAutomaton(queryAutomaton));
         const addTable = new AddTable(this.state.currentSheet.name, table);
         this.handleAction(addTable.wrapper());
     }
@@ -293,75 +292,9 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         }
         const tableName = this.newAssetName(this.state.currentSheet, 'table');
         const pivotAutomaton = new PivotAutomaton();
-        const table = new Table(tableName, [], new TableAutomaton(undefined, pivotAutomaton));
+        const table = new Table(tableName, [], [], [], new TableAutomaton(undefined, pivotAutomaton));
         const addTable = new AddTable(this.state.currentSheet.name, table);
         this.handleAction(addTable.wrapper());
-    }
-
-    protected handleAlterTable(buttonName: string) {
-        if (typeof this.state.currentSheet === 'undefined') {
-            return;
-        }
-        const sheet = this.state.currentSheet;
-        if (typeof this.state.currentAsset === 'undefined' ||
-            this.state.currentAsset.assetType() !== 'table') {
-            return;
-        }
-        const table = this.state.currentAsset.specific() as Table;
-        const selection = table.getSelectedRange();
-        if (selection === null) {
-            return;
-        }
-
-        let action: Action | null = null;
-        switch (buttonName) {
-            case 'insert-row':
-                action = new InsertRows(sheet.name, table.name, selection.top, 1).wrapper();
-                break;
-            case 'insert-column':
-                action = new InsertColumns(sheet.name, table.name, selection.left, 1).wrapper();
-                break;
-            case 'append-row':
-                action = new InsertRows(sheet.name, table.name, selection.bottom + 1, 1).wrapper();
-                break;
-            case 'append-column':
-                action = new InsertColumns(sheet.name, table.name, selection.right + 1, 1).wrapper();
-                break;
-            case 'remove-row':
-                action = new RemoveRows(sheet.name, table.name, selection.top, selection.bottom - selection.top + 1).wrapper();
-                break;
-            case 'remove-column':
-                action = new RemoveColumns(sheet.name, table.name, selection.left, selection.right - selection.left + 1).wrapper();
-                break;
-        }
-
-        if (action !== null) {
-            this.handleAction(action);
-        }
-    }
-
-    protected handleFormatCell(format: string) {
-        if (typeof this.state.currentSheet === 'undefined') {
-            return;
-        }
-        const sheet = this.state.currentSheet;
-        if (typeof this.state.currentAsset === 'undefined' ||
-            this.state.currentAsset.assetType() !== 'table') {
-            return;
-        }
-        const table = this.state.currentAsset.specific() as Table;
-        const selection = table.getSelectedRange();
-        if (selection === null) {
-            return;
-        }
-        this.handleAction(new SetCellsFormat(
-            sheet.name,
-            table.name,
-            selection.top,
-            selection.left,
-            selection.bottom - selection.top + 1,
-            selection.right - selection.left + 1,
-            format).wrapper());
     }
 
     protected handleAddLineChart() {
@@ -510,9 +443,8 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
 
     // FIXME setState is not synchronize, txId may duplicate
     protected handleRemoteAction(action: Action) {
-        const request = new EditRequest(this.state.txId + 1, action);
+        const request = new EditRequest(++this.reqTxId, action);
         this.setState({
-            txId: request.txId,
             message: `服务请求中，txId=${request.txId}…`,
             serviceStatus: "忙碌…",
             showMask: true,
@@ -525,14 +457,12 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
     }
 
     protected onServiceOk(resp: EditResponse) {
-        // make sure resp is an EditResponse instance.
-        resp = EditResponse.deserialize(resp);
         if (resp.statusCode === 0) {
             if (typeof resp.changes !== 'undefined') {
                 this.applyChanges(resp.changes.actions);
             }
             this.setState({
-                txId: resp.txId,
+                respTxId: resp.txId,
                 message: `服务成功，txId=${resp.txId}, ${resp.message}`,
                 serviceStatus: "就绪",
                 showMask: false,
@@ -540,7 +470,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
 
         } else {
             this.setState({
-                txId: resp.txId,
+                respTxId: resp.txId,
                 message: `服务失败，txId=${resp.txId}, status=${resp.statusCode}, ${resp.message}`,
                 serviceStatus: "就绪",
                 showMask: false,
@@ -609,12 +539,15 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         defaultSheet={this.props.defaultSheet}
                         editable={true}
                         onAction={this.handleAction}
-                        herald={this} />
-                    {this.state.showSidebar && (
-                        <div className="sidebar">
-                            {this.renderSideContent()}
-                        </div>
-                    )}
+                        herald={this}
+                        controlPortal={this.sideBarPortalNode} />
+                    <div
+                        ref={this.sideBarRef}
+                        className="sidebar"
+                        style={{
+                            display: this.state.showSidebar ? undefined : "none"
+                        }}>
+                    </div>
                 </div>
                 <div className="editor-footer">
                     <span className="editor-footer-item message">
@@ -780,366 +713,6 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         onClick={this.handleToggleSidebar} />
                 </Group>
             </Toolbar>
-        );
-    }
-
-    protected renderSideContent() {
-        if (typeof this.state.currentSheet !== 'undefined') {
-            if (typeof this.state.currentAsset !== 'undefined') {
-                const assetType = this.state.currentAsset.assetType();
-                const asset = this.state.currentAsset.specific();
-                switch (assetType) {
-                    case 'table':
-                        return this.renderTableOption(asset as Table);
-                    case 'chart':
-                        return this.renderChartOption(asset as Chart);
-                    case 'text':
-                        return this.renderTextOption(asset as Text);
-                    case 'form':
-                        return this.renderFormOption(asset as Form);
-                    default:
-                        throw new Error('Invalid asset type!');
-                }
-
-            } else {
-                return this.renderSheetOption(this.state.currentSheet);
-            }
-
-        } else {
-            return (
-                <div className="realtime-edit" />
-            );
-        }
-    }
-
-    protected renderSheetOption(sheet: Sheet) {
-        const handleLayoutChange = (layout: Layout) => {
-            // TODO update sheet layout
-        };
-        return (
-            <GroupView className="realtime-edit sheet-option">
-                <GroupItem
-                    name="layout"
-                    title="布局">
-                    <form onSubmit={this.preventSubmit}>
-                        <LayoutForm
-                            layout={sheet.layout}
-                            afterChange={handleLayoutChange} />
-                    </form>
-                </GroupItem>
-            </GroupView>
-        );
-    }
-
-    protected renderTableOption(table: Table) {
-        const sheet = this.state.currentSheet;
-        if (typeof sheet === 'undefined') {
-            throw new Error('Current sheet is undefined.');
-        }
-
-        const handleAutomatonChange = () => {
-            const automateTable = new AutomateTable(sheet.name, table.name, table.automaton);
-            this.handleAction(automateTable.wrapper());
-        };
-
-        const handleLayoutChange = (layout: Layout) => {
-            const layoutAsset = new LayoutAsset(sheet.name, table.name, layout);
-            this.handleAction(layoutAsset.wrapper());
-        };
-
-        const isTableSelected = true; // maybe just spare this, as this pane only be renderred when a table is selected.
-
-        const isTableEditable = typeof table.automaton.queryAutomaton === "undefined" &&
-            typeof table.automaton.pivotAutomaton === "undefined";
-
-        return (
-            <GroupView
-                className="realtime-edit table-option">
-                {table.automaton.queryAutomaton && (
-                    <GroupItem
-                        name="query"
-                        title="查询模板">
-                        {this.showQueryWizardButtonIfPossible(table.automaton.queryAutomaton.template, handleAutomatonChange)}
-                        <form onSubmit={this.preventSubmit}>
-                            <QueryTemplateForm
-                                queryTemplate={table.automaton.queryAutomaton.template}
-                                afterChange={handleAutomatonChange} />
-                        </form>
-                    </GroupItem>
-                )}
-                {table.automaton.pivotAutomaton && (
-                    <GroupItem
-                        name="pivot"
-                        title="透视表">
-                        <form onSubmit={this.preventSubmit}>
-                            <PivotForm
-                                pivot={table.automaton.pivotAutomaton}
-                                afterChange={handleAutomatonChange} />
-                        </form>
-                    </GroupItem>
-                )}
-                {isTableEditable && (
-                    <GroupItem
-                        name="alter-table"
-                        title="修改表">
-                        <div className="alter-table-actions">
-                            <div>
-                                <Button
-                                    name="insert-row"
-                                    label="插入行"
-                                    tips="在当前行之前插入新行"
-                                    disabled={!isTableSelected}
-                                    onClick={this.handleAlterTable} />
-                                <Button
-                                    name="insert-column"
-                                    label="插入列"
-                                    tips="在当前列之前插入新的列"
-                                    disabled={!isTableSelected}
-                                    onClick={this.handleAlterTable} />
-                            </div>
-                            <div>
-                                <Button
-                                    name="append-row"
-                                    label="追加行"
-                                    tips="在当前行后追加新行"
-                                    disabled={!isTableSelected}
-                                    onClick={this.handleAlterTable} />
-                                <Button
-                                    name="append-column"
-                                    label="追加列"
-                                    tips="在当前列后追加新列"
-                                    disabled={!isTableSelected}
-                                    onClick={this.handleAlterTable} />
-                            </div>
-                            <div>
-                                <Button
-                                    name="remove-row"
-                                    label="删除行"
-                                    tips="删除当前行"
-                                    disabled={!isTableSelected}
-                                    className="danger"
-                                    onClick={this.handleAlterTable} />
-                                <Button
-                                    name="remove-column"
-                                    label="删除列"
-                                    tips="删除当前列"
-                                    disabled={!isTableSelected}
-                                    className="danger"
-                                    onClick={this.handleAlterTable} />
-                            </div>
-                        </div>
-                        <div className="alter-table-actions">
-                            {this.showFormatCellButtonIfPossible(this.handleFormatCell)}
-                        </div>
-                    </GroupItem>
-                )}
-                <GroupItem
-                    name="layout"
-                    title="布局">
-                    <form onSubmit={this.preventSubmit}>
-                        <LayoutForm
-                            layout={table.layout}
-                            afterChange={handleLayoutChange} />
-                    </form>
-                </GroupItem>
-            </GroupView>
-        );
-    }
-
-    protected showQueryWizardButtonIfPossible(queryTemplate: QueryTemplate, handleAutomatonChange: () => void) {
-        if (typeof this.props.extensions === "undefined") {
-            return;
-        }
-        let wizard: QueryWizard | undefined = undefined;
-        for (let i = 0; i < this.props.extensions.length; i++) {
-            const extension = this.props.extensions[i];
-            if (typeof extension.queryWizard === "undefined") {
-                continue;
-            }
-            if (extension.queryWizard.accepts(queryTemplate)) {
-                wizard = extension.queryWizard;
-                break;
-            }
-        }
-        if (wizard === undefined) {
-            return;
-        }
-        const nonNullWizard = wizard;
-        const openWizard = () => {
-            Dialog.show(props => <nonNullWizard.component
-                initialQueryTemplate={queryTemplate}
-                onOk={(result) => {
-                    props.close();
-                    Object.assign(queryTemplate, result);
-                    handleAutomatonChange();
-                }}
-                onCancel={() => {
-                    props.close();
-                    this.handleQueryWizardCancelled();
-                }} />);
-        }
-        return (
-            <div className="query-wizard-actions">
-                <Button
-                    name="open-query-wizard"
-                    label="使用向导编辑"
-                    tips="使用查询器向导编辑该查询"
-                    onClick={openWizard} />
-            </div>
-        );
-    }
-
-    protected showFormatCellButtonIfPossible(submitCallback: (format: string) => void) {
-        // TODO check if cell(s) selected
-        const openFormatForm = () => {
-            // if (typeof this.state.currentSheet === 'undefined') {
-            //     return;
-            // }
-            // const sheet = this.state.currentSheet;
-            let formatSet = new Set<string>();
-            if (typeof this.state.currentAsset !== 'undefined' &&
-                this.state.currentAsset.assetType() === 'table') {
-                const table = this.state.currentAsset.specific() as Table;
-                const selection = table.getSelectedRange();
-                if (selection !== null) {
-                    for (let r = selection.top; r <= selection.bottom; r++) {
-                        for (let c = selection.left; c <= selection.right; c++) {
-                            const cell = selection.cellMatrix[r][c];
-                            if (typeof cell === "undefined") {
-                                continue;
-                            }
-                            formatSet.add(cell.format);
-                        }
-                    }
-                }
-            }
-            if (formatSet.size > 1) {
-                Dialog.confirm(
-                    "所选区域存在多种格式，是否继续以统一设置新的格式？",
-                    () => {
-                        FormatFormDialog.show("", submitCallback);
-                    });
-            } else {
-                FormatFormDialog.show(formatSet.values().next().value, submitCallback);
-            }
-        }
-        return (
-            <div className="cell-format-actions">
-                <Button
-                    name="format-cell"
-                    label="单元格格式"
-                    tips="设置单元格格式"
-                    onClick={openFormatForm} />
-            </div>
-        );
-    }
-
-    protected renderChartOption(chart: Chart) {
-        const sheet = this.state.currentSheet;
-        if (typeof sheet === 'undefined') {
-            throw new Error('Current sheet is undefined.');
-        }
-
-        const handleChartChange = () => {
-            const updateChart = new UpdateChart(sheet.name, chart);
-            this.handleAction(updateChart.wrapper());
-        };
-
-        const handleLayoutChange = (layout: Layout) => {
-            const layoutAsset = new LayoutAsset(sheet.name, chart.name, layout);
-            this.handleAction(layoutAsset.wrapper());
-        };
-
-        return (
-            <GroupView
-                className="realtime-edit chart-option">
-                <GroupItem
-                    name="chart"
-                    title="图表">
-                    <form onSubmit={this.preventSubmit}>
-                        <ChartForm
-                            chart={chart}
-                            afterChange={handleChartChange} />
-                    </form>
-                </GroupItem>
-                <GroupItem
-                    name="layout"
-                    title="布局">
-                    <form onSubmit={this.preventSubmit}>
-                        <LayoutForm
-                            layout={chart.layout}
-                            afterChange={handleLayoutChange} />
-                    </form>
-                </GroupItem>
-            </GroupView>
-        );
-    }
-
-    protected renderTextOption(text: Text) {
-        const sheet = this.state.currentSheet;
-        if (typeof sheet === 'undefined') {
-            throw new Error('Current sheet is undefined.');
-        }
-
-        const handleLayoutChange = (layout: Layout) => {
-            const layoutAsset = new LayoutAsset(sheet.name, text.name, layout);
-            this.handleAction(layoutAsset.wrapper());
-        };
-
-        return (
-            <GroupView
-                className="realtime-edit text-option">
-                <GroupItem
-                    name="layout"
-                    title="布局">
-                    <form onSubmit={this.preventSubmit}>
-                        <LayoutForm
-                            layout={text.layout}
-                            afterChange={handleLayoutChange} />
-                    </form>
-                </GroupItem>
-            </GroupView>
-        );
-    }
-
-    protected renderFormOption(form: Form) {
-        const sheet = this.state.currentSheet;
-        if (typeof sheet === 'undefined') {
-            throw new Error('Current sheet is undefined.');
-        }
-
-        const handleFormChange = () => {
-            const updateForm = new UpdateForm(sheet.name, form);
-            this.handleAction(updateForm.wrapper());
-        }
-
-        const handleLayoutChange = (layout: Layout) => {
-            const layoutAsset = new LayoutAsset(sheet.name, form.name, layout);
-            this.handleAction(layoutAsset.wrapper());
-        };
-
-        return (
-            <GroupView
-                className="realtime-edit form-option">
-                <GroupItem
-                    name="form"
-                    title="表单">
-                    <form onSubmit={this.preventSubmit}>
-                        <FormForm
-                            form={form}
-                            afterChange={handleFormChange} />
-                    </form>
-                </GroupItem>
-                <GroupItem
-                    name="layout"
-                    title="布局">
-                    <form onSubmit={this.preventSubmit}>
-                        <LayoutForm
-                            layout={form.layout}
-                            afterChange={handleLayoutChange} />
-                    </form>
-                </GroupItem>
-            </GroupView>
         );
     }
 }

@@ -11,6 +11,10 @@ public class TestAutoFiller extends TestCase {
 
     public void testAutoFillDown() {
         DefaultTable table = (DefaultTable) workbook.addSheet("test").addAsset(Table.class, "test");
+
+        table.addRows(0, 3);
+        table.addColumns(0, 3);
+
         table.setCellValue(0, 0, new Value.DecimalValue(1));
         table.setCellValue(1, 0, new Value.DecimalValue(2));
         table.setCellValue(2, 0, new Value.DecimalValue(3));
@@ -48,6 +52,9 @@ public class TestAutoFiller extends TestCase {
 
     public void testFillUp() {
         DefaultTable table = (DefaultTable) workbook.addSheet("test").addAsset(Table.class, "test");
+
+        table.addColumns(0, 6);
+        table.addRows(0, 7);
 
         table.setCellValue(0, 1, new Value.DecimalValue(1));
         table.setCellValue(1, 1, new Value.DecimalValue(3));

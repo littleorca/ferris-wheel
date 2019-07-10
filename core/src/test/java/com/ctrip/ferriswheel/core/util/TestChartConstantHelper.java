@@ -22,7 +22,7 @@ public class TestChartConstantHelper extends TestCase {
 
     public void testGetSuggestedChartModel() {
         Table table = workbook.addSheet("sheet1").addAsset(Table.class, "table1");
-        initTable33WithLables(table);
+        initTable(table);
         ChartData chart = ChartConsultantHelper.getSuggestedChartModel(table, 0, 0, 3, 3);
         assertEquals("sheet1!table1!$B$1:$D$1", chart.getCategories().getFormulaString());
 //        assertEquals("a", chart.getCategories().item(0).strValue());
@@ -56,7 +56,9 @@ public class TestChartConstantHelper extends TestCase {
 //        assertEquals(Integer.valueOf(33), s.getyValues().item(2).intValue());
     }
 
-    private void initTable33WithLables(Table table) {
+    private void initTable(Table table) {
+        table.addRows(4);
+        table.addColumns(4);
         table.setCellValue(0, 0, new Value.StrValue("test"));
         table.setCellValue(0, 1, new Value.StrValue("a"));
         table.setCellValue(0, 2, new Value.StrValue("b"));

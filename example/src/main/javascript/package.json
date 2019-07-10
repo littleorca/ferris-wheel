@@ -3,7 +3,7 @@
   "version": "0.1.5",
   "private": true,
   "dependencies": {
-    "@littleorca/ferris-wheel": "^0.1.5-alpha.4",
+    "@littleorca/ferris-wheel": "^0.1.5-alpha.15",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "react-router": "^4.3.1",

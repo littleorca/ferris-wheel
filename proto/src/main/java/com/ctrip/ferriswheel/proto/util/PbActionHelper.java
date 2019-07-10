@@ -1,12 +1,9 @@
 package com.ctrip.ferriswheel.proto.util;
 
 import com.ctrip.ferriswheel.common.action.Action;
-import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.proto.v1.Table;
-import com.ctrip.ferriswheel.proto.v1.TableAutomaton;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,32 +44,12 @@ public class PbActionHelper {
     }
 
     public static com.ctrip.ferriswheel.proto.v1.AddTable pb(AddTable bean) {
-        Table.Builder tableBuilder = Table.newBuilder();
+        com.ctrip.ferriswheel.proto.v1.AddTable.Builder builder = com.ctrip.ferriswheel.proto.v1.AddTable.newBuilder()
+                .setSheetName(bean.getSheetName());
         if (bean.getTableData() != null) {
-            com.ctrip.ferriswheel.common.table.Table td = bean.getTableData();
-            tableBuilder.setName(td.getName());
-            for (Map.Entry<Integer, Row> rowEntry : td) {
-                tableBuilder.addRows(PbHelper.pb(rowEntry.getValue(), rowEntry.getKey()));
-            }
-            if (bean.getTableData().getAutomateConfiguration() != null) {
-                if (bean.getTableData().getAutomateConfiguration() instanceof TableAutomatonInfo.QueryAutomatonInfo) {
-                    TableAutomaton.Builder auto = TableAutomaton.newBuilder();
-                    auto.setQueryAutomaton(PbHelper.pb((TableAutomatonInfo.QueryAutomatonInfo) bean.getTableData().getAutomateConfiguration()));
-                    tableBuilder.setAutomaton(auto);
-                } else if (bean.getTableData().getAutomateConfiguration() instanceof TableAutomatonInfo.PivotAutomatonInfo) {
-                    TableAutomaton.Builder auto = TableAutomaton.newBuilder();
-                    auto.setPivotAutomaton(PbHelper.pb((TableAutomatonInfo.PivotAutomatonInfo) bean.getTableData().getAutomateConfiguration()));
-                    tableBuilder.setAutomaton(auto);
-                }
-            }
-            if (bean.getTableData().getLayout() != null) {
-                tableBuilder.setLayout(PbHelper.pb(bean.getTableData().getLayout()));
-            }
+            builder.setTable(PbHelper.pb(bean.getTableData()).getTable());
         }
-        return com.ctrip.ferriswheel.proto.v1.AddTable.newBuilder()
-                .setSheetName(bean.getSheetName())
-                .setTable(tableBuilder)
-                .build();
+        return builder.build();
     }
 
     public static AutomateTable bean(com.ctrip.ferriswheel.proto.v1.AutomateTable proto) {
@@ -181,35 +158,23 @@ public class PbActionHelper {
                 .build();
     }
 
-    public static EraseColumns bean(com.ctrip.ferriswheel.proto.v1.EraseColumns proto) {
-        return new EraseColumns(proto.getSheetName(),
+    public static EraseCells bean(com.ctrip.ferriswheel.proto.v1.EraseCells proto) {
+        return new EraseCells(proto.getSheetName(),
                 proto.getTableName(),
-                proto.getColumnIndex(),
-                proto.getNColumns());
+                proto.getTop(),
+                proto.getRight(),
+                proto.getBottom(),
+                proto.getLeft());
     }
 
-    public static com.ctrip.ferriswheel.proto.v1.EraseColumns pb(EraseColumns bean) {
-        return com.ctrip.ferriswheel.proto.v1.EraseColumns.newBuilder()
+    public static com.ctrip.ferriswheel.proto.v1.EraseCells pb(EraseCells bean) {
+        return com.ctrip.ferriswheel.proto.v1.EraseCells.newBuilder()
                 .setSheetName(bean.getSheetName())
                 .setTableName(bean.getTableName())
-                .setColumnIndex(bean.getColumnIndex())
-                .setNColumns(bean.getnColumns())
-                .build();
-    }
-
-    public static EraseRows bean(com.ctrip.ferriswheel.proto.v1.EraseRows proto) {
-        return new EraseRows(proto.getSheetName(),
-                proto.getTableName(),
-                proto.getRowIndex(),
-                proto.getNRows());
-    }
-
-    public static com.ctrip.ferriswheel.proto.v1.EraseRows pb(EraseRows bean) {
-        return com.ctrip.ferriswheel.proto.v1.EraseRows.newBuilder()
-                .setSheetName(bean.getSheetName())
-                .setTableName(bean.getTableName())
-                .setRowIndex(bean.getRowIndex())
-                .setNRows(bean.getnRows())
+                .setTop(bean.getTop())
+                .setRight(bean.getRight())
+                .setBottom(bean.getBottom())
+                .setLeft(bean.getLeft())
                 .build();
     }
 
@@ -585,15 +550,15 @@ public class PbActionHelper {
                     .setChartConsult(pb((ChartConsult) action))
                     .build();
 
-        } else if (action instanceof EraseColumns) {
+        } else if (action instanceof EraseCells) {
             return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
-                    .setEraseColumns(pb((EraseColumns) action))
+                    .setEraseCells(pb((EraseCells) action))
                     .build();
 
-        } else if (action instanceof EraseRows) {
-            return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
-                    .setEraseRows(pb((EraseRows) action))
-                    .build();
+//        } else if (action instanceof EraseRows) {
+//            return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()
+//                    .setEraseRows(pb((EraseRows) action))
+//                    .build();
 
         } else if (action instanceof FillCells.FillUp) {
             return com.ctrip.ferriswheel.proto.v1.Action.newBuilder()

@@ -33,6 +33,10 @@ class Form {
         this.fields = fields;
         this.layout = layout;
     }
+
+    clone() {
+        return Form.deserialize(this);
+    }
 }
 
 export default Form;

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { FormFieldForm, Values, VariantType } from "../../src";
+import FormFieldForm from "../../src/form/FormFieldForm";
+import Values from "../../src/model/Values";
+import { VariantType } from "../../src/model/Variant";
 import FormField from "../../src/model/FormField";
 import FormFieldBinding from "../../src/model/FormFieldBinding";
 

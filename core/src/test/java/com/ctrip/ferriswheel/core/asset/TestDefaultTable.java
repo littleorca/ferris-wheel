@@ -40,44 +40,58 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         // empty
         assertEquals(0, table.getRowCount());
         assertEquals(0, table.getColumnCount());
-        assertTrue(table.getCell(0, 0).isBlank());
-        assertTrue(table.getCell(1, 1).isBlank());
+
+        try {
+            table.getCell(0, 0);
+            fail();
+        } catch (IndexOutOfBoundsException e) {
+            // expected
+        }
+        try {
+            table.getCell(1, 1);
+            fail();
+        } catch (IndexOutOfBoundsException e) {
+            // expected
+        }
+
+        table.addColumns(0, 3);
+        table.addRows(0, 3);
 
         // set 0, 0
         Variant old = table.setCellValue(0, 0, createIntValue(11));
         assertTrue(old.isBlank());
         // update: blank cells won't be trimmed.
-        assertEquals(2, table.getRowCount());
-        assertEquals(2, table.getColumnCount());
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
 
         // set 1, 1
         old = table.setCellValue(1, 1, createIntValue(2020));
         assertTrue(old.isBlank());
-        assertEquals(2, table.getRowCount());
-        assertEquals(2, table.getColumnCount());
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
 
         // set 0, 1
         old = table.setCellValue(0, 1, createIntValue(12));
         assertTrue(old.isBlank());
-        assertEquals(2, table.getRowCount());
-        assertEquals(2, table.getColumnCount());
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
 
         // set 1, 0
         old = table.setCellValue(1, 0, createIntValue(21));
         assertTrue(old.isBlank());
-        assertEquals(2, table.getRowCount());
-        assertEquals(2, table.getColumnCount());
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
 
         // set 1, 1 again
         old = table.setCellValue(1, 1, createIntValue(22));
         assertEquals(2020, old.intValue());
-        assertEquals(2, table.getRowCount());
-        assertEquals(2, table.getColumnCount());
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
 
         // set 1, 2
         old = table.setCellValue(1, 2, createIntValue(23));
         assertTrue(old.isBlank());
-        assertEquals(2, table.getRowCount());
+        assertEquals(3, table.getRowCount());
         assertEquals(3, table.getColumnCount());
 
         // set 2, 1
@@ -95,170 +109,178 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         // check cells
 
         checkIntegerGrid(new Integer[][]{
-                {11, 12, null, null},
-                {21, 22, 23, null},
-                {null, 32, 33, null},
-                {null, null, null, null}
+                {11, 12, null},
+                {21, 22, 23},
+                {null, 32, 33}
         }, table);
     }
 
     public void testFillUp() {
-        DefaultTable sheet = createTable33();
-        sheet.setCellFormula(2, 3, "SUM(A3:C3)");
-        System.out.println(sheet);
-        sheet.fillUp(2, 3, 2);
-        System.out.println(sheet);
+        DefaultTable table = createTable33();
+        table.addColumns(3, 2);
+        table.setCellFormula(2, 3, "SUM(A3:C3)");
+        System.out.println(table);
+        table.fillUp(2, 3, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:C1)", sheet.getCell(0, 3).getFormulaString());
-        assertEquals("SUM(A2:C2)", sheet.getCell(1, 3).getFormulaString());
-        assertEquals("SUM(A3:C3)", sheet.getCell(2, 3).getFormulaString());
+        assertEquals("SUM(A1:C1)", table.getCell(0, 3).getFormulaString());
+        assertEquals("SUM(A2:C2)", table.getCell(1, 3).getFormulaString());
+        assertEquals("SUM(A3:C3)", table.getCell(2, 3).getFormulaString());
 
-        sheet.setCellFormula(2, 3, "SUM(A3:B3)");
-        sheet.setCellFormula(2, 4, "SUM(B3:C3)");
-        System.out.println(sheet);
-        sheet.fillUp(2, 3, 4, 2);
-        System.out.println(sheet);
+        table.setCellFormula(2, 3, "SUM(A3:B3)");
+        table.setCellFormula(2, 4, "SUM(B3:C3)");
+        System.out.println(table);
+        table.fillUp(2, 3, 4, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:B1)", sheet.getCell(0, 3).getFormulaString());
-        assertEquals("SUM(B1:C1)", sheet.getCell(0, 4).getFormulaString());
-        assertEquals("SUM(A2:B2)", sheet.getCell(1, 3).getFormulaString());
-        assertEquals("SUM(B2:C2)", sheet.getCell(1, 4).getFormulaString());
-        assertEquals("SUM(A3:B3)", sheet.getCell(2, 3).getFormulaString());
-        assertEquals("SUM(B3:C3)", sheet.getCell(2, 4).getFormulaString());
+        assertEquals("SUM(A1:B1)", table.getCell(0, 3).getFormulaString());
+        assertEquals("SUM(B1:C1)", table.getCell(0, 4).getFormulaString());
+        assertEquals("SUM(A2:B2)", table.getCell(1, 3).getFormulaString());
+        assertEquals("SUM(B2:C2)", table.getCell(1, 4).getFormulaString());
+        assertEquals("SUM(A3:B3)", table.getCell(2, 3).getFormulaString());
+        assertEquals("SUM(B3:C3)", table.getCell(2, 4).getFormulaString());
     }
 
     public void testFillRight() {
-        DefaultTable sheet = createTable33();
-        sheet.setCellFormula(3, 0, "SUM(A1:A3)");
-        System.out.println(sheet);
-        sheet.fillRight(3, 0, 2);
-        System.out.println(sheet);
+        DefaultTable table = createTable33();
 
-        assertEquals("SUM(A1:A3)", sheet.getCell(3, 0).getFormulaString());
-        assertEquals("SUM(B1:B3)", sheet.getCell(3, 1).getFormulaString());
-        assertEquals("SUM(C1:C3)", sheet.getCell(3, 2).getFormulaString());
+        table.addRows(3, 2);
 
-        sheet.setCellFormula(3, 0, "SUM(A1:A2)");
-        sheet.setCellFormula(4, 0, "SUM(A2:A3)");
-        System.out.println(sheet);
-        sheet.fillRight(3, 4, 0, 2);
-        System.out.println(sheet);
+        table.setCellFormula(3, 0, "SUM(A1:A3)");
+        System.out.println(table);
+        table.fillRight(3, 0, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:A2)", sheet.getCell(3, 0).getFormulaString());
-        assertEquals("SUM(A2:A3)", sheet.getCell(4, 0).getFormulaString());
-        assertEquals("SUM(B1:B2)", sheet.getCell(3, 1).getFormulaString());
-        assertEquals("SUM(B2:B3)", sheet.getCell(4, 1).getFormulaString());
-        assertEquals("SUM(C1:C2)", sheet.getCell(3, 2).getFormulaString());
-        assertEquals("SUM(C2:C3)", sheet.getCell(4, 2).getFormulaString());
+        assertEquals("SUM(A1:A3)", table.getCell(3, 0).getFormulaString());
+        assertEquals("SUM(B1:B3)", table.getCell(3, 1).getFormulaString());
+        assertEquals("SUM(C1:C3)", table.getCell(3, 2).getFormulaString());
+
+        table.setCellFormula(3, 0, "SUM(A1:A2)");
+        table.setCellFormula(4, 0, "SUM(A2:A3)");
+        System.out.println(table);
+        table.fillRight(3, 4, 0, 2);
+        System.out.println(table);
+
+        assertEquals("SUM(A1:A2)", table.getCell(3, 0).getFormulaString());
+        assertEquals("SUM(A2:A3)", table.getCell(4, 0).getFormulaString());
+        assertEquals("SUM(B1:B2)", table.getCell(3, 1).getFormulaString());
+        assertEquals("SUM(B2:B3)", table.getCell(4, 1).getFormulaString());
+        assertEquals("SUM(C1:C2)", table.getCell(3, 2).getFormulaString());
+        assertEquals("SUM(C2:C3)", table.getCell(4, 2).getFormulaString());
     }
 
     public void testFillDown() {
-        DefaultTable sheet = createTable33();
-        sheet.setCellFormula(0, 3, "SUM(A1:C1)");
-        System.out.println(sheet);
-        sheet.fillDown(0, 3, 2);
-        System.out.println(sheet);
+        DefaultTable table = createTable33();
+        table.addColumns(3, 2);
+        table.setCellFormula(0, 3, "SUM(A1:C1)");
+        System.out.println(table);
+        table.fillDown(0, 3, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:C1)", sheet.getCell(0, 3).getFormulaString());
-        assertEquals("SUM(A2:C2)", sheet.getCell(1, 3).getFormulaString());
-        assertEquals("SUM(A3:C3)", sheet.getCell(2, 3).getFormulaString());
+        assertEquals("SUM(A1:C1)", table.getCell(0, 3).getFormulaString());
+        assertEquals("SUM(A2:C2)", table.getCell(1, 3).getFormulaString());
+        assertEquals("SUM(A3:C3)", table.getCell(2, 3).getFormulaString());
 
-        sheet.setCellFormula(0, 3, "SUM(A1:B1)");
-        sheet.setCellFormula(0, 4, "SUM(B1:C1)");
-        System.out.println(sheet);
-        sheet.fillDown(0, 3, 4, 2);
-        System.out.println(sheet);
+        table.setCellFormula(0, 3, "SUM(A1:B1)");
+        table.setCellFormula(0, 4, "SUM(B1:C1)");
+        System.out.println(table);
+        table.fillDown(0, 3, 4, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:B1)", sheet.getCell(0, 3).getFormulaString());
-        assertEquals("SUM(B1:C1)", sheet.getCell(0, 4).getFormulaString());
-        assertEquals("SUM(A2:B2)", sheet.getCell(1, 3).getFormulaString());
-        assertEquals("SUM(B2:C2)", sheet.getCell(1, 4).getFormulaString());
-        assertEquals("SUM(A3:B3)", sheet.getCell(2, 3).getFormulaString());
-        assertEquals("SUM(B3:C3)", sheet.getCell(2, 4).getFormulaString());
+        assertEquals("SUM(A1:B1)", table.getCell(0, 3).getFormulaString());
+        assertEquals("SUM(B1:C1)", table.getCell(0, 4).getFormulaString());
+        assertEquals("SUM(A2:B2)", table.getCell(1, 3).getFormulaString());
+        assertEquals("SUM(B2:C2)", table.getCell(1, 4).getFormulaString());
+        assertEquals("SUM(A3:B3)", table.getCell(2, 3).getFormulaString());
+        assertEquals("SUM(B3:C3)", table.getCell(2, 4).getFormulaString());
     }
 
     public void testFillLeft() {
-        DefaultTable sheet = createTable33();
-        sheet.setCellFormula(3, 2, "SUM(C1:C3)");
-        System.out.println(sheet);
-        sheet.fillLeft(3, 2, 2);
-        System.out.println(sheet);
+        DefaultTable table = createTable33();
+        table.addRows(3, 2);
+        table.setCellFormula(3, 2, "SUM(C1:C3)");
+        System.out.println(table);
+        table.fillLeft(3, 2, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:A3)", sheet.getCell(3, 0).getFormulaString());
-        assertEquals("SUM(B1:B3)", sheet.getCell(3, 1).getFormulaString());
-        assertEquals("SUM(C1:C3)", sheet.getCell(3, 2).getFormulaString());
+        assertEquals("SUM(A1:A3)", table.getCell(3, 0).getFormulaString());
+        assertEquals("SUM(B1:B3)", table.getCell(3, 1).getFormulaString());
+        assertEquals("SUM(C1:C3)", table.getCell(3, 2).getFormulaString());
 
-        sheet.setCellFormula(3, 2, "SUM(C1:C2)");
-        sheet.setCellFormula(4, 2, "SUM(C2:C3)");
-        System.out.println(sheet);
-        sheet.fillLeft(3, 4, 2, 2);
-        System.out.println(sheet);
+        table.setCellFormula(3, 2, "SUM(C1:C2)");
+        table.setCellFormula(4, 2, "SUM(C2:C3)");
+        System.out.println(table);
+        table.fillLeft(3, 4, 2, 2);
+        System.out.println(table);
 
-        assertEquals("SUM(A1:A2)", sheet.getCell(3, 0).getFormulaString());
-        assertEquals("SUM(A2:A3)", sheet.getCell(4, 0).getFormulaString());
-        assertEquals("SUM(B1:B2)", sheet.getCell(3, 1).getFormulaString());
-        assertEquals("SUM(B2:B3)", sheet.getCell(4, 1).getFormulaString());
-        assertEquals("SUM(C1:C2)", sheet.getCell(3, 2).getFormulaString());
-        assertEquals("SUM(C2:C3)", sheet.getCell(4, 2).getFormulaString());
+        assertEquals("SUM(A1:A2)", table.getCell(3, 0).getFormulaString());
+        assertEquals("SUM(A2:A3)", table.getCell(4, 0).getFormulaString());
+        assertEquals("SUM(B1:B2)", table.getCell(3, 1).getFormulaString());
+        assertEquals("SUM(B2:B3)", table.getCell(4, 1).getFormulaString());
+        assertEquals("SUM(C1:C2)", table.getCell(3, 2).getFormulaString());
+        assertEquals("SUM(C2:C3)", table.getCell(4, 2).getFormulaString());
+    }
+
+    public void testEraseCells() {
+        DefaultTable table = createTable33();
+        table.eraseCells(1, 2, 1, 0);
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
+        assertEquals(11, table.getCell(0, 0).intValue());
+        assertEquals(13, table.getCell(0, 2).intValue());
+        assertTrue(table.getCell(1, 0).isBlank());
+        assertTrue(table.getCell(1, 2).isBlank());
+        assertEquals(31, table.getCell(2, 0).intValue());
+        assertEquals(33, table.getCell(2, 2).intValue());
+
+        table.addColumns(3, 2);
+        table.setCellValue(2, 4, new Value.StrValue("test"));
+        assertEquals(3, table.getRowCount());
+        assertEquals(5, table.getColumnCount());
+
+        table.eraseCells(1, 2, 2, 0);
+        // update: blank cells won't be trimmed.
+        assertEquals(3, table.getRowCount());
+        assertEquals(5, table.getColumnCount());
     }
 
     public void testInsertRows() {
-        DefaultTable sheet = createTable33();
-        sheet.insertRows(1, 2);
-        assertEquals(5, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-        sheet.setCellValue(1, 1, new Value.DecimalValue(10));
-        sheet.setCellValue(2, 1, new Value.DecimalValue(24));
-        assertEquals(11, sheet.getCell(0, 0).intValue());
-        assertEquals(13, sheet.getCell(0, 2).intValue());
-        assertEquals(10, sheet.getCell(1, 1).intValue());
-        assertEquals(24, sheet.getCell(2, 1).intValue());
-        assertEquals(21, sheet.getCell(3, 0).intValue());
-        assertEquals(23, sheet.getCell(3, 2).intValue());
-    }
-
-    public void testEraseRows() {
-        DefaultTable sheet = createTable33();
-        sheet.eraseRows(1, 1);
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-        assertEquals(11, sheet.getCell(0, 0).intValue());
-        assertEquals(13, sheet.getCell(0, 2).intValue());
-        assertTrue(sheet.getCell(1, 0).isBlank());
-        assertTrue(sheet.getCell(1, 2).isBlank());
-        assertEquals(31, sheet.getCell(2, 0).intValue());
-        assertEquals(33, sheet.getCell(2, 2).intValue());
-
-        sheet.setCellValue(2, 4, new Value.StrValue("test"));
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(5, sheet.getColumnCount());
-
-        sheet.eraseRows(1, 2);
-        // update: blank cells won't be trimmed.
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(5, sheet.getColumnCount());
+        DefaultTable table = createTable33();
+        table.addRows(1, 2);
+        assertEquals(5, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
+        table.setCellValue(1, 1, new Value.DecimalValue(10));
+        table.setCellValue(2, 1, new Value.DecimalValue(24));
+        assertEquals(11, table.getCell(0, 0).intValue());
+        assertEquals(13, table.getCell(0, 2).intValue());
+        assertEquals(10, table.getCell(1, 1).intValue());
+        assertEquals(24, table.getCell(2, 1).intValue());
+        assertEquals(21, table.getCell(3, 0).intValue());
+        assertEquals(23, table.getCell(3, 2).intValue());
     }
 
     public void testRemoveRows() {
-        DefaultTable sheet = createTable33();
-        sheet.removeRows(0, 2);
-        assertEquals(1, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-        assertEquals(31, sheet.getCell(0, 0).intValue());
-        assertEquals(33, sheet.getCell(0, 2).intValue());
+        DefaultTable table = createTable33();
+        table.removeRows(0, 2);
+        assertEquals(1, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
+        assertEquals(31, table.getCell(0, 0).intValue());
+        assertEquals(33, table.getCell(0, 2).intValue());
 
-        sheet.setCellFormula(2, 4, "SUM(A3:C3)");
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(5, sheet.getColumnCount());
+        table.addColumns(3, 2);
+        table.addRows(1, 2);
+        table.setCellFormula(2, 4, "SUM(A3:C3)");
+        assertEquals(3, table.getRowCount());
+        assertEquals(5, table.getColumnCount());
 
-        sheet.removeRows(2, 1);
-        assertEquals(1, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
+        table.removeRows(2, 1);
+        assertEquals(2, table.getRowCount());
+        assertEquals(5, table.getColumnCount());
     }
 
     public void testInsertColumns() {
         DefaultTable sheet = createTable33();
-        sheet.insertColumns(1, 2);
+        sheet.addColumns(1, 2);
         sheet.setCellValue(0, 1, new Value.DecimalValue(10));
         sheet.setCellValue(2, 2, new Value.DecimalValue(24));
         assertEquals(3, sheet.getRowCount());
@@ -275,82 +297,30 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         assertEquals(33, sheet.getCell(2, 4).intValue());
     }
 
-    public void testEraseColumns() {
-        DefaultTable sheet = createTable33();
-        sheet.eraseColumns(0, 2);
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-        assertTrue(sheet.getCell(0, 0).isBlank());
-        assertTrue(sheet.getCell(0, 1).isBlank());
-        assertEquals(13, sheet.getCell(0, 2).intValue());
-        assertTrue(sheet.getCell(1, 0).isBlank());
-        assertTrue(sheet.getCell(1, 1).isBlank());
-        assertEquals(23, sheet.getCell(1, 2).intValue());
-        assertTrue(sheet.getCell(2, 0).isBlank());
-        assertTrue(sheet.getCell(2, 1).isBlank());
-        assertEquals(33, sheet.getCell(2, 2).intValue());
-
-        sheet.setCellValue(1, 1, new Value.StrValue("test"));
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-
-        sheet.eraseColumns(2, 1);
-        // update: blank cells won't be trimmed.
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-
-        // update: blank cells won't be trimmed.
-        sheet.eraseColumns(1, 1);
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(3, sheet.getColumnCount());
-    }
-
     public void testRemoveColumns() {
-        DefaultTable sheet = createTable33();
-        sheet.removeColumns(0, 2);
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(1, sheet.getColumnCount());
-        assertEquals(13, sheet.getCell(0, 0).intValue());
-        assertEquals(23, sheet.getCell(1, 0).intValue());
-        assertEquals(33, sheet.getCell(2, 0).intValue());
+        DefaultTable table = createTable33();
+        table.removeColumns(0, 2);
+        assertEquals(3, table.getRowCount());
+        assertEquals(1, table.getColumnCount());
+        assertEquals(13, table.getCell(0, 0).intValue());
+        assertEquals(23, table.getCell(1, 0).intValue());
+        assertEquals(33, table.getCell(2, 0).intValue());
 
-        sheet.setCellFormula(1, 2, "SUM(A2:B2)");
-        assertEquals(3, sheet.getColumnCount());
-        sheet.removeColumns(2, 1);
-        assertEquals(3, sheet.getRowCount());
-        assertEquals(2, sheet.getColumnCount()); // update: blank cells won't be trimmed.
-    }
-
-    public void testEraseCell() {
-        DefaultTable sheet = createTable33();
-        sheet.setCellValue(5, 5, new Value.StrValue("test"));
-        sheet.setCellValue(5, 6, new Value.StrValue("test"));
-        sheet.setCellValue(6, 5, new Value.StrValue("test"));
-        assertEquals(7, sheet.getRowCount());
-        assertEquals(7, sheet.getColumnCount());
-
-        sheet.eraseCell(5, 6);
-        assertEquals(7, sheet.getRowCount());
-        assertEquals(7, sheet.getColumnCount()); // update: blank cells won't be trimmed.
-
-        sheet.eraseCell(6, 5);
-        // update: blank cells won't be trimmed.
-        assertEquals(7, sheet.getRowCount());
-        assertEquals(7, sheet.getColumnCount());
-
-        // update: blank cells won't be trimmed.
-        sheet.eraseCell(5, 5);
-        assertEquals(7, sheet.getRowCount());
-        assertEquals(7, sheet.getColumnCount());
+        table.addColumns(1, 2);
+        table.setCellFormula(1, 2, "SUM(A2:B2)");
+        assertEquals(3, table.getColumnCount());
+        table.removeColumns(2, 1);
+        assertEquals(3, table.getRowCount());
+        assertEquals(2, table.getColumnCount()); // update: blank cells won't be trimmed.
     }
 
     public void testAddChart() {
         DefaultTable table = createTable33();
-        table.insertRows(0, 1);
+        table.addRows(0, 1);
         table.setCellValue(0, 0, new Value.StrValue("Q1"));
         table.setCellValue(0, 1, new Value.StrValue("Q2"));
         table.setCellValue(0, 2, new Value.StrValue("Q3"));
-        table.insertColumns(0, 1);
+        table.addColumns(0, 1);
         table.setCellValue(1, 0, new Value.StrValue("apple"));
         table.setCellValue(2, 0, new Value.StrValue("boy"));
         table.setCellValue(3, 0, new Value.StrValue("cat"));
@@ -420,8 +390,8 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         // let's do something
         table.setCellValue(1, 1, new Value.DecimalValue("1024"));
         table.setCellValue(3, 3, new Value.DecimalValue("3072"));
-        table.insertRows(2, 1);
-        table.insertColumns(3, 1);
+        table.addRows(2, 1);
+        table.addColumns(3, 1);
 
         chart = table.getSheet().getAsset("testChart");
 
@@ -473,11 +443,11 @@ public class TestDefaultTable extends DefaultTableTestSupport {
 
     public void testUpdateChart() {
         DefaultTable table = createTable33();
-        table.insertRows(0, 1);
+        table.addRows(0, 1);
         table.setCellValue(0, 0, new Value.StrValue("Q1"));
         table.setCellValue(0, 1, new Value.StrValue("Q2"));
         table.setCellValue(0, 2, new Value.StrValue("Q3"));
-        table.insertColumns(0, 1);
+        table.addColumns(0, 1);
         table.setCellValue(1, 0, new Value.StrValue("apple"));
         table.setCellValue(2, 0, new Value.StrValue("boy"));
         table.setCellValue(3, 0, new Value.StrValue("cat"));

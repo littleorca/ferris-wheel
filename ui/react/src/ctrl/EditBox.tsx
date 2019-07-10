@@ -1,10 +1,14 @@
-import * as React from 'react';
-import ValueChange from './ValueChange';
+import * as React from "react";
+import ValueChange from "./ValueChange";
 import classnames from "classnames";
 import "./EditBox.css";
 
 export interface EditBoxProps extends React.ClassAttributes<EditBox> {
     value: string;
+    /**
+     * Initial update value, treated as non-committed, and purposed for eidt suggestion.
+     */
+    initialUpdate?: string; // Initial update
     id?: string;
     name?: string;
     placeholder?: string;
@@ -25,18 +29,31 @@ export interface EditBoxProps extends React.ClassAttributes<EditBox> {
 }
 
 interface EditBoxState {
-    currentValue: string,
+    originValue: string;
+    currentValue: string;
 }
 
 class EditBox extends React.Component<EditBoxProps, EditBoxState> {
     protected textareaRef = React.createRef<HTMLTextAreaElement>();
 
+    protected static getDerivedStateFromProps(nextProps: EditBoxProps, prevState: EditBoxState) {
+        if (nextProps.value === prevState.originValue) {
+            return null;
+        }
+        return {
+            originValue: nextProps.value,
+            currentValue: nextProps.value,
+        };
+    }
+
     constructor(props: EditBoxProps) {
         super(props);
 
         const value = this.props.value;
+        const initialUpdate = this.props.initialUpdate;
         this.state = {
-            currentValue: value,
+            originValue: value,
+            currentValue: typeof initialUpdate === "string" ? initialUpdate : value,
         }
 
         this.handleFocus = this.handleFocus.bind(this);
@@ -56,14 +73,10 @@ class EditBox extends React.Component<EditBoxProps, EditBoxState> {
     }
 
     public componentDidUpdate(prevProps: EditBoxProps, prevState: EditBoxState) {
-        if (prevProps.value !== this.props.value) {
+        if (prevState.currentValue !== this.state.currentValue) {
             if (this.textareaRef.current) {
-                this.textareaRef.current.value = this.props.value;
                 this.resizeIfNeeded(this.textareaRef.current);
             }
-            this.setState({
-                currentValue: this.props.value,
-            });
         }
     }
 

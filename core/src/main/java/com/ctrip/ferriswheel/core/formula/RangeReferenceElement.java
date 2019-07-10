@@ -20,7 +20,7 @@ public class RangeReferenceElement extends ReferenceElement {
 
     @Override
     public void evaluate(FormulaEvaluationContext context) {
-        if (!rangeReference.isValid()) {
+        if (!rangeReference.isAlive()) {
             context.pushOperand(Value.err(ErrorCodes.REF));
             return;
         }

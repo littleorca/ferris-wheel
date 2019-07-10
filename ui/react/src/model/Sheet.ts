@@ -48,6 +48,10 @@ class Sheet {
         }
         return null;
     }
+
+    clone() {
+        return SheetAsset.deserialize(this);
+    }
 }
 
 export default Sheet;

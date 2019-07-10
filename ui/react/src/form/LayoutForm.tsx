@@ -5,6 +5,7 @@ import Placement from '../model/Placement';
 import NumberInput from '../ctrl/NumberInput';
 import IntervalInput from '../ctrl/IntervalInput';
 import Interval from '../model/Interval';
+import Span from '../model/Span';
 import classnames from "classnames";
 
 interface LayoutFormProps extends React.ClassAttributes<LayoutForm> {
@@ -67,18 +68,12 @@ class LayoutForm extends React.Component<LayoutFormProps> {
     }
 
     protected handleChangeColumnSpan(value: Interval) {
-        this.props.layout.grid.column = {
-            start: value.from,
-            end: value.to,
-        };
+        this.props.layout.grid.column = new Span(value.from, value.to);
         this.afterChange();
     }
 
     protected handleChangeRowSpan(value: Interval) {
-        this.props.layout.grid.row = {
-            start: value.from,
-            end: value.to,
-        };
+        this.props.layout.grid.row = new Span(value.from, value.to);
         this.afterChange();
 
     }

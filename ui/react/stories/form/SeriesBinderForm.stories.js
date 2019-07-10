@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SeriesBinderForm } from '../../src';
+import SeriesBinderForm from '../../src/form/SeriesBinderForm';
 import { action } from '@storybook/addon-actions';
 
 class SeriesBinderFormStories extends Component {

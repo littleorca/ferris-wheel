@@ -1,23 +1,45 @@
 import * as React from 'react';
+import * as ReactDOM from "react-dom";
 import Table from '../model/Table';
 import SharedViewProps from './SharedViewProps';
-import { HotTable } from '@handsontable/react';
-import { GridSettings } from 'handsontable';
 import { VariantType } from '../model/Variant';
 import UnionValue from '../model/UnionValue';
 import Parameter from '../model/Parameter';
 import Values from '../model/Values';
 import QueryAutomaton from '../model/QueryAutomaton';
-import { toEditableString, fromEditableString } from '../ctrl/UnionValueEdit';
+import UnionValueEdit, { fromEditableString } from '../ctrl/UnionValueEdit';
 import EditableText from '../ctrl/EditableText';
-import {
-    ExecuteQuery, Action, AutomateTable, RenameAsset, RefreshCellValue,
-    SetCellValue, SetCellFormula, InsertRows, RemoveRows, RemoveColumns,
-    InsertColumns, ResetTable, SetCellsFormat, Cell, Formatter
-} from '..';
-import DataTable from '../table/DataTable';
+import GridTable, { CustomEditorProps } from '../table/GridTable';
+import Cell from '../model/Cell';
+import { QueryWizard } from '../extension/Extension';
+import Formatter from '../util/Formatter';
+import RenameAsset from '../action/RenameAsset';
+import InsertRows from '../action/InsertRows';
+import RemoveRows from '../action/RemoveRows';
+import InsertColumns from '../action/InsertColumns';
+import RemoveColumns from '../action/RemoveColumns';
+import EraseCells from '../action/EraseCells';
+import GridCell from '../model/GridCell';
+import SetCellFormula from '../action/SetCellFormula';
+import SetCellValue from '../action/SetCellValue';
+import ExecuteQuery from '../action/ExecuteQuery';
+import Action from '../action/Action';
+import AutomateTable from '../action/AutomateTable';
+import RefreshCellValue from '../action/RefreshCellValue';
+import ResetTable from '../action/ResetTable';
+import SetCellsFormat from '../action/SetCellsFormat';
+import Layout from '../model/Layout';
+import LayoutAsset from '../action/LayoutAsset';
+import ValueChange from '../ctrl/ValueChange';
+import GroupView, { GroupItem } from './GroupView';
+import QueryTemplateForm from '../form/QueryTemplateForm';
+import PivotForm from '../form/PivotForm';
+import Button from '../ctrl/Button';
+import LayoutForm from '../form/LayoutForm';
+import QueryTemplate from '../model/QueryTemplate';
+import Dialog from './Dialog';
+import FormatFormDialog from './FormatFormDialog';
 import classnames from "classnames";
-import 'handsontable/dist/handsontable.full.css';
 import './TableView.css';
 
 interface TableViewProps extends SharedViewProps<TableView> {
@@ -26,76 +48,64 @@ interface TableViewProps extends SharedViewProps<TableView> {
     style?: React.CSSProperties;
 }
 
-type Primitive = string | number | boolean | Date;
-
-interface TableData {
-    rows: number;
-    columns: number;
-    cellMatrix: Cell[][];
-    hotTableData: Primitive[][];
-}
-
 class TableView extends React.Component<TableViewProps>{
-    private hotTableRef: React.RefObject<HotTable> = React.createRef();
-    private tableData: TableData;
+    private tableRef: React.RefObject<GridTable<Cell>> = React.createRef();
+    // private tableData: GridData<Cell>;
+    private queryWizardMap: Map<string, QueryWizard> = new Map();
 
     constructor(props: TableViewProps) {
         super(props);
 
         this.handleNameChange = this.handleNameChange.bind(this);
 
-        this.getSelectedRange = this.getSelectedRange.bind(this);
+        this.afterAddRows = this.afterAddRows.bind(this);
+        this.afterRemoveRows = this.afterRemoveRows.bind(this);
+        this.afterAddColumns = this.afterAddColumns.bind(this);
+        this.afterRemoveColumns = this.afterRemoveColumns.bind(this);
+        this.afterEraseCells = this.afterEraseCells.bind(this);
+        this.afterSetCellValue = this.afterSetCellValue.bind(this);
 
-        this.getCellProperties = this.getCellProperties.bind(this);
-        this.shouldDeselectOnOutsideClick = this.shouldDeselectOnOutsideClick.bind(this);
+        // this.shouldDeselectOnOutsideClick = this.shouldDeselectOnOutsideClick.bind(this);
 
-        // this.beforeCut = this.beforeCut.bind(this);
-        this.beforePaste = this.beforePaste.bind(this);
+        this.handleAddRowsAbove = this.handleAddRowsAbove.bind(this);
+        this.handleAddRowsBelow = this.handleAddRowsBelow.bind(this);
+        this.handleRemoveRows = this.handleRemoveRows.bind(this);
+        this.handleAddColumnsBefore = this.handleAddColumnsBefore.bind(this);
+        this.handleAddColumnsAfter = this.handleAddColumnsAfter.bind(this);
+        this.handleRemoveColumns = this.handleRemoveColumns.bind(this);
 
-        this.beforeCreateRow = this.beforeCreateRow.bind(this);
-        this.afterCreateRow = this.afterCreateRow.bind(this);
-        this.beforeRemoveRow = this.beforeRemoveRow.bind(this);
-        this.afterRemoveRow = this.afterRemoveRow.bind(this);
-
-        this.beforeColumnSort = this.beforeColumnSort.bind(this);
-        this.afterColumnSort = this.afterColumnSort.bind(this);
-        this.beforeCreateCol = this.beforeCreateCol.bind(this);
-        this.afterCreateCol = this.afterCreateCol.bind(this);
-        this.beforeRemoveCol = this.beforeRemoveCol.bind(this);
-        this.afterRemoveCol = this.afterRemoveCol.bind(this);
-
-        this.afterSetDataAtCell = this.afterSetDataAtCell.bind(this);
-        this.beforeValueRender = this.beforeValueRender.bind(this);
-        this.modifyData = this.modifyData.bind(this);
-
-        this.afterDeselect = this.afterDeselect.bind(this);
-        this.afterSelectionEnd = this.afterSelectionEnd.bind(this);
+        this.handleFormatCell = this.handleFormatCell.bind(this);
+        this.handleAutomatonChange = this.handleAutomatonChange.bind(this);
 
         this.handleQuery = this.handleQuery.bind(this);
+        this.handleLayoutChange = this.handleLayoutChange.bind(this);
+
         this.applyAction = this.applyAction.bind(this);
 
-        this.tableData = this.prepareTableData(props.table);
-    }
+        this.renderUnionValueEditor = this.renderUnionValueEditor.bind(this);
 
-    public componentDidUpdate(prevProps: TableViewProps) {
-        // maybe skip update to prevent performance issue.
-        if (this.props.table !== prevProps.table) {
-            this.tableData = this.prepareTableData(this.props.table);
-            // unhook table method
-            prevProps.table.getSelectedRange = function () {
-                return null;
-            };
-        }
-    }
+        // this.tableData = this.prepareTableData(props.table);
 
-    public componentDidMount() {
-        if (this.hotTableRef.current) {
-            this.hotTableRef.current.forceUpdate();
+        if (typeof this.props.extensions !== 'undefined') {
+            this.props.extensions.forEach((value, index) => {
+                if (typeof value.queryWizard !== 'undefined') {
+                    const name = 'add-query-table--' + value.queryWizard.name;
+                    this.queryWizardMap.set(name, value.queryWizard);
+                }
+            });
         }
+
         if (typeof this.props.herald !== 'undefined') {
             this.props.herald.subscribe(this.applyAction);
         }
     }
+
+    // public componentDidUpdate(prevProps: TableViewProps) {
+    //     // maybe skip update to prevent performance issue.
+    //     if (this.props.table !== prevProps.table) {
+    //         this.tableData = this.prepareTableData(this.props.table);
+    //     }
+    // }
 
     public componentWillUnmount() {
         if (typeof this.props.herald !== 'undefined') {
@@ -103,83 +113,38 @@ class TableView extends React.Component<TableViewProps>{
         }
     }
 
-    protected handleNameChange(value: string) {
-        if (typeof this.props.onAction !== 'undefined') {
-            const renameAsset = new RenameAsset('', this.props.table.name, value);
-            this.props.onAction(renameAsset.wrapper());
-        }
-    }
+    // protected prepareTableData(data: Table): GridData<Cell> {
+    //     const columnHeaders: Header[] = [];
+    //     const rowHeaders: Header[] = [];
+    //     const rows: GridCell<Cell>[][] = [];
 
-    protected prepareTableData(table: Table): TableData {
-        /*
-         * Bad code: the following code contains two work around.
-         * getSelectedRange: for convenience of get selected cells range from workbook editor;
-         *
-         * __table_data__: when switch between sheets, table will be redraw, if this.props.table not reloaded, changes will disappear. so here I hacked table object and save extra data to it.
-         * 
-         * It is supposed to improve in the future!
-         */
+    //     data.columnHeaders.forEach(columnHeader =>
+    //         columnHeaders.push(new Header(/* TBD */)));
 
-        // hook table method
-        table.getSelectedRange = this.getSelectedRange;
+    //     data.rowHeaders.forEach((rowHeader, rowIndex) => {
+    //         rowHeaders.push(new Header(/* TBD */));
 
-        if (typeof table['__table_data__'] !== 'undefined') {
-            return table['__table_data__'];
-        }
+    //         rows[rowIndex] = [];
+    //         data.columnHeaders.forEach((columnHeader, columnIndex) => {
+    //             rows[rowIndex][columnIndex] = new GridData<Cell>();
+    //         });
+    //     });
 
-        let maxRowIdx = -1;
-        let maxColIdx = -1;
-        const cellMatrix: Cell[][] = [];
-        const hotTableData: Primitive[][] = [];
+    //     data.rows.forEach(tableRow => {
+    //         tableRow.cells.forEach(tableCell => {
+    //             const cellData = rows[tableRow.rowIndex][tableCell.columnIndex];
+    //             cellData.setData(tableCell);
+    //             if (tableCell.value.valueType() === VariantType.DECIMAL) {
+    //                 cellData.setAlign("right");
+    //             }
+    //         });
+    //     });
 
-        const rows = table.rows;
-        for (const row of rows) {
-            if (maxRowIdx < row.rowIndex) {
-                maxRowIdx = row.rowIndex;
-            }
-            const cells = row.cells;
-            const matrixRow: Cell[] = cellMatrix[row.rowIndex] = [];
-            const htRow: Primitive[] = hotTableData[row.rowIndex] = [];
-            for (const cell of cells) {
-                if (maxColIdx < cell.columnIndex) {
-                    maxColIdx = cell.columnIndex;
-                }
-                matrixRow[cell.columnIndex] = cell;
-                htRow[cell.columnIndex] = toEditableString(cell.value);
-            }
-        }
-
-        // fill blank cells, if not, handsontable may not work properly.
-        for (let i = 0; i <= maxRowIdx; i++) {
-            if (typeof hotTableData[i] === 'undefined') {
-                hotTableData[i] = [];
-            }
-            for (let j = 0; j <= maxColIdx; j++) {
-                if (typeof hotTableData[i][j] === 'undefined') {
-                    hotTableData[i][j] = '';
-                }
-            }
-        }
-
-        // hotTableData cannot be empty
-        if (hotTableData.length === 0) {
-            hotTableData.push([]);
-        }
-
-        return table['__table_data__'] = {
-            rows: maxRowIdx + 1,
-            columns: maxColIdx + 1,
-            cellMatrix,
-            hotTableData
-        };
-    }
+    //     return new GridData<Cell>(columnHeaders, rowHeaders, rows);
+    // }
 
     protected getCell(row: number, column: number): Cell | undefined {
-        const matrixRow = this.tableData.cellMatrix[row];
-        if (matrixRow === undefined) {
-            return undefined;
-        }
-        return matrixRow[column];
+        return this.props.table.getCellData(row, column).getData();
     }
 
     protected getCellValue(row: number, column: number) {
@@ -190,278 +155,126 @@ class TableView extends React.Component<TableViewProps>{
         return cell.value;
     }
 
-    protected getCellValueForDisplay(row: number, column: number) {
-        const cell = this.getCell(row, column);
-        if (typeof cell === "undefined") {
-            return '';
+    protected cellValueToDisplayString(cell?: Cell) {
+        if (!cell) {
+            return "";
         } else {
             return Formatter.format(cell.value, cell.format);
         }
     }
 
     protected setCell(row: number, column: number, cell: Cell) {
-        let matrixRow = this.tableData.cellMatrix[row];
-        if (matrixRow === undefined) {
-            matrixRow = this.tableData.cellMatrix[row] = [];
+        // const table = this.assertAndGetTable();
+        const table = this.props.table;
+        const gridCell = table.getCellData(row, column);
+        gridCell.setData(cell);
+        if (cell.value.valueType() === VariantType.DECIMAL) {
+            gridCell.setAlign("right");
+        } else {
+            gridCell.setAlign("left");
         }
-        matrixRow[column] = cell;
-        if (row >= this.tableData.rows) {
-            this.tableData.rows = row + 1;
-        }
-        if (column >= this.tableData.columns) {
-            this.tableData.columns = column + 1;
-        }
+        this.forceUpdate();
     }
 
     protected setCellValue(row: number, column: number, value: UnionValue) {
         let cell = this.getCell(row, column);
         if (typeof cell !== "undefined") {
             cell.value = value;
-            return;
+        } else {
+            cell = new Cell(column, value);
         }
-
-        cell = new Cell(column, value);
         this.setCell(row, column, cell);
 
         // TODO action callback
     }
 
-    protected getSelectedRange() {
-        if (this.hotTableRef.current === null) {
+    protected getSelection() {
+        const table = this.tableRef.current;
+        if (!table) {
             return null;
         }
-        const hotInst = this.hotTableRef.current.hotInstance;
-        const ranges: any = hotInst.getSelectedRange();
-        if (typeof ranges === 'undefined') {
-            return null;
+        return table.getSelection();
+    }
+
+    protected handleNameChange(value: string) {
+        if (typeof this.props.onAction !== 'undefined') {
+            const renameAsset = new RenameAsset('', this.props.table.name, value);
+            this.props.onAction(renameAsset.wrapper());
         }
-
-        let finalRange = null;
-        for (const range of ranges) {
-            const rangeElement = {
-                left: range.getTopLeftCorner().col,
-                top: range.getTopLeftCorner().row,
-                right: range.getBottomRightCorner().col,
-                bottom: range.getBottomRightCorner().row,
-                cellMatrix: this.tableData.cellMatrix,
-            };
-
-            if (finalRange === null) {
-                finalRange = rangeElement;
-
-            } else {
-                if (finalRange.left > rangeElement.left) {
-                    finalRange.left = rangeElement.left;
-                }
-                if (finalRange.top > rangeElement.top) {
-                    finalRange.top = rangeElement.top;
-                }
-                if (finalRange.right < rangeElement.right) {
-                    finalRange.right = rangeElement.right;
-                }
-                if (finalRange.bottom < rangeElement.bottom) {
-                    finalRange.bottom = rangeElement.bottom;
-                }
-            }
-        }
-        return finalRange;
     }
 
-    protected getCellProperties(row?: number, col?: number, prop?: object): GridSettings {
-        const cellProperties = {};
-        if (typeof row === "number" && typeof col === "number") {
-            const value = this.getCellValue(row, col);
-            if (value.valueType() === VariantType.DECIMAL) {
-                cellProperties["className"] = "htRight";
-            }
-        }
-        return cellProperties;
+    protected afterAddRows(rowIndex: number, rowCount: number) {
+        const insertRows = new InsertRows("", this.props.table.name, rowIndex, rowCount);
+        this.handleAction(insertRows.wrapper());
     }
 
-    protected shouldDeselectOnOutsideClick(e: HTMLElement) {
-        // FIXME this is a hack for preventing handsontable from grabbing cursor
-        // unexpectedly. e.g.:
-        // select a cell and then double click the table name to rename the table,
-        // and the input will be captured by the cell instead of name input box.
-        if (e.closest(".workbook-editor .editor-header") !== null ||
-            e.closest(".workbook-editor .sidebar") !== null ||
-            e.closest(".dialog") !== null) {
-            return false;
-        }
-        return true;
+    protected afterRemoveRows(rowIndex: number, rowCount: number) {
+        const removeRows = new RemoveRows("", this.props.table.name, rowIndex, rowCount);
+        this.handleAction(removeRows.wrapper());
     }
 
-    // protected beforeCut() {
-    //     return false;
-    // }
-
-    protected beforePaste() {
-        return false;
+    protected afterAddColumns(columnIndex: number, columnCount: number) {
+        const insertColumns = new InsertColumns("", this.props.table.name, columnIndex, columnCount);
+        this.handleAction(insertColumns.wrapper());
     }
 
-    protected beforeCreateRow(index: number, amount: number, source?: string) {
-        // console.log('beforeCreateRow', index, amount, source);
+    protected afterRemoveColumns(columnIndex: number, columnCount: number) {
+        const removeColumns = new RemoveColumns("", this.props.table.name, columnIndex, columnCount);
+        this.handleAction(removeColumns.wrapper());
     }
 
-    protected afterCreateRow(index: number, amount: number) {
-        // console.log('afterCreateRow', index, amount);
-        // alter table matrix
-        const matrix = this.tableData.cellMatrix;
-        const tail = matrix.splice(index);
-        for (let i = 0; i < tail.length; i++) {
-            if (tail[i] !== undefined) {
-                matrix[index + amount + i] = tail[i];
-            }
-        }
-        if (index < this.tableData.rows) {
-            this.tableData.rows += amount;
-        } else {
-            this.tableData.rows = index + amount;
-        }
-        // console.log('altered table: ', this.tableData);
-        // TODO action callback
+    protected afterEraseCells(top: number, right: number, bottom: number, left: number) {
+        const eraseCells = new EraseCells("", this.props.table.name,
+            top, right, bottom, left);
+        this.handleAction(eraseCells.wrapper());
     }
 
-    protected beforeRemoveRow(index: number, amount: number, logicalRows?: any[]) {
-        // console.log('beforeRemoveRow', index, amount, logicalRows);
-    }
-
-    protected afterRemoveRow(index: number, amount: number) {
-        // console.log('afterRemoveRow', index, amount);
-        // alter table matrix
-        const matrix = this.tableData.cellMatrix;
-        matrix.splice(index, amount);
-        if (index + amount < this.tableData.rows) {
-            this.tableData.rows -= amount;
-        } else {
-            this.tableData.rows = index;
-        }
-        // console.log('altered table: ', this.tableData);
-        // TODO action callback
-    }
-
-    protected beforeColumnSort(currentSortConfig: object[], destinationSortConfigs: object[]) {
-        // console.log('beforeColumnSort', currentSortConfig, destinationSortConfigs);
-    }
-
-    protected afterColumnSort(currentSortConfig: object[], destinationSortConfigs: object[]) {
-        // console.log('afterColumnSort', currentSortConfig, destinationSortConfigs);
-        // TODO action callback
-    }
-
-    protected beforeCreateCol(index: number, amount: number, source?: string) {
-        // console.log('beforeCreateCol', index, amount, source);
-    }
-
-    protected afterCreateCol(index: number, amount: number) {
-        // console.log('afterCreateCol', index, amount);
-        // alter table matrix
-        const matrix = this.tableData.cellMatrix;
-        for (const row of matrix) {
-            if (row === undefined) { // is that possible?
-                continue;
-            }
-            const tail = row.splice(index);
-            for (let i = 0; i < tail.length; i++) {
-                if (tail[i] !== undefined) {
-                    row[index + amount + i] = tail[i];
-                }
-            }
-        }
-        if (index < this.tableData.columns) {
-            this.tableData.columns += amount;
-        } else {
-            this.tableData.columns = index + amount;
-        }
-        // console.log('altered table: ', this.tableData);
-        // TODO action callback
-    }
-
-    protected beforeRemoveCol(index: number, amount: number, logicalCols?: any[]) {
-        // console.log('beforeRemoveCol', index, amount, logicalCols);
-    }
-
-    protected afterRemoveCol(index: number, amount: number) {
-        // console.log('afterRemoveCol', index, amount);
-        // alter table matrix
-        const matrix = this.tableData.cellMatrix;
-        for (const row of matrix) {
-            if (row === undefined) { // is that possible?
-                continue;
-            }
-            row.splice(index, amount);
-        }
-        if (index + amount < this.tableData.columns) {
-            this.tableData.columns -= amount;
-        } else {
-            this.tableData.columns = index;
-        }
-        // console.log('altered table: ', this.tableData);
-        // TODO action callback
-    }
-
-    protected afterSetDataAtCell(changes: any[], source?: string) {
-        // console.log('afterSetDataAtCell', changes, source);
-        if (source === 'loadData' || source === 'sync') {
+    protected afterSetCellValue(cellData: GridCell<Cell>, rowIndex: number, columnIndex: number) {
+        const cell = cellData.getData();
+        if (typeof cell === "undefined") {
             return;
         }
-        const hotTable = this.hotTableRef.current;
-        if (!hotTable) {
-            throw new Error('Table not ready.');
+
+        if (cell.value.valueType() === VariantType.DECIMAL) {
+            cellData.setAlign("right");
+        } else {
+            cellData.setAlign("left");
         }
 
-        for (const [row, column, oldValue, newValue] of changes) {
-            const physicalColumn = hotTable.hotInstance.propToCol(column);
-            const physicalRow = hotTable.hotInstance.toPhysicalRow(row);
+        let action;
 
-            if (oldValue !== newValue) {
-                const value = fromEditableString(newValue);
-                this.setCellValue(physicalRow, physicalColumn, value);
+        if (cell.value.isFormula()) {
+            const setCellFormula = new SetCellFormula("",
+                this.props.table.name,
+                rowIndex,
+                columnIndex,
+                cell.value.getFormulaString());
+            action = setCellFormula.wrapper();
 
-                if (typeof this.props.onAction !== 'undefined') {
-                    if (value.isFormula()) {
-                        const setCellFormula = new SetCellFormula('', this.props.table.name,
-                            physicalRow, physicalColumn, value.formulaString || ''/* should never be undefined */);
-                        this.props.onAction(setCellFormula.wrapper());
-                    } else {
-                        const setCellValue = new SetCellValue('', this.props.table.name,
-                            physicalRow, physicalColumn, value);
-                        this.props.onAction(setCellValue.wrapper());
-                    }
-                }
-            }
+        } else {
+            const setCellValue = new SetCellValue("",
+                this.props.table.name,
+                rowIndex,
+                columnIndex,
+                cell.value);
+            action = setCellValue.wrapper();
         }
+
+        this.handleAction(action);
     }
 
-    protected beforeValueRender(value: any, cellProperties: object) {
-        // const str = toEditableString(Values.auto(value));
-        // str.toString();
-        // console.log('beforeValueRender', value, cellProperties);
-        // return "render as what?";
-        return value;
-    }
-
-    protected afterDeselect() {
-        // TODO
-    }
-
-    protected afterSelectionEnd(
-        r: number,
-        c: number,
-        r2: number,
-        c2: number,
-        selectionLayerLevel: number) {
-        // TODO
-    }
-
-    protected modifyData(row: number, column: number, valueHolder: any, ioMode: string) {
-        if (ioMode === 'get') {
-            valueHolder.value = this.getCellValueForDisplay(row, column);
-        } else if (ioMode === 'set') {
-            const value = fromEditableString(valueHolder.value);
-            valueHolder.value = toEditableString(value);
-        }
-    }
+    // protected shouldDeselectOnOutsideClick(e: HTMLElement) {
+    //     // FIXME this is a hack for preventing handsontable from grabbing cursor
+    //     // unexpectedly. e.g.:
+    //     // select a cell and then double click the table name to rename the table,
+    //     // and the input will be captured by the cell instead of name input box.
+    //     if (e.closest(".workbook-editor .editor-header") !== null ||
+    //         e.closest(".workbook-editor .sidebar") !== null ||
+    //         e.closest(".dialog") !== null) {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     protected handleQuery(params: Parameter[]) {
         // console.log('query', params);
@@ -496,13 +309,15 @@ class TableView extends React.Component<TableViewProps>{
         } else if (typeof action.refreshCellValue !== 'undefined') {
             this.applyRefreshCellValue(action.refreshCellValue);
         } else if (typeof action.insertRows !== 'undefined') {
-            this.applyInsertRows(action.insertRows);
+            // this.applyInsertRows(action.insertRows);
         } else if (typeof action.insertColumns !== 'undefined') {
-            this.applyInsertColumns(action.insertColumns);
+            // this.applyInsertColumns(action.insertColumns);
         } else if (typeof action.removeRows !== 'undefined') {
-            this.applyRemoveRows(action.removeRows);
+            // this.applyRemoveRows(action.removeRows);
         } else if (typeof action.removeColumns !== 'undefined') {
-            this.applyRemoveColumns(action.removeColumns);
+            // this.applyRemoveColumns(action.removeColumns);
+        } else if (typeof action.eraseCells !== "undefined") {
+            // nothing to do
         } else if (typeof action.resetTable !== 'undefined') {
             this.applyResetTable(action.resetTable);
         } else if (typeof action.setCellsFormat !== 'undefined') {
@@ -556,58 +371,14 @@ class TableView extends React.Component<TableViewProps>{
 
     protected doApplySetCellValue(rowIndex: number, columnIndex: number, value: UnionValue) {
         this.setCellValue(rowIndex, columnIndex, value);
-        if (this.hotTableRef.current !== null) {
-            const inst = this.hotTableRef.current.hotInstance;
-            /* this will trigger a refresh of table cell */
-            inst.setDataAtCell(rowIndex, columnIndex, toEditableString(value), 'sync');
-        }
-    }
-
-    protected applyInsertRows(insertRows: InsertRows) {
-        if (this.hotTableRef.current === null) {
-            throw new Error('Table not available.');
-        }
-        const hTable = this.hotTableRef.current.hotInstance;
-        const rowIndex = insertRows.rowIndex;
-        const nRows = insertRows.nRows;
-        hTable.alter('insert_row', rowIndex, nRows);
-    }
-
-    protected applyInsertColumns(insertColumns: InsertColumns) {
-        if (this.hotTableRef.current === null) {
-            throw new Error('Table not available.');
-        }
-        const hTable = this.hotTableRef.current.hotInstance;
-        const columnIndex = insertColumns.columnIndex;
-        const nColumns = insertColumns.nColumns;
-        hTable.alter('insert_col', columnIndex, nColumns);
-    }
-
-    protected applyRemoveRows(removeRows: RemoveRows) {
-        if (this.hotTableRef.current === null) {
-            throw new Error('Table not available.');
-        }
-        const hTable = this.hotTableRef.current.hotInstance;
-        const rowIndex = removeRows.rowIndex;
-        const nRows = removeRows.nRows;
-        hTable.alter('remove_row', rowIndex, nRows);
-    }
-
-    protected applyRemoveColumns(removeColumns: RemoveColumns) {
-        if (this.hotTableRef.current === null) {
-            throw new Error('Table not available.');
-        }
-        const hTable = this.hotTableRef.current.hotInstance;
-        var columnIndex = removeColumns.columnIndex;
-        var nColumns = removeColumns.nColumns;
-        hTable.alter('remove_col', columnIndex, nColumns);
     }
 
     protected applyResetTable(resetTable: ResetTable) {
         Object.assign(this.props.table, resetTable.table);
-        // remove this hack, or prepareTableData won't work.
-        this.props.table['__table_data__'] = undefined;
-        this.tableData = this.prepareTableData(this.props.table);
+        // this.tableData = this.prepareTableData(this.props.table);
+        if (this.tableRef.current) {
+            this.tableRef.current.validSelection();
+        }
         this.forceUpdate();
     }
 
@@ -648,13 +419,88 @@ class TableView extends React.Component<TableViewProps>{
         });
     }
 
+    protected handleAddRowsAbove() {
+        const table = this.tableRef.current;
+        if (table) {
+            table.addRowsAbove();
+        }
+    }
+
+    protected handleAddRowsBelow() {
+        const table = this.tableRef.current;
+        if (table) {
+            table.addRowsBelow();
+        }
+    }
+
+    protected handleRemoveRows() {
+        const table = this.tableRef.current;
+        if (table) {
+            table.removeRows();
+        }
+    }
+
+    protected handleAddColumnsBefore() {
+        const table = this.tableRef.current;
+        if (table) {
+            table.addColumnsBefore();
+        }
+    }
+
+    protected handleAddColumnsAfter() {
+        const table = this.tableRef.current;
+        if (table) {
+            table.addColumnsAfter();
+        }
+    }
+
+    protected handleRemoveColumns() {
+        const table = this.tableRef.current;
+        if (table) {
+            table.removeColumns();
+        }
+    }
+
+    protected handleFormatCell(format: string) {
+        const table = this.props.table;
+        const selection = this.getSelection();
+        if (selection === null) {
+            return;
+        }
+        this.handleAction(new SetCellsFormat(
+            "", // will be filled by SheetView when this action pass through it.
+            table.name,
+            selection.topRow(),
+            selection.leftColumn(),
+            selection.rowCount(),
+            selection.columnCount(),
+            format).wrapper());
+    }
+
+    protected handleAutomatonChange() {
+        const table = this.props.table;
+        const automateTable = new AutomateTable("", table.name, table.automaton);
+        this.handleAction(automateTable.wrapper());
+    }
+
+    protected handleLayoutChange(layout: Layout) {
+        const table = this.props.table;
+        const layoutAsset = new LayoutAsset("", table.name, layout);
+        this.handleAction(layoutAsset.wrapper());
+    }
+
+    protected handleAction(action: Action) {
+        if (this.props.onAction) {
+            this.props.onAction(action);
+        }
+    }
+
     public render() {
         const className = classnames(
             "table-view",
             { "editable": this.props.editable },
             this.props.className);
 
-        const data = this.tableData.hotTableData;
         const auto = this.props.table.automaton;
         const params: Parameter[] = [];
         if (typeof this.props.table.automaton.queryAutomaton !== 'undefined') {
@@ -684,60 +530,250 @@ class TableView extends React.Component<TableViewProps>{
                     )}
                 </div> */}
                 <div className="content">
-                    {readOnly ?
-                        (
-                            <DataTable
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                }}
-                                data={this.props.table} />
-                        )
-                        :
-                        (
-                            <HotTable
-                                ref={this.hotTableRef}
-                                data={data}
-                                cells={this.getCellProperties}
-                                readOnly={readOnly}
-                                colHeaders={true}
-                                rowHeaders={true}
-                                columnSorting={false}
-                                // width="auto"
-                                stretchH="all"
-                                manualColumnResize={true}
-                                manualRowResize={true}
-                                outsideClickDeselects={this.shouldDeselectOnOutsideClick}
-                                fillHandle={{ autoInsertRow: false }}
-                                contextMenu={false}
-                                copyable={true}
-                                copyPaste={true} // paste are disabled by beforePaste hook
-                                // afterBeginEdting={this.afterBeginEditing}
-                                // beforeChange={this.beforeChange}
-                                // afterChange={this.afterChange}
-                                afterColumnSort={this.afterColumnSort}
-                                afterCreateCol={this.afterCreateCol}
-                                afterCreateRow={this.afterCreateRow}
-                                afterDeselect={this.afterDeselect}
-                                afterRemoveCol={this.afterRemoveCol}
-                                afterRemoveRow={this.afterRemoveRow}
-                                afterSelectionEnd={this.afterSelectionEnd}
-                                afterSetDataAtCell={this.afterSetDataAtCell}
-                                afterSetDataAtRowProp={this.afterSetDataAtCell}
-                                beforeColumnSort={this.beforeColumnSort}
-                                beforeCreateCol={this.beforeCreateCol}
-                                beforeCreateRow={this.beforeCreateRow}
-                                // beforeCut={this.beforeCut}
-                                beforePaste={this.beforePaste}
-                                beforeRemoveCol={this.beforeRemoveCol}
-                                beforeRemoveRow={this.beforeRemoveRow}
-                                beforeValueRender={this.beforeValueRender}
-                                modifyData={this.modifyData} />
-                        )}
+                    {(
+                        <GridTable
+                            ref={this.tableRef}
+                            data={this.props.table}
+                            editable={!readOnly}
+                            forDisplay={this.cellValueToDisplayString}
+                            customEditor={this.renderUnionValueEditor}
+                            afterAddRows={this.afterAddRows}
+                            afterRemoveRows={this.afterRemoveRows}
+                            afterAddColumns={this.afterAddColumns}
+                            afterRemoveColumns={this.afterRemoveColumns}
+                            afterEraseCells={this.afterEraseCells}
+                            afterSetCellValue={this.afterSetCellValue} />
+                    )}
                 </div>
+                <>
+                    {this.props.controlPortal &&
+                        ReactDOM.createPortal(this.renderControl(), this.props.controlPortal)}
+                </>
             </div>
         );
     }
+
+    protected renderUnionValueEditor(props: CustomEditorProps<Cell>) {
+        const cell = props.data;
+        const value = typeof cell !== "undefined" ? cell.value : Values.blank();
+        const initialUpdate = typeof props.initialInput === "string" ?
+            fromEditableString(props.initialInput) : undefined;
+
+        const afterChange = (change: ValueChange<UnionValue>) => {
+            if (change.type === "commit") {
+                props.onOk(new Cell(props.columnIndex, change.toValue, cell && cell.format));
+            } else if (change.type === "rollback") {
+                props.onCancel();
+            }
+        };
+
+        return (
+            <UnionValueEdit
+                className="cell-editor"
+                style={{
+                    boxSizing: "border-box",
+                    width: "100%",
+                    height: "100%",
+                }}
+                value={value}
+                initialUpdate={initialUpdate}
+                focusByDefault={true}
+                afterChange={afterChange}
+                afterEndEdit={props.onCancel} />
+        );
+    }
+
+    protected renderControl() {
+        const table = this.props.table;
+
+        const isTableSelected = true; // maybe just spare this, as this pane only be renderred when a table is selected.
+
+        const isTableEditable = typeof table.automaton.queryAutomaton === "undefined" &&
+            typeof table.automaton.pivotAutomaton === "undefined";
+
+        return (
+            <GroupView
+                className="realtime-edit table-option">
+                {table.automaton.queryAutomaton && (
+                    <GroupItem
+                        name="query"
+                        title="查询模板">
+                        {this.showQueryWizardButtonIfPossible(table.automaton.queryAutomaton.template,
+                            this.handleAutomatonChange)}
+                        <form onSubmit={e => e.preventDefault()}>
+                            <QueryTemplateForm
+                                queryTemplate={table.automaton.queryAutomaton.template}
+                                afterChange={this.handleAutomatonChange} />
+                        </form>
+                    </GroupItem>
+                )}
+                {table.automaton.pivotAutomaton && (
+                    <GroupItem
+                        name="pivot"
+                        title="透视表">
+                        <form onSubmit={e => e.preventDefault()}>
+                            <PivotForm
+                                pivot={table.automaton.pivotAutomaton}
+                                afterChange={this.handleAutomatonChange} />
+                        </form>
+                    </GroupItem>
+                )}
+                {isTableEditable && (
+                    <GroupItem
+                        name="alter-table"
+                        title="修改表">
+                        <div className="alter-table-actions">
+                            <div>
+                                <Button
+                                    name="insert-row"
+                                    label="插入行"
+                                    tips="在上面插入新行"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAddRowsAbove} />
+                                <Button
+                                    name="insert-column"
+                                    label="插入列"
+                                    tips="在前面插入新列"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAddColumnsBefore} />
+                            </div>
+                            <div>
+                                <Button
+                                    name="append-row"
+                                    label="追加行"
+                                    tips="在下面添加行"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAddRowsBelow} />
+                                <Button
+                                    name="append-column"
+                                    label="追加列"
+                                    tips="在后面添加列"
+                                    disabled={!isTableSelected}
+                                    onClick={this.handleAddColumnsAfter} />
+                            </div>
+                            <div>
+                                <Button
+                                    name="remove-row"
+                                    label="删除行"
+                                    tips="删除当前行"
+                                    disabled={!isTableSelected}
+                                    className="danger"
+                                    onClick={this.handleRemoveRows} />
+                                <Button
+                                    name="remove-column"
+                                    label="删除列"
+                                    tips="删除当前列"
+                                    disabled={!isTableSelected}
+                                    className="danger"
+                                    onClick={this.handleRemoveColumns} />
+                            </div>
+                        </div>
+                        <div className="alter-table-actions">
+                            {this.showFormatCellButtonIfPossible(this.handleFormatCell)}
+                        </div>
+                    </GroupItem>
+                )}
+                <GroupItem
+                    name="layout"
+                    title="布局">
+                    <form onSubmit={e => e.preventDefault()}>
+                        <LayoutForm
+                            layout={table.layout}
+                            afterChange={this.handleLayoutChange} />
+                    </form>
+                </GroupItem>
+            </GroupView>
+        );
+    }
+    protected showQueryWizardButtonIfPossible(queryTemplate: QueryTemplate, handleAutomatonChange: () => void) {
+        if (typeof this.props.extensions === "undefined") {
+            return;
+        }
+        let wizard: QueryWizard | undefined = undefined;
+        for (let i = 0; i < this.props.extensions.length; i++) {
+            const extension = this.props.extensions[i];
+            if (typeof extension.queryWizard === "undefined") {
+                continue;
+            }
+            if (extension.queryWizard.accepts(queryTemplate)) {
+                wizard = extension.queryWizard;
+                break;
+            }
+        }
+        if (wizard === undefined) {
+            return;
+        }
+        const nonNullWizard = wizard;
+        const openWizard = () => {
+            Dialog.show(props => <nonNullWizard.component
+                initialQueryTemplate={queryTemplate}
+                onOk={(result) => {
+                    props.close();
+                    Object.assign(queryTemplate, result);
+                    handleAutomatonChange();
+                }}
+                onCancel={() => { props.close(); }} />);
+        }
+        return (
+            <div className="query-wizard-actions">
+                <Button
+                    name="open-query-wizard"
+                    label="使用向导编辑"
+                    tips="使用查询器向导编辑该查询"
+                    onClick={openWizard} />
+            </div>
+        );
+    }
+
+    protected showFormatCellButtonIfPossible(submitCallback: (format: string) => void) {
+        // TODO check if cell(s) selected
+        const openFormatForm = () => {
+            // if (typeof this.state.currentSheet === 'undefined') {
+            //     return;
+            // }
+            // const sheet = this.state.currentSheet;
+            let formatSet = new Set<string>();
+            const table = this.tableRef.current;
+            const selection = table ? table.getSelection() : null;
+            if (selection !== null) {
+                for (let r = selection.topRow(); r <= selection.bottomRow(); r++) {
+                    for (let c = selection.leftColumn(); c <= selection.rightColumn(); c++) {
+                        const cell = this.getCell(r, c);
+                        if (typeof cell === "undefined") {
+                            continue;
+                        }
+                        formatSet.add(cell.format);
+                    }
+                }
+            }
+            if (formatSet.size > 1) {
+                Dialog.confirm(
+                    "所选区域存在多种格式，是否继续以统一设置新的格式？",
+                    () => {
+                        FormatFormDialog.show("", submitCallback);
+                    });
+            } else {
+                FormatFormDialog.show(formatSet.values().next().value, submitCallback);
+            }
+        }
+        return (
+            <div className="cell-format-actions">
+                <Button
+                    name="format-cell"
+                    label="单元格格式"
+                    tips="设置单元格格式"
+                    onClick={openFormatForm} />
+            </div>
+        );
+    }
+
+    // protected assertAndGetTable() {
+    //     const table = this.tableRef.current;
+    //     if (!table) {
+    //         throw new Error("Table is not available.");
+    //     }
+    //     return table;
+    // }
 }
 
 export default TableView;

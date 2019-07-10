@@ -17,7 +17,7 @@ public class References {
         PositionRef positionRef = parseRangeEndRef(refStr);
 
         if (positionRef.getRowIndex() == -1 || positionRef.getColumnIndex() == -1) {
-//            positionRef.setValid(false);
+//            positionRef.setAlive(false);
             positionRef.setRowIndex(-1);
             positionRef.setColumnIndex(-1);
         }
@@ -134,7 +134,7 @@ public class References {
     }
 
     public static String toFormula(CellReference cellReference, int nShiftRows, int nShiftCols) {
-        if (!cellReference.isValid()) {
+        if (!cellReference.isAlive()) {
             return ErrorCodes.REF.getName();
         }
 
@@ -149,7 +149,7 @@ public class References {
     }
 
     public static String toFormula(RangeReference rangeReference, int nShiftRows, int nShiftCols) {
-        if (!rangeReference.isValid()) {
+        if (!rangeReference.isAlive()) {
             return ErrorCodes.REF.getName();
 
         } else if (rangeReference.getTop() == -1 && rangeReference.getLeft() == -1) {
@@ -217,7 +217,7 @@ public class References {
 
     static StringBuilder appendPosition(StringBuilder sb, PositionRef positionRef, int nShiftRows, int nShiftCols, boolean allowPartial) {
 //        if (positionRef instanceof CellReference &&
-//                !((CellReference) positionRef).isValid()) {
+//                !((CellReference) positionRef).isAlive()) {
 //            sb.append("#REF!");
 //            return sb;
 //        }

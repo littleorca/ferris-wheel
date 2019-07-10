@@ -112,40 +112,39 @@ public interface ActionOrBuilder extends
   com.ctrip.ferriswheel.proto.v1.ChartConsultOrBuilder getChartConsultOrBuilder();
 
   /**
-   * <code>.ferriswheel.v1.EraseColumns erase_columns = 9;</code>
+   * <code>.ferriswheel.v1.EraseCells erase_cells = 9;</code>
    */
-  boolean hasEraseColumns();
+  boolean hasEraseCells();
   /**
-   * <code>.ferriswheel.v1.EraseColumns erase_columns = 9;</code>
+   * <code>.ferriswheel.v1.EraseCells erase_cells = 9;</code>
    */
-  com.ctrip.ferriswheel.proto.v1.EraseColumns getEraseColumns();
+  com.ctrip.ferriswheel.proto.v1.EraseCells getEraseCells();
   /**
-   * <code>.ferriswheel.v1.EraseColumns erase_columns = 9;</code>
+   * <code>.ferriswheel.v1.EraseCells erase_cells = 9;</code>
    */
-  com.ctrip.ferriswheel.proto.v1.EraseColumnsOrBuilder getEraseColumnsOrBuilder();
+  com.ctrip.ferriswheel.proto.v1.EraseCellsOrBuilder getEraseCellsOrBuilder();
 
   /**
-   * <code>.ferriswheel.v1.EraseRows erase_rows = 10;</code>
-   */
-  boolean hasEraseRows();
-  /**
-   * <code>.ferriswheel.v1.EraseRows erase_rows = 10;</code>
-   */
-  com.ctrip.ferriswheel.proto.v1.EraseRows getEraseRows();
-  /**
-   * <code>.ferriswheel.v1.EraseRows erase_rows = 10;</code>
-   */
-  com.ctrip.ferriswheel.proto.v1.EraseRowsOrBuilder getEraseRowsOrBuilder();
-
-  /**
+   * <pre>
+   * EraseRows erase_rows = 10; // Reserved
+   * </pre>
+   *
    * <code>.ferriswheel.v1.FillUp fill_up = 11;</code>
    */
   boolean hasFillUp();
   /**
+   * <pre>
+   * EraseRows erase_rows = 10; // Reserved
+   * </pre>
+   *
    * <code>.ferriswheel.v1.FillUp fill_up = 11;</code>
    */
   com.ctrip.ferriswheel.proto.v1.FillUp getFillUp();
   /**
+   * <pre>
+   * EraseRows erase_rows = 10; // Reserved
+   * </pre>
+   *
    * <code>.ferriswheel.v1.FillUp fill_up = 11;</code>
    */
   com.ctrip.ferriswheel.proto.v1.FillUpOrBuilder getFillUpOrBuilder();

@@ -153,7 +153,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
         return new TableAutomatonInfo.QueryAutomatonInfo(
                 template.getQueryTemplateInfo(),
                 new LinkedHashMap<>(parameters),
-                new TableAutomatonInfo.QueryInfo(query));
+                query == null ? null : new TableAutomatonInfo.QueryInfo(query));
     }
 
     public DefaultQueryTemplate getTemplate() {

@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { EditBox, EditableList } from '../../src';
+import EditBox from '../../src/ctrl/EditBox';
+import EditableList from '../../src/ctrl/EditableList';
 import { action } from '@storybook/addon-actions';
 
 const editableListValues = ["foo", "bar", "demo"];
 const createEditableListItem = () => "new one";
 const textEditor = (props) => {
     const afterChange = (change) => {
-        if (change.type === 'rollback') {
-            props.onSubmit(change.originValue);
-        } else {
-            props.onSubmit(change.nextValue);
+        if (change.type === 'commit') {
+            props.onSubmit(change.toValue);
         }
     };
     return (

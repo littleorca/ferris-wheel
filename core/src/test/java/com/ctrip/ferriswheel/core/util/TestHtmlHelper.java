@@ -22,6 +22,9 @@ public class TestHtmlHelper extends TestCase {
         DefaultWorkbook workbook = new FilingClerk(environment).createWorkbook("test-workbook");
         Sheet s1 = workbook.addSheet("sheet1");
         Table t11 = s1.addAsset(Table.class, "table1");
+        t11.addRows(0, 4);
+        t11.addColumns(0, 4);
+
         t11.setCellValue(0, 1, Value.str("foo"));
         t11.setCellValue(0, 2, Value.str("bar"));
         t11.setCellValue(0, 3, Value.str("foobar"));
@@ -43,6 +46,8 @@ public class TestHtmlHelper extends TestCase {
 
         Sheet s2 = workbook.addSheet("sheet2");
         Table t21 = s2.addAsset(Table.class, "table1");
+        t21.addColumns(0, 1);
+        t21.addRows(0, 1);
         t21.setCellFormula(0, 0, "SUM(sheet1!table1!$B2:$D4)");
 
         String html = new HtmlHelper().workbookToHtml(workbook);

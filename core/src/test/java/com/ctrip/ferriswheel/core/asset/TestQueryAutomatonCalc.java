@@ -42,13 +42,15 @@ public class TestQueryAutomatonCalc extends TestCase {
         builtinParams.put("p1", new DefaultParameter("p1", Value.str("this is parameter 1").dynamic()));
         builtinParams.put("p2", new DefaultParameter("p2", new DynamicValue("normal!A1")));
 
+        normalTable.addColumns(2);
+        normalTable.addRows(1);
         normalTable.setCellValue(0, 0, Value.str("Cell A1"));
-        normalTable.setCellFormula(0, 1, "auto!A1");
         autoTable.automate(new TableAutomatonInfo.QueryAutomatonInfo(
                 new TableAutomatonInfo.QueryTemplateInfo(
                         TestQueryAutomatonCalc.class.getName(),
                         builtinParams),
                 null, null));
+        normalTable.setCellFormula(0, 1, "auto!A1");
 
         System.out.println(workbook);
 

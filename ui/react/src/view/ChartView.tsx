@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import Chart from '../model/Chart';
 import SharedViewProps from './SharedViewProps';
 import UnionValue from '../model/UnionValue';
@@ -18,10 +19,15 @@ import {
     PlotlyDoughnutChart
 } from '../chart/PlotlyCharts';
 import GaugeChart from '../chart/GaugeChart';
-import  { VariantType }  from '../model/Variant';
+import { VariantType } from '../model/Variant';
 import RenameAsset from '../action/RenameAsset';
 import Action from '../action/Action';
 import UpdateChart from '../action/UpdateChart';
+import GroupView, { GroupItem } from './GroupView';
+import ChartForm from '../form/ChartForm';
+import LayoutForm from '../form/LayoutForm';
+import Layout from '../model/Layout';
+import LayoutAsset from '../action/LayoutAsset';
 import classnames from "classnames";
 import './ChartView.css';
 
@@ -39,12 +45,13 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
     constructor(props: ChartViewProps) {
         super(props);
 
+        this.handleChartChange = this.handleChartChange.bind(this);
+        this.handleLayoutChange = this.handleLayoutChange.bind(this);
+        this.handleAction = this.handleAction.bind(this);
+        this.applyAction = this.applyAction.bind(this);
+
         this.state = this.createInitialState(props);
 
-        this.applyAction = this.applyAction.bind(this);
-    }
-
-    public componentDidMount() {
         if (typeof this.props.herald !== 'undefined') {
             this.props.herald.subscribe(this.applyAction);
         }
@@ -154,6 +161,22 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
         }
     }
 
+    protected handleChartChange() {
+        const updateChart = new UpdateChart("", this.props.chart);
+        this.handleAction(updateChart.wrapper());
+    };
+
+    protected handleLayoutChange(layout: Layout) {
+        const layoutAsset = new LayoutAsset("", this.props.chart.name, layout);
+        this.handleAction(layoutAsset.wrapper());
+    };
+
+    protected handleAction(action: Action) {
+        if (typeof this.props.onAction === "function") {
+            this.props.onAction(action);
+        }
+    }
+
     protected applyAction(action: Action) {
         if (!action.isAssetAction() ||
             action.targetAsset() !== this.props.chart.name) {
@@ -192,9 +215,39 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
                     <h3>{data.title}</h3>
                 </div>
                 <div className="content">
-                    <Renderer style={{flex:"1 1"}} data={data} />
+                    <Renderer style={{ flex: "1 1" }} data={data} />
                 </div>
+                <>
+                    {this.props.controlPortal &&
+                        ReactDOM.createPortal(this.renderControl(), this.props.controlPortal)}
+                </>
             </div>
+        );
+    }
+
+    protected renderControl() {
+        return (
+            <GroupView
+                className="realtime-edit chart-option">
+                <GroupItem
+                    name="chart"
+                    title="图表">
+                    <form onSubmit={e => e.preventDefault()}>
+                        <ChartForm
+                            chart={this.props.chart}
+                            afterChange={this.handleChartChange} />
+                    </form>
+                </GroupItem>
+                <GroupItem
+                    name="layout"
+                    title="布局">
+                    <form onSubmit={e => e.preventDefault()}>
+                        <LayoutForm
+                            layout={this.props.chart.layout}
+                            afterChange={this.handleLayoutChange} />
+                    </form>
+                </GroupItem>
+            </GroupView>
         );
     }
 }

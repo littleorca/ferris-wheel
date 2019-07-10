@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { SeriesForm, Series } from '../../src';
+import SeriesForm from "../../src/form/SeriesForm";
+import Series from '../../src/model/Series';
 import { action } from '@storybook/addon-actions';
 
 class SeriesFormStories extends Component {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import Popover from "react-popover";
+import * as Popover from "react-popover";
 import OmniInput, { OmniInputProps } from "./OmniInput";
 import "./DropdownOmniInput.css";
 

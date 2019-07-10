@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import SpreadsheetClient from './SpreadsheetClient';
 import {
-  Workbook, WorkbookEditor, WorkbookPresenter, Action, WorkbookOperation
+  Workbook, WorkbookEditor, WorkbookPresenter
 } from '@littleorca/ferris-wheel';
+import Action from "@littleorca/ferris-wheel/lib/action/Action";
+import WorkbookOperation from "@littleorca/ferris-wheel/lib/action/WorkbookOperation";
 import '@littleorca/ferris-wheel/theme/default/theme.css';
 import './App.css';
 
@@ -47,7 +49,7 @@ class App extends Component {
       console.log('open workbook', resp);
       if (resp.statusCode === 0) {
         this.setState({
-          workbook: Workbook.deserialize(resp.workbook),
+          workbook: resp.workbook,
         });
       }
     });

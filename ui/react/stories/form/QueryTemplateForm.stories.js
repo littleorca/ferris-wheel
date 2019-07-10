@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { QueryTemplateForm, QueryTemplate } from '../../src';
+import QueryTemplateForm from "../../src/form/QueryTemplateForm";
+import QueryTemplate from '../../src/model/QueryTemplate';
 import { action } from '@storybook/addon-actions';
 
 class QueryTemplateFormStories extends Component {

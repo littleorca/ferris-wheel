@@ -79,6 +79,10 @@ class Chart {
         this.yAxis = yAxis;
         this.zAxis = zAxis;
     }
+
+    clone() {
+        return Chart.deserialize(this);
+    }
 }
 
 export default Chart;

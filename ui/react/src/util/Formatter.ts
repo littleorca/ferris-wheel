@@ -1,6 +1,6 @@
 import UnionValue from "../model/UnionValue";
 import { VariantType } from "../model/Variant";
-import moment from "moment";
+import * as moment from "moment";
 import numbro from "numbro";
 
 /**

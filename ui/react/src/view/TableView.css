@@ -19,3 +19,7 @@
 .table-view > .title h3 {
     text-align: center;
 }
+
+.table-view .cell-editor {
+    border: 0 none;
+}

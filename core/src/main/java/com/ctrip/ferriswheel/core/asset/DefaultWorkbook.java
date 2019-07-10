@@ -563,7 +563,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     @Override
     public Variant resolve(CellReferenceElement referenceElement, FormulaEvaluationContext context) {
         CellReference cellReference = referenceElement.getCellReference();
-        if (!cellReference.isValid()) {
+        if (!cellReference.isAlive()) {
             return Value.err(ErrorCodes.REF);
         }
         if (cellReference.getCellId() != Asset.UNSPECIFIED_ASSET_ID) {
@@ -662,22 +662,33 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     }
 
     private void hookCellRef(ValueNode fromNode, CellReference cellReference) {
-        if (!cellReference.isValid()) {
+        if (!cellReference.isAlive()) {
             return;
         }
         DefaultTable table = (DefaultTable) getReferredSheetAsset(cellReference,
                 fromNode.parent(DefaultSheet.class),
                 fromNode.parent(DefaultTable.class));
         if (table == null) {
-            cellReference.setValid(false);
+            cellReference.setAlive(false);
             return;
         }
-        DefaultCell depCell = table.getCell(cellReference.getPositionRef().getRowIndex(),
-                cellReference.getPositionRef().getColumnIndex());
+        final int rowIndex = cellReference.getPositionRef().getRowIndex();
+        final int columnIndex = cellReference.getPositionRef().getColumnIndex();
+        if (rowIndex < 0 || rowIndex >= table.getRowCount() ||
+                columnIndex < 0 || columnIndex >= table.getColumnCount()) {
+            if (table.getAutomaton() != null) {
+                cellReference.setCellId(DefaultCell.UNSPECIFIED_ASSET_ID);
+                fromNode.addDependency(table);
+            } else {
+                cellReference.setAlive(false);
+            }
+            return;
+        }
+        DefaultCell depCell = table.getCell(rowIndex, columnIndex);
         cellReference.setCellId(depCell.getAssetId()); // fill runtime id for convenience.
         fromNode.addDependency(depCell);
         if (depCell.isEphemeral()) {
-            fromNode.addDependency(depCell.getRow().getTable());
+            fromNode.addDependency(table);
         }
     }
 
@@ -705,14 +716,14 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     }
 
     private void hookRangeRef(ValueNode fromNode, RangeReference rangeReference) {
-        if (!rangeReference.isValid()) {
+        if (!rangeReference.isAlive()) {
             return;
         }
         DefaultTable table = (DefaultTable) getReferredSheetAsset(rangeReference,
                 fromNode.parent(DefaultSheet.class),
                 fromNode.parent(DefaultTable.class));
         if (table == null) {
-            rangeReference.setValid(false);
+            rangeReference.setAlive(false);
             return;
 //            throw new IllegalArgumentException();
         }
@@ -723,17 +734,17 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                 table.getColumnCount() > 0 ? table.getColumnCount() - 1 : 0;
         final int bottom = rangeReference.getBottom() != -1 ? rangeReference.getBottom() :
                 table.getRowCount() > 0 ? table.getRowCount() - 1 : 0;
-        DefaultCell upperLeft = table.getCell(top, left);
-        DefaultCell lowerRight = table.getCell(bottom, right);
-        if (upperLeft != null) {
+        if (top >= 0 && top < table.getRowCount() && left >= 0 && left < table.getColumnCount()) {
+            DefaultCell upperLeft = table.getCell(top, left);
             rangeReference.setUpperLeftTargetId(upperLeft.getAssetId());
         }
-        if (lowerRight != null) {
+        if (bottom >= 0 && bottom < table.getRowCount() && right >= 0 && right < table.getColumnCount()) {
+            DefaultCell lowerRight = table.getCell(bottom, right);
             rangeReference.setLowerRightTargetId(lowerRight.getAssetId());
         }
         // scan dependencies
-        for (int row = top; row <= bottom; row++) {
-            for (int col = left; col <= right; col++) {
+        for (int row = Math.max(top, 0); row <= bottom && row < table.getRowCount(); row++) {
+            for (int col = Math.max(left, 0); col <= right && col < table.getColumnCount(); col++) {
                 DefaultCell depCell = table.getCell(row, col);
                 if (depCell != null) {
                     fromNode.addDependency(depCell);
@@ -746,7 +757,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     }
 
     private void traceRange(ValueNode fromNode, CellReference cellReference) {
-        if (!cellReference.isValid()) {
+        if (!cellReference.isAlive()) {
             return;
         }
         DefaultTable referredTable = (DefaultTable) getReferredSheetAsset(cellReference,
@@ -769,23 +780,27 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             return; // TODO is that ok?
         }
 
-        if (rangeReference.isValid()) {
+        if (rangeReference.isAlive()) {
             fromNode.watchRange(targetTable,
                     rangeReference.getLeft(),
                     rangeReference.getTop(),
                     rangeReference.getRight(),
                     rangeReference.getBottom());
 
-//        } else if (rangeReference.getUpperLeft().isValid()) {
+//        } else if (rangeReference.getUpperLeft().isAlive()) {
 //            fromNode.watchRange(targetTable,
 //                    rangeReference.getUpperLeft().getRowIndex(),
 //                    rangeReference.getUpperLeft().getColumnIndex());
 //
-//        } else if (rangeReference.getLowerRight().isValid()) {
+//        } else if (rangeReference.getLowerRight().isAlive()) {
 //            fromNode.watchRange(targetTable,
 //                    rangeReference.getLowerRight().getRowIndex(),
 //                    rangeReference.getLowerRight().getColumnIndex());
         }
+    }
+
+    void onCellsErased(DefaultTable table, int top, int right, int bottom, int left) {
+        refreshIfNeeded();
     }
 
     void onRowsInserted(Table table, int rowIndex, int nRows) {
@@ -800,10 +815,6 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             autoFiller.autoFillRowsIfPossible(table, rowIndex, nRows);
         });
 
-        refreshIfNeeded();
-    }
-
-    void onRowsErased(DefaultTable sheet, int rowIndex, int nRows) {
         refreshIfNeeded();
     }
 
@@ -831,10 +842,6 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             autoFiller.autoFillColumnsIfPossible(table, colIndex, nCols);
         });
 
-        refreshIfNeeded();
-    }
-
-    void onColumnsErased(Table table, int colIndex, int nCols) {
         refreshIfNeeded();
     }
 
@@ -998,8 +1005,9 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
 
         } else if (node.getParent() instanceof DefaultQueryAutomaton
-                || node.getParent() instanceof DefaultPivotAutomaton) {
-            AbstractAutomaton auto = (AbstractAutomaton) node.getParent();
+                || node.getParent() instanceof DefaultPivotAutomaton
+                || node.getParent() instanceof DefaultQueryTemplate) {
+            AbstractAutomaton auto = node.parent(AbstractAutomaton.class);
             AutomateTable automateTable = new AutomateTable(auto.getTable().getSheet().getName(),
                     auto.getTable().getName(), null);
             listenerChain.publicly(automateTable, () -> {
@@ -1035,7 +1043,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         if (positionRef.getColumnIndex() != -1) {
             positionRef.setColumnIndex(newCell.getColumnIndex());
         }
-        cellReference.setValid(true);
+        cellReference.setAlive(true);
     }
 
     /**
@@ -1048,15 +1056,17 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
      * @return true if reference has been modified, false otherwise.
      */
     private boolean fixCellRef(ValueNode sourceNode, CellReference cellReference, boolean stubborn) {
-        if (!cellReference.isValid()) {
+        if (!cellReference.isAlive()) {
             return false;
         }
         DefaultCell referredCell = getCellByAssetId(cellReference.getCellId());
         if (referredCell == null) {
             if (!stubborn) {
-                cellReference.setValid(false);
+                cellReference.setAlive(false);
+                cellReference.setCellId(UNSPECIFIED_ASSET_ID);
             } else {
-                if (cellReference.getPositionRef().getRowIndex() != -1 && cellReference.getPositionRef().getColumnIndex() != -1) {
+                if (cellReference.getPositionRef().getRowIndex() != -1 &&
+                        cellReference.getPositionRef().getColumnIndex() != -1) {
                     hookCellRef(sourceNode, cellReference);
                 } else {
                     cellReference.setCellId(UNSPECIFIED_ASSET_ID);
@@ -1111,12 +1121,12 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                 rangeReference.getAssetName(),
                 rangeReference.getUpperLeftRef(),
                 rangeReference.getUpperLeftTargetId(),
-                rangeReference.isValid());
+                rangeReference.isAlive());
         CellReference lowerRightRef = new CellReference(rangeReference.getSheetName(),
                 rangeReference.getAssetName(),
                 rangeReference.getLowerRightRef(),
                 rangeReference.getLowerRightTargetId(),
-                rangeReference.isValid());
+                rangeReference.isAlive());
         modified |= fixCellRef(sourceNode, upperLeftRef, stubborn);
         modified |= fixCellRef(sourceNode, lowerRightRef, stubborn);
 
@@ -1181,7 +1191,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             rangeReference.setUpperLeftTargetId(upperLeftRef.getCellId());
             rangeReference.setLowerRightRef(lowerRightRef.getPositionRef());
             rangeReference.setLowerRightTargetId(lowerRightRef.getCellId());
-            rangeReference.setValid(upperLeftRef.isValid() && lowerRightRef.isValid());
+            rangeReference.setAlive(upperLeftRef.isAlive() && lowerRightRef.isAlive());
         }
 
         return modified;
@@ -1191,7 +1201,10 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         Collection<Parameter> params = queryAutomaton.getTemplate().getAllBuiltinParams().values();
         for (Parameter param : params) {
             ValueNode valueNode = (ValueNode) param;
-            for (AssetNode node : valueNode.getDependents()) {
+            // copy dependent set as during the fix procedure the set can be rebuilt and
+            // cause concurrent modification issue.
+            Set<AssetNode> dependents = new HashSet(valueNode.getDependents());
+            for (AssetNode node : dependents) {
                 fixNameReferenceForForm(node, (ManagedParameter) param);
             }
         }

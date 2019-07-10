@@ -25,6 +25,8 @@ public class TestDefaultWorkbookWithReviseCollector extends TestCase {
         workbook.addListener(revListener);
         Sheet sheet1 = workbook.addSheet("sheet1");
         Table table1 = sheet1.addAsset(Table.class, "table1");
+        table1.addRows(0, 2);
+        table1.addColumns(0, 2);
         table1.setCellValue(0, 0, new Value.DecimalValue(1024));
         table1.setCellFormula(0, 1, "A1*2");
         System.out.println(workbook);
@@ -32,7 +34,7 @@ public class TestDefaultWorkbookWithReviseCollector extends TestCase {
         List<Action> actions = revListener.drainRevises();
         actions.forEach(rev -> System.out.println(rev));
 
-        table1.insertRows(0, 1);
+        table1.addRows(0, 1);
         table1.setCellValue(0, 0, new Value.DecimalValue(3072));
         table1.setCellFormula(1, 1, null);
         table1.setCellFormula(2, 0, "SUM(A1:A2)");

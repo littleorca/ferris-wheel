@@ -144,8 +144,9 @@ class Values {
             return this.blank();
         }
 
-        const formulaString = (typeof input.formulaString === 'string') ?
-            input.formulaString : undefined;
+        const formulaString = (
+            typeof input.formulaString === 'string' && input.formulaString !== ""
+        ) ? input.formulaString : undefined;
 
         if (typeof input.error === 'string') {
             return this.error(input.error as ErrorCode, formulaString);

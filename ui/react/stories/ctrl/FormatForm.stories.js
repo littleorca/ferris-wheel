@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { FormatForm, Values } from "../../src";
+import FormatForm from "../../src/form/FormatForm";
+import Values from "../../src/model/Values";
 
 class FormatFormStories extends Component {
     format = "";

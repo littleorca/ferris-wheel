@@ -1,11 +1,29 @@
 import React, { Component } from 'react';
-import {
-    SheetView,
-    Text, Chart, Table, Values, Row, Cell, VariantType, Series, Axis, Layout, Binder, Placement, Interval, AxisBand, Sheet, SheetAsset, Color, Grid, Span
-} from '../../src';
+import SheetView from "../../src/view/SheetView"
+import Text from "../../src/model/Text"
+import Chart from "../../src/model/Chart"
+import Table from "../../src/model/Table"
+import Values from "../../src/model/Values"
+import Row from "../../src/model/Row"
+import Cell from "../../src/model/Cell"
+import { VariantType } from "../../src/model/Variant"
+import Series from "../../src/model/Series"
+import Axis from "../../src/model/Axis"
+import Layout from "../../src/model/Layout"
+import Binder from "../../src/model/Binder"
+import Placement from "../../src/model/Placement"
+import Interval from "../../src/model/Interval"
+import AxisBand from "../../src/model/AxisBand"
+import Sheet from "../../src/model/Sheet"
+import SheetAsset from "../../src/model/SheetAsset"
+import Color from "../../src/model/Color"
+import Grid from "../../src/model/Grid"
+import Span from "../../src/model/Span"
 import Form from "../../src/model/Form";
 import FormField from '../../src/model/FormField';
 import FormFieldBinding from '../../src/model/FormFieldBinding';
+import Header from '../../src/model/Header';
+import GridCellImpl from '../../src/model/GridCellImpl';
 
 const form = new Form("test_form",
     [
@@ -31,20 +49,19 @@ const form = new Form("test_form",
 const text = new Text('test_text',
     Values.str('hello\n\tworld!'),
     new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(1, 7), new Span(3, 9))));
-const table = new Table('test_table', [], undefined,
+const table = new Table('test_table',
+    [[
+        new GridCellImpl(new Cell(0, Values.str('hello'))),
+        new GridCellImpl(new Cell(1, Values.str('world'))),
+        new GridCellImpl(new Cell(2, Values.str('~!'))),
+    ], [
+        new GridCellImpl(new Cell(0, Values.dec(10))),
+        new GridCellImpl(new Cell(1, Values.dec(15))),
+        new GridCellImpl(new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2"))),
+    ]
+    ],
+    undefined, undefined, undefined,
     new Layout(undefined, undefined, undefined, undefined, undefined, new Grid(undefined, undefined, new Span(7, 13), new Span(3, 9))));
-table.rows.push(new Row(0,
-    [
-        new Cell(0, Values.str('hello')),
-        new Cell(1, Values.str('world')),
-        new Cell(2, Values.str('~!')),
-    ]));
-table.rows.push(new Row(1,
-    [
-        new Cell(0, Values.dec(10)),
-        new Cell(1, Values.dec(15)),
-        new Cell(2, Values.withType(VariantType.DECIMAL, 25, "A2+B2")),
-    ]));
 
 const lineChart = new Chart(
     'c1',

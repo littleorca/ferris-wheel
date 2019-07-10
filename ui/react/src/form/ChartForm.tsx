@@ -10,7 +10,7 @@ import DataBinderForm from './DataBinderForm';
 import SeriesBinderForm from './SeriesBinderForm';
 import Axis from '../model/Axis'
 import Values from '../model/Values';
-import UnionValue from 'src/model/UnionValue';
+import UnionValue from '../model/UnionValue';
 import './ChartForm.css';
 
 interface ChartFormProps extends React.ClassAttributes<ChartForm> {

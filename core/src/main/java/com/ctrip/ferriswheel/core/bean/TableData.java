@@ -26,10 +26,7 @@
 package com.ctrip.ferriswheel.core.bean;
 
 import com.ctrip.ferriswheel.common.automaton.Automaton;
-import com.ctrip.ferriswheel.common.table.AutomateConfiguration;
-import com.ctrip.ferriswheel.common.table.Cell;
-import com.ctrip.ferriswheel.common.table.Row;
-import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.table.*;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.common.variant.Value;
@@ -41,12 +38,14 @@ import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class TableData implements Table, Serializable {
     private String name;
+    private List<Header> rowHeaders;
+    private List<Header> columnHeaders;
     private TreeSparseArray<Row> rows;
-    private int columnCount;
     private AutomateConfiguration automateConfiguration;
     private Layout layout;
 
@@ -69,7 +68,16 @@ public class TableData implements Table, Serializable {
 
     @Override
     public int getRowCount() {
-        return rows == null ? 0 : rows.size();
+        return rowHeaders == null ? 0 : rowHeaders.size();
+    }
+
+    @Override
+    public Header getRowHeader(int rowIndex) {
+        return rowHeaders.get(rowIndex);
+    }
+
+    public void setRowHeaders(List<Header> rowHeaders) {
+        this.rowHeaders = rowHeaders;
     }
 
     @Override
@@ -79,11 +87,16 @@ public class TableData implements Table, Serializable {
 
     @Override
     public int getColumnCount() {
-        return columnCount;
+        return columnHeaders == null ? 0 : columnHeaders.size();
     }
 
-    public void setColumnCount(int columnCount) {
-        this.columnCount = columnCount;
+    @Override
+    public Header getColumnHeader(int columnIndex) {
+        return columnHeaders.get(columnIndex);
+    }
+
+    public void setColumnHeaders(List<Header> columnHeaders) {
+        this.columnHeaders = columnHeaders;
     }
 
     @Override
@@ -199,16 +212,24 @@ public class TableData implements Table, Serializable {
     }
 
     @Override
-    public void eraseCell(int rowIndex, int columnIndex) {
-        Cell cell = getCell(rowIndex, columnIndex);
-        if (!cell.getData().isBlank()) {
-            // TODO review this cast
-            ((CellData) cell).setData(new DynamicValue(Value.BLANK));
+    public void eraseCells(int top, int right, int bottom, int left) {
+        for (int r = top; r <= bottom; r++) {
+            Row row = getRow(r);
+            if (row == null) {
+                continue;
+            }
+            for (int c = left; c <= right; c++) {
+                Cell cell = row.getCell(c);
+                if (cell != null) {
+                    // TODO review this cast
+                    ((CellData) cell).erase();
+                }
+            }
         }
     }
 
     @Override
-    public void insertRows(int rowIndex, int nRows) {
+    public void addRows(int rowIndex, int nRows) {
         // just move rows to make room for new rows.
         for (int i = getRowCount() - 1; i >= rowIndex; i--) {
             Row row = rows.remove(i);
@@ -218,25 +239,6 @@ public class TableData implements Table, Serializable {
             } else {
                 rows.set(toIdx, row);
             }
-        }
-    }
-
-    @Override
-    public void eraseRows(int rowIndex, int nRows) {
-        boolean needFixColumnCount = false;
-        for (int i = rowIndex; i < rowIndex + nRows; i++) {
-            Row row = getRow(i);
-            if (row != null) {
-                if (!needFixColumnCount && row.getCellCount() == getColumnCount()) {
-                    needFixColumnCount = true;
-                }
-                for (Map.Entry<Integer, Cell> cellEntry : row) {
-                    ((CellData) cellEntry.getValue()).setData(new DynamicValue(Value.BLANK));
-                }
-            }
-        }
-        if (needFixColumnCount) {
-            fixColumnCount();
         }
     }
 
@@ -259,7 +261,7 @@ public class TableData implements Table, Serializable {
     }
 
     @Override
-    public void insertColumns(int colIndex, int nCols) {
+    public void addColumns(int colIndex, int nCols) {
         final int columns = getColumnCount();
         for (int r = 0; r < getRowCount(); r++) {
             Row row = getRow(r);
@@ -275,26 +277,6 @@ public class TableData implements Table, Serializable {
     }
 
     @Override
-    public void eraseColumns(int colIndex, int nCols) {
-        for (int r = 0; r < getRowCount(); r++) {
-            Row row = getRow(r);
-            if (row == null) {
-                continue;
-            }
-            for (int c = colIndex; c < colIndex + nCols; c++) {
-                Cell cell = row.getCell(c);
-                if (cell != null) {
-                    // TODO review this cast
-                    ((CellData) cell).erase();
-                }
-            }
-        }
-        if (colIndex + nCols == getColumnCount()) {
-            fixColumnCount();
-        }
-    }
-
-    @Override
     public void removeColumns(int colIndex, int nCols) {
         for (int r = 0; r < getRowCount(); r++) {
             Row row = getRow(r);
@@ -302,7 +284,7 @@ public class TableData implements Table, Serializable {
                 continue;
             }
             int c;
-            for (c = colIndex; c < columnCount - nCols; c++) {
+            for (c = colIndex; c < getColumnCount() - nCols; c++) {
                 ((RowData) row).moveCell(c + nCols, c);
             }
             for (; c < colIndex + nCols; c++) {
@@ -332,6 +314,7 @@ public class TableData implements Table, Serializable {
         return cell;
     }
 
+    @Deprecated
     protected void fixColumnCount() {
         int maxColumnCount = 0;
         Iterator<Row> it = rows.values().iterator();
@@ -341,7 +324,7 @@ public class TableData implements Table, Serializable {
                 maxColumnCount = row.getCellCount();
             }
         }
-        setColumnCount(maxColumnCount);
+//        setColumnCount(maxColumnCount);
     }
 
     @Override

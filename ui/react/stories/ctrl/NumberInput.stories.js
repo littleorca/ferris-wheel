@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NumberInput } from '../../src';
+import NumberInput from '../../src/ctrl/NumberInput';
 import { action } from '@storybook/addon-actions';
 
 class NumberInputStories extends Component {

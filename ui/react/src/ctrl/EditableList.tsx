@@ -28,7 +28,6 @@ interface EditableListProps<T> extends React.ClassAttributes<EditableList<T>> {
 }
 
 interface EditableListState<T> {
-    selectItem: T | null,
     selectIndex: number,
 }
 
@@ -47,8 +46,8 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
         this.listRef = React.createRef();
 
         this.state = {
-            selectItem: null,
-            selectIndex: -1
+            selectIndex: typeof props.initialSelect === "undefined" ?
+                -1 : props.initialSelect
         };
 
         this.handleSelect = this.handleSelect.bind(this);
@@ -82,7 +81,6 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
 
     protected handleSelect(selectItem: T, selectIndex: number) {
         this.setState({
-            selectItem,
             selectIndex
         });
         if (typeof this.props.onSelect !== "undefined") {
@@ -135,8 +133,8 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
 
     public render() {
         const list = this.props.list;
-        const selectItem = this.state.selectItem;
         const selectIndex = this.state.selectIndex;
+        const selectItem = list[selectIndex];
 
         const onSubmit = (newVal: T) => {
             this.onSubmit(newVal, selectIndex);
@@ -188,7 +186,7 @@ class EditableList<T> extends React.Component<EditableListProps<T>, EditableList
                 </div>
                 {this.props.editor && (
                     <div className="editor-container">
-                        {selectItem !== null && (
+                        {typeof selectItem !== "undefined" && (
                             <this.props.editor
                                 value={selectItem}
                                 onSubmit={onSubmit}

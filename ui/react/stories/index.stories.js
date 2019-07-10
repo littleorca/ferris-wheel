@@ -5,14 +5,11 @@ import { action } from '@storybook/addon-actions';
 
 // import { Button, Welcome } from '@storybook/react/demo';
 
-import {
-  Button,
-  CheckBox,
-  DropdownButton,
-  Select,
-  Toolbar,
-  Group
-} from '../src';
+import Button from "../src/ctrl/Button";
+import CheckBox from "../src/ctrl/CheckBox";
+import DropdownButton from "../src/ctrl/DropdownButton";
+import Select from "../src/ctrl/Select";
+import Toolbar, { Group } from "../src/ctrl/Toolbar";
 
 import GaugeChartStories from './chart/GaugeChart.stories';
 import PlotlyChartsStories from './chart/PlotlyCharts.stories';
@@ -68,9 +65,9 @@ import WorkbookPresenterStories from './view/WorkbookPresenter.stories'
 import WorkbookViewStories from './view/WorkbookView.stories';
 import QueryWizardStories from './view/QueryWizard.stories';
 import FormatFormStories from './ctrl/FormatForm.stories';
-import TableLayoutStories from './table/TableLayout.stories';
-import TableManipulateStories from './table/TableManipulate.stories';
-import TableDataTypesStories from './table/TableDataTypes.stories';
+import GridTableLayoutStories from './table/GridTableLayout.stories';
+import GridTableManipulateStories from './table/GridTableManipulate.stories';
+import GridTableCustomStories from './table/GridTableCustom.stories';
 
 import DefaultThemeEditor from "./theme/DefaultThemeEditor.stories";
 
@@ -212,10 +209,10 @@ storiesOf('Form', module)
   .add('SmartForm', () => <SmartFormStories />);
 
 
-storiesOf('DataTable', module)
-  .add('Table Layout', () => <TableLayoutStories />)
-  .add('Table Manipulate', () => <TableManipulateStories />)
-  .add('Table DataTypes', () => <TableDataTypesStories />);
+storiesOf('GridTable', module)
+  .add('Table Layout', () => <GridTableLayoutStories />)
+  .add('Table Manipulate', () => <GridTableManipulateStories />)
+  .add('Table Custom', () => <GridTableCustomStories />);
 
 
 storiesOf('View', module)

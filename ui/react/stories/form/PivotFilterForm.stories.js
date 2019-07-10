@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { PivotFilterForm } from '../../src';
+import PivotFilterForm from '../../src/form/PivotFilterForm';
 import { action } from '@storybook/addon-actions';
 
 class PivotFilterFormStories extends Component {

@@ -6,8 +6,7 @@ import SetCellValue from "./SetCellValue";
 import SetCellFormula from "./SetCellFormula";
 import RefreshCellValue from "./RefreshCellValue";
 import ChartConsult from "./ChartConsult";
-import EraseColumns from "./EraseColumns";
-import EraseRows from "./EraseRows";
+import EraseCells from "./EraseCells";
 import FillUp from "./FillUp";
 import FillRight from "./FillRight";
 import FillDown from "./FillDown";
@@ -47,8 +46,7 @@ class Action extends ActionMeta {
     public setCellFormula?: SetCellFormula;
     public refreshCellValue?: RefreshCellValue;
     public chartConsult?: ChartConsult;
-    public eraseColumns?: EraseColumns;
-    public eraseRows?: EraseRows;
+    public eraseCells?: EraseCells;
     public fillUp?: FillUp;
     public fillRight?: FillRight;
     public fillDown?: FillDown;
@@ -100,10 +98,8 @@ class Action extends ActionMeta {
             action.refreshCellValue = RefreshCellValue.deserialize(input.refreshCellValue);
         } else if (typeof input.chartConsult !== 'undefined') {
             action.chartConsult = ChartConsult.deserialize(input.chartConsult);
-        } else if (typeof input.eraseColumns !== 'undefined') {
-            action.eraseColumns = EraseColumns.deserialize(input.eraseColumns);
-        } else if (typeof input.eraseRows !== 'undefined') {
-            action.eraseRows = EraseRows.deserialize(input.eraseRows);
+        } else if (typeof input.eraseCells !== 'undefined') {
+            action.eraseCells = EraseCells.deserialize(input.eraseCells);
         } else if (typeof input.fillUp !== 'undefined') {
             action.fillUp = FillUp.deserialize(input.fillUp);
         } else if (typeof input.fillRight !== 'undefined') {
@@ -187,10 +183,8 @@ class Action extends ActionMeta {
             return this.refreshCellValue;
         } else if (typeof this.chartConsult !== 'undefined') {
             return this.chartConsult;
-        } else if (typeof this.eraseColumns !== 'undefined') {
-            return this.eraseColumns;
-        } else if (typeof this.eraseRows !== 'undefined') {
-            return this.eraseRows;
+        } else if (typeof this.eraseCells !== 'undefined') {
+            return this.eraseCells;
         } else if (typeof this.fillUp !== 'undefined') {
             return this.fillUp;
         } else if (typeof this.fillRight !== 'undefined') {

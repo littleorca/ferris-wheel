@@ -27,6 +27,13 @@ class Grid {
         this.column = column;
         this.row = row;
     }
+
+    clone() {
+        return new Grid(this.columns,
+            this.rows,
+            this.column.clone(),
+            this.row.clone());
+    }
 }
 
 export default Grid;

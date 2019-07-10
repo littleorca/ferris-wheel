@@ -20,20 +20,21 @@ interface WorkbookPresenterProps extends React.ClassAttributes<WorkbookPresenter
 }
 
 interface WorkbookPresenterState {
-    txId: number;
+    respTxId: number;
     message: string;
     serviceStatus: string;
     showMask: boolean;
 }
 
 class WorkbookPresenter extends React.Component<WorkbookPresenterProps, WorkbookPresenterState> implements ActionHerald {
+    private reqTxId = 0;
     protected listeners: Set<ActionHandler> = new Set();
 
     constructor(props: WorkbookPresenterProps) {
         super(props);
 
         this.state = {
-            txId: 0,
+            respTxId: 0,
             message: '',
             serviceStatus: '就绪',
             showMask: false
@@ -79,9 +80,9 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
             return;
         }
 
-        const request = new EditRequest(this.state.txId + 1, action);
+        const request = new EditRequest(++this.reqTxId, action);
         this.setState({
-            txId: request.txId,
+            respTxId: request.txId,
             message: `服务请求中，txId=${request.txId}…`,
             serviceStatus: "忙碌…",
             showMask: true,
@@ -94,8 +95,6 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
     }
 
     protected onServiceOk(resp: EditResponse) {
-        // make sure resp is an EditResponse instance.
-        resp = EditResponse.deserialize(resp);
         if (resp.statusCode === 0) {
             if (typeof resp.changes !== 'undefined') {
                 this.applyChanges(resp.changes.actions);

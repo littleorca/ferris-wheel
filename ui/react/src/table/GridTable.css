@@ -1,0 +1,75 @@
+.fw-grid-table {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    user-select: none;
+}
+
+.fw-grid-table .cell {
+    padding: 0 .4em;
+    line-height: 1.5;
+    border-width: 0 1px 1px 0;
+    border-style: solid;
+    border-color: #ddd;
+    /* text-overflow: ellipsis; */
+    background: #fff;
+}
+
+.fw-grid-table .cell.header-cell {
+    min-width: 2em;
+    text-align: center;
+    font-weight: normal;
+    color: #333;
+    background: #f3f3f3;
+    border-width: 0 1px 1px 0;
+    border-style: solid;
+    border-color: #ccc;
+    cursor: default;
+}
+
+.fw-grid-table.focused .cell.header-cell.highlight {
+    background: #dfdfdf;
+}
+
+.fw-grid-table.focused .cell.header-cell.selected {
+    background: #8eb0e6;
+}
+
+.fw-grid-table .align-center {
+    text-align: center;
+}
+
+.fw-grid-table .align-right {
+    text-align: right;
+}
+
+.fw-grid-table .corner-overlay {
+    background: #f3f3f3;
+    /* border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc; */
+}
+
+.fw-grid-table .resize-handle {
+    background: transparent;
+}
+
+/* .fw-grid-table .resize-handle:hover {
+    background: #39f;
+} */
+
+.fw-grid-table .selection-border,
+.fw-grid-table .column-resize-helper {
+    border-width: 0;
+    outline: thin solid #abc;
+}
+
+.fw-grid-table.focused .selection-border,
+.fw-grid-table.focused .column-resize-helper {
+    outline: thin solid #39f;
+}
+
+.fw-grid-table .cell-edit-container {
+    outline: 2px solid #39f;
+    background: #fff;
+}

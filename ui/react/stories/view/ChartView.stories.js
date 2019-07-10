@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
-import {
-    ChartView,
-    Chart, Series, AxisBand, Values, Layout, Binder, Axis, Placement, Interval, Color, Stacking
-} from '../../src';
+import ChartView from "../../src/view/ChartView";
+import Chart from "../../src/model/Chart";
+import Series from "../../src/model/Series";
+import AxisBand from "../../src/model/AxisBand";
+import Values from "../../src/model/Values";
+import Layout from "../../src/model/Layout";
+import Binder from "../../src/model/Binder";
+import Axis from "../../src/model/Axis";
+import Placement from "../../src/model/Placement";
+import Interval from "../../src/model/Interval";
+import Color from "../../src/model/Color";
+import Stacking from "../../src/model/Stacking";
 
 const lineChart = new Chart(
     'c0',

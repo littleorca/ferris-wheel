@@ -1,6 +1,6 @@
 import * as React from "react";
 import FormatForm from "../form/FormatForm";
-import Popover from "react-popover";
+import * as Popover from "react-popover";
 import classnames from "classnames";
 import "./FormatInput.css";
 

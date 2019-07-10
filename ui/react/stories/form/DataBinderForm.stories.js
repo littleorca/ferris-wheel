@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { DataBinderForm, Binder } from '../../src';
+import DataBinderForm from '../../src/form/DataBinderForm';
+import Binder from '../../src/model/Binder';
 import { action } from '@storybook/addon-actions';
 
 class DataBinderFormStories extends Component {
