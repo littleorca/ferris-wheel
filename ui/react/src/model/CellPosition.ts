@@ -1,7 +1,7 @@
 
 class CellPosition {
-    rowIndex: number;
-    columnIndex: number;
+    public rowIndex: number;
+    public columnIndex: number;
 
     constructor(rowIndex: number, columnIndex: number) {
         this.rowIndex = rowIndex;

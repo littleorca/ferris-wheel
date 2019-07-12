@@ -80,7 +80,7 @@ class Chart {
         this.zAxis = zAxis;
     }
 
-    clone() {
+    public clone() {
         return Chart.deserialize(this);
     }
 }

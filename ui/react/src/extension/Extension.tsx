@@ -8,16 +8,17 @@ interface QueryWizardProps extends React.ClassAttributes<any> {
 }
 
 interface QueryWizard {
-    name: string;
-    title?: string;
-    description?: string;
-    accepts: (queryTemplate: QueryTemplate) => boolean;
-    component: React.SFC<QueryWizardProps>;
+    readonly name: string;
+    readonly title?: string;
+    readonly description?: string;
+    readonly accepts: (queryTemplate: QueryTemplate) => boolean;
+    readonly component: React.SFC<QueryWizardProps>;
 }
 
 interface Extension {
-    queryWizard?: QueryWizard;
+    readonly queryWizard?: QueryWizard;
 }
 
 export default Extension;
 export { QueryWizardProps, QueryWizard };
+

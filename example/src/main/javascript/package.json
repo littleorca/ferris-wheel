@@ -3,7 +3,7 @@
   "version": "0.1.5",
   "private": true,
   "dependencies": {
-    "@littleorca/ferris-wheel": "^0.1.5-alpha.15",
+    "@littleorca/ferris-wheel": "^0.1.5-alpha.16",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "react-router": "^4.3.1",
@@ -19,7 +19,7 @@
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
     "http-proxy-middleware": "^0.19.1",
-    "react-scripts": "^2.1.5"
+    "react-scripts": "^3.0.1"
   },
   "browserslist": [
     ">0.2%",

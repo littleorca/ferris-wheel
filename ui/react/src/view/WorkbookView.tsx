@@ -385,6 +385,7 @@ class WorkbookView extends React.Component<WorkbookViewProps, WorkbookViewState>
                             className={(this.state.selected === sheet) ?
                                 "active" : "inactive"}
                             editable={this.props.editable}
+                            extensions={this.props.extensions}
                             onAction={this.handleSheetAction}
                             herald={this}
                             controlPortal={this.state.selected === sheet ?

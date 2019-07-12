@@ -1,6 +1,6 @@
 {
   "name": "@littleorca/ferris-wheel",
-  "version": "0.1.5-alpha.15",
+  "version": "0.1.5-alpha.16",
   "author": {
     "name": "Liu Haifeng",
     "email": "haifeng.813@gmail.com"
@@ -53,24 +53,29 @@
     "prebuild": "npm run clean",
     "build": "copyfiles -u 1 src/**/*.css lib && tsc",
     "test": "jest",
+    "lint": "tslint -c tslint.json 'src/**/*.{ts,tsx}'",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "devDependencies": {
-    "@storybook/addon-actions": "^5.0.8",
-    "@storybook/addon-info": "^5.0.8",
-    "@storybook/addon-links": "^5.0.8",
-    "@storybook/addons": "^5.0.8",
-    "@storybook/react": "^5.0.8",
-    "@storybook/theming": "^5.0.8",
+    "@storybook/addon-actions": "^5.1.9",
+    "@storybook/addon-info": "^5.1.9",
+    "@storybook/addon-links": "^5.1.9",
+    "@storybook/addons": "^5.1.9",
+    "@storybook/react": "^5.1.9",
+    "@storybook/theming": "^5.1.9",
     "@types/jest": "^23.3.1",
     "@types/node": "^10.9.4",
     "@types/react": "^16.4.13",
     "@types/react-dom": "^16.0.7",
     "awesome-typescript-loader": "^5.2.1",
+    "babel-loader": "^8.0.6",
     "copyfiles": "^2.1.0",
     "jest": "^24.7.1",
     "rimraf": "^2.6.3",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-react": "^4.0.0",
     "typescript": "^3.4.3"
   }
 }

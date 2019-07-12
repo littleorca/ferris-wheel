@@ -358,6 +358,7 @@ class SheetView extends React.Component<SheetViewProps, SheetViewState> implemen
                                 <AssetView
                                     asset={arbitraryAsset}
                                     editable={this.props.editable}
+                                    extensions={this.props.extensions}
                                     onAction={this.handleAssetAction}
                                     herald={this}
                                     controlPortal={isSelected ?

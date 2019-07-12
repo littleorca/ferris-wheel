@@ -107,7 +107,8 @@ public class SymbolHandlers {
                     null,
                     positionRef,
                     Asset.UNSPECIFIED_ASSET_ID,
-                    positionRef.getRowIndex() != -1 && positionRef.getColumnIndex() != -1));
+                    positionRef.getRowIndex() != -1 && positionRef.getColumnIndex() != -1,
+                    false));
             elem.setSlices(1);
             elem.setToken(identifier.getToken());
             stack.push(elem);

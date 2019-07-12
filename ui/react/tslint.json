@@ -6,7 +6,8 @@
   ],
   "linterOptions": {
     "exclude": [
-      "config/**/*.js",
+      "lib/**/*",
+      "stories/**/*",
       "node_modules/**/*.ts",
       "coverage/lcov-report/*.js"
     ]

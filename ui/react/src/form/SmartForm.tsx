@@ -55,8 +55,7 @@ class SmartForm extends React.Component<SmartFormProps> {
                     className="submit-button"
                     name="submit"
                     type="submit"
-                    label={props.submitButtonLabel || "确定"}
-                    onClick={this.handleSubmit} />
+                    label={props.submitButtonLabel || "确定"} />
             </form>
         );
     }

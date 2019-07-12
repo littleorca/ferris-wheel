@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import UnionValue from '../model/UnionValue';
+import UnionValue from 'model/UnionValue';
 import EditBox from './EditBox';
 import Values from '../model/Values';
 import { VariantType } from '../model/Variant';

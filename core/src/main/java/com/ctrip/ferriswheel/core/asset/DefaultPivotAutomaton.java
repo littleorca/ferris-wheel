@@ -197,22 +197,28 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 
         int fieldOffset = rows.isEmpty() ? 0 : 1;
         for (Dimension[] columnDimensions : allColumnDimensions) {
-            StringBuilder namePrefix = new StringBuilder();
-            for (Dimension columnDimension : columnDimensions) {
-                if (namePrefix.length() > 0) {
-                    namePrefix.append("\n");
-                }
-                namePrefix.append(columnDimension.getValue().strValue());
-            }
-            for (com.ctrip.ferriswheel.common.automaton.PivotValue value : values) {
-                String name = namePrefix.toString();
-                if (values.size() > 1 || name.isEmpty()) {
-                    if (!name.isEmpty()) {
-                        name += "\n";
+            if (columnDimensions.length == 1 && values.size() <= 1) {
+                // For single variant just keep the variant.
+                headerBuilder.set(fieldOffset++, columnDimensions[0].getValue());
+
+            } else { // For multiple variant we join there string values.
+                StringBuilder namePrefix = new StringBuilder();
+                for (Dimension columnDimension : columnDimensions) {
+                    if (namePrefix.length() > 0) {
+                        namePrefix.append("\n");
                     }
-                    name += StringUtils.isNullOrEmpty(value.getLabel()) ? value.getField() : value.getLabel();
+                    namePrefix.append(columnDimension.getValue().strValue());
                 }
-                headerBuilder.set(fieldOffset++, Value.str(name));
+                for (com.ctrip.ferriswheel.common.automaton.PivotValue value : values) {
+                    String name = namePrefix.toString();
+                    if (values.size() > 1 || name.isEmpty()) {
+                        if (!name.isEmpty()) {
+                            name += "\n";
+                        }
+                        name += StringUtils.isNullOrEmpty(value.getLabel()) ? value.getField() : value.getLabel();
+                    }
+                    headerBuilder.set(fieldOffset++, Value.str(name));
+                }
             }
         }
         headerBuilder.commit();
@@ -222,9 +228,14 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         for (Dimension[] rowDimensions : allRowDimensions) {
             ListDataSet.RecordBuilder recordBuilder = dataSetBuilder.newRecordBuilder();
             int fieldIdx = 0;
-            StringBuilder name = new StringBuilder();
             Map<String, Variant> rowDimMap = new HashMap<>();
-            if (rowDimensions.length > 0) {
+
+            if (rowDimensions.length == 1) { // For single variant just keep the variant.
+                rowDimMap.put(rowDimensions[0].getName(), rowDimensions[0].getValue());
+                recordBuilder.set(fieldIdx++, rowDimensions[0].getValue());
+
+            } else if (rowDimensions.length > 1) { // For multiple variant join there string values.
+                StringBuilder name = new StringBuilder();
                 for (Dimension rowDimension : rowDimensions) {
                     rowDimMap.put(rowDimension.getName(), rowDimension.getValue());
                     if (name.length() > 0) {
@@ -232,8 +243,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
                     }
                     name.append(rowDimension.getValue().strValue());
                 }
-                recordBuilder.set(fieldIdx, Value.str(name.toString()));
-                fieldIdx++;
+                recordBuilder.set(fieldIdx++, Value.str(name.toString()));
             }
 
             for (Dimension[] columnDimensions : allColumnDimensions) {

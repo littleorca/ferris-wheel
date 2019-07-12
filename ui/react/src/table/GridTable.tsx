@@ -3,6 +3,7 @@ import Rectangle from "../model/Rectangle";
 import CellPosition from "../model/CellPosition";
 import GridCell, { CellAlign } from "../model/GridCell";
 import GridData from "../model/GridData";
+import GridEditSession from "./GridEditSession";
 import Header from "../model/Header";
 import Selection from "../model/Selection";
 import RectangleImpl from "../model/RectangleImpl";
@@ -69,40 +70,16 @@ interface GridTableProps<T> extends React.ClassAttributes<GridTable<T>> {
     afterSetCellValue?: (gridCell: GridCell<T>, rowIndex: number, columnIndex: number) => void;
 }
 
-interface ClientPosition {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-}
-
 interface Coordinate {
     x: number;
     y: number;
 }
 
-class EditSession<T> extends CellPosition {
-    gridCell: GridCell<T>;
-    initialInput?: string;
-
-    constructor(rowIndex: number,
-        columnIndex: number,
-        gridCell: GridCell<T>,
-        initialInput?: string) {
-
-        super(rowIndex, columnIndex);
-        this.gridCell = gridCell;
-        this.initialInput = initialInput;
-    }
-}
-
 interface GridTableState<T> {
     gridData: GridData<T>;
-    clientPosition: ClientPosition;
-    visibleRect: Rectangle;
     focused: boolean;
     selection?: Selection;
-    editSession?: EditSession<T>;
+    editSession?: GridEditSession<T>;
 }
 
 class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>> {
@@ -118,14 +95,12 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
     private invisibleTextAreaRef = React.createRef<HTMLTextAreaElement>();
     private resizeHelperRef = React.createRef<HTMLDivElement>();
 
-    // private setStateTimer: number | null;
-
     private dragTriggerTimer: number | null;
     private dragStart?: { x: number, y: number, target: HTMLElement };
 
     private scrollIntoViewTimer: number | null;
 
-    static getDerivedStateFromProps<T>(nextProps: GridTableProps<T>,
+    public static getDerivedStateFromProps<T>(nextProps: GridTableProps<T>,
         prevState: GridTableState<T>) {
         if (nextProps.data === prevState.gridData) {
             return null;
@@ -144,8 +119,6 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
 
         this.state = {
             gridData: props.data,
-            clientPosition: { top: 0, right: 0, bottom: 0, left: 0 },
-            visibleRect: new RectangleImpl(0, 0, window.innerWidth, window.innerHeight),
             focused: false,
         };
 
@@ -170,12 +143,12 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         this.handleCustomEditorCancel = this.handleCustomEditorCancel.bind(this);
     }
 
-    componentDidUpdate(prevProps: GridTableProps<T>) {
-        this.fixLayoutIfNeeded(() => this.refreshLayout());
+    public componentDidUpdate(prevProps: GridTableProps<T>) {
+        this.fixLayoutIfNeeded(() => this.syncOverlays());
     }
 
-    componentDidMount() {
-        this.fixLayoutIfNeeded(() => this.refreshLayout());
+    public componentDidMount() {
+        this.fixLayoutIfNeeded(() => this.syncOverlays());
 
         // document.addEventListener("click", this.handleClickHeader);
         // document.addEventListener("mousedown", this.handleMouseDown);
@@ -184,7 +157,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         document.addEventListener("resize", this.handleResize);
     }
 
-    componentWillUnmount() {
+    public componentWillUnmount() {
         // document.removeEventListener("click", this.handleClickHeader);
         // document.removeEventListener("mousedown", this.handleMouseDown);
         document.removeEventListener("mousemove", this.handleMouseMove);
@@ -212,7 +185,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
 
     public addRowsBelow() {
         this.assertEditable();
-        let selection = this.state.selection;
+        const selection = this.state.selection;
         const [rowIndex, rowCount] = selection ?
             [selection.bottomRow() + 1, selection.rowCount()] : [0, 1];
 
@@ -275,7 +248,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         } else {
             selection = undefined;
         }
-        this.setState({ gridData: gridData, selection });
+        this.setState({ gridData, selection });
     }
 
     public addColumnsBefore() {
@@ -290,7 +263,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
 
     public addColumnsAfter() {
         this.assertEditable();
-        let selection = this.state.selection;
+        const selection = this.state.selection;
         const [columnIndex, columnCount] = selection ?
             [selection.rightColumn() + 1, selection.columnCount()] : [0, 1];
 
@@ -353,7 +326,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         } else {
             selection = undefined;
         }
-        this.setState({ gridData: gridData, selection });
+        this.setState({ gridData, selection });
     }
 
     public eraseSelectedCells() {
@@ -363,10 +336,10 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
             return;
         }
 
-        const top = sel.topRow(),
-            right = sel.rightColumn(),
-            bottom = sel.bottomRow(),
-            left = sel.leftColumn();
+        const top = sel.topRow();
+        const right = sel.rightColumn();
+        const bottom = sel.bottomRow();
+        const left = sel.leftColumn();
 
         if (typeof this.props.beforeEraseCells === "function") {
             if (this.props.beforeEraseCells(top, right, bottom, left) === false) {
@@ -388,7 +361,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
             this.props.afterEraseCells(top, right, bottom, left);
         }
 
-        this.setState({ gridData: gridData });
+        this.setState({ gridData });
     }
 
     private doEraseCellData(gridCell: GridCell<T>) {
@@ -396,7 +369,8 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
     }
 
     public refreshLayout() {
-        this.updateVisibleRect(() => this.syncOverlays());
+        this.syncOverlays();
+        this.forceUpdate(); // in render process visible rect will be update.
     }
 
     private fixLayoutIfNeeded(callbackAfterFixed?: () => void) {
@@ -440,7 +414,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         gridData.setHeight(offsetY);
         gridData.setArranged(true);
 
-        this.setState({ gridData: gridData }, callbackAfterFixed);
+        this.setState({ gridData }, callbackAfterFixed);
     }
 
     private syncOverlays() {
@@ -452,31 +426,8 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         leftOverlay.scrollTop = scrollableContainer.scrollTop;
     }
 
-    private updateVisibleRect(callback?: () => void) {
-        const sc = this.assertAndGetScrollableContainer();
-
-        const clientPosition = this.state.clientPosition;
-        clientPosition.top = sc.clientTop;
-        clientPosition.right = sc.offsetWidth - sc.clientLeft - sc.clientWidth;
-        clientPosition.bottom = sc.offsetHeight - sc.clientTop - sc.clientHeight;
-        clientPosition.left = sc.clientLeft;
-
-        const visibleRect = new RectangleImpl(
-            sc.scrollLeft,
-            sc.scrollTop,
-            sc.clientWidth,
-            sc.clientHeight
-        );
-
-        this.setState({
-            clientPosition,
-            visibleRect
-        }, callback);
-    }
-
     protected handleScroll(event: React.UIEvent<HTMLDivElement>) {
-        this.syncOverlays();
-        this.updateVisibleRect();
+        this.refreshLayout();
     }
 
     protected handleClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -508,7 +459,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
             }
 
             const cellData = gridData.getCellData(pos.rowIndex, pos.columnIndex);
-            const editSession = new EditSession<T>(pos.rowIndex, pos.columnIndex, cellData);
+            const editSession = new GridEditSession<T>(pos.rowIndex, pos.columnIndex, cellData);
             this.setState({ editSession });
         }
     }
@@ -727,10 +678,10 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
     protected scrollCellIntoView(rowIndex: number, columnIndex: number) {
         const container = this.assertAndGetScrollableContainer();
         const gridData = this.state.gridData;
-        let leftAnchor: number = NaN,
-            rightAnchor: number = NaN,
-            topAnchor: number = NaN,
-            bottomAnchor: number = NaN;
+        let leftAnchor: number = NaN;
+        let rightAnchor: number = NaN;
+        let topAnchor: number = NaN;
+        let bottomAnchor: number = NaN;
 
         if (!isNaN(columnIndex)) {
             const columnHeader = gridData.getColumnHeader(columnIndex);
@@ -820,12 +771,12 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                 columnHeader.setLeft(left);
                 left = columnHeader.getRight();
             }
-            this.setState({ gridData: gridData }, () => this.refreshLayout());
+            this.setState({ gridData }, () => this.syncOverlays());
         }
     }
 
     protected handleResize(e: Event) {
-        this.updateVisibleRect();
+        this.refreshLayout();
     }
 
     protected handleFocus() {
@@ -914,9 +865,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
 
         e.preventDefault();
 
-        // TODO
-        // when metaKey/ctrlKey is on, move to head/tail instead
-        // when altKey is down, apple's Number do row/column insert.
+        // TODO when altKey is down, apple's Number do row/column insert.
 
         const newSelection = selection.duplicate();
         const target = (e.shiftKey) ? newSelection.end : newSelection.start;
@@ -1054,29 +1003,6 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
             return;
         }
         const gridData = this.state.gridData;
-        //         let text = "",
-        //             html = "<!doctype html><html><head>\
-        // <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\
-        // </head><body><table><tbody>\n";
-        //         for (let i = selection.topRow(); i <= selection.bottomRow(); i++) {
-        //             if (text.length > 0) {
-        //                 text += "\r\n";
-        //             }
-        //             html += "<tr>";
-
-        //             let line = "";
-        //             for (let j = selection.leftColumn(); j <= selection.rightColumn(); j++) {
-        //                 if (line.length > 0) {
-        //                     line += ",";
-        //                 }
-        //                 const value = this.cellDataToCopyableString(tableData.getCellData(j, i));
-        //                 line += EscapeHelper.escapeForCSV(value);
-        //                 html += "<td>" + EscapeHelper.escapeForHtml(value) + "</td>";
-        //             }
-        //             text += line;
-        //             html += "</tr>\n";
-        //         }
-        //         html += "</tbody></table></body></html>";
 
         const csv = gridData.toCsv(selection.topRow(),
             selection.rightColumn(),
@@ -1165,7 +1091,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         initialInput?: string) {
 
         this.assertEditable();
-        const editSession = new EditSession<T>(
+        const editSession = new GridEditSession<T>(
             rowIndex,
             columnIndex,
             cellData,
@@ -1232,7 +1158,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         return String(rowIndex + 1);
     }
 
-    render() {
+    public render() {
         const focused = this.state.focused;
         const className = classnames(
             "fw-grid-table",
@@ -1243,8 +1169,24 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
             }
         );
         const gridData = this.state.gridData;
-        const clientPosition = this.state.clientPosition;
-        const visibleRect = this.state.visibleRect;
+
+        const clientPosition = { top: 0, right: 0, bottom: 0, left: 0 };
+        const visibleRect = new RectangleImpl(0, 0, window.innerWidth, window.innerHeight);
+
+        if (this.scrollableContainerRef.current) {
+            const sc = this.scrollableContainerRef.current;
+
+            clientPosition.top = sc.clientTop;
+            clientPosition.right = sc.offsetWidth - sc.clientLeft - sc.clientWidth;
+            clientPosition.bottom = sc.offsetHeight - sc.clientTop - sc.clientHeight;
+            clientPosition.left = sc.clientLeft;
+
+            visibleRect.setLeft(sc.scrollLeft);
+            visibleRect.setTop(sc.scrollTop);
+            visibleRect.setWidth(sc.clientWidth);
+            visibleRect.setHeight(sc.clientHeight);
+        }
+
         const renderRect = new RectangleImpl(
             visibleRect.getLeft() - visibleRect.getWidth(),
             visibleRect.getTop() - visibleRect.getHeight(),
@@ -1257,7 +1199,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
 
         const selection = this.state.selection;
 
-        let dataCellSelectionRect = undefined;
+        let dataCellSelectionRect/* = undefined*/;
 
         if (selection) {
             const firstColumn = gridData.getColumnHeader(selection.leftColumn());
@@ -1274,7 +1216,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         }
 
         const editSession = this.state.editSession;
-        let editingRect = undefined;
+        let editingRect/* = undefined*/;
         if (editSession) {
             editingRect = gridData.getCellOffsetRect(
                 editSession.rowIndex,
@@ -1310,7 +1252,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                                     top: dataCellSelectionRect.getTop(),
                                     left: dataCellSelectionRect.getLeft(),
                                     width: dataCellSelectionRect.getWidth()
-                                }}></div>
+                                }} />
                             <div
                                 className="selection-border selection-right-border"
                                 style={{
@@ -1318,7 +1260,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                                     top: dataCellSelectionRect.getTop(),
                                     left: dataCellSelectionRect.getRight(),
                                     height: dataCellSelectionRect.getHeight()
-                                }}></div>
+                                }} />
                             <div
                                 className="selection-border selection-bottom-border"
                                 style={{
@@ -1326,7 +1268,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                                     top: dataCellSelectionRect.getBottom(),
                                     left: dataCellSelectionRect.getLeft(),
                                     width: dataCellSelectionRect.getWidth()
-                                }}></div>
+                                }} />
                             <div
                                 className="selection-border selection-left-border"
                                 style={{
@@ -1334,7 +1276,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                                     top: dataCellSelectionRect.getTop(),
                                     left: dataCellSelectionRect.getLeft(),
                                     height: dataCellSelectionRect.getHeight()
-                                }}></div>
+                                }} />
                         </div>
                     )}
                     {editingRect && (
@@ -1421,7 +1363,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                     <div
                         ref={this.resizeHelperRef}
                         className="resize-helper column-resize-helper"
-                        style={resizeHelperStyle}></div>
+                        style={resizeHelperStyle} />
                     {/* <div
                         ref={this.selectionHelperRef}
                         style={{
@@ -1442,7 +1384,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                         resize: "none",
                     }}
                     defaultValue={"ferris wheel"}
-                    readOnly
+                    readOnly={true}
                     tabIndex={-1}
                     onFocus={this.handleFocus}
                     onBlur={this.handleBlur}
@@ -1495,7 +1437,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                             left: 0,
                             width: gridData.getLeft(),
                             height: gridData.getTop(),
-                        }}></div>
+                        }} />
                 )}
                 {withColumnHeader && offsetY >= renderRect.getTop() && gridData.mapColumn((columnHeader, columnIndex) => {
                     const left = offsetX + columnHeader.getLeft();
@@ -1526,7 +1468,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
                             {this.getColumnName(columnIndex, columnHeader)}
                             <div
                                 className="resize-handle column-resize-handle"
-                                style={columnResizeHandleStyle}></div>
+                                style={columnResizeHandleStyle} />
                         </div>
                     );
                 })}
@@ -1848,7 +1790,7 @@ class GridTable<T> extends React.Component<GridTableProps<T>, GridTableState<T>>
         return this.assertAndGetRef(this.resizeHelperRef);
     }
 
-    protected assertAndGetRef<T>(ref: React.RefObject<T>): T {
+    protected assertAndGetRef<O>(ref: React.RefObject<O>): O {
         const obj = ref.current;
         if (obj === null) {
             throw new Error("Referred object not available.");

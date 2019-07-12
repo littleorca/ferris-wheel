@@ -8,6 +8,7 @@ import EditRequest from '../action/EditRequest';
 import EditResponse from '../action/EditResponse';
 import WorkbookView from './WorkbookView';
 import ReactLoading from 'react-loading';
+import Extension from 'extension/Extension';
 import './WorkbookPresenter.css';
 
 interface WorkbookPresenterProps extends React.ClassAttributes<WorkbookPresenter> {
@@ -15,6 +16,7 @@ interface WorkbookPresenterProps extends React.ClassAttributes<WorkbookPresenter
     service: Service;
     defaultSheet?: string;
     className?: string;
+    extensions?: Extension[];
     beforeAction?: (action: Action) => boolean;
     afterAction?: (action: Action) => void;
 }
@@ -126,6 +128,7 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
                     workbook={this.props.workbook}
                     defaultSheet={this.props.defaultSheet}
                     editable={false}
+                    extensions={this.props.extensions}
                     onAction={this.handleAction}
                     herald={this} />
                 {this.state.showMask && (

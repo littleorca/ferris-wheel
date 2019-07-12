@@ -29,10 +29,18 @@ import java.io.Serializable;
 public abstract class AbstractReference implements Serializable {
     private String sheetName;
     private String assetName;
+    private boolean alive;
+    private boolean phantom;
 
     public AbstractReference(String sheetName, String assetName) {
+        this(sheetName, assetName, true, false);
+    }
+
+    public AbstractReference(String sheetName, String assetName, boolean alive, boolean phantom) {
         this.sheetName = sheetName;
         this.assetName = assetName;
+        this.alive = alive;
+        this.phantom = phantom;
     }
 
     public String getSheetName() {
@@ -49,5 +57,28 @@ public abstract class AbstractReference implements Serializable {
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    /**
+     * A phantom reference means it refer to ephemeral node(s) that dynamically
+     * created by some other controller node and may destroy/recreate during
+     * the calculation process.
+     *
+     * @return
+     */
+    public boolean isPhantom() {
+        return phantom;
+    }
+
+    public void setPhantom(boolean phantom) {
+        this.phantom = phantom;
     }
 }

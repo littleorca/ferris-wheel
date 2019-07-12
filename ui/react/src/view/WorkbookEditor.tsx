@@ -538,6 +538,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         workbook={this.props.workbook}
                         defaultSheet={this.props.defaultSheet}
                         editable={true}
+                        extensions={this.props.extensions}
                         onAction={this.handleAction}
                         herald={this}
                         controlPortal={this.sideBarPortalNode} />

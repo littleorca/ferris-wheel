@@ -93,9 +93,17 @@ class SparseAssetArray<E extends AssetNode> implements Iterable<Map.Entry<Intege
 
         @Override
         public void remove() {
-            delegate.remove();
+            /**
+             * CAUTION: Get element before remove as map entry's behavior is
+             * undefined if the backing map has been modified.
+             */
+            E element = null;
             if (current != null && current.getValue() != null) {
-                SparseAssetArray.this.owner.unbindChild(current.getValue());
+                element = current.getValue();
+            }
+            delegate.remove();
+            if (element != null) {
+                SparseAssetArray.this.owner.unbindChild(element);
             }
         }
     }

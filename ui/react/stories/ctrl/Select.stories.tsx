@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import * as React from "react";
 import Select from "../../src/ctrl/Select";
 
 const options = [{
@@ -10,9 +10,9 @@ const options = [{
 }];
 
 let testValue = "foo";
-const selection = [];
+// const selection = [];
 
-class SelectStories extends Component {
+class SelectStories extends React.Component {
     render() {
         return (
             <div>

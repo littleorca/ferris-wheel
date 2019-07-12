@@ -8,7 +8,6 @@ import java.io.Serializable;
 public class CellReference extends AbstractReference implements Serializable {
     private PositionRef positionRef;
     private long cellId = Asset.UNSPECIFIED_ASSET_ID;
-    private boolean alive = true;
 
     public CellReference() {
         super(null, null);
@@ -19,18 +18,19 @@ public class CellReference extends AbstractReference implements Serializable {
                 cell.getRow().getTable().getName(),
                 new PositionRef(cell.getRowIndex(), isRowAbsolute, cell.getColumnIndex(), isColumnAbsolute),
                 cell.getAssetId(),
-                true);
+                true,
+                false);
     }
 
     public CellReference(String sheetName,
                          String assetName,
                          PositionRef positionRef,
                          long cellId,
-                         boolean alive) {
-        super(sheetName, assetName);
+                         boolean alive,
+                         boolean phantom) {
+        super(sheetName, assetName, alive, phantom);
         this.positionRef = positionRef;
         this.cellId = cellId;
-        this.alive = alive;
     }
 
     public PositionRef getPositionRef() {
@@ -49,15 +49,7 @@ public class CellReference extends AbstractReference implements Serializable {
         this.cellId = cellId;
     }
 
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
-
     public boolean isValid() {
-        return alive && cellId != Asset.UNSPECIFIED_ASSET_ID;
+        return isAlive() && cellId != Asset.UNSPECIFIED_ASSET_ID;
     }
 }

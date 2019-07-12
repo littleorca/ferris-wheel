@@ -159,54 +159,54 @@ public class TestReferences extends TestCase {
     public void testCellRefToFormula() {
         assertEquals("A1", References.toFormula(new CellReference(null, null,
                 new PositionRef(0, false, 0, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
         assertEquals("Z9", References.toFormula(new CellReference(null, null,
                 new PositionRef(8, false, 25, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
         assertEquals("AA10", References.toFormula(new CellReference(null, null,
                 new PositionRef(9, false, 26, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
         assertEquals("AZ19", References.toFormula(new CellReference(null, null,
                 new PositionRef(18, false, 51, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
         assertEquals("BA20", References.toFormula(new CellReference(null, null,
                 new PositionRef(19, false, 52, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
         assertEquals("ZZ99", References.toFormula(new CellReference(null, null,
                 new PositionRef(98, false, 701, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
         assertEquals("AAA100", References.toFormula(new CellReference(null, null,
                 new PositionRef(99, false, 702, false),
-                Asset.UNSPECIFIED_ASSET_ID, true)));
+                Asset.UNSPECIFIED_ASSET_ID, true, false)));
 
         assertEquals("AAB101", References.toFormula(new CellReference(null, null,
                         new PositionRef(99, false, 702, false),
-                        Asset.UNSPECIFIED_ASSET_ID, true),
+                        Asset.UNSPECIFIED_ASSET_ID, true, false),
                 1, 1));
 
         // absolute reference will not shift
         assertEquals("$AAA$100", References.toFormula(new CellReference(null, null,
                         new PositionRef(99, true, 702, true),
-                        Asset.UNSPECIFIED_ASSET_ID, true),
+                        Asset.UNSPECIFIED_ASSET_ID, true, false),
                 1, 1));
         assertEquals("foobar!$AAA$100", References.toFormula(new CellReference(null, "foobar",
                         new PositionRef(99, true, 702, true),
-                        Asset.UNSPECIFIED_ASSET_ID, true),
+                        Asset.UNSPECIFIED_ASSET_ID, true, false),
                 1, 1));
         // relative reference will be shifted
         assertEquals("hello!world!AAB101", References.toFormula(new CellReference("hello", "world",
                         new PositionRef(99, false, 702, false),
-                        Asset.UNSPECIFIED_ASSET_ID, true),
+                        Asset.UNSPECIFIED_ASSET_ID, true, false),
                 1, 1));
         assertEquals("'你好'!'世界'!$AAA$100", References.toFormula(new CellReference("你好", "世界",
                         new PositionRef(99, true, 702, true),
-                        Asset.UNSPECIFIED_ASSET_ID, true),
+                        Asset.UNSPECIFIED_ASSET_ID, true, false),
                 1, 1));
 
         try {
             References.toFormula(new CellReference(null, null,
                     new PositionRef(-1, false, 0, false),
-                    Asset.UNSPECIFIED_ASSET_ID, true));
+                    Asset.UNSPECIFIED_ASSET_ID, true, false));
             fail();
         } catch (IllegalArgumentException e) {
         }
@@ -214,7 +214,7 @@ public class TestReferences extends TestCase {
         try {
             References.toFormula(new CellReference(null, null,
                     new PositionRef(0, false, -1, false),
-                    Asset.UNSPECIFIED_ASSET_ID, true));
+                    Asset.UNSPECIFIED_ASSET_ID, true, false));
             fail();
         } catch (IllegalArgumentException e) {
         }
@@ -222,7 +222,7 @@ public class TestReferences extends TestCase {
         try {
             References.toFormula(new CellReference(null, null,
                     new PositionRef(-1, false, -1, false),
-                    Asset.UNSPECIFIED_ASSET_ID, true));
+                    Asset.UNSPECIFIED_ASSET_ID, true, false));
             fail();
         } catch (IllegalArgumentException e) {
         }

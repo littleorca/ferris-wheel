@@ -60,6 +60,7 @@ class AssetView extends React.Component<AssetViewProps> implements ActionHerald 
             className,
             asset,
             editable: this.props.editable,
+            extensions: this.props.extensions,
             onAction: this.onRequestAction,
             herald: this,
         }

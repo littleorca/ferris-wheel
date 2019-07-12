@@ -672,11 +672,14 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             cellReference.setAlive(false);
             return;
         }
+        if (table.getAutomaton() != null) {
+            cellReference.setPhantom(true); // actually this only need to be done once
+        }
         final int rowIndex = cellReference.getPositionRef().getRowIndex();
         final int columnIndex = cellReference.getPositionRef().getColumnIndex();
         if (rowIndex < 0 || rowIndex >= table.getRowCount() ||
                 columnIndex < 0 || columnIndex >= table.getColumnCount()) {
-            if (table.getAutomaton() != null) {
+            if (cellReference.isPhantom()) {
                 cellReference.setCellId(DefaultCell.UNSPECIFIED_ASSET_ID);
                 fromNode.addDependency(table);
             } else {
@@ -686,9 +689,10 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         }
         DefaultCell depCell = table.getCell(rowIndex, columnIndex);
         cellReference.setCellId(depCell.getAssetId()); // fill runtime id for convenience.
-        fromNode.addDependency(depCell);
-        if (depCell.isEphemeral()) {
+        if (cellReference.isPhantom()) {
             fromNode.addDependency(table);
+        } else {
+            fromNode.addDependency(depCell);
         }
     }
 
@@ -727,6 +731,9 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             return;
 //            throw new IllegalArgumentException();
         }
+        if (table.getAutomaton() != null) {
+            rangeReference.setPhantom(true); // actually this only need to be done once
+        }
         // fill runtime id for convenience.
         final int left = rangeReference.getLeft() == -1 ? 0 : rangeReference.getLeft();
         final int top = rangeReference.getTop() == -1 ? 0 : rangeReference.getTop();
@@ -742,14 +749,17 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             DefaultCell lowerRight = table.getCell(bottom, right);
             rangeReference.setLowerRightTargetId(lowerRight.getAssetId());
         }
-        // scan dependencies
-        for (int row = Math.max(top, 0); row <= bottom && row < table.getRowCount(); row++) {
-            for (int col = Math.max(left, 0); col <= right && col < table.getColumnCount(); col++) {
-                DefaultCell depCell = table.getCell(row, col);
-                if (depCell != null) {
-                    fromNode.addDependency(depCell);
-                    if (depCell.isEphemeral()) {
-                        fromNode.addDependency(depCell.getRow().getTable());
+
+        if (rangeReference.isPhantom()) {
+            fromNode.addDependency(table);
+
+        } else {
+            // scan dependencies
+            for (int row = Math.max(top, 0); row <= bottom && row < table.getRowCount(); row++) {
+                for (int col = Math.max(left, 0); col <= right && col < table.getColumnCount(); col++) {
+                    DefaultCell depCell = table.getCell(row, col);
+                    if (depCell != null) {
+                        fromNode.addDependency(depCell);
                     }
                 }
             }
@@ -873,9 +883,9 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                 null,
                 null,
                 null);
-        if (table.getAutomaton() instanceof DefaultQueryAutomaton) {
-            updateNamedReferences((DefaultQueryAutomaton) table.getAutomaton());
-        }
+        // if (table.getAutomaton() instanceof DefaultQueryAutomaton) {
+        // updateNamedReferences((DefaultQueryAutomaton) table.getAutomaton());
+        // }
     }
 
     /**
@@ -922,14 +932,14 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
     }
 
     /**
-     * @param table       In which table, area change happened.
-     * @param node
+     * @param changedTable  In which table, area change happened.
+     * @param dependentNode
      * @param alignLeft
      * @param alignTop
      * @param alignRight
      * @param alignBottom
      */
-    private void fixFormulaAfterAreaChanged(DefaultTable table, ValueNode node,
+    private void fixFormulaAfterAreaChanged(DefaultTable changedTable, ValueNode dependentNode,
                                             Integer alignLeft, Integer alignTop,
                                             Integer alignRight, Integer alignBottom) {
         // update references and construct new formula string, then parse
@@ -946,24 +956,23 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         boolean modified = false;
 
         // this loop check and update elements for construct new formula
-        for (FormulaElement elem : node.getFormulaElements()) {
+        for (FormulaElement elem : dependentNode.getFormulaElements()) {
             if (!(elem instanceof ReferenceElement)) {
                 continue;
             }
             if (elem instanceof CellReferenceElement) {
                 CellReference cellReference = ((CellReferenceElement) elem).getCellReference();
-                modified |= fixCellRef(node, cellReference, table.getAutomaton() != null);
+                modified |= fixCellRef(changedTable, dependentNode, cellReference);
 
             } else if (elem instanceof RangeReferenceElement) {
                 RangeReference rangeReference = ((RangeReferenceElement) elem).getRangeReference();
-                modified |= fixRangeRef(node,
-                        table,
+                modified |= fixRangeRef(changedTable,
+                        dependentNode,
                         rangeReference,
                         alignLeft,
                         alignTop,
                         alignRight,
-                        alignBottom,
-                        table.getAutomaton() != null);
+                        alignBottom);
 
             } else {
                 throw new RuntimeException("What? I don't recognize the reference: " + elem.getClass());
@@ -975,14 +984,14 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
 //        }
 
         // now lets construct new formula
-        String newFormula = FormulaParser.toFormula(node.getFormulaElements(), 0, 0);
-        if (node instanceof DefaultCell) {
-            DefaultCell cell = (DefaultCell) node;
+        String newFormula = FormulaParser.toFormula(dependentNode.getFormulaElements(), 0, 0);
+        if (dependentNode instanceof DefaultCell) {
+            DefaultCell cell = (DefaultCell) dependentNode;
             cell.getRow().getTable().setCellFormula(cell.getRowIndex(), cell.getColumnIndex(), newFormula); // this will trigger onCellUpdate, some other businesses will be done there.
 
-        } else if (node.getParent() instanceof Chart
-                || node.getParent() instanceof DataSeries
-                || node.getParent() instanceof ChartBinder) {
+        } else if (dependentNode.getParent() instanceof Chart
+                || dependentNode.getParent() instanceof DataSeries
+                || dependentNode.getParent() instanceof ChartBinder) {
             // chart property update is not as easy as a cell, property of chart may be a little
             // difficult to trace as it doesn't has row/column index. a chart property can be
             // a categories formula, or one property of any series.
@@ -990,47 +999,47 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             // should we notify the listeners (especially the revise collector)?
             // currently just tell listeners the chart has changed, either model or data.
             DefaultChart chart = (DefaultChart)
-                    (((node.getParent() instanceof DataSeries)
-                            || node.getParent() instanceof ChartBinder) ?
-                            node.getParent().getParent() : node.getParent());
+                    (((dependentNode.getParent() instanceof DataSeries)
+                            || dependentNode.getParent() instanceof ChartBinder) ?
+                            dependentNode.getParent().getParent() : dependentNode.getParent());
             UpdateChart action = new UpdateChart(chart.getSheet().getName(), chart.getName(), null);
             listenerChain.publicly(action, () -> {
-                node.setFormula(new Formula(newFormula));
-                onValueNodeUpdate(node);
+                dependentNode.setFormula(new Formula(newFormula));
+                onValueNodeUpdate(dependentNode);
                 return chart;
             });
 
-        } else if (node.getParent() instanceof Text) {
-            DefaultText text = (DefaultText) node.getParent();
+        } else if (dependentNode.getParent() instanceof Text) {
+            DefaultText text = (DefaultText) dependentNode.getParent();
             text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
 
-        } else if (node.getParent() instanceof DefaultQueryAutomaton
-                || node.getParent() instanceof DefaultPivotAutomaton
-                || node.getParent() instanceof DefaultQueryTemplate) {
-            AbstractAutomaton auto = node.parent(AbstractAutomaton.class);
+        } else if (dependentNode.getParent() instanceof DefaultQueryAutomaton
+                || dependentNode.getParent() instanceof DefaultPivotAutomaton
+                || dependentNode.getParent() instanceof DefaultQueryTemplate) {
+            AbstractAutomaton auto = dependentNode.parent(AbstractAutomaton.class);
             AutomateTable automateTable = new AutomateTable(auto.getTable().getSheet().getName(),
                     auto.getTable().getName(), null);
             listenerChain.publicly(automateTable, () -> {
-                node.setDynamicVariant(new DynamicValue(newFormula));
-                onValueNodeUpdate(node);
+                dependentNode.setDynamicVariant(new DynamicValue(newFormula));
+                onValueNodeUpdate(dependentNode);
                 automateTable.setSolution(auto instanceof DefaultQueryAutomaton ?
                         ((DefaultQueryAutomaton) auto).getQueryAutomatonInfo() :
                         ((DefaultPivotAutomaton) auto).getPivotAutomatonInfo());
             });
 
-        } else if (node.getParent() instanceof DefaultFormField
-                || node.getParent() instanceof DefaultFormFieldBinding) {
-            node.setDynamicVariant(new DynamicValue(newFormula));
-            DefaultForm form = node.parent(DefaultForm.class);
+        } else if (dependentNode.getParent() instanceof DefaultFormField
+                || dependentNode.getParent() instanceof DefaultFormFieldBinding) {
+            dependentNode.setDynamicVariant(new DynamicValue(newFormula));
+            DefaultForm form = dependentNode.parent(DefaultForm.class);
             UpdateForm action = new UpdateForm(form.getSheet().getName(), form.getName(), form);
             listenerChain.publicly(action, () -> {
-                node.setFormula(new Formula(newFormula));
-                onValueNodeUpdate(node);
+                dependentNode.setFormula(new Formula(newFormula));
+                onValueNodeUpdate(dependentNode);
                 return form;
             });
 
         } else {
-            throw new RuntimeException("Unsupported value node: " + node);
+            throw new RuntimeException("Unsupported value node: " + dependentNode);
         }
     }
 
@@ -1050,85 +1059,103 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
      * Update row/column index of the reference by the cell's runtime ID. When a cell has moved,
      * use this method to keep the row/column index up to date.
      *
+     * @param changedTable
      * @param sourceNode    Source node that the <code>cellReference</code> comes from.
      * @param cellReference
-     * @param stubborn      Determine if reference should be kept untouched even it is invalid.
      * @return true if reference has been modified, false otherwise.
      */
-    private boolean fixCellRef(ValueNode sourceNode, CellReference cellReference, boolean stubborn) {
+    private boolean fixCellRef(DefaultTable changedTable, ValueNode sourceNode, CellReference cellReference) {
         if (!cellReference.isAlive()) {
             return false;
         }
-        DefaultCell referredCell = getCellByAssetId(cellReference.getCellId());
-        if (referredCell == null) {
-            if (!stubborn) {
+        if (!cellReference.isPhantom()) {
+            DefaultCell referredCell = getCellByAssetId(cellReference.getCellId());
+            if (referredCell == null) {
                 cellReference.setAlive(false);
                 cellReference.setCellId(UNSPECIFIED_ASSET_ID);
-            } else {
-                if (cellReference.getPositionRef().getRowIndex() != -1 &&
-                        cellReference.getPositionRef().getColumnIndex() != -1) {
-                    hookCellRef(sourceNode, cellReference);
-                } else {
-                    cellReference.setCellId(UNSPECIFIED_ASSET_ID);
-                }
+                return true;
             }
-            return true;
+
+            boolean modified = false;
+            DefaultTable table = referredCell.getRow().getTable();
+
+            String oldRefSheetName = cellReference.getSheetName() == null ?
+                    sourceNode.parent(DefaultSheet.class).getName() : cellReference.getSheetName();
+            String oldRefTableName = cellReference.getAssetName() == null ?
+                    sourceNode.parent(SheetAssetNode.class).getName() : cellReference.getAssetName();
+
+            if (!oldRefSheetName.equals(table.getSheet().getName())) {
+                cellReference.setSheetName(table.getSheet().getName());
+                modified = true;
+            }
+
+            if (!oldRefTableName.equals(table.getName())) {
+                cellReference.setAssetName(table.getName());
+                modified = true;
+            }
+
+            PositionRef positionRef = cellReference.getPositionRef();
+            if (positionRef.getRowIndex() != referredCell.getRowIndex()
+                    && positionRef.getRowIndex() != -1) {
+                positionRef.setRowIndex(referredCell.getRowIndex());
+                modified = true;
+            }
+            if (positionRef.getColumnIndex() != referredCell.getColumnIndex()
+                    && positionRef.getColumnIndex() != -1) {
+                positionRef.setColumnIndex(referredCell.getColumnIndex());
+                modified = true;
+            }
+
+            return modified;
+
+        } else { // phantom reference, just try to re-hook
+            if (cellReference.getPositionRef().getRowIndex() != -1 &&
+                    cellReference.getPositionRef().getColumnIndex() != -1) {
+                hookCellRef(sourceNode, cellReference);
+            } else {
+                cellReference.setCellId(UNSPECIFIED_ASSET_ID);
+            }
+
+            return true; // FIXME
         }
-
-        boolean modified = false;
-        DefaultTable table = referredCell.getRow().getTable();
-
-        String oldRefSheetName = cellReference.getSheetName() == null ?
-                sourceNode.parent(DefaultSheet.class).getName() : cellReference.getSheetName();
-        String oldRefTableName = cellReference.getAssetName() == null ?
-                sourceNode.parent(SheetAssetNode.class).getName() : cellReference.getAssetName();
-
-        if (!oldRefSheetName.equals(table.getSheet().getName())) {
-            cellReference.setSheetName(table.getSheet().getName());
-            modified = true;
-        }
-
-        if (!oldRefTableName.equals(table.getName())) {
-            cellReference.setAssetName(table.getName());
-            modified = true;
-        }
-
-        PositionRef positionRef = cellReference.getPositionRef();
-        if (positionRef.getRowIndex() != referredCell.getRowIndex()
-                && positionRef.getRowIndex() != -1) {
-            positionRef.setRowIndex(referredCell.getRowIndex());
-            modified = true;
-        }
-        if (positionRef.getColumnIndex() != referredCell.getColumnIndex()
-                && positionRef.getColumnIndex() != -1) {
-            positionRef.setColumnIndex(referredCell.getColumnIndex());
-            modified = true;
-        }
-
-        return modified;
     }
 
-    private boolean fixRangeRef(ValueNode sourceNode,
-                                DefaultTable table,
+    private boolean fixRangeRef(DefaultTable changedTable,
+                                ValueNode sourceNode,
                                 RangeReference rangeReference,
                                 Integer alignLeft,
                                 Integer alignTop,
                                 Integer alignRight,
-                                Integer alignBottom,
-                                boolean stubborn) {
+                                Integer alignBottom) {
+        if (!rangeReference.isPhantom()) {
+            return fixNormalRangeRef(changedTable, sourceNode, rangeReference, alignLeft, alignTop, alignRight, alignBottom);
+        } else {
+            return fixPhantomRangeRef(changedTable, sourceNode, rangeReference, alignLeft, alignTop, alignRight, alignBottom);
+        }
+    }
+
+    private boolean fixNormalRangeRef(DefaultTable changedTable,
+                                      ValueNode sourceNode,
+                                      RangeReference rangeReference,
+                                      Integer alignLeft,
+                                      Integer alignTop,
+                                      Integer alignRight,
+                                      Integer alignBottom) {
         boolean modified = false;
         CellReference upperLeftRef = new CellReference(rangeReference.getSheetName(),
                 rangeReference.getAssetName(),
                 rangeReference.getUpperLeftRef(),
                 rangeReference.getUpperLeftTargetId(),
-                rangeReference.isAlive());
+                rangeReference.isAlive(),
+                rangeReference.isPhantom());
         CellReference lowerRightRef = new CellReference(rangeReference.getSheetName(),
                 rangeReference.getAssetName(),
                 rangeReference.getLowerRightRef(),
                 rangeReference.getLowerRightTargetId(),
-                rangeReference.isAlive());
-        modified |= fixCellRef(sourceNode, upperLeftRef, stubborn);
-        modified |= fixCellRef(sourceNode, lowerRightRef, stubborn);
+                rangeReference.isAlive(),
+                rangeReference.isPhantom());
+        modified |= fixCellRef(changedTable, sourceNode, upperLeftRef);
+        modified |= fixCellRef(changedTable, sourceNode, lowerRightRef);
 
         // FIXME cut/past cells not supported yet, but if once supported, upper left cell and lower right cell may resident in different table.
 
@@ -1138,13 +1165,13 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         } else if (!upperLeftRef.isValid()) { // shrink to bottom/right
             if (alignBottom != null) {
                 moveToAnotherInternalCell(upperLeftRef,
-                        table.getOrCreateCell(alignBottom,
+                        changedTable.getOrCreateCell(alignBottom,
                                 Math.max(upperLeftRef.getPositionRef().getColumnIndex(), 0)));
                 modified = true;
 
             } else if (alignRight != null) {
                 moveToAnotherInternalCell(upperLeftRef,
-                        table.getOrCreateCell(
+                        changedTable.getOrCreateCell(
                                 Math.max(upperLeftRef.getPositionRef().getRowIndex(), 0),
                                 alignRight));
                 modified = true;
@@ -1157,25 +1184,25 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
             if (alignTop != null) {
                 int columnIndex = lowerRightRef.getPositionRef().getColumnIndex();
                 if (columnIndex == -1) {
-                    columnIndex = table.getColumnCount() - 1;
+                    columnIndex = changedTable.getColumnCount() - 1;
                 }
                 if (columnIndex == -1) {
                     columnIndex = 0; // Default
                 }
                 moveToAnotherInternalCell(lowerRightRef,
-                        table.getOrCreateCell(alignTop, columnIndex));
+                        changedTable.getOrCreateCell(alignTop, columnIndex));
                 modified = true;
 
             } else if (alignLeft != null) {
                 int rowIndex = lowerRightRef.getPositionRef().getRowIndex();
                 if (rowIndex == -1) {
-                    rowIndex = table.getRowCount() - 1;
+                    rowIndex = changedTable.getRowCount() - 1;
                 }
                 if (rowIndex == -1) {
                     rowIndex = 0; // Default
                 }
                 moveToAnotherInternalCell(lowerRightRef,
-                        table.getOrCreateCell(rowIndex, alignLeft));
+                        changedTable.getOrCreateCell(rowIndex, alignLeft));
                 modified = true;
 
             } else {
@@ -1195,6 +1222,23 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
         }
 
         return modified;
+    }
+
+    private boolean fixPhantomRangeRef(DefaultTable changedTable,
+                                       ValueNode sourceNode,
+                                       RangeReference rangeReference,
+                                       Integer alignLeft,
+                                       Integer alignTop,
+                                       Integer alignRight,
+                                       Integer alignBottom) {
+        rangeReference.setAssetName(changedTable.getName());
+        if (!changedTable.getSheet().getName().equals(sourceNode.parent(DefaultSheet.class).getName())) {
+            rangeReference.setSheetName(changedTable.getSheet().getName());
+        } else {
+            rangeReference.setSheetName(null);
+        }
+
+        return true;
     }
 
     private void updateNamedReferences(DefaultQueryAutomaton queryAutomaton) {

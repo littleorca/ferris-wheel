@@ -10,14 +10,13 @@ public class RangeReference extends AbstractReference implements Serializable {
 
     private long upperLeftTargetId = Asset.UNSPECIFIED_ASSET_ID;
     private long lowerRightTargetId = Asset.UNSPECIFIED_ASSET_ID;
-    private boolean alive = true;
 
     public RangeReference() {
         super(null, null);
     }
 
     public RangeReference(CellReference upperLeft, CellReference lowerRight) {
-        super(upperLeft.getSheetName(), upperLeft.getAssetName());
+        super(upperLeft.getSheetName(), upperLeft.getAssetName(), upperLeft.isAlive() && lowerRight.isAlive(), false);
         if (!lowerRight.getSheetName().equals(upperLeft.getSheetName())
                 || !lowerRight.getAssetName().equals(upperLeft.getAssetName())) {
             throw new IllegalArgumentException();
@@ -26,7 +25,6 @@ public class RangeReference extends AbstractReference implements Serializable {
         this.lowerRightRef = lowerRight.getPositionRef();
         this.upperLeftTargetId = upperLeft.getCellId();
         this.lowerRightTargetId = lowerRight.getCellId();
-        this.alive = upperLeft.isAlive() && lowerRight.isAlive();
     }
 
     public RangeReference(String sheetName, String assetName, PositionRef upperLeftPos, PositionRef lowerRightPos) {
@@ -67,7 +65,8 @@ public class RangeReference extends AbstractReference implements Serializable {
                 new PositionRef(bottom, isBottomAbsolute, right, isRightAbsolute),
                 upperLeftCellId,
                 lowerRightCellId,
-                true);
+                true,
+                false);
     }
 
     public RangeReference(String sheetName,
@@ -76,13 +75,13 @@ public class RangeReference extends AbstractReference implements Serializable {
                           PositionRef lowerRightRef,
                           long upperLeftTargetId,
                           long lowerRightTargetId,
-                          boolean alive) {
-        super(sheetName, assetName);
+                          boolean alive,
+                          boolean phantom) {
+        super(sheetName, assetName, alive, phantom);
         this.upperLeftRef = upperLeftRef;
         this.lowerRightRef = lowerRightRef;
         this.upperLeftTargetId = upperLeftTargetId;
         this.lowerRightTargetId = lowerRightTargetId;
-        this.alive = alive;
     }
 
     @Override
@@ -148,14 +147,6 @@ public class RangeReference extends AbstractReference implements Serializable {
 
     public void setLowerRightTargetId(long lowerRightTargetId) {
         this.lowerRightTargetId = lowerRightTargetId;
-    }
-
-    public boolean isAlive() {
-        return alive;
-    }
-
-    public void setAlive(boolean alive) {
-        this.alive = alive;
     }
 
     public boolean isValid() {

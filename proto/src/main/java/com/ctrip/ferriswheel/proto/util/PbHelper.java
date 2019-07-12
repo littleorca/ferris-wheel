@@ -95,7 +95,7 @@ public class PbHelper {
             switch (asset.getAssetCase()) {
                 case TABLE:
                     Table table = sheet.addAsset(Table.class, asset.getTable().getName());
-                    bean(table, asset.getTable());
+                    fill(table, asset.getTable());
                     break;
                 case CHART:
                     sheet.addAsset(Chart.class, bean(asset.getChart()));
@@ -145,37 +145,7 @@ public class PbHelper {
 
     public static TableData bean(com.ctrip.ferriswheel.proto.v1.Table proto) {
         TableData table = new TableData();
-        TreeSparseArray<Row> rows = new TreeSparseArray<>();
-        for (int i = 0; i < proto.getRowsCount(); i++) {
-            com.ctrip.ferriswheel.proto.v1.Row rowProto = proto.getRows(i);
-            rows.set(rowProto.getRowIndex(), bean(rowProto));
-        }
-        table.setRows(rows);
-        if (proto.hasAutomaton()) {
-            com.ctrip.ferriswheel.proto.v1.TableAutomaton automatonProto = proto.getAutomaton();
-            if (automatonProto.getAutomatonCase() != com.ctrip.ferriswheel.proto.v1.TableAutomaton.AutomatonCase.AUTOMATON_NOT_SET) {
-                TableAutomatonInfo automaton = bean(automatonProto);
-                table.setAutomateConfiguration(automaton);
-            }
-        }
-        if (proto.hasLayout()) {
-            if (table.getLayout() == null) {
-                table.setLayout(new LayoutImpl());
-            }
-            fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
-        }
-        List<Header> rowHeaders = new ArrayList<>(proto.getRowHeadersCount());
-        for (int rowIndex = 0; rowIndex < proto.getRowHeadersCount(); rowIndex++) {
-            rowHeaders.add(bean(proto.getRowHeaders(rowIndex)));
-        }
-        table.setRowHeaders(rowHeaders);
-
-        List<Header> columnHeaders = new ArrayList<>(proto.getColumnHeadersCount());
-        for (int columnIndex = 0; columnIndex < proto.getColumnHeadersCount(); columnIndex++) {
-            columnHeaders.add(bean(proto.getColumnHeaders(columnIndex)));
-        }
-        table.setColumnHeaders(columnHeaders);
-        return table;
+        return fill(table, proto);
     }
 
     public static com.ctrip.ferriswheel.proto.v1.Header pb(Header bean) {
@@ -238,7 +208,7 @@ public class PbHelper {
         return com.ctrip.ferriswheel.proto.v1.SheetAsset.newBuilder().setTable(builder).build();
     }
 
-    static Table bean(Table table, com.ctrip.ferriswheel.proto.v1.Table proto) {
+    static <T extends Table> T fill(T table, com.ctrip.ferriswheel.proto.v1.Table proto) {
         fixTableSize(table, proto);
         for (int i = 0; i < proto.getRowsCount(); i++) {
             com.ctrip.ferriswheel.proto.v1.Row rowProto = proto.getRows(i);

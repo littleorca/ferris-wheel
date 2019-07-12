@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "outDir": "lib",
     "module": "esnext",
     "target": "es6",
@@ -13,7 +12,11 @@
     "jsx": "react",
     "moduleResolution": "node",
     "declaration": true,
-    "rootDir": "src",
+    "rootDirs": [
+      "src",
+      "stories"
+    ],
+    "baseUrl": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -23,6 +26,10 @@
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": false
   },
+  "include": [
+    "src/**/*",
+    "typesing.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "lib",
