@@ -27,7 +27,7 @@ class Table extends GridDataImpl<Cell> {
             input.columnHeaders.forEach((h: any) => columnHeaders.push(Header.deserialize(h)));
         }
 
-        const rows: GridCell<Cell>[][] = [];
+        const rows: Array<Array<GridCell<Cell>>> = [];
         rowHeaders.forEach((rowHeader, rowIndex) => {
             rows[rowIndex] = [];
             columnHeaders.forEach((columnHeader, columnIndex) => {
@@ -56,7 +56,7 @@ class Table extends GridDataImpl<Cell> {
 
     constructor(
         name: string,
-        rows: GridCell<Cell>[][] = [],
+        rows: Array<Array<GridCell<Cell>>> = [],
         columnHeaders?: Header[],
         rowHeaders?: Header[],
         automaton: TableAutomaton = new TableAutomaton(),
@@ -69,7 +69,7 @@ class Table extends GridDataImpl<Cell> {
         this.layout = layout;
     }
 
-    clone() {
+    public clone() {
         return Table.deserialize(this.toJSON());
     }
 

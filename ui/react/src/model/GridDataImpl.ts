@@ -13,10 +13,10 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
     private defaultRowHeight: number = 25;
     private columnHeaders: Header[];
     private rowHeaders: Header[];
-    private rows: GridCell<T>[][];
+    private rows: Array<Array<GridCell<T>>>;
     private arranged: boolean;
 
-    constructor(rows: GridCell<T>[][] = [],
+    constructor(rows: Array<Array<GridCell<T>>> = [],
         columnHeaders?: Header[],
         rowHeaders?: Header[],
         left: number = 0,
@@ -296,7 +296,7 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
         this.addRowHeaders(rowIndex, rowCount);
 
         const createEmptyRow = () => {
-            const row: GridCell<T>[] = [];
+            const row: Array<GridCell<T>> = [];
             for (let i = 0; i < this.getColumnCount(); i++) {
                 row.push(new GridCellImpl<T>());
             }
@@ -304,7 +304,7 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
         };
 
         if (rowIndex < this.rows.length) {
-            const args: (number | GridCell<T>[])[] = [rowIndex, 0];
+            const args: Array<number | Array<GridCell<T>>> = [rowIndex, 0];
             for (let i = 0; i < rowCount; i++) {
                 args.push(createEmptyRow());
             }
@@ -323,8 +323,8 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
             throw new Error("Invalid argument(s)");
         }
 
-        let width = this.defaultRowHeaderWidth,
-            height = this.defaultRowHeight;
+        let width = this.defaultRowHeaderWidth;
+        let height = this.defaultRowHeight;
         let refRowHeader;
 
         if (rowIndex < this.getRowCount()) {
@@ -341,7 +341,7 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
             }
         }
 
-        const args: (number | Header)[] = [rowIndex, 0];
+        const args: Array<number | Header> = [rowIndex, 0];
         for (let i = 0; i < rowCount; i++) {
             args.push(new Header(undefined, undefined, width, height));
         }
@@ -403,7 +403,7 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
         const endColumnIndex = columnIndex + columnCount;
         this.rows.forEach(row => {
             if (row.length >= columnIndex) {
-                const args: (number | GridCell<T>)[] = [columnIndex, 0];
+                const args: Array<number | GridCell<T>> = [columnIndex, 0];
                 for (let i = 0; i < columnCount; i++) {
                     args.push(new GridCellImpl<T>());
                 }
@@ -422,8 +422,8 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
             throw new Error("Invalid argument(s)");
         }
 
-        let width = this.defaultColumnWidth,
-            height = this.defaultRowHeight;
+        const width = this.defaultColumnWidth;
+        let height = this.defaultRowHeight;
         if (this.getColumnCount() > 0) {
             const refColumnHeader = this.getColumnHeader(0);
             if (refColumnHeader.getHeight() > 0) {
@@ -431,7 +431,7 @@ class GridDataImpl<T> extends RectangleImpl implements GridData<T> {
             }
         }
 
-        const args: (number | Header)[] = [columnIndex, 0];
+        const args: Array<number | Header> = [columnIndex, 0];
         for (let i = 0; i < columnCount; i++) {
             args.push(new Header(undefined, undefined, width, height));
         }

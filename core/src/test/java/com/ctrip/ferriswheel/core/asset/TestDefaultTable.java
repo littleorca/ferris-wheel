@@ -562,6 +562,24 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         assertEquals(33, table.getCell(3, 2).intValue());
     }
 
+    public void testFillTable() {
+        DefaultTable table = createTable33();
+
+        assertEquals(3, table.getRowCount());
+        assertEquals(3, table.getColumnCount());
+
+        DataSet dataSet = new ListDataSet.Builder()
+                .setColumnCount(1)
+                .newRecordBuilder()
+                .set(0, Value.str("foobar"))
+                .commit()
+                .build();
+        table.doFillTable(dataSet);
+
+        assertEquals(1, table.getRowCount());
+        assertEquals(1, table.getColumnCount());
+    }
+
     class ProviderMock implements DataProvider {
         @Override
         public boolean acceptsQuery(DataQuery query) {

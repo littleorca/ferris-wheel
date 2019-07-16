@@ -873,19 +873,15 @@ public class DefaultTable extends SheetAssetNode implements Table {
         }
 
         // trim rows/columns if needed
+        for (int i = getRowCount(); i < rows.size(); i++) {
+            rows.remove(i);
+        }
         Iterator<Map.Entry<Integer, DefaultRow>> rowIter = rows.iterator();
         while (rowIter.hasNext()) {
-            Map.Entry<Integer, DefaultRow> row = rowIter.next();
-            if (row.getKey() >= getRowCount()) {
-                rowIter.remove();
-            } else {
-                Iterator<Map.Entry<Integer, Cell>> colIter = row.getValue().iterator();
-                while (colIter.hasNext()) {
-                    Map.Entry<Integer, Cell> col = colIter.next();
-                    if (col.getKey() >= getColumnCount()) {
-                        colIter.remove();
-                    }
-                }
+            DefaultRow row = rowIter.next().getValue();
+            int count = row.getCellCount();
+            for (int i = getColumnCount(); i < count; i++) {
+                row.removeCell(i);
             }
         }
     }
