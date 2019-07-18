@@ -62,6 +62,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                 originModes: nextProps.modes,
                 allowedModes,
                 currentMode,
+                currentValue: nextProps.value,
                 pendingValue: nextProps.value,
                 valid: typeof currentMode !== "undefined",
             };
@@ -134,6 +135,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
         this.handleEditBoxClick = this.handleEditBoxClick.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleListChange = this.handleListChange.bind(this);
+        this.handleModeClick = this.handleModeClick.bind(this);
         this.handleCloseAux = this.handleCloseAux.bind(this);
     }
 
@@ -399,6 +401,21 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
         });
     }
 
+    protected handleModeClick(name: string) {
+        switch (name) {
+            case "formula":
+            case "decimal":
+            case "boolean":
+            case "date":
+            case "string":
+            case "list":
+                this.handleModeSwitch(name);
+                break;
+            default: // should never happen
+                throw new Error("Unknown mode name: " + name);
+        }
+    }
+
     protected handleCloseAux(event: Event) {
         this.setState({ active: false });
         if (this.state.currentValue === this.props.value) {
@@ -489,7 +506,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                         className="union-value-edit-aux">
                         {showCalendar && (
                             <DatePicker
-                                inline
+                                inline={true}
                                 dateFormat={"YYYY-MM-DD HH:mm:ss"}
                                 selected={value.valueType() === VariantType.DATE ?
                                     value.dateValue() : new Date()}
@@ -543,7 +560,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                                             "mode-current": "formula" === this.state.currentMode
                                         })}
                                         disabled={!editable}
-                                        onClick={e => this.handleModeSwitch("formula")} />
+                                        onClick={this.handleModeClick} />
                                 )}
                                 {this.state.allowedModes.has("decimal") && (
                                     <Button
@@ -554,7 +571,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                                             "mode-current": "decimal" === this.state.currentMode
                                         })}
                                         disabled={!editable}
-                                        onClick={e => this.handleModeSwitch("decimal")} />
+                                        onClick={this.handleModeClick} />
                                 )}
                                 {this.state.allowedModes.has("boolean") && (
                                     <Button
@@ -565,7 +582,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                                             "mode-current": "boolean" === this.state.currentMode
                                         })}
                                         disabled={!editable}
-                                        onClick={e => this.handleModeSwitch("boolean")} />
+                                        onClick={this.handleModeClick} />
                                 )}
                                 {this.state.allowedModes.has("date") && (
                                     <Button
@@ -576,7 +593,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                                             "mode-current": "date" === this.state.currentMode
                                         })}
                                         disabled={!editable}
-                                        onClick={e => this.handleModeSwitch("date")} />
+                                        onClick={this.handleModeClick} />
                                 )}
                                 {this.state.allowedModes.has("string") && (
                                     <Button
@@ -587,7 +604,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                                             "mode-current": "string" === this.state.currentMode
                                         })}
                                         disabled={!editable}
-                                        onClick={e => this.handleModeSwitch("string")} />
+                                        onClick={this.handleModeClick} />
                                 )}
                                 {this.state.allowedModes.has("list") && (
                                     <Button
@@ -597,7 +614,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
                                         className={classnames({
                                             "mode-current": "list" === this.state.currentMode
                                         })}
-                                        onClick={e => this.handleModeSwitch("list")} />
+                                        onClick={this.handleModeClick} />
                                 )}
                             </Group>
                         </Toolbar>

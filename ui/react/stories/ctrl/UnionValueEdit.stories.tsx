@@ -1,20 +1,40 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import UnionValueEdit from "../../src/ctrl/UnionValueEdit";
 import Values from '../../src/model/Values';
 import { action } from '@storybook/addon-actions';
+import ValueChange from '../../src/ctrl/ValueChange';
+import UnionValue from '../../src/model/UnionValue';
 
-class UnionValueEditStories extends Component {
-    value = Values.str("hello world");
+class UnionValueEditStories extends React.Component {
+    private value: UnionValue = Values.str("hello world");
+    private valueB: UnionValue = Values.str("foobar");
+    private switchableValue = this.value;
 
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleSwitchValue = this.handleSwitchValue.bind(this);
+        this.handleSwitchableValueChange = this.handleSwitchableValueChange.bind(this);
     }
 
-    handleChange(change) {
+    handleChange(change: ValueChange<UnionValue>) {
         if (change.type === "commit") {
             this.value = change.toValue;
+            this.forceUpdate();
+        }
+        action('UnionValueEdit afterChange')(change);
+    }
+
+    handleSwitchValue() {
+        this.switchableValue = (this.switchableValue === this.value) ?
+            this.valueB : this.value;
+        this.forceUpdate();
+    }
+
+    handleSwitchableValueChange(change: ValueChange<UnionValue>) {
+        if (change.type === "commit") {
+            this.switchableValue = change.toValue;
             this.forceUpdate();
         }
         action('UnionValueEdit afterChange')(change);
@@ -27,6 +47,12 @@ class UnionValueEditStories extends Component {
                     <h3>UnionValueEdit</h3>
                     <UnionValueEdit
                         value={this.value}
+                        afterChange={this.handleChange} />
+                </div><div>
+                    <h3>UnionValueEdit test switch value</h3>
+                    <button onClick={this.handleSwitchValue}>Switch Value</button>
+                    <UnionValueEdit
+                        value={this.switchableValue}
                         afterChange={this.handleChange} />
                 </div><div>
                     <h3>UnionValueEdit mode=formula</h3>

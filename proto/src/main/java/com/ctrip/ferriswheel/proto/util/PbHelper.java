@@ -235,7 +235,13 @@ public class PbHelper {
             table.automate(automaton);
         }
         if (proto.hasLayout()) {
-            fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
+            if (table.getLayout() != null) {
+                fillBeanFromProto((LayoutImpl) table.getLayout(), proto.getLayout());
+            } else if (table instanceof TableData) {
+                ((TableData) table).setLayout(bean(proto.getLayout()));
+            } else {
+                // no way!
+            }
         }
         return table;
     }
