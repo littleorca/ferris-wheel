@@ -36,10 +36,7 @@ import com.ctrip.ferriswheel.core.util.TreeSparseArray;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TableData implements Table, Serializable {
     private String name;
@@ -82,6 +79,9 @@ public class TableData implements Table, Serializable {
 
     @Override
     public Row getRow(int rowIndex) {
+        if (rows == null) {
+            return null;
+        }
         return rows.get(rowIndex);
     }
 
@@ -196,13 +196,13 @@ public class TableData implements Table, Serializable {
 
     @Override
     public void setCellsFormat(int rowIndex, int columnIndex, int nRows, int nColumns, String format) {
-        final int left = columnIndex;
-        final int top = rowIndex;
-        final int right = columnIndex + nColumns - 1;
-        final int bottom = rowIndex + nRows - 1;
-        if (left < 0 || top < 0 || right <= left || bottom <= top) {
-            throw new IllegalArgumentException();
-        }
+        final int left = Math.max(columnIndex, 0);
+        final int top = Math.max(rowIndex, 0);
+        final int right = Math.min(columnIndex + nColumns - 1, getColumnCount() - 1);
+        final int bottom = Math.min(rowIndex + nRows - 1, getRowCount() - 1);
+//        if (left < 0 || top < 0 || right <= left || bottom <= top) {
+//            throw new IllegalArgumentException();
+//        }
         for (int r = top; r <= bottom; r++) {
             for (int c = left; c <= right; c++) {
                 CellData cell = (CellData) getOrCreateCell(r, c);
@@ -230,8 +230,13 @@ public class TableData implements Table, Serializable {
 
     @Override
     public void addRows(int rowIndex, int nRows) {
+        final int prevRowCount = getRowCount();
+        if (rowIndex < 0 || rowIndex > prevRowCount || nRows < 1) {
+            throw new IllegalArgumentException();
+        }
+        createRowHeaders(rowIndex, nRows);
         // just move rows to make room for new rows.
-        for (int i = getRowCount() - 1; i >= rowIndex; i--) {
+        for (int i = prevRowCount - 1; i >= rowIndex; i--) {
             Row row = rows.remove(i);
             int toIdx = i + nRows;
             if (row == null) {
@@ -242,8 +247,20 @@ public class TableData implements Table, Serializable {
         }
     }
 
+    private void createRowHeaders(int rowIndex, int nRows) {
+        if (rowHeaders == null) {
+            rowHeaders = new ArrayList<>();
+        }
+        for (int i = 0; i < nRows; i++) {
+            rowHeaders.add(rowIndex, new HeaderInfo());
+        }
+    }
+
     @Override
     public void removeRows(int rowIndex, int nRows) {
+        if (rowIndex < 0 || nRows < 1 || rowIndex + nRows > getRowCount()) {
+            throw new IllegalArgumentException();
+        }
         int i;
         for (i = rowIndex; i < getRowCount() - nRows; i++) {
             int fromIdx = i + nRows;
@@ -257,74 +274,99 @@ public class TableData implements Table, Serializable {
         for (; i < rowIndex + nRows; i++) {
             rows.remove(i);
         }
-        fixColumnCount(); // TODO this can be optimized
+        removeRowHeaders(rowIndex, nRows);
+    }
+
+    private void removeRowHeaders(int rowIndex, int nRows) {
+        for (int i = 0; i < nRows; i++) {
+            rowHeaders.remove(rowIndex);
+        }
     }
 
     @Override
     public void addColumns(int colIndex, int nCols) {
-        final int columns = getColumnCount();
+        final int prevColumnCount = getColumnCount();
+        if (colIndex < 0 || colIndex > prevColumnCount || nCols < 1) {
+            throw new IllegalArgumentException();
+        }
+        createColumnHeaders(colIndex, nCols);
         for (int r = 0; r < getRowCount(); r++) {
             Row row = getRow(r);
             if (row == null) {
                 continue;
             }
-            for (int c = columns - 1; c >= colIndex; c--) {
+            for (int c = prevColumnCount - 1; c >= colIndex; c--) {
                 // TODO review this cast
                 ((RowData) row).moveCell(c, c + nCols);
             }
         }
-        fixColumnCount();
+    }
+
+    private void createColumnHeaders(int colIndex, int nCols) {
+        if (columnHeaders == null) {
+            columnHeaders = new ArrayList<>();
+        }
+        for (int i = 0; i < nCols; i++) {
+            columnHeaders.add(colIndex, new HeaderInfo());
+        }
     }
 
     @Override
     public void removeColumns(int colIndex, int nCols) {
+        final int prevColumnCount = getColumnCount();
+        if (colIndex < 0 || nCols < 1 || colIndex + nCols > prevColumnCount) {
+            throw new IllegalArgumentException();
+        }
         for (int r = 0; r < getRowCount(); r++) {
             Row row = getRow(r);
             if (row == null) {
                 continue;
             }
             int c;
-            for (c = colIndex; c < getColumnCount() - nCols; c++) {
+            for (c = colIndex; c < prevColumnCount - nCols; c++) {
                 ((RowData) row).moveCell(c + nCols, c);
             }
             for (; c < colIndex + nCols; c++) {
                 ((RowData) row).removeCell(c);
             }
         }
-        fixColumnCount();
+        removeColumnHeaders(colIndex, nCols);
+    }
+
+    private void removeColumnHeaders(int colIndex, int nCols) {
+        for (int i = 0; i < nCols; i++) {
+            columnHeaders.remove(colIndex);
+        }
     }
 
     protected Row getOrCreateRow(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= getRowCount()) {
+            throw new IndexOutOfBoundsException();
+        }
         Row row = getRow(rowIndex);
         if (row == null) {
             row = new RowData();
+            if (rows == null) {
+                rows = new TreeSparseArray<>();
+            }
             rows.set(rowIndex, row);
         }
         return row;
     }
 
     protected Cell getOrCreateCell(int rowIndex, int columnIndex) {
+        if (rowIndex < 0 || rowIndex >= getRowCount() ||
+                columnIndex < 0 || columnIndex >= getColumnCount()) {
+            throw new IndexOutOfBoundsException();
+        }
         Row row = getOrCreateRow(rowIndex);
         Cell cell = row.getCell(columnIndex);
         if (cell == null) {
             cell = new CellData();
             // TODO review this
-            ((RowData) row).getCells().set(columnIndex, cell);
+            ((RowData) row).setCell(columnIndex, cell);
         }
         return cell;
-    }
-
-    @Deprecated
-    protected void fixColumnCount() {
-        int maxColumnCount = 0;
-        Iterator<Row> it = rows.values().iterator();
-        while (it.hasNext()) {
-            Row row = it.next();
-            if (maxColumnCount < row.getCellCount()) {
-                maxColumnCount = row.getCellCount();
-            }
-        }
-//        setColumnCount(maxColumnCount);
     }
 
     @Override

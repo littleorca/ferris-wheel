@@ -29,7 +29,17 @@ public class RowData implements Row, Serializable {
 
     @Override
     public Cell getCell(int index) {
+        if (cells == null) {
+            return null;
+        }
         return cells.get(index);
+    }
+
+    public void setCell(int columnIndex, Cell cell) {
+        if (cells == null) {
+            cells = new TreeSparseArray<>();
+        }
+        cells.set(columnIndex, cell);
     }
 
     @Override

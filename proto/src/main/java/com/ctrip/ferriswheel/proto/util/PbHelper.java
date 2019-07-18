@@ -229,7 +229,9 @@ public class PbHelper {
                 }
             }
         }
-        if (proto.hasAutomaton()) {
+        if (proto.hasAutomaton() &&
+                (proto.getAutomaton().hasQueryAutomaton() ||
+                        proto.getAutomaton().hasPivotAutomaton())) {
             com.ctrip.ferriswheel.proto.v1.TableAutomaton automatonProto = proto.getAutomaton();
             TableAutomatonInfo automaton = bean(automatonProto);
             table.automate(automaton);
