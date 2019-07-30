@@ -38,6 +38,8 @@ class AddFormForm extends React.Component<AddFormFormProps> {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
+        this.getFieldKey = this.getFieldKey.bind(this);
+        this.getFieldLabel = this.getFieldLabel.bind(this);
         this.renderPendingFieldForm = this.renderPendingFieldForm.bind(this);
     }
 
@@ -87,7 +89,16 @@ class AddFormForm extends React.Component<AddFormFormProps> {
         this.forceUpdate();
     }
 
-    render() {
+    protected getFieldKey(field: PendingField) {
+        return this.toReference(field);
+    }
+
+    protected getFieldLabel(field: PendingField) {
+        const prefix = typeof field.formField === "undefined" ? "　" : "✓";
+        return prefix + " " + this.toReference(field);
+    }
+
+    public render() {
         const className = classnames("add-form-form", this.props.className);
         return (
             <div
@@ -109,11 +120,8 @@ class AddFormForm extends React.Component<AddFormFormProps> {
                         addible={false}
                         removable={false}
                         sortable={false}
-                        getKey={field => this.toReference(field)}
-                        getLabel={field => {
-                            const prefix = typeof field.formField === "undefined" ? "　" : "✓";
-                            return prefix + " " + this.toReference(field);
-                        }}
+                        getKey={this.getFieldKey}
+                        getLabel={this.getFieldLabel}
                         afterChange={this.handleChange}
                     />
                 </Field>
@@ -121,31 +129,33 @@ class AddFormForm extends React.Component<AddFormFormProps> {
         );
     }
 
-    renderPendingFieldForm(props: EditorProps<PendingField>) {
+    protected renderPendingFieldForm(props: EditorProps<PendingField>) {
+        const handleCheckBoxChange = (newVal: boolean) => {
+            if (newVal && typeof props.value.formField === 'undefined') {
+                props.value.formField = this.createFormField(props.value);
+            } else {
+                props.value.formField = undefined;
+            }
+            this.handleChange(this.props.pendingFields);
+        };
+        const handleFieldChange = (field: FormField) => {
+            this.handleChange(this.props.pendingFields);
+        };
         return (
             <>
                 <Field
                     name="enable"
-                    disableLabel>
+                    disableLabel={true}>
                     <CheckBox
                         name="enable"
                         label="添加到表单"
                         value={typeof props.value.formField !== 'undefined'}
-                        afterChange={newVal => {
-                            if (newVal && typeof props.value.formField === 'undefined') {
-                                props.value.formField = this.createFormField(props.value);
-                            } else {
-                                props.value.formField = undefined;
-                            }
-                            this.handleChange(this.props.pendingFields);
-                        }} />
+                        afterChange={handleCheckBoxChange} />
                 </Field>
                 {typeof props.value.formField !== 'undefined' && (
                     <FormFieldForm
                         field={props.value.formField}
-                        afterChange={field => {
-                            this.handleChange(this.props.pendingFields);
-                        }} />
+                        afterChange={handleFieldChange} />
                 )}
             </>
         );

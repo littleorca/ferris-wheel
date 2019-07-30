@@ -14,6 +14,7 @@ import LayoutAsset from '../action/LayoutAsset';
 import GroupView, { GroupItem } from './GroupView';
 import FormForm from '../form/FormForm';
 import LayoutForm from '../form/LayoutForm';
+import StillFormEnclosure from "../form/StillFormEnclosure";
 import classnames from "classnames";
 
 interface FormViewProps extends SharedViewProps<FormView> {
@@ -22,10 +23,14 @@ interface FormViewProps extends SharedViewProps<FormView> {
 }
 
 class FormView extends React.Component<FormViewProps>{
+    private formFormChanged: boolean = false;
+
     constructor(props: FormViewProps) {
         super(props);
 
-        this.handleFormChange = this.handleFormChange.bind(this);
+        this.handleFormFormChange = this.handleFormFormChange.bind(this);
+        this.handleSubmitFormFormIfChanged = this.handleSubmitFormFormIfChanged.bind(this);
+        this.handleSubmitFormFormChange = this.handleSubmitFormFormChange.bind(this);
         this.handleLayoutChange = this.handleLayoutChange.bind(this);
         this.handleAction = this.handleAction.bind(this);
         this.applyAction = this.applyAction.bind(this);
@@ -42,7 +47,19 @@ class FormView extends React.Component<FormViewProps>{
         }
     }
 
-    protected handleFormChange() {
+    protected handleFormFormChange() {
+        this.formFormChanged = true;
+    }
+
+    protected handleSubmitFormFormIfChanged() {
+        if (!this.formFormChanged) {
+            return;
+        }
+        this.formFormChanged = false;
+        this.handleSubmitFormFormChange();
+    }
+
+    protected handleSubmitFormFormChange() {
         const updateForm = new UpdateForm("", this.props.form);
         this.handleAction(updateForm.wrapper());
     }
@@ -116,20 +133,26 @@ class FormView extends React.Component<FormViewProps>{
                 <GroupItem
                     name="form"
                     title="表单">
-                    <form onSubmit={e => e.preventDefault()}>
+                    <StillFormEnclosure
+                        noResetButton={true}
+                        submitLabel={"立即应用"}
+                        onSubmit={this.handleSubmitFormFormIfChanged}
+                        onDestroy={this.handleSubmitFormFormIfChanged}>
                         <FormForm
                             form={this.props.form}
-                            afterChange={this.handleFormChange} />
-                    </form>
+                            afterChange={this.handleFormFormChange} />
+                    </StillFormEnclosure>
                 </GroupItem>
                 <GroupItem
                     name="layout"
                     title="布局">
-                    <form onSubmit={e => e.preventDefault()}>
+                    <StillFormEnclosure
+                        noSubmitButton={true}
+                        noResetButton={true}>
                         <LayoutForm
                             layout={this.props.form.layout}
                             afterChange={this.handleLayoutChange} />
-                    </form>
+                    </StillFormEnclosure>
                 </GroupItem>
             </GroupView>
         );

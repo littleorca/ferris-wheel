@@ -4,7 +4,7 @@ import './Button.css';
 
 interface ButtonProps extends React.ClassAttributes<any> {
     name: string;
-    type?: "button" | "submit";
+    type?: "button" | "submit" | "reset";
     onClick?: (name: string, event: React.MouseEvent<HTMLButtonElement>) => void;
     label?: string;
     tips?: string;

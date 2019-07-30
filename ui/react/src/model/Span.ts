@@ -20,7 +20,7 @@ class Span {
         this.end = end;
     }
 
-    clone() {
+    public clone() {
         return new Span(this.start, this.end);
     }
 }

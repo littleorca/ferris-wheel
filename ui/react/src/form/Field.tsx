@@ -16,7 +16,7 @@ interface FieldProps<V> extends React.ClassAttributes<Field<V>> {
 }
 
 class Field<V> extends React.PureComponent<FieldProps<V>> {
-    render() {
+    public render() {
         const props = this.props;
         const className = classnames("field-container", props.className);
 

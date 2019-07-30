@@ -474,6 +474,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     void handleAction(LayoutAsset layoutAsset) {
         NamedAsset asset = getAsset(layoutAsset.getAssetName());
         if (asset == null) {
+            // FIXME if asset is null, should mean to layout sheet itself
             throw new IllegalArgumentException("Asset not found, name=" + layoutAsset.getAssetName());
         } else if (!(asset instanceof Displayable)) {
             throw new IllegalArgumentException("Asset \"" + asset.getName() + "\" no displayable.");

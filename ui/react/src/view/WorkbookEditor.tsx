@@ -35,6 +35,7 @@ import { PendingField } from '../form/AddFormForm';
 import AddFormDialog from './AddFormDialog';
 import Extension, { QueryWizard } from '../extension/Extension';
 import Dialog from './Dialog';
+import { ModalProps } from './Modal';
 import Loading from 'react-loading';
 import classnames from "classnames";
 import './WorkbookEditor.css';
@@ -143,7 +144,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         };
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         const sideBar = this.sideBarRef.current;
         if (!sideBar) {
             throw Error("Missing sidebar!");
@@ -253,15 +254,20 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
         if (typeof wizard === 'undefined') {
             throw new Error('Wizard component not found: ' + name); // TODO review
         }
-        Dialog.show(props => <wizard.component
-            onOk={queryTemplate => {
+        const wizardRender = (props: ModalProps) => {
+            const onOk = (queryTemplate: QueryTemplate) => {
                 props.close();
                 this.handleQueryWizardOk(queryTemplate);
-            }}
-            onCancel={() => {
+            };
+            const onCancel = () => {
                 props.close();
                 this.handleQueryWizardCancelled();
-            }} />);
+            };
+            return (<wizard.component
+                onOk={onOk}
+                onCancel={onCancel} />);
+        };
+        Dialog.show(wizardRender);
     }
 
     protected handleQueryWizardOk(queryTemplate: QueryTemplate) {
@@ -269,6 +275,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
     }
 
     protected handleQueryWizardCancelled() {
+        // TBD
     }
 
     protected handleAddQueryTable() {
@@ -547,8 +554,7 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         className="sidebar"
                         style={{
                             display: this.state.showSidebar ? undefined : "none"
-                        }}>
-                    </div>
+                        }} />
                 </div>
                 <div className="editor-footer">
                     <span className="editor-footer-item message">
@@ -586,6 +592,26 @@ class WorkbookEditor extends React.Component<WorkbookEditorProps, WorkbookEditor
                         label="保存"
                         className="primary"
                         onClick={this.handleSave} />
+                    {/* <DropdownButton
+                        className="primary"
+                        primary={{
+                            name: "save",
+                            label: "保存",
+                            className: "primary",
+                            tips: "保存编辑内容使之生效。",
+                            onClick: this.handleSave
+                        }}
+                        items={[{
+                            name: "save-and-close",
+                            label: "保存并关闭",
+                            tips: "保存编辑内容并关闭。",
+                            onClick: this.handleSaveAndClose
+                        }, {
+                            name: "close-without-save",
+                            label: "放弃编辑并关闭",
+                            tips: "放弃编辑内容直接关闭。",
+                            onClick: this.handleCloseWithoutSave
+                        }]} /> */}
                 </Group>
                 <Group>
                     <Button

@@ -11,8 +11,8 @@ class SubmitForm extends SheetAction {
         const formName = input.formName;
         const params: Parameter[] = [];
         if (Array.isArray(input.params)) {
-            for (let i = 0; i < input.params.length; i++) {
-                params.push(Parameter.deserialize(input.params[i]));
+            for (const param of input.params) {
+                params.push(Parameter.deserialize(param));
             }
         }
         return new SubmitForm(sheetName, formName, params);

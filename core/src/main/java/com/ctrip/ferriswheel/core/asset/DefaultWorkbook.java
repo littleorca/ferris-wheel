@@ -883,9 +883,9 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, Referen
                 null,
                 null,
                 null);
-        // if (table.getAutomaton() instanceof DefaultQueryAutomaton) {
-        // updateNamedReferences((DefaultQueryAutomaton) table.getAutomaton());
-        // }
+        if (table.getAutomaton() instanceof DefaultQueryAutomaton) {
+            updateNamedReferences((DefaultQueryAutomaton) table.getAutomaton());
+        }
     }
 
     /**

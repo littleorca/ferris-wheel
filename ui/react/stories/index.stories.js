@@ -70,6 +70,7 @@ import GridTableManipulateStories from './table/GridTableManipulate.stories';
 import GridTableCustomStories from './table/GridTableCustom.stories';
 
 import DefaultThemeEditor from "./theme/DefaultThemeEditor.stories";
+import StillFormStories from './form/StillForm.stories';
 
 // storiesOf('Welcome', module)
 //   .add('Example', () => <ExampleStories />);
@@ -83,21 +84,27 @@ storiesOf('Control', module)
   .add('Button', () =>
     <div>
       <h3>Button</h3>
-      <Button
-        name="btn-demo"
-        label="Button Demo"
-        tips="This is a button demonstration."
-        onClick={action('Button click')} />
-      <Button
-        name="btn-demo-disabled"
-        label="Disabled Button"
-        tips="This is a disabled button demonstration."
-        disabled={true}
-        onClick={action('Button click')} />
-      <Button
-        label="Anchor"
-        tips="A button style anchor"
-        href="/" />
+      <div>
+        <Button
+          name="btn-demo"
+          label="Button Demo"
+          tips="This is a button demonstration."
+          onClick={action('Button click')} />
+        <Button
+          name="btn-demo-disabled"
+          label="Disabled Button"
+          tips="This is a disabled button demonstration."
+          disabled={true}
+          onClick={action('Button click')} />
+        <Button
+          label="Anchor"
+          tips="A button style anchor"
+          href="/" />
+      </div>
+      <div>
+        <Button name="Submit" type="submit" />
+        <Button name="Reset" type="reset" />
+      </div>
     </div>)
   .add('CheckBox', () => <CheckBoxStories />)
   .add('ColorInput', () => <ColorInputStories />)
@@ -206,7 +213,8 @@ storiesOf('Form', module)
   .add('SeriesBinderForm', () => <SeriesBinderFormStories />)
   .add('SeriesForm', () => <SeriesFormStories />)
   .add('SmartField', () => <SmartFieldStories />)
-  .add('SmartForm', () => <SmartFormStories />);
+  .add('SmartForm', () => <SmartFormStories />)
+  .add('StillForm', () => <StillFormStories />);
 
 
 storiesOf('GridTable', module)

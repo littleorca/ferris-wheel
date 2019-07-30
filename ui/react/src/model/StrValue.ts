@@ -4,9 +4,9 @@ import UnionValue from "./UnionValue";
 class StrValue extends UnionValue {
     public string: string;
 
-    constructor(string: string, formula?: string) {
+    constructor(str: string, formula?: string) {
         super(formula);
-        this.string = string;
+        this.string = str;
     }
 
     public valueType() {

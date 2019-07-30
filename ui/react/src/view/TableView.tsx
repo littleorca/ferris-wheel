@@ -7,7 +7,7 @@ import UnionValue from '../model/UnionValue';
 import Parameter from '../model/Parameter';
 import Values from '../model/Values';
 import QueryAutomaton from '../model/QueryAutomaton';
-import UnionValueEdit, { fromEditableString } from '../ctrl/UnionValueEdit';
+import UnionValueEdit, { fromEditableString, UnionValueEditMode } from '../ctrl/UnionValueEdit';
 import EditableText from '../ctrl/EditableText';
 import GridTable, { CustomEditorProps } from '../table/GridTable';
 import Cell from '../model/Cell';
@@ -39,6 +39,8 @@ import LayoutForm from '../form/LayoutForm';
 import QueryTemplate from '../model/QueryTemplate';
 import Dialog from './Dialog';
 import FormatFormDialog from './FormatFormDialog';
+import { ModalProps } from './Modal';
+import StillFormEnclosure from '../form/StillFormEnclosure';
 import classnames from "classnames";
 import './TableView.css';
 
@@ -49,9 +51,11 @@ interface TableViewProps extends SharedViewProps<TableView> {
 }
 
 class TableView extends React.Component<TableViewProps>{
+    private readonly VALUE_MODES: UnionValueEditMode[] = ["formula", "decimal", "boolean", "date", "string"];
+
     private tableRef: React.RefObject<GridTable<Cell>> = React.createRef();
-    // private tableData: GridData<Cell>;
     private queryWizardMap: Map<string, QueryWizard> = new Map();
+    private automatonChanged: boolean = false;
 
     constructor(props: TableViewProps) {
         super(props);
@@ -76,6 +80,8 @@ class TableView extends React.Component<TableViewProps>{
 
         this.handleFormatCell = this.handleFormatCell.bind(this);
         this.handleAutomatonChange = this.handleAutomatonChange.bind(this);
+        this.handleSubmitAutomatonIfChanged = this.handleSubmitAutomatonIfChanged.bind(this);
+        this.handleSubmitAutomatonChange = this.handleSubmitAutomatonChange.bind(this);
 
         this.handleQuery = this.handleQuery.bind(this);
         this.handleLayoutChange = this.handleLayoutChange.bind(this);
@@ -83,8 +89,6 @@ class TableView extends React.Component<TableViewProps>{
         this.applyAction = this.applyAction.bind(this);
 
         this.renderUnionValueEditor = this.renderUnionValueEditor.bind(this);
-
-        // this.tableData = this.prepareTableData(props.table);
 
         if (typeof this.props.extensions !== 'undefined') {
             this.props.extensions.forEach((value, index) => {
@@ -100,48 +104,11 @@ class TableView extends React.Component<TableViewProps>{
         }
     }
 
-    // public componentDidUpdate(prevProps: TableViewProps) {
-    //     // maybe skip update to prevent performance issue.
-    //     if (this.props.table !== prevProps.table) {
-    //         this.tableData = this.prepareTableData(this.props.table);
-    //     }
-    // }
-
     public componentWillUnmount() {
         if (typeof this.props.herald !== 'undefined') {
             this.props.herald.unsubscribe(this.applyAction);
         }
     }
-
-    // protected prepareTableData(data: Table): GridData<Cell> {
-    //     const columnHeaders: Header[] = [];
-    //     const rowHeaders: Header[] = [];
-    //     const rows: GridCell<Cell>[][] = [];
-
-    //     data.columnHeaders.forEach(columnHeader =>
-    //         columnHeaders.push(new Header(/* TBD */)));
-
-    //     data.rowHeaders.forEach((rowHeader, rowIndex) => {
-    //         rowHeaders.push(new Header(/* TBD */));
-
-    //         rows[rowIndex] = [];
-    //         data.columnHeaders.forEach((columnHeader, columnIndex) => {
-    //             rows[rowIndex][columnIndex] = new GridData<Cell>();
-    //         });
-    //     });
-
-    //     data.rows.forEach(tableRow => {
-    //         tableRow.cells.forEach(tableCell => {
-    //             const cellData = rows[tableRow.rowIndex][tableCell.columnIndex];
-    //             cellData.setData(tableCell);
-    //             if (tableCell.value.valueType() === VariantType.DECIMAL) {
-    //                 cellData.setAlign("right");
-    //             }
-    //         });
-    //     });
-
-    //     return new GridData<Cell>(columnHeaders, rowHeaders, rows);
-    // }
 
     protected getCell(row: number, column: number): Cell | undefined {
         return this.props.table.getCellData(row, column).getData();
@@ -375,7 +342,6 @@ class TableView extends React.Component<TableViewProps>{
 
     protected applyResetTable(resetTable: ResetTable) {
         Object.assign(this.props.table, resetTable.table);
-        // this.tableData = this.prepareTableData(this.props.table);
         if (this.tableRef.current) {
             this.tableRef.current.validSelection();
         }
@@ -478,6 +444,18 @@ class TableView extends React.Component<TableViewProps>{
     }
 
     protected handleAutomatonChange() {
+        this.automatonChanged = true;
+    }
+
+    protected handleSubmitAutomatonIfChanged() {
+        if (!this.automatonChanged) {
+            return;
+        }
+        this.automatonChanged = false;
+        this.handleSubmitAutomatonChange();
+    }
+
+    protected handleSubmitAutomatonChange() {
         const table = this.props.table;
         const automateTable = new AutomateTable("", table.name, table.automaton);
         this.handleAction(automateTable.wrapper());
@@ -575,6 +553,7 @@ class TableView extends React.Component<TableViewProps>{
                     width: "100%",
                     height: "100%",
                 }}
+                modes={this.VALUE_MODES}
                 value={value}
                 initialUpdate={initialUpdate}
                 focusByDefault={true}
@@ -599,23 +578,31 @@ class TableView extends React.Component<TableViewProps>{
                         name="query"
                         title="查询模板">
                         {this.showQueryWizardButtonIfPossible(table.automaton.queryAutomaton.template,
-                            this.handleAutomatonChange)}
-                        <form onSubmit={e => e.preventDefault()}>
+                            this.handleSubmitAutomatonChange)}
+                        <StillFormEnclosure
+                            noResetButton={true}
+                            submitLabel={"立即应用"}
+                            onSubmit={this.handleSubmitAutomatonIfChanged}
+                            onDestroy={this.handleSubmitAutomatonIfChanged}>
                             <QueryTemplateForm
                                 queryTemplate={table.automaton.queryAutomaton.template}
                                 afterChange={this.handleAutomatonChange} />
-                        </form>
+                        </StillFormEnclosure>
                     </GroupItem>
                 )}
                 {table.automaton.pivotAutomaton && (
                     <GroupItem
                         name="pivot"
                         title="透视表">
-                        <form onSubmit={e => e.preventDefault()}>
+                        <StillFormEnclosure
+                            noResetButton={true}
+                            submitLabel={"立即应用"}
+                            onSubmit={this.handleSubmitAutomatonIfChanged}
+                            onDestroy={this.handleSubmitAutomatonIfChanged}>
                             <PivotForm
                                 pivot={table.automaton.pivotAutomaton}
                                 afterChange={this.handleAutomatonChange} />
-                        </form>
+                        </StillFormEnclosure>
                     </GroupItem>
                 )}
                 {isTableEditable && (
@@ -676,22 +663,24 @@ class TableView extends React.Component<TableViewProps>{
                 <GroupItem
                     name="layout"
                     title="布局">
-                    <form onSubmit={e => e.preventDefault()}>
+                    <StillFormEnclosure
+                        noSubmitButton={true}
+                        noResetButton={true}>
                         <LayoutForm
                             layout={table.layout}
                             afterChange={this.handleLayoutChange} />
-                    </form>
+                    </StillFormEnclosure>
                 </GroupItem>
             </GroupView>
         );
     }
+
     protected showQueryWizardButtonIfPossible(queryTemplate: QueryTemplate, handleAutomatonChange: () => void) {
         if (typeof this.props.extensions === "undefined") {
             return;
         }
-        let wizard: QueryWizard | undefined = undefined;
-        for (let i = 0; i < this.props.extensions.length; i++) {
-            const extension = this.props.extensions[i];
+        let wizard: QueryWizard | undefined/* = undefined*/;
+        for (const extension of this.props.extensions) {
             if (typeof extension.queryWizard === "undefined") {
                 continue;
             }
@@ -704,15 +693,19 @@ class TableView extends React.Component<TableViewProps>{
             return;
         }
         const nonNullWizard = wizard;
-        const openWizard = () => {
-            Dialog.show(props => <nonNullWizard.component
+        const wizardRenderer = (props: ModalProps) => {
+            const handleOk = (result: QueryTemplate) => {
+                props.close();
+                Object.assign(queryTemplate, result);
+                handleAutomatonChange();
+            };
+            return <nonNullWizard.component
                 initialQueryTemplate={queryTemplate}
-                onOk={(result) => {
-                    props.close();
-                    Object.assign(queryTemplate, result);
-                    handleAutomatonChange();
-                }}
-                onCancel={() => { props.close(); }} />);
+                onOk={handleOk}
+                onCancel={props.close} />;
+        };
+        const openWizard = () => {
+            Dialog.show(wizardRenderer);
         }
         return (
             <div className="query-wizard-actions">
@@ -732,7 +725,7 @@ class TableView extends React.Component<TableViewProps>{
             //     return;
             // }
             // const sheet = this.state.currentSheet;
-            let formatSet = new Set<string>();
+            const formatSet = new Set<string>();
             const table = this.tableRef.current;
             const selection = table ? table.getSelection() : null;
             if (selection !== null) {

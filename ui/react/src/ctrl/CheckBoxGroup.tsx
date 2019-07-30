@@ -29,7 +29,7 @@ class CheckBoxGroup extends InputCtrl<string[], CheckBoxGroupProps> {
         this.afterChange(value);
     }
 
-    render() {
+    public render() {
         const props = this.props;
         const className = classnames("check-box-group", props.className);
 
@@ -38,12 +38,13 @@ class CheckBoxGroup extends InputCtrl<string[], CheckBoxGroupProps> {
                 style={props.style}>
                 {props.options.map((opt, i) => {
                     const label = typeof opt.label !== "undefined" ? opt.label : opt.value;
+                    const afterChange = (checked: boolean) => this.handleChange(opt, checked);
                     return (
                         <CheckBox
                             key={i + ":" + opt.value}
                             label={label}
                             value={props.value.indexOf(opt.value) !== -1}
-                            afterChange={checked => this.handleChange(opt, checked)}
+                            afterChange={afterChange}
                         />
                     )
                 })}

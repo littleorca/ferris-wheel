@@ -28,7 +28,7 @@ class Grid {
         this.row = row;
     }
 
-    clone() {
+    public clone() {
         return new Grid(this.columns,
             this.rows,
             this.column.clone(),

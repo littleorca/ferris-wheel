@@ -5,9 +5,9 @@ type HorizontalOrientation = "left" | "right" | "N/A";
 type VerticalOrientation = "up" | "down" | "N/A";
 
 class Selection {
-    mode: SelectMode;
-    start: CellPosition;
-    end: CellPosition;
+    public mode: SelectMode;
+    public start: CellPosition;
+    public end: CellPosition;
 
     constructor(mode: SelectMode, start: CellPosition, end: CellPosition) {
         this.mode = mode;

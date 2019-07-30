@@ -59,12 +59,12 @@ public class DefaultForm extends SheetAssetNode implements Form {
     }
 
     @Override
-    public FormField getField(int index) {
+    public DefaultFormField getField(int index) {
         return fields.get(index);
     }
 
     @Override
-    public FormField getField(String name) {
+    public DefaultFormField getField(String name) {
         return fields.get(name);
     }
 

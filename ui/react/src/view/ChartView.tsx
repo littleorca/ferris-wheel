@@ -28,6 +28,7 @@ import ChartForm from '../form/ChartForm';
 import LayoutForm from '../form/LayoutForm';
 import Layout from '../model/Layout';
 import LayoutAsset from '../action/LayoutAsset';
+import StillFormEnclosure from "../form/StillFormEnclosure";
 import classnames from "classnames";
 import './ChartView.css';
 
@@ -42,10 +43,14 @@ interface ChartViewState {
 }
 
 class ChartView extends React.Component<ChartViewProps, ChartViewState>{
+    private chartChanged: boolean = false;
+
     constructor(props: ChartViewProps) {
         super(props);
 
         this.handleChartChange = this.handleChartChange.bind(this);
+        this.handleSubmitChartIfChanged = this.handleSubmitChartIfChanged.bind(this);
+        this.handleSubmitChartChange = this.handleSubmitChartChange.bind(this);
         this.handleLayoutChange = this.handleLayoutChange.bind(this);
         this.handleAction = this.handleAction.bind(this);
         this.applyAction = this.applyAction.bind(this);
@@ -162,9 +167,21 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
     }
 
     protected handleChartChange() {
+        this.chartChanged = true;
+    };
+
+    protected handleSubmitChartIfChanged() {
+        if (!this.chartChanged) {
+            return;
+        }
+        this.chartChanged = false;
+        this.handleSubmitChartChange();
+    }
+
+    protected handleSubmitChartChange() {
         const updateChart = new UpdateChart("", this.props.chart);
         this.handleAction(updateChart.wrapper());
-    };
+    }
 
     protected handleLayoutChange(layout: Layout) {
         const layoutAsset = new LayoutAsset("", this.props.chart.name, layout);
@@ -232,20 +249,26 @@ class ChartView extends React.Component<ChartViewProps, ChartViewState>{
                 <GroupItem
                     name="chart"
                     title="图表">
-                    <form onSubmit={e => e.preventDefault()}>
+                    <StillFormEnclosure
+                        noResetButton={true}
+                        submitLabel={"立即应用"}
+                        onSubmit={this.handleSubmitChartIfChanged}
+                        onDestroy={this.handleSubmitChartIfChanged}>
                         <ChartForm
                             chart={this.props.chart}
                             afterChange={this.handleChartChange} />
-                    </form>
+                    </StillFormEnclosure>
                 </GroupItem>
                 <GroupItem
                     name="layout"
                     title="布局">
-                    <form onSubmit={e => e.preventDefault()}>
+                    <StillFormEnclosure
+                        noSubmitButton={true}
+                        noResetButton={true}>
                         <LayoutForm
                             layout={this.props.chart.layout}
                             afterChange={this.handleLayoutChange} />
-                    </form>
+                    </StillFormEnclosure>
                 </GroupItem>
             </GroupView>
         );

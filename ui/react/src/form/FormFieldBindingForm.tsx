@@ -25,7 +25,7 @@ class FormFieldBindingForm extends React.Component<FormFieldBindingFormProps>{
         }
     }
 
-    render() {
+    public render() {
         const className = classnames("form-field-binding-form", this.props.className);
         const binding = this.props.binding;
         return (

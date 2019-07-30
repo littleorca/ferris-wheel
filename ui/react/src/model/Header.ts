@@ -6,7 +6,7 @@ class Header extends RectangleImpl {
     private id: number;
     // TBD
 
-    static deserialize(input: any) {
+    public static deserialize(input: any) {
         return new Header();
     }
 
@@ -15,7 +15,7 @@ class Header extends RectangleImpl {
         this.id = Header.sequence++;
     }
 
-    getId() {
+    public getId() {
         return this.id;
     }
 }

@@ -38,7 +38,7 @@ export function PlotlyLineChart(props: ChartRendererProps) {
     const plotData: any = [];
 
     chartData.series.forEach(s => {
-        let categories = chartData.categories;
+        const categories = chartData.categories;
         if (categories.length === 0) {
             s.yValues.forEach((v, i) => {
                 categories.push(String(i));
@@ -77,7 +77,7 @@ export function PlotlyLineChart(props: ChartRendererProps) {
         data={plotData}
         config={plotConfig}
         layout={layout}
-        useResizeHandler
+        useResizeHandler={true}
     />
 }
 
@@ -88,7 +88,7 @@ export function PlotlyBarChart(props: ChartRendererProps) {
     const isHorizontal = (chartData.yAxis.placement === Placement.BOTTOM);
 
     chartData.series.forEach(s => {
-        let categories = chartData.categories;
+        const categories = chartData.categories;
         if (categories.length === 0) {
             s.yValues.forEach((v, i) => {
                 categories.push(String(i));
@@ -131,7 +131,7 @@ export function PlotlyBarChart(props: ChartRendererProps) {
         data={plotData}
         config={plotConfig}
         layout={layout}
-        useResizeHandler
+        useResizeHandler={true}
     />
 }
 
@@ -144,10 +144,10 @@ function _internalPlotlyPieChart(props: ChartRendererProps, hole?: number) {
     const rows = Math.ceil(pieCount / columns);
 
     chartData.series.forEach((s, i) => {
-        let categories = chartData.categories;
+        const categories = chartData.categories;
         if (categories.length === 0) {
-            s.yValues.forEach((v, i) => {
-                categories.push(String(i));
+            s.yValues.forEach((v, j) => {
+                categories.push(String(j));
             })
         }
         const trace: any = {
@@ -184,7 +184,7 @@ function _internalPlotlyPieChart(props: ChartRendererProps, hole?: number) {
         data={plotData}
         config={plotConfig}
         layout={layout}
-        useResizeHandler
+        useResizeHandler={true}
     />
 }
 
@@ -201,7 +201,7 @@ export function PlotlyRadarChart(props: ChartRendererProps) {
     const plotData: any = [];
 
     chartData.series.forEach(s => {
-        let categories = chartData.categories;
+        const categories = chartData.categories;
         if (categories.length === 0) {
             s.yValues.forEach((v, i) => {
                 categories.push(String(i));
@@ -236,7 +236,7 @@ export function PlotlyRadarChart(props: ChartRendererProps) {
         data={plotData}
         config={plotConfig}
         layout={layout}
-        useResizeHandler
+        useResizeHandler={true}
     />
 }
 
@@ -245,7 +245,7 @@ export function PlotlyScatterChart(props: ChartRendererProps) {
     const plotData: any = [];
 
     chartData.series.forEach(s => {
-        let categories = chartData.categories;
+        const categories = chartData.categories;
         if (categories.length === 0) {
             s.yValues.forEach((v, i) => {
                 categories.push(String(i));
@@ -282,7 +282,7 @@ export function PlotlyScatterChart(props: ChartRendererProps) {
         data={plotData}
         config={plotConfig}
         layout={layout}
-        useResizeHandler
+        useResizeHandler={true}
     />
 }
 
@@ -302,7 +302,7 @@ export function PlotlyBubbleChart(props: ChartRendererProps) {
     })
 
     chartData.series.forEach(s => {
-        let categories = chartData.categories;
+        const categories = chartData.categories;
         if (categories.length === 0) {
             s.yValues.forEach((v, i) => {
                 categories.push(String(i));
@@ -341,6 +341,6 @@ export function PlotlyBubbleChart(props: ChartRendererProps) {
         data={plotData}
         config={plotConfig}
         layout={layout}
-        useResizeHandler
+        useResizeHandler={true}
     />
 }

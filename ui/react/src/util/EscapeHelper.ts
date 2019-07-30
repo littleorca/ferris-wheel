@@ -13,8 +13,9 @@ class EscapeHelper {
 
     public static escapeName(name: string) {
         let escapedName = this.SINGLE_QUOTE;
-        let offset = 0, pos;
-        while ((pos = name.indexOf(this.SINGLE_QUOTE, offset)) != -1) {
+        let offset = 0;
+        let pos;
+        while ((pos = name.indexOf(this.SINGLE_QUOTE, offset)) !== -1) {
             escapedName += name.substring(offset, pos) + this.SINGLE_QUOTE + this.SINGLE_QUOTE;
             offset = pos + 1;
         }
@@ -32,19 +33,19 @@ class EscapeHelper {
         let sb = "";
         let pos = 1;
         let offset = pos;
-        while ((pos = name.indexOf(this.SINGLE_QUOTE, offset)) != -1) {
+        while ((pos = name.indexOf(this.SINGLE_QUOTE, offset)) !== -1) {
             if (pos > offset) {
                 sb += name.substring(offset, pos);
             }
             offset = pos + 1;
-            if (offset < name.length && name.charAt(offset) == this.SINGLE_QUOTE) {
+            if (offset < name.length && name.charAt(offset) === this.SINGLE_QUOTE) {
                 sb += this.SINGLE_QUOTE;
                 offset++;
             } else {
                 break;
             }
         }
-        if (offset != name.length) {
+        if (offset !== name.length) {
             throw new Error();
         }
         return sb;

@@ -43,13 +43,15 @@
       inset 0 0 1em rgba(0, 0, 0, .4);
 }
 
-.workbook-editor .editor-header .toolbar .button.primary {
+.workbook-editor .editor-header .toolbar .button.primary,
+.workbook-editor .editor-header .toolbar .button.primary .dropdown-trigger {
     color: #fff;
     background: #399;
     border-color: #388;
 }
 
-.workbook-editor .editor-header .toolbar .button.primary:hover {
+.workbook-editor .editor-header .toolbar .button.primary:hover,
+.workbook-editor .editor-header .toolbar .button.primary .dropdown-trigger:hover {
     background: #388;
 }
 
@@ -222,4 +224,14 @@
 
 .workbook-loading {
     fill: rgba(82, 133, 125, 0.75) !important;
+}
+
+.still-form-enclosure .still-form-action button[type="submit"] {
+    color: #f6f6f6;
+    background: rgb(77, 193, 109);
+}
+
+.still-form-enclosure .still-form-action button[type="submit"]:hover {
+    color: #fff;
+    background: rgb(66, 180, 98);
 }

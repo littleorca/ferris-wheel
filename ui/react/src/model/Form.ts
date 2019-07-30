@@ -34,7 +34,7 @@ class Form {
         this.layout = layout;
     }
 
-    clone() {
+    public clone() {
         return Form.deserialize(this);
     }
 }

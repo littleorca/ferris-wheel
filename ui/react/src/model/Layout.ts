@@ -37,7 +37,7 @@ class Layout {
         this.grid = grid;
     }
 
-    clone() {
+    public clone() {
         return new Layout(this.display,
             this.width,
             this.height,

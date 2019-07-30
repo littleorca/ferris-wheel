@@ -145,8 +145,8 @@ class SmartField extends React.PureComponent<SmartFieldProps> {
         } else if (!field.value.isBlank()) {
             value.push(field.value.toString());
         }
-        const handleChange = (value: string[]) => {
-            const values = value.map(v => field.type === VariantType.DECIMAL ?
+        const handleChange = (newValues: string[]) => {
+            const values = newValues.map(v => field.type === VariantType.DECIMAL ?
                 Values.dec(v) : Values.str(v));
             field.value = Values.list(values);
             this.afterChange();
@@ -170,8 +170,8 @@ class SmartField extends React.PureComponent<SmartFieldProps> {
                 name={field.name}
                 value={value}
                 options={options}
-                afterChange={value => {
-                    field.value = Values.withType(field.type, value);
+                afterChange={newValue => {
+                    field.value = Values.withType(field.type, newValue);
                     this.afterChange();
                 }} />
         );

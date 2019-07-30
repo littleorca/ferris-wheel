@@ -62,7 +62,7 @@ class SheetAsset {
         throw new Error('Illegal asset.');
     }
 
-    clone() {
+    public clone() {
         return new SheetAsset(
             this.table ? this.table.clone() : undefined,
             this.chart ? this.chart.clone() : undefined,

@@ -39,7 +39,7 @@ class DateSelect extends InputCtrl<Date, DateSelectProps, DateSelectState> {
         this.setState({ isOpen: false });
     }
 
-    render() {
+    public render() {
         const props = this.props;
         const className = classnames("date-select", props.className);
         const dt = props.value;
@@ -52,7 +52,7 @@ class DateSelect extends InputCtrl<Date, DateSelectProps, DateSelectState> {
                 preferPlace="below"
                 onOuterAction={this.handleClose}
                 body={<DatePicker
-                    inline
+                    inline={true}
                     dateFormat={format}
                     selected={dt}
                     showTimeSelect={true}

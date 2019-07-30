@@ -1,5 +1,5 @@
 import * as React from "react";
-import EditableList from "../ctrl/EditableList";
+import EditableList, { EditorProps } from "../ctrl/EditableList";
 import Form from "../model/Form";
 import FormField from "../model/FormField";
 import FormFieldForm from "../form/FormFieldForm";
@@ -15,20 +15,29 @@ class FormForm extends React.Component<FormFormProps> {
     constructor(props: FormFormProps) {
         super(props);
 
+        this.getFormFieldLabel = this.getFormFieldLabel.bind(this);
+        this.createFormField = this.createFormField.bind(this);
         this.afterChange = this.afterChange.bind(this);
+
+        this.renderEditor = this.renderEditor.bind(this);
     }
 
     protected getFormFieldLabel(field: FormField, index: number) {
         return field.name || field.label || "[" + index + "]";
     }
 
+    protected createFormField() {
+        return new FormField();
+    }
+
     protected afterChange() {
         if (typeof this.props.afterChange !== "undefined") {
             this.props.afterChange(this.props.form);
         }
+        this.forceUpdate();
     }
 
-    render() {
+    public render() {
         const form = this.props.form;
 
         return (
@@ -52,16 +61,21 @@ class FormForm extends React.Component<FormFormProps> {
                     <EditableList<FormField>
                         list={form.fields}
                         getLabel={this.getFormFieldLabel}
-                        createItem={() => new FormField()}
-                        editor={props => <FormFieldForm
-                            field={props.value}
-                            afterChange={(field: FormField) => {
-                                this.afterChange();
-                            }} />}
+                        createItem={this.createFormField}
+                        editor={this.renderEditor}
                         afterChange={this.afterChange} />
                 </Field>
             </div>
         );
+    }
+
+    protected renderEditor(props: EditorProps<FormField>) {
+        const afterChange = (field: FormField) => {
+            this.afterChange();
+        };
+        return <FormFieldForm
+            field={props.value}
+            afterChange={afterChange} />;
     }
 }
 

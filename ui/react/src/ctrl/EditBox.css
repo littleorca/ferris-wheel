@@ -1,6 +1,8 @@
 textarea.edit-box {
     border: 1px solid #ccc;
     font-size: inherit;
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 textarea.edit-box.singleline {

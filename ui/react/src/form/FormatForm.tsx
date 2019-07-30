@@ -69,7 +69,7 @@ class FormatForm extends React.Component<FormatFormProps> {
         this.props.onChange(format);
     }
 
-    render() {
+    public render() {
         const className = classnames("format-form", this.props.className);
         const format = this.props.format;
         const option = Formatter.parseFormat(format);
@@ -144,7 +144,7 @@ export class DecimalFormat extends React.Component<DecimalFormatProps> {
         this.props.onChange(Formatter.createFormat(this.props.option));
     }
 
-    render() {
+    public render() {
         const option = this.props.option;
 
         const sampleValue =
@@ -212,7 +212,7 @@ export class DateTimeFormat extends React.Component<DateTimeFormatProps> {
         this.props.onChange(format);
     }
 
-    render() {
+    public render() {
         const format = this.props.option.format;
         const date = new Date();
         const sampleValue =

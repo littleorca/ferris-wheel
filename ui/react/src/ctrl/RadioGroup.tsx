@@ -18,7 +18,7 @@ class RadioGroup extends InputCtrl<string, RadioGroupProps> {
         this.afterChange(value);
     }
 
-    render() {
+    public render() {
         const props = this.props;
         const className = classnames("radio-group", props.className);
 

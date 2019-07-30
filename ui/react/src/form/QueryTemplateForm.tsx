@@ -75,7 +75,7 @@ class QueryTemplateForm extends React.Component<QueryTemplateFormProps> {
                         afterChange={this.handleSchemeChange} />
                 </label>
                 <div className="builtin-params">
-                    <label>内置参数</label>
+                    <label>参数</label>
                     <EditableList<Parameter>
                         list={queryTemplate.builtinParams}
                         getLabel={this.getParamLabel}

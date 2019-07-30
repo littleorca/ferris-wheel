@@ -27,17 +27,17 @@
     transition: 200ms all;
 }
 
+.button:disabled,
+.button.disabled {
+    color: #999;
+    background: #f6f6f6;
+    box-shadow: none;
+}
+
 .button.big {
     font-size: 1.25em;
 }
 
 .button.small {
     font-size: .875em;
-}
-
-.button:disabled,
-.button.disabled {
-    color: #999;
-    background: #f6f6f6;
-    box-shadow: none;
 }

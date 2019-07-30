@@ -25,6 +25,7 @@ class TextView extends React.Component<TextViewProps> {
 
         this.afterChange = this.afterChange.bind(this);
         this.handleLayoutChange = this.handleLayoutChange.bind(this);
+        this.preventDefault = this.preventDefault.bind(this);
         this.handleAction = this.handleAction.bind(this);
         this.applyAction = this.applyAction.bind(this);
 
@@ -81,6 +82,10 @@ class TextView extends React.Component<TextViewProps> {
         this.forceUpdate();
     }
 
+    protected preventDefault(e: React.FormEvent) {
+        e.preventDefault();
+    }
+
     public render() {
         const text = this.props.text;
 
@@ -111,7 +116,7 @@ class TextView extends React.Component<TextViewProps> {
                 <GroupItem
                     name="layout"
                     title="布局">
-                    <form onSubmit={e => e.preventDefault()}>
+                    <form onSubmit={this.preventDefault}>
                         <LayoutForm
                             layout={this.props.text.layout}
                             afterChange={this.handleLayoutChange} />

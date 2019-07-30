@@ -1,5 +1,5 @@
 import * as React from "react";
-import Modal from "./Modal";
+import Modal, { ModalProps } from "./Modal";
 import Dialog from "./Dialog";
 import FormatForm from "../form/FormatForm";
 import classnames from "classnames";
@@ -33,7 +33,7 @@ class FormatFormDialog extends React.Component<
         this.setState({ pendingFormat: format });
     }
 
-    render() {
+    public render() {
         const className = classnames(
             "format-form-dialog",
             this.props.className
@@ -66,13 +66,17 @@ class FormatFormDialog extends React.Component<
     }
 
     public static show(format: string, onOk: (format: string) => void) {
-        Modal.show(props => <FormatFormDialog
-            format={format}
-            onCancel={props.close}
-            onOk={format => {
+        const dialogRenderer = (props: ModalProps) => {
+            const handleOk = (newFmt: string) => {
                 props.close();
-                onOk(format);
-            }} />);
+                onOk(newFmt);
+            };
+            return <FormatFormDialog
+                format={format}
+                onCancel={props.close}
+                onOk={handleOk} />
+        };
+        Modal.show(dialogRenderer);
     }
 }
 

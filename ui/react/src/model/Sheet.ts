@@ -49,7 +49,7 @@ class Sheet {
         return null;
     }
 
-    clone() {
+    public clone() {
         return SheetAsset.deserialize(this);
     }
 }

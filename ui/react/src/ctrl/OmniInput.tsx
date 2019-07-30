@@ -33,6 +33,9 @@ class OmniInput extends React.Component<OmniInputProps, OmniInputState> {
 
         this.handleFilterChange = this.handleFilterChange.bind(this);
         this.handleInput = this.handleInput.bind(this);
+        this.handleToggleSelectAll = this.handleToggleSelectAll.bind(this);
+        this.handleToggleShowSelectedOnly = this.handleToggleShowSelectedOnly.bind(this);
+        this.handleFalseClick = this.handleFalseClick.bind(this);
     }
 
     protected handleFilterChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -58,13 +61,29 @@ class OmniInput extends React.Component<OmniInputProps, OmniInputState> {
         }
     }
 
+    protected handleToggleSelectAll(newVal: boolean) {
+        let newSelection: string[] = [];
+        if (newVal && this.props.options) { // select all
+            newSelection = this.props.options.map(o => o.value);
+        }
+        this.afterChange(newSelection);
+    }
+
+    protected handleToggleShowSelectedOnly(newVal: boolean) {
+        this.setState({ showSelectedOnly: newVal });
+    }
+
+    protected handleFalseClick() {
+        return false;
+    }
+
     protected checkItem(value: string, checked: boolean) {
         const newValue = [];
         let done = false;
-        for (let i = 0; i < this.props.value.length; i++) {
-            if (this.props.value[i] !== value || checked) {
-                newValue.push(this.props.value[i]);
-                if (this.props.value[i] === value/* && checked */) {
+        for (const item of this.props.value) {
+            if (item !== value || checked) {
+                newValue.push(item);
+                if (item === value/* && checked */) {
                     done = true;
                 }
             }
@@ -116,7 +135,7 @@ class OmniInput extends React.Component<OmniInputProps, OmniInputState> {
             this.props.allowManualInput : typeof this.props.options === "undefined";
     }
 
-    render() {
+    public render() {
         const props = this.props;
         const className = classnames("omni-input", props.className);
         const hasOptions = typeof props.options !== "undefined";
@@ -175,20 +194,12 @@ class OmniInput extends React.Component<OmniInputProps, OmniInputState> {
                                 label="选择全部"
                                 value={allSelected}
                                 indeterminate={selectedSet.size > 0 && !allSelected}
-                                afterChange={newVal => {
-                                    let newSelection: string[] = [];
-                                    if (newVal && this.props.options) { // select all
-                                        newSelection = this.props.options.map(o => o.value);
-                                    }
-                                    this.afterChange(newSelection);
-                                }} />
+                                afterChange={this.handleToggleSelectAll} />
                             <CheckBox
                                 name="selected-only"
                                 label="仅显示选中"
                                 value={this.state.showSelectedOnly}
-                                afterChange={newVal => {
-                                    this.setState({ showSelectedOnly: newVal });
-                                }} />
+                                afterChange={this.handleToggleShowSelectedOnly} />
                         </div>
                     )}
                     <ul
@@ -209,7 +220,10 @@ class OmniInput extends React.Component<OmniInputProps, OmniInputState> {
                                     className={classnames("omni-input-options-item", { "selected": selected })}
                                     title={label}
                                     onClick={handleClickItem}>
-                                    <input type="checkbox" defaultChecked onClick={() => false} />
+                                    <input
+                                        type="checkbox"
+                                        defaultChecked={true}
+                                        onClick={this.handleFalseClick} />
                                     <span>{label}</span>
                                 </li>
                             );

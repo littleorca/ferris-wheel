@@ -147,8 +147,8 @@
     content: ":";
 }
 
-.workbook-editor > .editor-body > .sidebar .field > input[type="text"],
-.workbook-editor > .editor-body > .sidebar .field-control > input[type="text"],
+.workbook-editor > .editor-body > .sidebar .field > .edit-box,
+.workbook-editor > .editor-body > .sidebar .field-control > .edit-box,
 .workbook-editor > .editor-body > .sidebar .field > .interval-input {
     width: 100%;
     box-sizing: border-box;

@@ -30,7 +30,7 @@ class Dialog extends React.Component<DialogProps> {
         //
     }
 
-    render() {
+    public render() {
         const className = classnames("dialog", this.props.className);
         return (
             <div className={className} style={this.props.style}>

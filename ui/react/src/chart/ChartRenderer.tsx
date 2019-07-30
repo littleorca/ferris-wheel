@@ -12,7 +12,7 @@ interface ChartData {
     type: string,
     name: string,
     title: string,
-    categories: (string | Date)[];
+    categories: Array<string | Date>;
     series: ChartSeriesData[];
     xAxis: Axis;
     yAxis: Axis;

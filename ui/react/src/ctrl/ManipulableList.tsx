@@ -69,7 +69,7 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
             && props.initialSelect >= 0
             && props.initialSelect < props.list.length ?
             props.initialSelect : (props.list.length > 0 ? 0 : -1);
-        this.state = { selectIndex: selectIndex };
+        this.state = { selectIndex };
         if (props.initialSelect !== selectIndex && typeof props.onSelect !== 'undefined') {
             props.onSelect(selectIndex === -1 ? null : props.list[selectIndex], selectIndex);
         }
@@ -359,7 +359,7 @@ class ManipulableList<T> extends React.Component<ManipulableListProps<T>, Manipu
 
         const selectIdxChanged = selectIndex !== this.state.selectIndex;
         if (selectIdxChanged) {
-            this.setState({ selectIndex: selectIndex });
+            this.setState({ selectIndex });
         }
 
         if (typeof this.props.onItemMoved !== 'undefined') {

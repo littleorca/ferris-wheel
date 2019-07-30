@@ -1,7 +1,7 @@
 import * as React from "react";
 import AddFormForm, { AddFormFormProps, PendingField } from "../form/AddFormForm";
 import Dialog from "./Dialog";
-import Modal from "./Modal";
+import Modal, { ModalProps } from "./Modal";
 import Form from "../model/Form";
 import classnames from "classnames";
 import "./AddFormDialog.css";
@@ -17,7 +17,7 @@ interface AddFormDialogProps extends React.ClassAttributes<AddFormDialog> {
 class AddFormDialog extends React.Component<AddFormDialogProps> {
     private formRef: React.RefObject<AddFormForm> = React.createRef();
 
-    render() {
+    public render() {
         const className = classnames("add-form-dialog", this.props.className);
         return (
             <Dialog
@@ -48,13 +48,17 @@ class AddFormDialog extends React.Component<AddFormDialogProps> {
     }
 
     public static show(pendingFields: PendingField[], onOk: (form: Form) => void) {
-        Modal.show(props => <AddFormDialog
-            pendingFields={pendingFields}
-            onCancel={props.close}
-            onOk={form => {
+        const renderer = (props: ModalProps) => {
+            const handleOk = (form: Form) => {
                 props.close();
                 onOk(form);
-            }} />);
+            };
+            return <AddFormDialog
+                pendingFields={pendingFields}
+                onCancel={props.close}
+                onOk={handleOk} />
+        };
+        Modal.show(renderer);
     }
 }
 

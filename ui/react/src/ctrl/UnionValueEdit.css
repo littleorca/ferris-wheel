@@ -88,6 +88,10 @@
     background: #555;
 }
 
+.union-value-edit-popover {
+    z-index: 999;
+}
+
 .union-value-edit-aux .union-value-list-edit {
     padding: .5em;
     width: 10em;

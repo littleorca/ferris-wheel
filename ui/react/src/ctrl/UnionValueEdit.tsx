@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import UnionValue from 'model/UnionValue';
+import UnionValue from '../model/UnionValue';
 import EditBox from './EditBox';
 import Values from '../model/Values';
 import { VariantType } from '../model/Variant';
@@ -52,18 +52,23 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
     private toolbarRef = React.createRef<Toolbar>();
     private auxRef = React.createRef<HTMLDivElement>();
 
-    protected static getDerivedStateFromProps(nextProps: UnionValueEditProps, prevState: UnionValueEditState) {
+    protected static getDerivedStateFromProps(nextProps: UnionValueEditProps,
+        prevState: UnionValueEditState): UnionValueEditState | null {
         if (nextProps.value !== prevState.originValue || nextProps.modes !== prevState.originModes) {
-            const allowedModes = UnionValueEdit.getAllowedModes();
-            const currentMode = UnionValueEdit.getLegalEditMode(nextProps.value, allowedModes);
+            const allowedModes = UnionValueEdit.getAllowedModes(nextProps.modes);
+            let currentValue = prevState.currentValue;
+            if (nextProps.value !== prevState.originValue) {
+                currentValue = (typeof nextProps.initialUpdate !== "undefined") ?
+                    nextProps.initialUpdate : nextProps.value;
+            }
+            const currentMode = UnionValueEdit.getLegalEditMode(currentValue, allowedModes);
             return {
                 ...prevState,
                 originValue: nextProps.value,
                 originModes: nextProps.modes,
                 allowedModes,
                 currentMode,
-                currentValue: nextProps.value,
-                pendingValue: nextProps.value,
+                currentValue,
                 valid: typeof currentMode !== "undefined",
             };
 
@@ -112,7 +117,7 @@ class UnionValueEdit extends React.Component<UnionValueEditProps, UnionValueEdit
 
     constructor(props: UnionValueEditProps) {
         super(props);
-        const allowedModes = UnionValueEdit.getAllowedModes();
+        const allowedModes = UnionValueEdit.getAllowedModes(props.modes);
         const currentValue = (typeof props.initialUpdate !== "undefined") ?
             props.initialUpdate : props.value;
         const currentMode = UnionValueEdit.getLegalEditMode(currentValue, allowedModes);
@@ -686,7 +691,7 @@ export default UnionValueEdit;
 export {
     UnionValueEditMode,
     UnionValueEditAux,
-    UnionValueEditProps as UninValueEditProps,
+    UnionValueEditProps,
     fromEditableString,
     toEditableString
 }

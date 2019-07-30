@@ -19,7 +19,7 @@ interface DropdownButtonState {
 }
 
 class DropdownButton extends React.Component<DropdownButtonProps, DropdownButtonState> {
-    static SEPARATOR: string = ""; // special button name for separator.
+    public static SEPARATOR: string = ""; // special button name for separator.
 
     constructor(props: DropdownButtonProps) {
         super(props);
@@ -86,7 +86,7 @@ class DropdownButton extends React.Component<DropdownButtonProps, DropdownButton
                     <div className="dropdown-primary">
                         <Button
                             {...this.props.primary}
-                            className="dropdown-header"
+                            className={classnames("dropdown-header", this.props.primary.className)}
                             style={{
                                 height: '100%', // set height here to boost priority and avoid using important in css file.
                             }}

@@ -120,7 +120,7 @@ class WorkbookPresenter extends React.Component<WorkbookPresenterProps, Workbook
         this.setState({ showMask: false });
     }
 
-    render() {
+    public render() {
         return (
             <>
                 <WorkbookView

@@ -1,5 +1,5 @@
 import CellPosition from "../model/CellPosition";
-import GridCell from "model/GridCell";
+import GridCell from "../model/GridCell";
 
 class GridEditSession<T> extends CellPosition {
     public gridCell: GridCell<T>;

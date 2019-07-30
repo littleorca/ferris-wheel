@@ -27,7 +27,7 @@ class Text {
         this.layout = layout;
     }
 
-    clone() {
+    public clone() {
         return Text.deserialize(this);
     }
 }

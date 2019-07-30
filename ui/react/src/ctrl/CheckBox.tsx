@@ -15,13 +15,13 @@ class CheckBox extends InputCtrl<boolean, CheckBoxProps> {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         if (this.props.indeterminate) {
             this.setIndeterminate();
         }
     }
 
-    componentDidUpdate() {
+    public componentDidUpdate() {
         if (this.props.indeterminate) {
             this.setIndeterminate();
         }

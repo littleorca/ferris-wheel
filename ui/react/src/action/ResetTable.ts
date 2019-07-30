@@ -4,7 +4,7 @@ import Table from "../model/Table";
 class ResetTable extends SheetAction {
     public table: Table;
 
-    static deserialize(input: any): ResetTable {
+    public static deserialize(input: any): ResetTable {
         const sheetName = input.sheetName;
         const table = Table.deserialize(input.table); // table cannot be empty!
         return new ResetTable(sheetName, table);
