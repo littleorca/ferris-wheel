@@ -207,6 +207,21 @@ public class DirectedAcyclicGraph<Id, Data> {
         return nodes.isEmpty();
     }
 
+    public void trimOutboundToKeyNodes(Set<Id> keyNodes) {
+        while (true) {
+            Set<Id> outboundEnds = collectOutboundEnds();
+            if (outboundEnds.isEmpty() || keyNodes.containsAll(outboundEnds)) {
+                break;
+            }
+            for (Id id : outboundEnds) {
+                if (keyNodes.contains(id)) {
+                    continue;
+                }
+                removeNode(id);
+            }
+        }
+    }
+
     /**
      * Graph node
      *

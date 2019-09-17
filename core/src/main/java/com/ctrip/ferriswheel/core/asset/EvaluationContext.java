@@ -24,32 +24,15 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.form.FormFieldBinding;
-import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 
-public class DefaultFormFieldBinding extends AssetNode implements FormFieldBinding {
-    private final ValueNode target;
+import java.util.concurrent.CompletionService;
 
-    public DefaultFormFieldBinding(AssetNode parent, FormFieldBinding bindingData) {
-        super(parent);
-        this.target = new ValueNode(parent.getAssetManager(),
-                Value.BLANK,
-                bindingData.getTarget());
-        this.bindChild(target);
-    }
+public interface EvaluationContext {
 
-    @Override
-    public String getTarget() {
-        return target.getFormulaString();
-    }
+    EvaluationMode getEvaluationMode();
 
-    ValueNode getTargetRefHolder() {
-        return target;
-    }
+    FormulaEvaluator getFormulaEvaluator();
 
-    @Override
-    protected EvaluationState doEvaluate(EvaluationContext context) {
-        // leave the job to form
-        return EvaluationState.DONE;
-    }
+    CompletionService<Long> getCompletionService();
 }

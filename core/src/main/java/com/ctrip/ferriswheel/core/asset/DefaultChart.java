@@ -11,12 +11,13 @@ import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.action.UpdateChart;
 import com.ctrip.ferriswheel.core.bean.AxisImpl;
 import com.ctrip.ferriswheel.core.bean.ChartData;
+import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.formula.ReferenceElement;
-import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.ref.CellReference;
 import com.ctrip.ferriswheel.core.ref.RangeReference;
+import com.ctrip.ferriswheel.core.ref.TableRange;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
 import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
@@ -28,7 +29,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     private String type;
     private final ValueNode title;
     private final ValueNode categories;
-    private final AssetList<DefaultDataSeries> seriesList;
+    private final AssetList<DefaultDataSeries> seriesList; // TODO asset list not marking revisions
     private AxisImpl xAxis;
     private AxisImpl yAxis;
     private AxisImpl zAxis;
@@ -77,6 +78,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
     void setType(String type) {
         this.type = type;
+        markDirty();
     }
 
     @Override
@@ -127,6 +129,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
     public void setxAxis(AxisImpl xAxis) {
         this.xAxis = xAxis;
+        markDirty(); // TODO modifications via AxisImpl object it self is not tracked.
     }
 
     @Override
@@ -136,6 +139,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
     public void setyAxis(AxisImpl yAxis) {
         this.yAxis = yAxis;
+        markDirty(); // TODO refer setxAxis
     }
 
     @Override
@@ -145,6 +149,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
     public void setzAxis(AxisImpl zAxis) {
         this.zAxis = zAxis;
+        markDirty(); // TODO refer setxAxis
     }
 
     @Override
@@ -160,12 +165,12 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     void setBinder(DefaultChartBinder binder) {
         if (this.binder != null) {
             unbindChild(this.binder);
-            removeDependency(this.binder.getData());
+//            removeDependency(this.binder.getData());
         }
         this.binder = binder;
         if (this.binder != null) {
             bindChild(this.binder);
-            addDependency(this.binder.getData());
+//            addDependency(this.binder.getData());
         }
     }
 
@@ -196,7 +201,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             throw new RuntimeException("Failed to get referred sheet.");
         }
         DefaultTable table = sheet.getAsset(rangeReference.getAssetName());
-        if (table == null) {
+        if (table == null || table.getRowCount() == 0 || table.getColumnCount() == 0) {
             clearData();
             getSheet().publicly(new UpdateChart(getSheet().getName(),
                     getName(), new ChartData(this)), () -> {
@@ -206,30 +211,13 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             return;
         }
 
-        int left = rangeReference.getLeft();
-        int top = rangeReference.getTop();
-        int right = rangeReference.getRight();
-        int bottom = rangeReference.getBottom();
-
-        if (left == -1) {
-            left = 0;
-        }
-        if (top == -1) {
-            top = 0;
-        }
-        if (right == -1) {
-            right = table.getColumnCount() - 1;
-        }
-        if (bottom == -1) {
-            bottom = table.getRowCount() - 1;
-        }
-
-        if (left > right || top > bottom) {
+        TableRange validRange = rangeReference.getOverlappedRectangle(table);
+        if (validRange == null) {
             clearData();
         } else if (binder.getOrientation() == Orientation.HORIZONTAL) {
-            bindHorizontally(table, left, top, right, bottom);
+            bindHorizontally(table, validRange.getLeft(), validRange.getTop(), validRange.getRight(), validRange.getBottom());
         } else if (binder.getOrientation() == Orientation.VERTICAL) {
-            bindVertically(table, left, top, right, bottom);
+            bindVertically(table, validRange.getLeft(), validRange.getTop(), validRange.getRight(), validRange.getBottom());
         }
 
         getSheet().publicly(new UpdateChart(getSheet().getName(),
@@ -412,4 +400,9 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         }
     }
 
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        rebindIfPossible();
+        return EvaluationState.DONE;
+    }
 }

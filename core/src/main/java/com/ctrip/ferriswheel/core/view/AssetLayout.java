@@ -4,6 +4,7 @@ import com.ctrip.ferriswheel.common.view.Display;
 import com.ctrip.ferriswheel.common.view.Layout;
 import com.ctrip.ferriswheel.common.view.Placement;
 
+// TODO asset layout should behaves like asset node, with revision mark
 public class AssetLayout extends LayoutImpl {
     public AssetLayout() {
         super(Display.BLOCK,

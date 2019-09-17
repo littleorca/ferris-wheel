@@ -1,10 +1,11 @@
 package com.ctrip.ferriswheel.core.ref;
 
+import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.Asset;
 
 import java.io.Serializable;
 
-public class RangeReference extends AbstractReference implements Serializable {
+public class RangeReference extends AbstractReference implements TableRange, Serializable {
     private PositionRef upperLeftRef;
     private PositionRef lowerRightRef;
 
@@ -93,26 +94,58 @@ public class RangeReference extends AbstractReference implements Serializable {
                 + ":R" + getBottom() + "C" + getRight();
     }
 
+
+    public TableRange getOverlappedRectangle(Table table) {
+        final int rowCount = table.getRowCount();
+        final int columnCount = table.getColumnCount();
+
+        final int expectedTop = getTop() == -1 ? 0 : getTop();
+        final int expectedBottom = getBottom() == -1 ? rowCount - 1 : getBottom();
+        final int expectedLeft = getLeft() == -1 ? 0 : getLeft();
+        final int expectedRight = getRight() == -1 ? columnCount - 1 : getRight();
+
+        if (expectedTop >= rowCount || expectedLeft >= columnCount) {
+            return null;
+        }
+
+        final int top = expectedTop;
+        final int left = expectedLeft;
+        final int bottom = Math.min(expectedBottom, rowCount - 1);
+        final int right = Math.min(expectedRight, columnCount - 1);
+
+        if (bottom < top || right < left) {
+            return null;
+        }
+
+        return new SimpleTableRange(left, top, right, bottom);
+    }
+
+    @Override
     public int getTop() {
         return upperLeftRef.getRowIndex();
     }
 
+    @Override
     public int getLeft() {
         return upperLeftRef.getColumnIndex();
     }
 
+    @Override
     public int getBottom() {
         return lowerRightRef.getRowIndex();
     }
 
+    @Override
     public int getRight() {
         return lowerRightRef.getColumnIndex();
     }
 
+    @Override
     public int width() {
         return getRight() + 1 - getLeft();
     }
 
+    @Override
     public int height() {
         return getBottom() + 1 - getTop();
     }
@@ -154,4 +187,5 @@ public class RangeReference extends AbstractReference implements Serializable {
                 upperLeftTargetId != Asset.UNSPECIFIED_ASSET_ID &&
                 lowerRightTargetId != Asset.UNSPECIFIED_ASSET_ID;
     }
+
 }

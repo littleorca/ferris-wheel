@@ -7,7 +7,9 @@ public class TestEscapeHelper extends TestCase {
     public void testEscapeAndUnescape() {
         assertEscapeAndUnescape("a", "a");
         assertEscapeAndUnescape("Z", "Z");
-        assertEscapeAndUnescape("9", "9");
+        assertEscapeAndUnescape("A9", "A9");
+        assertEscapeAndUnescape("9", "'9'");
+        assertEscapeAndUnescape("9A", "'9A'");
         assertEscapeAndUnescape("_", "_");
         assertEscapeAndUnescape("$", "$");
         assertEscapeAndUnescape("中", "'中'");

@@ -2,6 +2,8 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.core.action.CellAction;
 
 public class DefaultCell extends ValueNode implements Cell {
     private int columnIndex;
@@ -11,22 +13,36 @@ public class DefaultCell extends ValueNode implements Cell {
     private boolean fillLeft;
     private boolean fillRight;
 
-    DefaultCell(DefaultAssetManager assetManager) {
+    DefaultCell(AssetManager assetManager) {
         this(assetManager, Value.BLANK);
     }
 
-    DefaultCell(DefaultAssetManager assetManager, Value value) {
+    DefaultCell(AssetManager assetManager, Value value) {
         this(assetManager, value, null);
     }
 
-    DefaultCell(DefaultAssetManager assetManager, Value value, String formulaString) {
+    DefaultCell(AssetManager assetManager, Value value, String formulaString) {
         this(assetManager, value, formulaString, null);
     }
 
-    DefaultCell(DefaultAssetManager assetManager, Value value, String formulaString, String format) {
+    DefaultCell(AssetManager assetManager, Value value, String formulaString, String format) {
         super(assetManager, value, formulaString);
         this.format = format;
     }
+
+
+    @Override
+    protected void doUpdateValue(Variant newValue) {
+        DefaultTable table = getRow().getTable();
+        CellAction.RefreshCellValue action = new CellAction.RefreshCellValue(
+                table.getSheet().getName(),
+                table.getName(),
+                getRowIndex(),
+                getColumnIndex(),
+                Value.from(newValue));
+        table.publicly(action, () -> setValue(newValue));
+    }
+
 
     public DefaultRow getRow() {
         return (DefaultRow) getParent();
@@ -92,5 +108,4 @@ public class DefaultCell extends ValueNode implements Cell {
     void setFillRight(boolean fillRight) {
         this.fillRight = fillRight;
     }
-
 }

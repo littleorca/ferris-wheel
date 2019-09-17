@@ -54,6 +54,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
                 this.parameters = executeQuery.getParams();
             }
             this.query = null; // clear old query
+            markDirty();
 
             getTable().getWorkbook().refreshIfNeeded();
         });
@@ -65,7 +66,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
     @Override
     public void execute(boolean forceUpdate) {
         if (!forceUpdate && query != null &&
-                getLastUpdateSequenceNumber() > template.getLastUpdateSequenceNumber()) {
+                getCurrentRevision() > template.getCurrentRevision()) {
             return;
         }
         DataSet dataSet = doQuery();
@@ -74,11 +75,6 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
 
     @Override
     public <V> Future<V> execute(boolean forceUpdate, CompletionService<V> completionService, V result) {
-        if (!forceUpdate && query != null &&
-                getLastUpdateSequenceNumber() > template.getLastUpdateSequenceNumber()) {
-            return null;
-        }
-
         DefaultWorkbook wb = parent(DefaultWorkbook.class);
 
         if (wb.isForceRefresh()) {
@@ -90,16 +86,19 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
 
         try {
             if (provider == null) {
+                setVolatile(false);
                 throw new RuntimeException("Unable to find data provider for query scheme: "
                         + query.getScheme());
             }
+
+            // update volatile flag during every execution is not necessary but it's ok.
+            setVolatile(provider.isVolatile());
 
             // execute query
 
             return completionService.submit(() -> {
                 try {
                     dataSetReference.set(provider.execute(query));
-                    setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
                 } catch (Throwable e) {
                     LOG.warn("Failed to execute query.", e);
                     // TODO mark error

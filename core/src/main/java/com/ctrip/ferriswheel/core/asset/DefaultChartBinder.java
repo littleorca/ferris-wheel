@@ -18,6 +18,12 @@ public class DefaultChartBinder extends AssetNode implements ChartBinder {
         bindChild(this.data);
     }
 
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // leave the job to chart.
+        return EvaluationState.DONE;
+    }
+
     DefaultChart getChart() {
         return (DefaultChart) getParent();
     }
@@ -37,7 +43,15 @@ public class DefaultChartBinder extends AssetNode implements ChartBinder {
     }
 
     void setOrientation(Orientation orientation) {
+        if (this.orientation == null && orientation == null) {
+            return;
+        }
+        if (this.orientation != null && this.orientation.equals(orientation)) {
+            return;
+        }
+
         this.orientation = orientation;
+        markDirty();
     }
 
     @Override
@@ -46,7 +60,15 @@ public class DefaultChartBinder extends AssetNode implements ChartBinder {
     }
 
     void setCategoriesPlacement(Placement categoriesPlacement) {
+        if (this.categoriesPlacement == null && categoriesPlacement == null) {
+            return;
+        }
+        if (this.categoriesPlacement != null && this.categoriesPlacement.equals(categoriesPlacement)) {
+            return;
+        }
+
         this.categoriesPlacement = categoriesPlacement;
+        markDirty();
     }
 
     @Override
@@ -55,6 +77,14 @@ public class DefaultChartBinder extends AssetNode implements ChartBinder {
     }
 
     void setSeriesNamePlacement(Placement seriesNamePlacement) {
+        if (this.seriesNamePlacement == null && seriesNamePlacement == null) {
+            return;
+        }
+        if (this.seriesNamePlacement != null && this.seriesNamePlacement.equals(seriesNamePlacement)) {
+            return;
+        }
+
         this.seriesNamePlacement = seriesNamePlacement;
+        markDirty();
     }
 }

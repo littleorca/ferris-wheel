@@ -81,7 +81,6 @@ public class DefaultForm extends SheetAssetNode implements Form {
         field.fillFieldData(fieldData);
         getSheet().publicly(new UpdateForm(getSheet().getName(), getName(), this), () -> {
             fields.add(field);
-            getSheet().getWorkbook().onAssetUpdate(this);
         });
     }
 
@@ -92,7 +91,6 @@ public class DefaultForm extends SheetAssetNode implements Form {
         }
         getSheet().publicly(new UpdateForm(getSheet().getName(), getName(), this), () -> {
             field.fillFieldData(fieldData);
-            getSheet().getWorkbook().onAssetUpdate(this);
         });
     }
 
@@ -106,7 +104,6 @@ public class DefaultForm extends SheetAssetNode implements Form {
         }
         getSheet().publicly(new UpdateForm(getSheet().getName(), getName(), this), () -> {
             field.setName(newName);
-            getSheet().getWorkbook().onAssetUpdate(this);
         });
     }
 
@@ -117,7 +114,6 @@ public class DefaultForm extends SheetAssetNode implements Form {
         getSheet().publicly(new UpdateForm(getSheet().getName(), getName(), this), () -> {
             DefaultFormField field = fields.remove(name);
             fields.add(index, field);
-            getSheet().getWorkbook().onAssetUpdate(this);
         });
     }
 
@@ -127,7 +123,6 @@ public class DefaultForm extends SheetAssetNode implements Form {
         }
         getSheet().publicly(new UpdateForm(getSheet().getName(), getName(), this), () -> {
             fields.remove(name);
-            getSheet().getWorkbook().onAssetUpdate(this);
         });
     }
 
@@ -201,5 +196,13 @@ public class DefaultForm extends SheetAssetNode implements Form {
         } else {
             throw new RuntimeException("Unsupported reference type: " + elem.getClass());
         }
+    }
+
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        UpdateForm updateForm = new UpdateForm(getSheet().getName(), getName(), this);
+        getSheet().publicly(updateForm, () -> {
+        });
+        return EvaluationState.DONE;
     }
 }

@@ -22,34 +22,18 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.asset;
+package com.ctrip.ferriswheel.core.ref;
 
-import com.ctrip.ferriswheel.common.form.FormFieldBinding;
-import com.ctrip.ferriswheel.common.variant.Value;
+public interface TableRange {
+    int getLeft();
 
-public class DefaultFormFieldBinding extends AssetNode implements FormFieldBinding {
-    private final ValueNode target;
+    int getTop();
 
-    public DefaultFormFieldBinding(AssetNode parent, FormFieldBinding bindingData) {
-        super(parent);
-        this.target = new ValueNode(parent.getAssetManager(),
-                Value.BLANK,
-                bindingData.getTarget());
-        this.bindChild(target);
-    }
+    int getRight();
 
-    @Override
-    public String getTarget() {
-        return target.getFormulaString();
-    }
+    int getBottom();
 
-    ValueNode getTargetRefHolder() {
-        return target;
-    }
+    int width();
 
-    @Override
-    protected EvaluationState doEvaluate(EvaluationContext context) {
-        // leave the job to form
-        return EvaluationState.DONE;
-    }
+    int height();
 }

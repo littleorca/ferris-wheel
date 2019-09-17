@@ -24,32 +24,44 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.form.FormFieldBinding;
-import com.ctrip.ferriswheel.common.variant.Value;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
-public class DefaultFormFieldBinding extends AssetNode implements FormFieldBinding {
-    private final ValueNode target;
+class DefaultTransaction implements Transaction {
+    private final long id;
+    private volatile TransactionPhase phase = TransactionPhase.Polluting;
+    private Set<Long> dirtyNodes = new ConcurrentSkipListSet<>();
 
-    public DefaultFormFieldBinding(AssetNode parent, FormFieldBinding bindingData) {
-        super(parent);
-        this.target = new ValueNode(parent.getAssetManager(),
-                Value.BLANK,
-                bindingData.getTarget());
-        this.bindChild(target);
+    DefaultTransaction(long id) {
+        this.id = id;
     }
 
     @Override
-    public String getTarget() {
-        return target.getFormulaString();
-    }
-
-    ValueNode getTargetRefHolder() {
-        return target;
+    public long getId() {
+        return id;
     }
 
     @Override
-    protected EvaluationState doEvaluate(EvaluationContext context) {
-        // leave the job to form
-        return EvaluationState.DONE;
+    public TransactionPhase getCurrentPhase() {
+        return phase;
+    }
+
+    @Override
+    public void markDirtyNode(long assetId) {
+        if (getCurrentPhase() != TransactionPhase.Polluting) {
+            throw new IllegalStateException();
+        }
+        dirtyNodes.add(assetId);
+    }
+
+    @Override
+    public Set<Long> getDirtyNodes() {
+        return dirtyNodes;
+    }
+
+    @Override
+    public void close() {
+        phase = TransactionPhase.Done;
+        dirtyNodes.clear();
     }
 }

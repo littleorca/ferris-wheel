@@ -23,4 +23,10 @@ public class Attachment extends NamedAssetNode implements NamedAsset {
     public void setContent(byte[] content) {
         this.content = content;
     }
+
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // nothing to do at present
+        return EvaluationState.DONE;
+    }
 }

@@ -2,7 +2,9 @@ package com.ctrip.ferriswheel.core.formula;
 
 import junit.framework.TestCase;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TestDirectedAcyclicGraph extends TestCase {
     public void test() {
@@ -45,5 +47,31 @@ public class TestDirectedAcyclicGraph extends TestCase {
         } catch (IllegalArgumentException e) {
             //
         }
+    }
+
+    /**
+     * 1 -> 2, 3
+     * 2 -> 4
+     * 3 -> 2
+     * 5 -> 3
+     */
+    public void testTrimOutboundToKeyNodes() {
+        DirectedAcyclicGraph<Integer, Object> g = new DirectedAcyclicGraph<>();
+        g.addEdges(1, 2, 3);
+        g.addEdges(2, 4);
+        g.addEdges(3, 2);
+        g.addEdges(5, 3);
+
+        Set<Integer> keyNodes = new HashSet<>();
+        keyNodes.add(2);
+        keyNodes.add(5);
+        g.trimOutboundToKeyNodes(keyNodes);
+
+        List<Integer> list = g.sort();
+        assertEquals(4, list.size());
+        assertEquals(Integer.valueOf(2), list.get(0));
+        assertEquals(Integer.valueOf(3), list.get(1));
+        assertEquals(Integer.valueOf(5), list.get(2));
+        assertEquals(Integer.valueOf(1), list.get(3));
     }
 }

@@ -25,6 +25,8 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
+import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
+
 public interface AssetManager {
 
     /**
@@ -49,6 +51,10 @@ public interface AssetManager {
      */
     Asset get(long id);
 
+    ReferenceResolver getReferenceResolver();
+
+    ReferenceMaintainer getReferenceMaintainer();
+
     /**
      * Determine whether the asset with the specified ID is employed or not.
      *
@@ -65,33 +71,9 @@ public interface AssetManager {
     void dismiss(Asset asset);
 
     /**
-     * Subscribe asset change event.
+     * Get transaction.
+     *
+     * @return
      */
-    void subscribe(AssetChangeCallback callback);
-
-    /**
-     * Asset change event callback.
-     */
-    interface AssetChangeCallback {
-        /**
-         * Asset has been employed.
-         *
-         * @param asset
-         */
-        void onAssetEmployed(Asset asset);
-
-        /**
-         * Asset update event callback.
-         *
-         * @param asset
-         */
-        void onAssetUpdate(Asset asset);
-
-        /**
-         * Asset has been dismissed.
-         *
-         * @param asset
-         */
-        void onAssetDismissed(Asset asset);
-    }
+    Transaction getTransaction();
 }

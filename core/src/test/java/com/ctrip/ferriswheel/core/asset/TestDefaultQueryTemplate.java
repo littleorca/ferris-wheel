@@ -5,6 +5,7 @@ import com.ctrip.ferriswheel.common.variant.DefaultParameter;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import junit.framework.TestCase;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 // TODO improve cases
 public class TestDefaultQueryTemplate extends TestCase {
     public void testSetAndGet() {
-        DefaultAssetManager assetManager = new DefaultAssetManager();
+        DefaultWorkbook assetManager = new DefaultWorkbook(new DefaultEnvironment(null));
 
         TableAutomatonInfo.QueryTemplateInfo query = new TableAutomatonInfo.QueryTemplateInfo();
         query.setScheme("test");
@@ -32,7 +33,7 @@ public class TestDefaultQueryTemplate extends TestCase {
     }
 
     public void testRenderQuery() {
-        DefaultAssetManager assetManager = new DefaultAssetManager();
+        DefaultWorkbook assetManager = new DefaultWorkbook(new DefaultEnvironment(null));
         TableAutomatonInfo.QueryTemplateInfo querySolution = new TableAutomatonInfo.QueryTemplateInfo();
 
         querySolution.setScheme("test");

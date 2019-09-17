@@ -8,11 +8,11 @@ import com.ctrip.ferriswheel.core.formula.FormulaParser;
 import com.ctrip.ferriswheel.core.util.AreaPatternAnalyzer;
 
 public class AutoFiller {
-    private Workbook workbook;
+//    private Workbook workbook;
     private AreaPatternAnalyzer areaPatternAnalyzer = new AreaPatternAnalyzer();
 
-    public AutoFiller(Workbook workbook) {
-        this.workbook = workbook;
+    public AutoFiller(/*Workbook workbook*/) {
+//        this.workbook = workbook;
     }
 
     public void autoFillRowsIfPossible(Table table, int startRowIndex, int nRows) {

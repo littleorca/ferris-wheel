@@ -37,12 +37,20 @@ public interface Asset extends Serializable {
     boolean isValid();
 
     /**
-     * Determine if an asset is ephemeral. An ephemeral asset can be destroyed
-     * during the refresh procedure.
+     * A volatile node may evaluate different result each time even with the
+     * same parameters.
      *
      * @return
      */
-    boolean isEphemeral();
+    boolean isVolatile();
+
+    /**
+     * Determine if an asset is phantom node. A phantom node is created by other node
+     * and should not be used for dependency since it's not generally available.
+     *
+     * @return
+     */
+    boolean isPhantom();
 
     Asset getParent();
 
@@ -62,4 +70,10 @@ public interface Asset extends Serializable {
      */
     Set<? extends Asset> getDependents();
 
+    /**
+     * Evaluate the asset with the specified context.
+     *
+     * @param context
+     */
+    EvaluationState evaluate(EvaluationContext context);
 }

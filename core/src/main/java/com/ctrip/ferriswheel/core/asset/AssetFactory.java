@@ -24,32 +24,28 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.form.FormFieldBinding;
-import com.ctrip.ferriswheel.common.variant.Value;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
-public class DefaultFormFieldBinding extends AssetNode implements FormFieldBinding {
-    private final ValueNode target;
-
-    public DefaultFormFieldBinding(AssetNode parent, FormFieldBinding bindingData) {
-        super(parent);
-        this.target = new ValueNode(parent.getAssetManager(),
-                Value.BLANK,
-                bindingData.getTarget());
-        this.bindChild(target);
+public class AssetFactory {
+    public <T extends Asset> T createAsset(Class<T> assetInterface) {
+        T asset = null;
+        // TODO FIXME
+        return (T) Proxy.newProxyInstance(asset.getClass().getClassLoader(),
+                new Class<?>[]{assetInterface}, new AssetInvocationHandler(asset));
     }
 
-    @Override
-    public String getTarget() {
-        return target.getFormulaString();
-    }
+    class AssetInvocationHandler implements InvocationHandler {
+        private final Asset asset;
 
-    ValueNode getTargetRefHolder() {
-        return target;
-    }
+        AssetInvocationHandler(Asset asset) {
+            this.asset = asset;
+        }
 
-    @Override
-    protected EvaluationState doEvaluate(EvaluationContext context) {
-        // leave the job to form
-        return EvaluationState.DONE;
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return method.invoke(asset, args);
+        }
     }
 }

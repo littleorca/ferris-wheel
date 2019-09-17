@@ -11,6 +11,12 @@ class DefaultDataSeries extends AssetNode implements DataSeries {
         super(assetManager);
     }
 
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // leave the job to chart
+        return EvaluationState.DONE;
+    }
+
     public DefaultChart getChart() {
         return (DefaultChart) getParent();
     }

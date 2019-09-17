@@ -31,6 +31,7 @@ import com.ctrip.ferriswheel.common.aggregate.NamedValuesSample;
 import com.ctrip.ferriswheel.common.aggregate.Sample;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
@@ -189,6 +190,11 @@ public class ThreePhaseAggregator implements Aggregator {
         public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public Asset getAssetById(long assetId) {
+            throw new UnsupportedOperationException();
+        }
     }
 
     class DummyResolver implements ReferenceResolver {
@@ -204,6 +210,11 @@ public class ThreePhaseAggregator implements Aggregator {
 
         @Override
         public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Asset getAssetById(long assetId) {
             throw new UnsupportedOperationException();
         }
     }

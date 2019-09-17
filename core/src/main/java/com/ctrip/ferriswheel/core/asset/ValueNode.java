@@ -3,6 +3,7 @@ package com.ctrip.ferriswheel.core.asset;
 import com.ctrip.ferriswheel.common.variant.*;
 import com.ctrip.ferriswheel.core.formula.Formula;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
+import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -11,7 +12,6 @@ import java.util.List;
 public class ValueNode extends AssetNode implements VariantNode {
     private DynamicValue data;
     private Formula formula;
-//    private transient boolean dirty;
 
     ValueNode(AssetManager assetManager, Value value, String formulaString) {
         super(assetManager);
@@ -25,6 +25,29 @@ public class ValueNode extends AssetNode implements VariantNode {
         this.formula = data.isFormula() ? new Formula(data.getFormulaString()) : null;
     }
 
+    @Override
+    public EvaluationState doEvaluate(EvaluationContext context) {
+        if (!isFormula()) {
+            return EvaluationState.DONE;
+        }
+        if (getFormulaElements() == null) {
+            throw new IllegalArgumentException();
+        }
+        SheetAssetNode sheet = parent(SheetAssetNode.class);
+        FormulaEvaluator evaluator = context.getFormulaEvaluator();
+        evaluator.setCurrentSheet(sheet.getSheet());
+        evaluator.setCurrentAsset(sheet);
+        Variant value = evaluator.evaluate(getFormulaElements());
+        if (!value.equals(getData())) {
+            doUpdateValue(value);
+        }
+        return EvaluationState.DONE;
+    }
+
+    protected void doUpdateValue(Variant newValue) {
+        setValue(newValue);
+    }
+
     public boolean isFormula() {
         return data.isFormula();
     }
@@ -35,7 +58,7 @@ public class ValueNode extends AssetNode implements VariantNode {
 
     protected void setValue(Variant value) {
         this.data.setVariant(value);
-        updateSequenceNumber();
+        markDirty();
     }
 
     public String getFormulaString() {
@@ -49,7 +72,8 @@ public class ValueNode extends AssetNode implements VariantNode {
     protected void setFormula(Formula formula) {
         this.data.setFormulaString(formula == null ? null : formula.getString());
         this.formula = formula;
-        updateSequenceNumber();
+        markDirty();
+        resolveFormulaIfNeeded();
     }
 
     protected void setDynamicVariant(DynamicVariant variable) {
@@ -59,15 +83,18 @@ public class ValueNode extends AssetNode implements VariantNode {
         } else {
             this.formula = null;
         }
-        updateSequenceNumber();
+        markDirty();
+        resolveFormulaIfNeeded();
+    }
+
+    private void resolveFormulaIfNeeded() {
+        if (isEmployed()) {
+            getAssetManager().getReferenceMaintainer().resolveFormula(this);
+        }
     }
 
 //    public boolean isDirty() {
-//        return dirty;
-//    }
-//
-//    protected void setDirty(boolean dirty) {
-//        this.dirty = dirty;
+//        return getEvaluatedRevision() < getCurrentRevision();
 //    }
 
     protected FormulaElement[] getFormulaElements() {
@@ -77,6 +104,11 @@ public class ValueNode extends AssetNode implements VariantNode {
     protected void erase() {
         setFormula(null);
         setValue(Value.BLANK);
+    }
+
+    @Override
+    protected void afterEmployed() {
+        getAssetManager().getReferenceMaintainer().resolveFormula(this);
     }
 
     @Override

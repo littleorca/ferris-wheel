@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 public class TestAutoFiller extends TestCase {
     private DefaultWorkbook workbook = new DefaultWorkbook(new DefaultEnvironment.Builder().build());
-    private AutoFiller autoFiller = new AutoFiller(workbook);
+    private AutoFiller autoFiller = new AutoFiller();
 
     public void testAutoFillDown() {
         DefaultTable table = (DefaultTable) workbook.addSheet("test").addAsset(Table.class, "test");

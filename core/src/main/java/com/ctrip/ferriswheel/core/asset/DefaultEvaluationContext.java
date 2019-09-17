@@ -24,32 +24,35 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.form.FormFieldBinding;
-import com.ctrip.ferriswheel.common.variant.Value;
+import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 
-public class DefaultFormFieldBinding extends AssetNode implements FormFieldBinding {
-    private final ValueNode target;
+import java.util.concurrent.CompletionService;
 
-    public DefaultFormFieldBinding(AssetNode parent, FormFieldBinding bindingData) {
-        super(parent);
-        this.target = new ValueNode(parent.getAssetManager(),
-                Value.BLANK,
-                bindingData.getTarget());
-        this.bindChild(target);
+class DefaultEvaluationContext implements EvaluationContext {
+    private final EvaluationMode evaluationMode;
+    private final FormulaEvaluator formulaEvaluator;
+    private final CompletionService<Long> completionService;
+
+    DefaultEvaluationContext(EvaluationMode evaluationMode,
+                             FormulaEvaluator formulaEvaluator,
+                             CompletionService<Long> completionService) {
+        this.evaluationMode = evaluationMode;
+        this.formulaEvaluator = formulaEvaluator;
+        this.completionService = completionService;
     }
 
     @Override
-    public String getTarget() {
-        return target.getFormulaString();
-    }
-
-    ValueNode getTargetRefHolder() {
-        return target;
+    public FormulaEvaluator getFormulaEvaluator() {
+        return formulaEvaluator;
     }
 
     @Override
-    protected EvaluationState doEvaluate(EvaluationContext context) {
-        // leave the job to form
-        return EvaluationState.DONE;
+    public EvaluationMode getEvaluationMode() {
+        return evaluationMode;
+    }
+
+    @Override
+    public CompletionService<Long> getCompletionService() {
+        return completionService;
     }
 }

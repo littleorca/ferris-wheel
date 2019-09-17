@@ -13,6 +13,11 @@ abstract class NamedAssetNode extends AssetNode implements NamedAsset {
         this.name = name;
     }
 
+    NamedAssetNode(String name, long assetId) {
+        super(assetId);
+        this.name = name;
+    }
+
     @Override
     public String getName() {
         return name;

@@ -52,4 +52,5 @@ public interface Chart extends SheetAsset, Displayable {
     Axis getyAxis();
 
     Axis getzAxis();
+
 }

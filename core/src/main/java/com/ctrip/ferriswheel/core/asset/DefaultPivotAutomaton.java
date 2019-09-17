@@ -17,6 +17,7 @@ import com.ctrip.ferriswheel.core.bean.PivotValueImpl;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
 import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 import com.ctrip.ferriswheel.core.ref.RangeReference;
+import com.ctrip.ferriswheel.core.ref.TableRange;
 import com.ctrip.ferriswheel.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,14 +89,10 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
      */
     @Override
     public void execute(boolean forceUpdate) {
-        if (!forceUpdate && getLastUpdateSequenceNumber() > data.getLastUpdateSequenceNumber()) {
-            return;
-        }
         // TODO remove this debugging code.
-        LOG.info("Executing pivot automaton with forceUpdate=" + forceUpdate);
+        LOG.info("Executing pivot automaton({}) with forceUpdate={}", getAssetId(), forceUpdate);
         try {
             this.dataSet = doExecute();
-            setLastUpdateSequenceNumber(parent(DefaultWorkbook.class).nextSequenceNumber());
         } catch (RuntimeException e) {
             LOG.warn("Failed to execute pivot automaton.", e);
             // TODO mark error.
@@ -108,16 +105,22 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 
         DefaultSheet sourceSheet = rangeReference.getSheetName() == null ?
                 getTable().getSheet() : getTable().getWorkbook().getSheet(rangeReference.getSheetName());
-        DefaultTable sourceTable = sourceSheet.getAsset(rangeReference.getAssetName());
-        final int left = rangeReference.getLeft() >= 0 ? rangeReference.getLeft() : 0;
-        final int top = rangeReference.getTop() >= 0 ? rangeReference.getTop() : 0;
-        final int right = rangeReference.getRight() >= 0 ? rangeReference.getRight() : sourceTable.getColumnCount() - 1;
-        final int bottom = rangeReference.getBottom() >= 0 ? rangeReference.getBottom() : sourceTable.getRowCount() - 1;
+        if (sourceSheet == null) {
+            // TODO mark error
+            return ListDataSet.Builder.emptyDataSet();
+        }
 
+        DefaultTable sourceTable = sourceSheet.getAsset(rangeReference.getAssetName());
+        if (sourceTable == null) {
+            // TODO mark error
+            return ListDataSet.Builder.emptyDataSet();
+        }
+
+        TableRange validRange = rangeReference.getOverlappedRectangle(sourceTable);
         DataSet dataSet;
 
-        if (left <= right && top < bottom) {
-            dataSet = analyse(sourceTable, left, top, right, bottom);
+        if (validRange != null) {
+            dataSet = analyse(sourceTable, validRange.getLeft(), validRange.getTop(), validRange.getRight(), validRange.getBottom());
         } else {
             dataSet = ListDataSet.Builder.emptyDataSet();
         }

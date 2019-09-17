@@ -147,4 +147,9 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
         return Collections.unmodifiableList(bindings);
     }
 
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // nothing to do at present
+        return EvaluationState.DONE;
+    }
 }

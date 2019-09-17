@@ -17,6 +17,12 @@ public class DefaultRow extends AssetNode implements Row {
     }
 
     @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // nothing to do at present.
+        return EvaluationState.DONE;
+    }
+
+    @Override
     public DefaultCell getCell(int index) {
         return cells.get(index);
     }
@@ -30,6 +36,7 @@ public class DefaultRow extends AssetNode implements Row {
      * @return
      */
     DefaultCell setCell(int index, DefaultCell cell) {
+        markDirty();
         DefaultCell oldCell = removeCell(index);
         if (cell == null) {
             return oldCell;
@@ -47,6 +54,7 @@ public class DefaultRow extends AssetNode implements Row {
      * @return
      */
     DefaultCell removeCell(int index) {
+        markDirty();
         return cells.remove(index);
     }
 
@@ -59,6 +67,7 @@ public class DefaultRow extends AssetNode implements Row {
      * @return
      */
     DefaultCell moveCell(int from, int to) {
+        markDirty();
         DefaultCell cell = cells.get(from);
         DefaultCell oldCell = cells.move(from, to);
         if (cell != null) {
@@ -81,6 +90,7 @@ public class DefaultRow extends AssetNode implements Row {
 
     void setRowIndex(int rowIndex) {
         this.rowIndex = rowIndex;
+        markDirty();
     }
 
     @Override
@@ -137,5 +147,6 @@ public class DefaultRow extends AssetNode implements Row {
             DefaultCell cell = it.next().getValue();
             cell.erase();
         }
+        markDirty();
     }
 }

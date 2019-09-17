@@ -35,6 +35,7 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
 
     void setScheme(String scheme) {
         this.scheme = scheme;
+        markDirty();
     }
 
     @Override
@@ -110,7 +111,8 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
     }
 
     @Override
-    protected void afterChildUpdate(AssetNode child) {
-        setLastUpdateSequenceNumber(child.getLastUpdateSequenceNumber());
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // TODO TBD
+        return EvaluationState.DONE;
     }
 }

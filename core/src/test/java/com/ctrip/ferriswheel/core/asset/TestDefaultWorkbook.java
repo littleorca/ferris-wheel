@@ -475,6 +475,25 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(8, t2.getCell(0, 0).getData().intValue());
     }
 
+    public void testRemoveTableWithDependencies() {
+        DefaultWorkbook workbook = new DefaultWorkbook(environment);
+        DefaultSheet s1 = workbook.addSheet("sheet1");
+        Table t1 = s1.addAsset(Table.class, "t1");
+        t1.addRows(1);
+        t1.addColumns(2);
+        t1.setCellValue(0, 0, Value.dec(10));
+        t1.setCellValue(0, 1, Value.dec(2));
+        Table t2 = s1.addAsset(Table.class, "t2");
+        t2.addRows(1);
+        t2.addColumns(2);
+        t2.setCellFormula(0, 0, "t1!A1");
+        t2.setCellFormula(0, 1, "SUM(t1!A1:B1)");
+
+        s1.removeAsset("t1");
+        assertFalse(t2.getCell(0, 0).getData().isValid());
+        assertFalse(t2.getCell(0, 1).getData().isValid());
+    }
+
     private DefaultWorkbook createWorkbookWithTable33() {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
         DefaultTable table = (DefaultTable) workbook.addSheet("sheet1").addAsset(Table.class, "table1");

@@ -125,10 +125,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         }
         return publicly(removeAsset, () -> {
             assets.remove(asset.getName());
-            if (asset instanceof DefaultTable) {
-                DefaultTable table = (DefaultTable) asset;
-                getWorkbook().onTableRemoved(table);
-            }
+            getWorkbook().refreshIfNeeded();
             return (T) asset;
         });
     }
@@ -157,7 +154,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
                     // if renamed asset is  a table, there could be formulas which need update.
                     if (asset instanceof DefaultTable) {
                         DefaultTable table = (DefaultTable) asset;
-                        getWorkbook().onTableUpdate(table);
+                        table.onTableUpdate();
                     }
                 }));
         // technically rename a table doesn't affect any cell value or chart property value,
@@ -240,7 +237,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             // now fill data
             layoutNewAsset(chart);
             updateChart(chart, chartData);
-            getWorkbook().onChartCreated(chart);
+            getWorkbook().refreshIfNeeded();
             addChart.setChartData(chart);
             return chart;
         });
@@ -260,7 +257,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         }
         return publicly(updateChart, () -> {
             updateChart(chart, chartData);
-            getWorkbook().onChartUpdated(chart);
+            getWorkbook().refreshIfNeeded();
             return chart;
         });
     }
@@ -336,7 +333,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             if (addText.getTextData().getLayout() == null) {
                 layoutNewAsset(text);
             }
-            getWorkbook().onAssetUpdate(text);
+            getWorkbook().refreshIfNeeded();
             addText.setTextData(text);
             return text;
         });
@@ -363,7 +360,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
             if (updateText.getTextData().getLayout() == null) {
                 ((TextData) updateText.getTextData()).setLayout(new LayoutImpl(text.getLayout()));
             }
-            getWorkbook().onAssetUpdate(text);
+            getWorkbook().refreshIfNeeded();
             return text;
         });
     }
@@ -403,7 +400,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
                 layoutNewAsset(form);
             }
 
-            getWorkbook().onAssetUpdate(form);
+            getWorkbook().refreshIfNeeded();
             addForm.setFormData(form);
             return form;
         });
@@ -424,7 +421,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         return publicly(updateForm, () -> {
             DefaultForm form = getAsset(updateForm.getFormName());
             fillFormData(form, updateForm.getFormData());
-            getWorkbook().onAssetUpdate(form);
+            getWorkbook().refreshIfNeeded();
             updateForm.setFormData(form);
             return form;
         });
@@ -547,5 +544,11 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     @Override
     public Iterator<SheetAsset> iterator() {
         return new UnmodifiableIterator<>(assets.iterator());
+    }
+
+    @Override
+    protected EvaluationState doEvaluate(EvaluationContext context) {
+        // nothing to do at present
+        return EvaluationState.DONE;
     }
 }

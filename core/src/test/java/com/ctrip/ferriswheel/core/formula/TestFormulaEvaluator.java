@@ -7,6 +7,7 @@ import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.asset.DefaultTable;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
@@ -118,6 +119,11 @@ public class TestFormulaEvaluator extends TestCase {
                 return null;
             }
             return sheet.getAsset(tableName);
+        }
+
+        @Override
+        public Asset getAssetById(long assetId) {
+            throw new UnsupportedOperationException();
         }
 
     }

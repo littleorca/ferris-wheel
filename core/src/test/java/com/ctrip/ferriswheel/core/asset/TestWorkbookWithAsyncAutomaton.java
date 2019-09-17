@@ -159,6 +159,11 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
                     .commit();
             return dataSetBuilder.build();
         }
+
+        @Override
+        public boolean isVolatile() {
+            return true;
+        }
     }
 
     class Instruction {

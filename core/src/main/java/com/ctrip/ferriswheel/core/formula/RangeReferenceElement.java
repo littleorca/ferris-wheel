@@ -6,6 +6,7 @@ import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.ref.RangeReference;
+import com.ctrip.ferriswheel.core.ref.TableRange;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,17 +33,20 @@ public class RangeReferenceElement extends ReferenceElement {
             return;
         }
 
-        final int top = rangeReference.getTop() == -1 ? 0 : rangeReference.getTop();
-        final int bottom = rangeReference.getBottom() == -1 ? table.getRowCount() - 1 : rangeReference.getBottom();
-        final int left = rangeReference.getLeft() == -1 ? 0 : rangeReference.getLeft();
-        final int right = rangeReference.getRight() == -1 ? table.getColumnCount() - 1 : rangeReference.getRight();
+        TableRange validRange = rangeReference.getOverlappedRectangle(table);
+        if (validRange == null) {
+            context.pushOperand(Value.err(ErrorCodes.REF));
+            return;
+        }
+
         List<Variant> valueList = new LinkedList<>();
-        for (int row = top; row <= bottom; row++) {
-            for (int col = left; col <= right; col++) {
+        for (int row = validRange.getTop(); row <= validRange.getBottom(); row++) {
+            for (int col = validRange.getLeft(); col <= validRange.getRight(); col++) {
                 valueList.add(Value.from(table.getCell(row, col).getData()));
             }
         }
-        context.pushOperand(new Value.ListValue(valueList, right - left + 1));
+        final int actualResultColumns = validRange.getRight() - validRange.getLeft() + 1;
+        context.pushOperand(new Value.ListValue(valueList, actualResultColumns));
     }
 
     @Override

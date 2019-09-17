@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class EscapeHelper {
     //    public static final String RE_SIMPLE_NAME = "^[a-zA-Z0-9\\_$\\u4E00-\\u9FA5]+$";
-    private static final String RE_SIMPLE_NAME = "^[a-zA-Z0-9\\_$]+$";
+    private static final String RE_SIMPLE_NAME = "^[a-zA-Z\\_$][a-zA-Z0-9\\_$]*$";
     private static final char CHAR_SINGLE_QUOTE = '\'';
     private static final String STR_SINGLE_QUOTE = String.valueOf(CHAR_SINGLE_QUOTE);
 
