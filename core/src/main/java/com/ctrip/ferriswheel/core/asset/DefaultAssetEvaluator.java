@@ -42,11 +42,9 @@ public class DefaultAssetEvaluator implements AssetEvaluator {
     private static final long REFRESH_TIMEOUT_IN_MILLI_SECONDS = 15 * 60 * 1000L;
 
     private ReferenceResolver referenceResolver;
-    private TransactionManager transactionManager;
 
-    public DefaultAssetEvaluator(ReferenceResolver referenceResolver, TransactionManager transactionManager) {
+    public DefaultAssetEvaluator(ReferenceResolver referenceResolver) {
         this.referenceResolver = referenceResolver;
-        this.transactionManager = transactionManager;
     }
 
     @Override
@@ -58,14 +56,14 @@ public class DefaultAssetEvaluator implements AssetEvaluator {
 
         EvaluationContext evaluationContext = new DefaultEvaluationContext(mode, evaluator, completionService);
 
+        Set<Long> dirtyNodes = new HashSet<>();
         Set<Long> volatileNodes = new HashSet<>();
-        DirectedAcyclicGraph<Long, Asset> graph = GraphHelper.buildGraph(asset, volatileNodes);
+        DirectedAcyclicGraph<Long, Asset> graph = GraphHelper.buildGraph(asset, dirtyNodes, volatileNodes);
 
-        Transaction tx = transactionManager.getTransaction();
         Set<Long> pendingTasks = new HashSet<>();
 
         if (mode != EvaluationMode.Aggressive) {
-            HashSet<Long> keyNodes = new HashSet<>(tx.getDirtyNodes());
+            HashSet<Long> keyNodes = new HashSet<>(dirtyNodes);
             if (mode != EvaluationMode.Lazy) {
                 keyNodes.addAll(volatileNodes);
             }
@@ -90,7 +88,7 @@ public class DefaultAssetEvaluator implements AssetEvaluator {
                     }
                     processedAnyTask = true;
                     AssetNode assetNode = (AssetNode) referenceResolver.getAssetById(id);
-                    if (EvaluationState.PENDING != assetNode.evaluate(evaluationContext)) {
+                    if (EvaluationState.PENDING != evaluateAssetNode(assetNode, evaluationContext)) {
                         graph.removeNode(id);
                     } else {
                         pendingTasks.add(id);
@@ -138,12 +136,17 @@ public class DefaultAssetEvaluator implements AssetEvaluator {
             executor.shutdownNow();
         } finally {
             executor.shutdown(); // it's ok to shutdown an executor that already shutdown.
-            tx.close();
         }
 
 //        if (LOG.isDebugEnabled()) {
 //            LOG.debug(toString());
 //        }
 
+    }
+
+    private EvaluationState evaluateAssetNode(AssetNode node, EvaluationContext context) {
+        LOG.debug("Evaluating asset node: {}({}), mode={}",
+                node.getClass(), node.getAssetId(), context.getEvaluationMode());
+        return node.evaluate(context);
     }
 }

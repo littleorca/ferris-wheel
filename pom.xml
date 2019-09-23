@@ -55,7 +55,6 @@
         <findbugs-jsr305.version>3.0.1</findbugs-jsr305.version>
         <slf4j-api.version>1.7.24</slf4j-api.version>
         <logback.version>1.1.7</logback.version>
-        <uuid.version>3.2</uuid.version>
         <protobuf.version>3.5.1</protobuf.version>
         <tomcat-jdbc.version>8.5.15</tomcat-jdbc.version>
         <mysql.version>5.1.41</mysql.version>
@@ -122,11 +121,6 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.eaio.uuid</groupId>
-                <artifactId>uuid</artifactId>
-                <version>${uuid.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.protobuf</groupId>

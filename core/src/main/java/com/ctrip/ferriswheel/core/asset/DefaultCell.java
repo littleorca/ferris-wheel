@@ -43,6 +43,10 @@ public class DefaultCell extends ValueNode implements Cell {
         table.publicly(action, () -> setValue(newValue));
     }
 
+    @Override
+    public boolean isPhantom() {
+        return getRow() != null && getRow().isPhantom();
+    }
 
     public DefaultRow getRow() {
         return (DefaultRow) getParent();

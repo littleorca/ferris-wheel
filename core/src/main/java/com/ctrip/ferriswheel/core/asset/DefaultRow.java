@@ -116,6 +116,11 @@ public class DefaultRow extends AssetNode implements Row {
     }
 
     @Override
+    public boolean isPhantom() {
+        return getTable() != null && getTable().getAutomaton() != null;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         toString(sb);

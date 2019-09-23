@@ -13,8 +13,6 @@ abstract class AssetNode implements Asset {
     private volatile long currentRevision = 0;
     private volatile long evaluatedRevision = 0;
     private boolean valid = true;
-    private boolean isVolatile = false;
-    private boolean phantom = false;
 
     protected AssetNode(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -49,9 +47,9 @@ abstract class AssetNode implements Asset {
                 || selfChanged
                 || isVolatile()
                 || EvaluationMode.Aggressive == context.getEvaluationMode()) {
-            setCurrentRevision(getAssetManager().getTransaction().getId());
+            setCurrentRevision(getAssetManager().getTransaction().getTransactionId());
             resultState = doEvaluate(context);
-            // TODO for async evaluation, the job may still running, shall we update eval revision after it really done?
+            // TODO FIXME for async evaluation, the job may still running, shall we update eval revision after it really done?
             setEvaluatedRevision(getCurrentRevision());
         }
         return resultState;
@@ -87,16 +85,16 @@ abstract class AssetNode implements Asset {
         return Objects.hash(assetId);
     }
 
-    protected boolean isEmployed() {
+    protected boolean isAttached() {
         return getAssetManager().exists(assetId);
     }
 
     protected void bindChild(AssetNode child) {
         children.add(child);
         child.parent = this;
-        if (isEmployed()) {
-            getAssetManager().employ(child);
-            child.onEmployed();
+        if (isAttached()) {
+            getAssetManager().attach(child);
+            child.onAttached();
         }
         markDirty();
     }
@@ -104,44 +102,45 @@ abstract class AssetNode implements Asset {
     protected void unbindChild(AssetNode child) {
         children.remove(child);
         child.parent = null;
-        if (isEmployed()) {
-            getAssetManager().dismiss(child);
-            child.onDismissed();
+        if (isAttached()) {
+            getAssetManager().detach(child);
+            child.onDetached();
         }
         markDirty();
     }
 
-    protected void onEmployed() {
+    protected void onAttached() {
         if (currentRevision == 0) {
             markDirty();
         }
         for (AssetNode child : children) {
-            getAssetManager().employ(child);
-            child.onEmployed();
+            getAssetManager().attach(child);
+            child.onAttached();
         }
-        afterEmployed();
+        afterAttached();
     }
 
-    protected void onDismissed() {
+    protected void onDetached() {
         // mark all dependent nodes as dirty.
+        // TODO mark dirty is not enough, should fix reference
         for (AssetNode node : getDependents()) {
             node.markDirty();
         }
 
         clearDependencies();
         for (AssetNode child : children) {
-            getAssetManager().dismiss(child);
-            child.onDismissed();
+            getAssetManager().detach(child);
+            child.onDetached();
         }
-        afterDismissed();
+        afterDetached();
     }
 
     // overridable
-    protected void afterEmployed() {
+    protected void afterAttached() {
     }
 
     // overridable
-    protected void afterDismissed() {
+    protected void afterDetached() {
     }
 
     protected <T extends AssetNode> T parent(Class<T> parentClass) {
@@ -173,9 +172,9 @@ abstract class AssetNode implements Asset {
     }
 
     protected void markDirty() {
-        Transaction tx = getAssetManager().getTransaction();
-        setCurrentRevision(tx.getId());
-        tx.markDirtyNode(getAssetId());
+        AssetManager am = getAssetManager();
+        Transaction tx = am.getTransaction();
+        setCurrentRevision(tx.getTransactionId());
     }
 
     @Override
@@ -194,20 +193,17 @@ abstract class AssetNode implements Asset {
 
     @Override
     public boolean isVolatile() {
-        return isVolatile;
-    }
-
-    protected void setVolatile(boolean aVolatile) {
-        isVolatile = aVolatile;
+        return false;
     }
 
     @Override
     public boolean isPhantom() {
-        return phantom;
+        return false;
     }
 
-    protected void setPhantom(boolean phantom) {
-        this.phantom = phantom;
+    @Override
+    public boolean isDirty() {
+        return getCurrentRevision() > getEvaluatedRevision();
     }
 
     protected AssetManager getAssetManager() {

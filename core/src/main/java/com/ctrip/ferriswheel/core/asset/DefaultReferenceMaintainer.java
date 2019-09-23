@@ -65,14 +65,7 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
             return; // should manually resolve later
         }
         valueNode.clearDependencies();
-//        dependencyTracer.clearRangeDependencies(valueNode.getAssetId());
-
-        // TODO review if it is needed
-//        if (table != null) {
-//            valueNode.addDependency(table);
-//        } else if (valueNode.getParentAsset() instanceof DefaultChart) {
-//            valueNode.addDependency(valueNode.getParentAsset());
-//        }
+        valueNode.setValid(true);
 
         if (valueNode.isFormula()) {
             Formula f = valueNode.getFormula();

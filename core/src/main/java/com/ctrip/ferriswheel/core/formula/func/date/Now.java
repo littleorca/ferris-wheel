@@ -24,6 +24,11 @@ public class Now implements Function {
     }
 
     @Override
+    public boolean isVolatile() {
+        return true;
+    }
+
+    @Override
     public boolean checkArgc(int argc) {
         return (argc == 0);
     }

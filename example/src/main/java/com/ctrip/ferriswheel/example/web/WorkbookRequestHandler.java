@@ -196,7 +196,9 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
         com.ctrip.ferriswheel.proto.v1.Workbook.Builder builder = com.ctrip.ferriswheel.proto.v1.Workbook.newBuilder();
         JsonFormat.parser().merge(rd, builder);
         com.ctrip.ferriswheel.proto.v1.Workbook pb = builder.build();
-        return PbHelper.bean(ENV, pb);
+        Workbook wb = PbHelper.bean(ENV, pb);
+//        wb.refresh(true);
+        return wb;
     }
 
     class PingHandler implements RequestActionHandler {
@@ -221,7 +223,7 @@ public class WorkbookRequestHandler extends TextWebSocketHandler implements Requ
                 throw new IllegalArgumentException();
             }
             handle(txId, action, workbook);
-
+            workbook.refresh();
 
             List<Action> actions = drainRevises(workContext);
             com.ctrip.ferriswheel.proto.v1.EditResponse.Builder respBuilder = com.ctrip.ferriswheel.proto.v1.EditResponse.newBuilder();

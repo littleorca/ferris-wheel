@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Ctrip.com
+ * Copyright (c) 2018-2019 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,17 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.ctrip.ferriswheel.common.action;
+package com.ctrip.ferriswheel.provider;
 
-/**
- * @author liuhaifeng
- */
-public interface ActionContext {
-    boolean isSkipWelding();
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.util.DataSet;
 
-    boolean isSkipRefresh();
+import java.time.Duration;
 
-    boolean isForceRefresh();
+public interface CacheService {
+    DataSet getCache(DataQuery query);
+
+    void setCache(DataQuery query, DataSet dataSet, Duration duration);
 }

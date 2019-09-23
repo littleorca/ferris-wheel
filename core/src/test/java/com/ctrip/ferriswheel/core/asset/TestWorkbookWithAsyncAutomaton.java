@@ -93,12 +93,15 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
         t5.addRows(1);
         t5.addColumns(1);
         t5.setCellFormula(0, 0, "t3!A1+1");
+
+        workbook.refresh();
         System.out.println("## Initial workbook:");
         System.out.println(workbook);
     }
 
     public void testNormalCase() {
         t1.setCellValue(0, 0, Value.dec(1));
+        workbook.refresh();
         assertEquals(2, t2.getCell(0, 0).intValue());
         assertEquals(2, t3.getCell(0, 0).intValue());
         assertEquals(4, t4.getCell(0, 0).intValue());
@@ -113,6 +116,7 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
             return null;
         };
         t1.setCellValue(0, 0, Value.dec(2));
+        workbook.refresh();
         assertEquals(2, t1.getCell(0, 0).intValue());
 //        assertEquals(3, t3.getCell(0, 0).intValue());
 
@@ -122,14 +126,14 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
             }
             return null;
         };
-        workbook.refresh();
+        workbook.refresh(true);
         assertEquals(2, t1.getCell(0, 0).intValue());
         assertEquals(3, t2.getCell(0, 0).intValue());
         assertEquals(3, t3.getCell(0, 0).intValue());
         assertEquals(4, t5.getCell(0, 0).intValue());
 
         provider.beforeExecute = null;
-        workbook.refresh();
+        workbook.refresh(true);
         assertEquals(2, t1.getCell(0, 0).intValue());
         assertEquals(3, t2.getCell(0, 0).intValue());
         assertEquals(3, t3.getCell(0, 0).intValue());
@@ -166,12 +170,4 @@ public class TestWorkbookWithAsyncAutomaton extends TestCase {
         }
     }
 
-    class Instruction {
-        CountDownLatch latch;
-        boolean fireException = false;
-
-        Instruction(CountDownLatch latch) {
-            this.latch = latch;
-        }
-    }
 }

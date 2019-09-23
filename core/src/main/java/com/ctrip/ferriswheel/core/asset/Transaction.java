@@ -24,18 +24,15 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import java.util.Set;
-
 // TODO TBD
 public interface Transaction {
-    long getId();
+    long getTransactionId();
 
     TransactionPhase getCurrentPhase();
 
-    // TODO maybe move it out from transaction.
-    void markDirtyNode(long assetId);
+    void evaluate(EvaluationMode mode);
 
-    Set<Long> getDirtyNodes();
+    void commit();
 
-    void close();
+    void rollback();
 }

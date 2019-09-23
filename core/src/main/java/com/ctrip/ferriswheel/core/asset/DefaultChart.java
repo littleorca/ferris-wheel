@@ -29,7 +29,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     private String type;
     private final ValueNode title;
     private final ValueNode categories;
-    private final AssetList<DefaultDataSeries> seriesList; // TODO asset list not marking revisions
+    private final AssetList<DefaultDataSeries> seriesList;
     private AxisImpl xAxis;
     private AxisImpl yAxis;
     private AxisImpl zAxis;
@@ -129,7 +129,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
 
     public void setxAxis(AxisImpl xAxis) {
         this.xAxis = xAxis;
-        markDirty(); // TODO modifications via AxisImpl object it self is not tracked.
+        markDirty(); // TODO modifications via AxisImpl object itself is not tracked.
     }
 
     @Override
@@ -197,11 +197,17 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         if (rangeReference.getSheetName() != null) {
             sheet = sheet.getWorkbook().getSheet(rangeReference.getSheetName());
         }
-        if (sheet == null) {
-            throw new RuntimeException("Failed to get referred sheet.");
+        if (sheet == null) { // TODO mark illegal reference?
+            clearData();
+            getSheet().publicly(new UpdateChart(getSheet().getName(),
+                    getName(), new ChartData(this)), () -> {
+                // just publish the action
+            });
+            // throw new RuntimeException("Failed to get referred table.");
+            return;
         }
         DefaultTable table = sheet.getAsset(rangeReference.getAssetName());
-        if (table == null || table.getRowCount() == 0 || table.getColumnCount() == 0) {
+        if (table == null) { // TODO mark illegal reference?
             clearData();
             getSheet().publicly(new UpdateChart(getSheet().getName(),
                     getName(), new ChartData(this)), () -> {

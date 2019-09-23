@@ -56,9 +56,5 @@
             <groupId>com.ctrip.ferriswheel</groupId>
             <artifactId>quarks</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.eaio.uuid</groupId>
-            <artifactId>uuid</artifactId>
-        </dependency>
     </dependencies>
 </project>

@@ -37,14 +37,14 @@ public interface AssetManager {
     long nextAssetId();
 
     /**
-     * Employ the specified asset.
+     * Attach the specified asset.
      *
      * @param asset
      */
-    void employ(Asset asset);
+    void attach(Asset asset);
 
     /**
-     * Get employed asset by ID.
+     * Get attached asset by ID.
      *
      * @param id
      * @return
@@ -56,7 +56,7 @@ public interface AssetManager {
     ReferenceMaintainer getReferenceMaintainer();
 
     /**
-     * Determine whether the asset with the specified ID is employed or not.
+     * Determine whether the asset with the specified ID is attached or not.
      *
      * @param id
      * @return
@@ -64,11 +64,11 @@ public interface AssetManager {
     boolean exists(long id);
 
     /**
-     * Dismiss the specified asset.
+     * Detach the specified asset.
      *
      * @param asset
      */
-    void dismiss(Asset asset);
+    void detach(Asset asset);
 
     /**
      * Get transaction.

@@ -25,6 +25,12 @@ public class ValueNode extends AssetNode implements VariantNode {
         this.formula = data.isFormula() ? new Formula(data.getFormulaString()) : null;
     }
 
+    ValueNode(AssetNode parent, Value value, String formulaString) {
+        super(parent);
+        this.data = new DynamicValue(formulaString, value);
+        this.formula = (formulaString == null || formulaString.isEmpty()) ? null : new Formula(formulaString);
+    }
+
     @Override
     public EvaluationState doEvaluate(EvaluationContext context) {
         if (!isFormula()) {
@@ -46,6 +52,11 @@ public class ValueNode extends AssetNode implements VariantNode {
 
     protected void doUpdateValue(Variant newValue) {
         setValue(newValue);
+    }
+
+    @Override
+    public boolean isVolatile() {
+        return isFormula() && formula.isVolatile();
     }
 
     public boolean isFormula() {
@@ -88,7 +99,7 @@ public class ValueNode extends AssetNode implements VariantNode {
     }
 
     private void resolveFormulaIfNeeded() {
-        if (isEmployed()) {
+        if (isAttached()) {
             getAssetManager().getReferenceMaintainer().resolveFormula(this);
         }
     }
@@ -107,7 +118,7 @@ public class ValueNode extends AssetNode implements VariantNode {
     }
 
     @Override
-    protected void afterEmployed() {
+    protected void afterAttached() {
         getAssetManager().getReferenceMaintainer().resolveFormula(this);
     }
 

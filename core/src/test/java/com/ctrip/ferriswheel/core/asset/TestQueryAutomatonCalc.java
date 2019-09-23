@@ -34,6 +34,7 @@ public class TestQueryAutomatonCalc extends TestCase {
         DefaultSheet s1 = workbook.addSheet("s1");
         normalTable = (DefaultTable) s1.addAsset(Table.class, "normal");
         autoTable = (DefaultTable) s1.addAsset(Table.class, "auto");
+        workbook.refresh();
     }
 
     public void testCalcThroughQueryAutomaton() {
@@ -52,6 +53,7 @@ public class TestQueryAutomatonCalc extends TestCase {
                 null, null));
         normalTable.setCellFormula(0, 1, "auto!A1");
 
+        workbook.refresh();
         System.out.println(workbook);
 
         assertEquals(1, normalTable.getRowCount());
@@ -72,6 +74,7 @@ public class TestQueryAutomatonCalc extends TestCase {
         try {
             // auto->param2->normal!A1->normal!B1->auto!A1
             normalTable.setCellFormula(0, 0, "B1");
+            workbook.refresh(); // FIXME raise circular dependency exception while setting formula?
             fail("Expects circular dependency exception.");
         } catch (IllegalArgumentException e) {
         }

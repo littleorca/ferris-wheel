@@ -23,12 +23,16 @@ public class TestAutoFiller extends TestCase {
         table.setCellFormula(0, 2, "A1*B1");
         table.setCellFillDown(0, 1, true);
         table.setCellFillDown(0, 2, true);
+
+        workbook.refresh();
         System.out.println(workbook);
 
         autoFiller.autoFillCellIfPossible(table, 1, 1);
         autoFiller.autoFillCellIfPossible(table, 1, 2);
         autoFiller.autoFillCellIfPossible(table, 2, 1);
         autoFiller.autoFillCellIfPossible(table, 2, 2);
+
+        workbook.refresh();
         System.out.println(workbook);
 
         DefaultCell c11 = table.getCell(1, 1);
@@ -68,12 +72,15 @@ public class TestAutoFiller extends TestCase {
         table.setCellFormula(5, 3, "B$6+10");
         table.setCellFormula(5, 4, "SUM(B6:D6)");
 
+        workbook.refresh();
         System.out.println(workbook);
 
         autoFiller.fillUp(table, 5, 0, 4);
         autoFiller.fillUp(table, 5, 2, 4);
         autoFiller.fillUp(table, 5, 3, 4);
         autoFiller.fillUp(table, 5, 4, 4);
+
+        workbook.refresh();
         System.out.println(workbook);
 
         // these cells should not be filled

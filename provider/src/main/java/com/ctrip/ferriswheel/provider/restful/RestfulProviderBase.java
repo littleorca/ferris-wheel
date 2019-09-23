@@ -29,18 +29,22 @@ import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.provider.DataProviderSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author liuhaifeng
  */
-public abstract class RestfulProviderBase implements DataProvider {
+public abstract class RestfulProviderBase extends DataProviderSupport implements DataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(RestfulProviderBase.class);
 
     public static final String HTTP_METHOD_GET = "GET";
@@ -58,12 +62,8 @@ public abstract class RestfulProviderBase implements DataProvider {
     private volatile int connTimeoutInMillis = DEFAULT_CONN_TIMEOUT_IN_MILLIS;
     private volatile int readTimeoutInMillis = DEFAULT_READ_TIMEOUT_IN_MILLIS;
 
-    // TODO use LRU cache instead
-    // TODO cache should be expired after a certain duration.
-    private transient LinkedHashMap<RestfulRequest, String> cachedResponse = new LinkedHashMap<>();
-
     @Override
-    public DataSet execute(DataQuery query) throws IOException {
+    protected DataSet doExecute(DataQuery query) throws IOException {
         String response = executeRestfulRequest(createRequest(query));
         return parseToDataSet(query, response);
     }
@@ -98,23 +98,17 @@ public abstract class RestfulProviderBase implements DataProvider {
     }
 
     protected String executeRestfulRequest(RestfulRequest request) throws IOException {
-        String response = getCachedResponse(request);
-        if (response != null) {
-            LOG.info("Serve cached response of request: " + request.getUrl());
-            return response;
-        }
-
         LOG.info("Executing RESTful request: " + request.getUrl());
         long start = System.currentTimeMillis();
         try {
-            return executeRestfulRequestWithoutCache(request);
+            return doExecuteRestfulRequest(request);
         } finally {
             LOG.info("Execution done within {} milliseconds.", System.currentTimeMillis() - start);
         }
 
     }
 
-    protected String executeRestfulRequestWithoutCache(RestfulRequest request) throws IOException {
+    protected String doExecuteRestfulRequest(RestfulRequest request) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(request.getUrl()).openConnection();
         conn.setRequestMethod(request.getMethod());
 
@@ -155,29 +149,7 @@ public abstract class RestfulProviderBase implements DataProvider {
             while ((n = reader.read(cbuf)) != -1) {
                 sb.append(cbuf, 0, n);
             }
-            String response = sb.toString();
-            cacheResponseIfPossible(request, response);
-            return response;
-        }
-    }
-
-    protected String getCachedResponse(RestfulRequest request) {
-        synchronized (cachedResponse) {
-            return cachedResponse.get(request);
-        }
-    }
-
-    protected void cacheResponseIfPossible(RestfulRequest request, String response) {
-        if (!HTTP_METHOD_GET.equalsIgnoreCase(request.getMethod())) {
-            return;
-        }
-        synchronized (cachedResponse) {
-            while (cachedResponse.size() >= 10) {
-                Iterator<Map.Entry<RestfulRequest, String>> it = cachedResponse.entrySet().iterator();
-                it.next();
-                it.remove();
-            }
-            cachedResponse.put(request, response);
+            return sb.toString();
         }
     }
 

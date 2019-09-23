@@ -49,7 +49,6 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         } catch (RuntimeException e) {
             LOG.warn("Failed to update pivot table.", e);
             // TODO mark error
-            // TODO clearTable();
         }
     }
 
@@ -57,17 +56,12 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         if (pivot.getData() == null || pivot.getRows() == null || pivot.getValues() == null) {
             throw new IllegalArgumentException("Missing at least one of the required fields: [data, rows, values].");
         }
-        if (!pivot.getData().isFormula()) {
-            throw new IllegalArgumentException("Data area must be specified by a range reference formula.");
-        }
         this.data.setDynamicVariant(pivot.getData());
         if (this.data.getFormulaElements() == null
                 || this.data.getFormulaElements().length != 1
                 || !(this.data.getFormulaElements()[0] instanceof RangeReferenceElement)) {
-            this.data.setFormula(null);
-            this.data.setValue(Value.BLANK);
-            this.data.clearDependencies();
-            throw new IllegalArgumentException("Data area formula must be a simple range reference.");
+            this.data.setValid(false);
+            //throw new IllegalArgumentException("Data area formula must be a simple range reference.");
         }
 
         if (pivot.getFilters() != null) {
@@ -95,11 +89,16 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
             this.dataSet = doExecute();
         } catch (RuntimeException e) {
             LOG.warn("Failed to execute pivot automaton.", e);
+            this.dataSet = null;
             // TODO mark error.
         }
     }
 
     protected DataSet doExecute() {
+        if (!this.data.isValid()) {
+            return ListDataSet.Builder.emptyDataSet();
+        }
+
         RangeReferenceElement rangeElement = (RangeReferenceElement) data.getFormulaElements()[0];
         RangeReference rangeReference = rangeElement.getRangeReference();
 

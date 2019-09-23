@@ -27,6 +27,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
     private transient Map<String, Variant> parameters;
     private transient DataQuery query;
     private transient AtomicReference<DataSet> dataSetReference = new AtomicReference<>();
+    private boolean isVolatile = false;
 
     DefaultQueryAutomaton(AssetManager assetManager, QueryConfiguration solution) {
         super(assetManager);
@@ -55,8 +56,6 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
             }
             this.query = null; // clear old query
             markDirty();
-
-            getTable().getWorkbook().refreshIfNeeded();
         });
     }
 
@@ -69,7 +68,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
                 getCurrentRevision() > template.getCurrentRevision()) {
             return;
         }
-        DataSet dataSet = doQuery();
+        DataSet dataSet = doQuery(forceUpdate);
         this.dataSetReference.set(dataSet);
     }
 
@@ -77,7 +76,7 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
     public <V> Future<V> execute(boolean forceUpdate, CompletionService<V> completionService, V result) {
         DefaultWorkbook wb = parent(DefaultWorkbook.class);
 
-        if (wb.isForceRefresh()) {
+        if (forceUpdate) {
             parameters = Collections.emptyMap();
         }
         this.query = template.renderQuery(parameters);
@@ -113,10 +112,10 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
         }
     }
 
-    private DataSet doQuery() {
+    private DataSet doQuery(boolean forceUpdate) {
         DefaultWorkbook wb = parent(DefaultWorkbook.class);
 
-        if (wb.isForceRefresh()) {
+        if (forceUpdate) {
             parameters = Collections.emptyMap();
         }
         this.query = template.renderQuery(parameters);
@@ -141,6 +140,15 @@ public class DefaultQueryAutomaton extends AbstractAutomaton implements QueryAut
             // TODO mark error
             return null;
         }
+    }
+
+    @Override
+    public boolean isVolatile() {
+        return isVolatile;
+    }
+
+    private void setVolatile(boolean aVolatile) {
+        isVolatile = aVolatile;
     }
 
     @Override

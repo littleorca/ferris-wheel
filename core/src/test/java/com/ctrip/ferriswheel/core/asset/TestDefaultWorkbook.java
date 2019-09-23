@@ -35,6 +35,8 @@ public class TestDefaultWorkbook extends TestCase {
         table.setCellFormula(1, 2, "A2+B2");
         table.setCellFormula(2, 2, "C1+C2");
 
+        workbook.refresh();
+
         assertEquals(1, workbook.getSheetCount());
         table = workbook.getSheet(0).getAsset("table1");
         assertEquals(3, table.getRowCount());
@@ -59,6 +61,8 @@ public class TestDefaultWorkbook extends TestCase {
         table.setCellFormula(0, 3, "A1*B1");
 
         table.fillDown(0, 2, 3, 2);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(23, table.getCell(0, 2).intValue());
@@ -69,6 +73,8 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(992, table.getCell(2, 3).intValue());
 
         table.addRows(1, 1);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(23, table.getCell(0, 2).intValue());
@@ -91,6 +97,8 @@ public class TestDefaultWorkbook extends TestCase {
 
         table.fillRight(3, 4, 0, 2);
 
+        workbook.refresh();
+
         assertEquals(63, table.getCell(3, 0).intValue());
         assertEquals(0.5238095238095238, table.getCell(4, 0).doubleValue());
         assertEquals(66, table.getCell(3, 1).intValue());
@@ -99,6 +107,7 @@ public class TestDefaultWorkbook extends TestCase {
         assertEquals(0.5652173913043478, table.getCell(4, 2).doubleValue());
 
         table.addColumns(1, 1);
+        workbook.refresh();
 
         assertEquals(63, table.getCell(3, 0).intValue());
         assertEquals(0.5238095238095238, table.getCell(4, 0).doubleValue());
@@ -119,6 +128,8 @@ public class TestDefaultWorkbook extends TestCase {
         System.out.println(table);
 
         table.eraseCells(1, 4, 2, 0);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(3, table.getRowCount()); // update: blank cells won't be trimmed.
@@ -136,9 +147,13 @@ public class TestDefaultWorkbook extends TestCase {
         table.addColumns(3, 1);
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(1, 3, "A2+B2");
+
+        workbook.refresh();
         System.out.println(table);
 
         table.eraseCells(0, 2, 2, 1);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(3, table.getRowCount());
@@ -157,6 +172,8 @@ public class TestDefaultWorkbook extends TestCase {
         table.setCellFormula(1, 3, "SUM(A2:C2)");
         table.setCellFormula(2, 3, "B3+C3");
         table.addRows(1, 2);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(5, table.getRowCount());
@@ -170,6 +187,8 @@ public class TestDefaultWorkbook extends TestCase {
 
         table.setCellValue(1, 0, new Value.DecimalValue(10));
         table.setCellValue(2, 2, new Value.DecimalValue(24));
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(232, table.getCell(0, 3).intValue());
@@ -185,9 +204,13 @@ public class TestDefaultWorkbook extends TestCase {
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(0, 4, "A2+B2");
         table.setCellFormula(3, 3, "SUM(A2:B2)"); // this row will shift up after remove rows
+
+        workbook.refresh();
         System.out.println(table);
 
         table.removeRows(1, 2);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(2, table.getRowCount());
@@ -204,6 +227,8 @@ public class TestDefaultWorkbook extends TestCase {
 
         table.removeRows(0, 1);
         table.removeRows(0, 1);
+
+        workbook.refresh();
         System.out.println(table);
     }
 
@@ -227,6 +252,8 @@ public class TestDefaultWorkbook extends TestCase {
                 series));
         table.removeRows(0, 3);
 
+        workbook.refresh();
+
         assertEquals(0, table.getRowCount());
         assertEquals(3, table.getColumnCount());
     }
@@ -239,6 +266,8 @@ public class TestDefaultWorkbook extends TestCase {
         table.setCellFormula(1, 3, "SUM(B2:C2)");
         table.setCellFormula(2, 3, "B3+C3");
         table.addColumns(1, 2);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(3, table.getRowCount());
@@ -252,6 +281,8 @@ public class TestDefaultWorkbook extends TestCase {
 
         table.setCellValue(0, 1, new Value.DecimalValue(10));
         table.setCellValue(2, 2, new Value.DecimalValue(24));
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(232, table.getCell(0, 5).intValue());
@@ -265,9 +296,13 @@ public class TestDefaultWorkbook extends TestCase {
         table.addColumns(3, 1);
         table.setCellFormula(0, 3, "SUM(A1:C3)");
         table.setCellFormula(1, 3, "A2+B2");
+
+        workbook.refresh();
         System.out.println(table);
 
         table.removeColumns(1, 2);
+
+        workbook.refresh();
         System.out.println(table);
 
         assertEquals(3, table.getRowCount());
@@ -299,6 +334,8 @@ public class TestDefaultWorkbook extends TestCase {
                 new DynamicValue("table1!$B$1:$C$1"),
                 series));
         table.removeColumns(0, 3);
+
+        workbook.refresh();
 
         assertEquals(3, table.getRowCount()); // update: blank cells won't be trimmed.
         assertEquals(0, table.getColumnCount());
@@ -361,8 +398,12 @@ public class TestDefaultWorkbook extends TestCase {
                                 new DynamicValue("table2!B3:C3"))
                 )));
 
+//        workbook.refresh();
+
         workbook.renameSheet("sheet1", "s1");
         sheet2.renameAsset("table2", "t2");
+
+        workbook.refresh();
 
         assertEquals("SUM(A1:C3)", table1.getCell(0, 3).getFormulaString());
         assertEquals(198, table1.getCell(0, 3).intValue());
@@ -460,7 +501,8 @@ public class TestDefaultWorkbook extends TestCase {
             t2.addColumns(1);
             t2.addRows(1);
             t2.setCellValue(0, 0, Value.dec(8));
-        }, true);
+        });
+        workbook.refresh(true);
         assertEquals(1, workbook.getSheetCount());
         Sheet s1 = workbook.getSheet(0);
         assertEquals(2, s1.getAssetCount());
@@ -490,6 +532,9 @@ public class TestDefaultWorkbook extends TestCase {
         t2.setCellFormula(0, 1, "SUM(t1!A1:B1)");
 
         s1.removeAsset("t1");
+
+        workbook.refresh();
+
         assertFalse(t2.getCell(0, 0).getData().isValid());
         assertFalse(t2.getCell(0, 1).getData().isValid());
     }

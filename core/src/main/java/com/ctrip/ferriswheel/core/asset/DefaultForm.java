@@ -136,11 +136,10 @@ public class DefaultForm extends SheetAssetNode implements Form {
     }
 
     public void submit(Map<String, Variant> params) {
-        DefaultWorkbook wb = getSheet().getWorkbook();
-        wb.withoutRefresh(() -> doSubmit(params));
-        wb.refreshIfNeeded();
+        doSubmit(params);
     }
 
+    // TODO improve submit procedure
     void doSubmit(Map<String, Variant> params) {
         Map<Long, ExecuteQuery> pendingQuerys = new HashMap<>();
         for (Map.Entry<String, Variant> pair : params.entrySet()) {
@@ -164,7 +163,7 @@ public class DefaultForm extends SheetAssetNode implements Form {
     private void updateOrCollectQuery(DefaultFormField field,
                                       DefaultFormFieldBinding binding,
                                       Map<Long, ExecuteQuery> pendingQuerys) {
-        Formula f = binding.getTargetRefHolder().getFormula();
+        Formula f = binding.getFormula();
         if (f.getElements().length != 1) { // should be checked during update procedure.
             throw new RuntimeException();
         }

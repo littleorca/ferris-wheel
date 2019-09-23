@@ -82,7 +82,6 @@ public class DynamicValue implements DynamicVariant {
 
     @Override
     public VariantType valueType() {
-        refreshIfNeeded();
         return variant.valueType();
     }
 
@@ -93,91 +92,76 @@ public class DynamicValue implements DynamicVariant {
 
     @Override
     public boolean isBlank() {
-        refreshIfNeeded();
         return variant.isBlank();
     }
 
     @Override
     public ErrorCode errorValue() {
-        refreshIfNeeded();
         return variant.errorValue();
     }
 
     @Override
     public int intValue() {
-        refreshIfNeeded();
         return variant.intValue();
     }
 
     @Override
     public long longValue() {
-        refreshIfNeeded();
         return variant.longValue();
     }
 
     @Override
     public float floatValue() {
-        refreshIfNeeded();
         return variant.floatValue();
     }
 
     @Override
     public double doubleValue() {
-        refreshIfNeeded();
         return variant.doubleValue();
     }
 
     @Override
     public BigDecimal decimalValue() {
-        refreshIfNeeded();
         return variant.decimalValue();
     }
 
     @Override
     public boolean booleanValue() {
-        refreshIfNeeded();
         return variant.booleanValue();
     }
 
     @Override
     public Date dateValue() {
-        refreshIfNeeded();
         return variant.dateValue();
     }
 
     @Override
     public String strValue() {
-        refreshIfNeeded();
         return variant.strValue();
     }
 
     @Override
     public List<Variant> listValue() {
-        refreshIfNeeded();
         return variant.listValue();
     }
 
     @Override
     public int itemCount() {
-        refreshIfNeeded();
         return variant.itemCount();
     }
 
     @Override
     public Variant item(int i) {
-        refreshIfNeeded();
         return variant.item(i);
     }
 
     @Override
     public int columnCount() {
-        refreshIfNeeded();
         return variant.columnCount();
     }
 
     @Override
     public int rowCount() {
-        refreshIfNeeded();
         return variant.rowCount();
     }
 
@@ -186,15 +170,8 @@ public class DynamicValue implements DynamicVariant {
         return formulaString != null && !formulaString.isEmpty();
     }
 
-    /**
-     * Override this method to make sure the formula is evaluated.
-     */
-    protected void refreshIfNeeded() {
-    }
-
     @Override
     public int compareTo(Variant o) {
-        refreshIfNeeded();
         return variant.compareTo(o);
     }
 

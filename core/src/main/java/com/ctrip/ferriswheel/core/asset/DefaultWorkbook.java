@@ -1,14 +1,12 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.*;
-import com.ctrip.ferriswheel.common.action.ActionContextManager;
 import com.ctrip.ferriswheel.common.action.ActionListener;
 import com.ctrip.ferriswheel.core.action.AddSheet;
 import com.ctrip.ferriswheel.core.action.MoveSheet;
 import com.ctrip.ferriswheel.core.action.RemoveSheet;
 import com.ctrip.ferriswheel.core.action.RenameSheet;
 import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.util.UUIDGen;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +23,7 @@ import java.util.function.Consumer;
 public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetManager, TransactionManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultWorkbook.class);
     private static final VersionImpl VERSION = new VersionImpl(0, 0, 0);
+    private static final String DEFAULT_WORKBOOK_NAME = "Workbook";
 
     private final AtomicLong nextId = new AtomicLong(1);
     private final AtomicLong nextSequenceNumber = new AtomicLong(1);
@@ -32,23 +31,23 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     final Map<Long, AssetReference> assetMap = new ConcurrentHashMap<>();
     private DefaultTransaction transaction;
     private DefaultAssetEvaluator evaluator;
+    private boolean skipWelding = false;
 
     // revision sequence number is used to mark last update (like last modified timestamp)
     private final Environment environment;
     private final NamedAssetList<DefaultSheet> sheets;
     private final ActionListenerChain listenerChain;
-    private final ActionContextManager actionContextManager = new DefaultActionContextManager();
     private final DefaultReferenceMaintainer referenceMaintainer;
 
     DefaultWorkbook(Environment environment) {
-        // FIXME workbook name
-        super(UUIDGen.generate().toString(), 0);
-        employ(this); // self-register
+        // FIXME does workbook really need a name?
+        super(DEFAULT_WORKBOOK_NAME, 0);
+        attach(this); // self-register
         this.environment = environment;
         this.sheets = new NamedAssetList<>(this);
         this.listenerChain = createListenerChain();
         this.referenceMaintainer = new DefaultReferenceMaintainer(this);
-        this.evaluator = new DefaultAssetEvaluator(referenceMaintainer, this);
+        this.evaluator = new DefaultAssetEvaluator(referenceMaintainer);
     }
 
     @Override
@@ -110,7 +109,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
             return; // nothing changed
         }
         checkSheetName(newName);
-        withoutRefresh(() -> listenerChain.publicly(new RenameSheet(sheet.getName(), newName),
+        listenerChain.publicly(new RenameSheet(sheet.getName(), newName),
                 () -> {
                     if (!sheets.rename(oldName, newName)) {
                         throw new RuntimeException("Failed to rename sheet.");
@@ -121,11 +120,10 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
                             table.onTableUpdate();
                         }
                     }
-                }));
+                });
 
         // technically rename a sheet doesn't affect any cell value or chart property value,
         // it just affect formulas.
-        refreshIfNeeded();
     }
 
     @Override
@@ -167,25 +165,23 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
      * not resolvable yet.
      *
      * @param consumer
-     * @param forceRefresh
      */
-    void batch(Consumer<Workbook> consumer, boolean forceRefresh) {
-        actionContextManager.withContext(new DefaultActionContext(true, isSkipRefresh(), isForceRefresh()),
-                this, consumer);
-        resettle();
-        refresh(forceRefresh);
+    void batch(Consumer<Workbook> consumer) {
+        this.skipWelding = true;
+        try {
+            consumer.accept(this);
+        } finally {
+            this.skipWelding = false;
+            resettle();
+        }
     }
 
     /**
      * Scan and update reference anchor.
-     * TODO currently dependencies also been update during this procedure, need to split them.
      */
     void resettle() {
         LOG.debug("resettle");
-
-        withoutRefresh(() -> {
-            referenceMaintainer.resolveFormulas(this);
-        });
+        referenceMaintainer.resolveFormulas(this);
     }
 
     @Override
@@ -195,12 +191,11 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
 
     @Override
     public void refresh(boolean force) {
-        actionContextManager.withContext(new DefaultActionContext(isSkipWelding(), isSkipRefresh(), force),
-                () -> {
-                    LOG.debug("refresh");
-                    EvaluationMode mode = isForceRefresh() ? EvaluationMode.Aggressive : EvaluationMode.Normal;
-                    evaluator.evaluate(this, mode);
-                });
+        EvaluationMode mode = force ? EvaluationMode.Aggressive : EvaluationMode.Normal;
+        LOG.debug("refresh: mode={}", mode);
+        DefaultTransaction tx = getTransaction();
+        tx.evaluate(mode);
+        tx.commit();
     }
 
     @Override
@@ -213,22 +208,8 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
         return listenerChain.removeListener(listener);
     }
 
-    protected void refreshIfNeeded() {
-        if (!isSkipWelding() && !isSkipRefresh()) {
-            refresh();
-        }
-    }
-
-    boolean isSkipRefresh() {
-        return actionContextManager.isSkipRefresh();
-    }
-
     boolean isSkipWelding() {
-        return actionContextManager.isSkipWelding();
-    }
-
-    boolean isForceRefresh() {
-        return actionContextManager.isForceRefresh();
+        return skipWelding;
     }
 
     private void checkSheetName(String name) throws IllegalArgumentException {
@@ -240,10 +221,6 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     public AssetManager getAssetManager() {
         return this;
     }
-
-    //// ------------------------------------------------------------------------------------
-    //// callbacks for update dependencies and refresh formula results after certain changes.
-    //// ------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
@@ -262,10 +239,6 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
             }
         }
         return new ActionListenerChain(listeners);
-    }
-
-    void withoutRefresh(Runnable runnable) {
-        actionContextManager.withContext(new DefaultActionContext(isSkipWelding(), true, isForceRefresh()), runnable);
     }
 
     @Override
@@ -290,7 +263,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     }
 
     @Override
-    public void employ(Asset asset) {
+    public void attach(Asset asset) {
         AssetReference ref = assetMap.get(asset.getAssetId());
         if (ref == null) {
             ref = new AssetReference(asset);
@@ -324,10 +297,10 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     }
 
     @Override
-    public void dismiss(Asset asset) {
+    public void detach(Asset asset) {
         AssetReference ref = assetMap.get(asset.getAssetId());
         if (ref == null) {
-            throw new RuntimeException("This asset is not employed!");
+            throw new RuntimeException("This asset is not attached!");
         }
         if (ref.referenceCount.decrementAndGet() <= 0) {
             assetMap.remove(asset.getAssetId());
@@ -337,7 +310,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     @Override
     public synchronized DefaultTransaction getTransaction() {
         if (transaction == null || transaction.getCurrentPhase() == TransactionPhase.Done) {
-            transaction = new DefaultTransaction(nextSequenceNumber());
+            transaction = new DefaultTransaction(this, evaluator, nextSequenceNumber());
         }
         return transaction;
     }

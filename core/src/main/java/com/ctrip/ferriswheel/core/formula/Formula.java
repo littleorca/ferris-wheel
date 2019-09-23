@@ -18,6 +18,18 @@ public class Formula {
         this.resolved = resolved;
     }
 
+    public boolean isVolatile() {
+        if (elements == null) {
+            return false;
+        }
+        for (FormulaElement elem : elements) {
+            if (elem.isVolatile()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getString() {
         return string;
     }

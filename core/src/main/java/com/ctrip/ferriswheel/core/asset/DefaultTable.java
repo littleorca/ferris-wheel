@@ -89,8 +89,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
             Variant oldValue = new DynamicValue(cell.getData());
             cell.setValue(value);
             cell.getRow().getCellCount();
-//            onValueNodeUpdate(cell);
-            getWorkbook().refreshIfNeeded();
             return oldValue;
         });
     }
@@ -122,8 +120,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
             Formula oldFormula = cell.getFormula();
             cell.setFormula(formula == null ? null : new Formula(formula));
             cell.setValue(Value.BLANK); // wipe old value
-            //onValueNodeUpdate(cell);
-            getWorkbook().refreshIfNeeded();
             return oldFormula;
         });
     }
@@ -212,8 +208,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
         } else {
             throw new RuntimeException("Unknown fill cells action: " + fillCells.getClass());
         }
-
-        getWorkbook().refreshIfNeeded();
     }
 
     @Override
@@ -266,7 +260,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     row.getCell(columnIndex).setFormat(format);
                 }
             }
-            getWorkbook().refreshIfNeeded();
         });
     }
 
@@ -299,10 +292,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     }
                 }
             }
-//            if (colIndex + nCols == getColumnCount()) {
-//                fixColumnCount();
-//            }
-            getWorkbook().refreshIfNeeded();
         });
     }
 
@@ -341,13 +330,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
             final int right = getColumnCount() - 1;
             final int bottom = getRowCount() - 1;
 
-            getWorkbook().withoutRefresh(() -> {
-                updateRangeReferences(left, top, right, bottom,
-                        null, null, null, null);
-                autoFiller.autoFillRowsIfPossible(this, rowIndex, nRows);
-            });
-
-            getWorkbook().refreshIfNeeded();
+            updateRangeReferences(left, top, right, bottom,
+                    null, null, null, null);
+            autoFiller.autoFillRowsIfPossible(this, rowIndex, nRows);
         });
     }
 
@@ -390,12 +375,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
             final int left = 0;
             final int top = rowIndex;
 
-            getWorkbook().withoutRefresh(() ->
-                    updateRangeReferences(left, top, null, null,
-                            null, rowIndex > 0 ? rowIndex - 1 : null,
-                            null, rowIndex));
-
-            getWorkbook().refreshIfNeeded();
+            updateRangeReferences(left, top, null, null,
+                    null, rowIndex > 0 ? rowIndex - 1 : null,
+                    null, rowIndex);
 
             return removedRows;
         });
@@ -436,13 +418,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
             final int right = getColumnCount() - 1;
             final int bottom = getRowCount() - 1;
 
-            getWorkbook().withoutRefresh(() -> {
-                updateRangeReferences(left, top, right, bottom,
-                        null, null, null, null);
-                autoFiller.autoFillColumnsIfPossible(this, colIndex, nCols);
-            });
-
-            getWorkbook().refreshIfNeeded();
+            updateRangeReferences(left, top, right, bottom,
+                    null, null, null, null);
+            autoFiller.autoFillColumnsIfPossible(this, colIndex, nCols);
         });
     }
 
@@ -488,11 +466,9 @@ public class DefaultTable extends SheetAssetNode implements Table {
             final int left = colIndex;
             final int top = 0;
 
-            getWorkbook().withoutRefresh(() -> updateRangeReferences(left, top, null, null,
+            updateRangeReferences(left, top, null, null,
                     colIndex > 0 ? colIndex - 1 : null, null,
-                    colIndex, null));
-
-            getWorkbook().refreshIfNeeded();
+                    colIndex, null);
 
             return removedCells;
         });
@@ -506,44 +482,14 @@ public class DefaultTable extends SheetAssetNode implements Table {
     void handleAction(AutomateTable automateTable) {
         publicly(automateTable, () -> {
             createAndRegisterAutomaton(automateTable.getSolution());
-            doClearTable();
-
-            getWorkbook().withoutRefresh(() -> {
-                DefaultSheet sheet = getSheet();
-                Automaton auto = getAutomaton();
-
-                // currently a table can only depends on automaton,
-                // when it's automaton changed (including create/update/remove),
-                // table dependencies can be cleared and rebuilt.
-                // table.clearDependencies();
-
-                if (auto instanceof DefaultQueryAutomaton) {
-                    DefaultQueryTemplate template = ((DefaultQueryAutomaton) auto).getTemplate();
-                    for (String name : template.getBuiltinParamNames()) {
-                        Parameter param = template.getBuiltinParam(name);
-                        // table.addDependency(param);
-                        // cannot pass table parameter here, which mislead the method to deal
-                        // the node as a table cell
-                        //onValueNodeUpdate((ValueNode) param.getValue());
-                    }
-
-                } else if (auto instanceof DefaultPivotAutomaton) {
-                    ValueNode data = ((DefaultPivotAutomaton) auto).getData();
-                    // table.addDependency(data);
-                    //onValueNodeUpdate(data);
-                }
-
-                auto.init();
-            });
-
-            getWorkbook().refreshIfNeeded();
+            Automaton auto = getAutomaton();
+            auto.init();
         });
     }
 
     private Automaton createAndRegisterAutomaton(AutomateConfiguration solution) {
         if (this.automaton != null) {
             unbindChild((AssetNode) this.automaton);
-//            this.removeDependency(((AssetNode) this.automaton));
         }
 
         if (solution instanceof QueryConfiguration) {
@@ -555,7 +501,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 Parameter param = queryAutomaton.getTemplate().getBuiltinParam(name);
                 queryAutomaton.addDependency((ValueNode) param.getValue());
             }
-//            this.addDependency(queryAutomaton);
             return queryAutomaton;
 
         } else if (solution instanceof PivotConfiguration) {
@@ -563,8 +508,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     (PivotConfiguration) solution);
             bindChild(pivotAutomaton);
             this.automaton = pivotAutomaton;
-//            pivotAutomaton.addDependency(pivotAutomaton.getData());
-//            this.addDependency(pivotAutomaton);
             return pivotAutomaton;
 
         } else {
@@ -606,9 +549,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
         if (row == null) {
             row = new DefaultRow(getAssetManager());
             setRow(rowIndex, row);
-            if (getAutomaton() != null) {
-                row.setPhantom(true);
-            }
         }
         return row;
     }
@@ -621,10 +561,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
         if (cell == null) {
             cell = new DefaultCell(getAssetManager());
             row.setCell(columnIndex, cell);
-            // cell.addDependency(this); // TODO review if it is needed
-            if (getAutomaton() != null) {
-                cell.setPhantom(true);
-            }
         }
         return cell;
     }
@@ -846,7 +782,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
                                      Integer top,
                                      Integer right,
                                      Integer bottom) {
-        // 先用笨方法实现功能
+        // TODO optimize algorithm
         List<Range> ranges = new LinkedList<>();
         for (Range range : rangeToNodes.keySet()) {
             if (range.tableId != getAssetId()) {
@@ -894,14 +830,15 @@ public class DefaultTable extends SheetAssetNode implements Table {
         setReadOnly(false);
         try {
             DataSet dataSet = getAutomaton().getDataSet();
-            getSheet().getNotifier().privately(() -> getWorkbook().withoutRefresh(() -> {
+            getSheet().getNotifier().privately(() ->
+            {
                 if (dataSet != null) {
                     doFillTable(dataSet);
                 } else {
                     doClearTable();
                 }
                 onTableUpdate();
-            }));
+            });
         } finally {
             setReadOnly(true);
             publicly(new ResetTable(getSheet().getName(), this), () -> {
@@ -921,7 +858,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
             for (int col = 0; col < setMeta.getColumnCount(); col++) {
                 columnHeaders.add(new HeaderInfo(/* TBD */));
                 DefaultCell cell = getOrCreateCell(rowCount, col);
-                cell.setPhantom(true);
                 refreshCellValue(rowCount, col, Value.str(setMeta.getColumnMeta(col).getName()));
             }
             rowCount++;
@@ -942,7 +878,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 String format = stylizedVariant.getFormat();
 //                refreshCellValue(row, col, Value.from(value));
                 DefaultCell cell = getOrCreateCell(rowCount, col);
-                cell.setPhantom(true);
                 cell.setValue(value);
                 if (format != null) {
                     cell.setFormat(format);
@@ -958,7 +893,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
         Iterator<Map.Entry<Integer, DefaultRow>> rowIter = rows.iterator();
         while (rowIter.hasNext()) {
             DefaultRow row = rowIter.next().getValue();
-            row.setPhantom(true);
             int count = row.getCellCount();
             for (int i = getColumnCount(); i < count; i++) {
                 row.removeCell(i);
@@ -1163,7 +1097,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
             UpdateForm action = new UpdateForm(form.getSheet().getName(), form.getName(), form);
             publicly(action, () -> {
                 dependentNode.setFormula(new Formula(newFormula));
-//                onValueNodeUpdate(dependentNode);
                 return form;
             });
 
@@ -1207,7 +1140,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
         modified |= fixCellRef(sourceNode, upperLeftRef);
         modified |= fixCellRef(sourceNode, lowerRightRef);
 
-        // FIXME cut/past cells not supported yet, but if once supported, upper left cell and lower right cell may resident in different table.
+        // FIXME cut/paste cells not supported yet, but if once supported, upper left cell and lower right cell may resident in different table.
 
         if (!upperLeftRef.isValid() && !lowerRightRef.isValid()) {
             // invalid range reference
@@ -1411,7 +1344,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
                             form),
                     () -> {
                         vn.setFormula(new Formula(newFormula));
-//                        onValueNodeUpdate(vn);
                     });
         }
     }

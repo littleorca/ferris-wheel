@@ -170,7 +170,7 @@ public abstract class PlainAggregator implements Aggregator {
 
         protected void doFeed(Variant variant) {
             if (variant.valueType() != VariantType.DECIMAL) {
-                return; // TODO support max string?
+                return; // TODO support min string?
             }
             if (value == null) {
                 value = variant.decimalValue();

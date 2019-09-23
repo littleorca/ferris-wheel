@@ -52,6 +52,8 @@ public interface Asset extends Serializable {
      */
     boolean isPhantom();
 
+    boolean isDirty();
+
     Asset getParent();
 
     List<? extends Asset> getChildren();

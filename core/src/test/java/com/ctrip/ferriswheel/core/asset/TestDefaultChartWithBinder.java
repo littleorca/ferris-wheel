@@ -15,14 +15,15 @@ import junit.framework.TestCase;
 import java.util.Arrays;
 
 public class TestDefaultChartWithBinder extends TestCase {
+    private DefaultWorkbook workbook;
     private DefaultTable table;
     private Environment environment;
 
     @Override
     protected void setUp() throws Exception {
         environment = new DefaultEnvironment.Builder().build();
-        DefaultWorkbook wb = new DefaultWorkbook(environment);
-        DefaultSheet s1 = wb.addSheet("s1");
+        workbook = new DefaultWorkbook(environment);
+        DefaultSheet s1 = workbook.addSheet("s1");
         table = (DefaultTable) s1.addAsset(Table.class, "t1");
 
         table.addColumns(0,3);
@@ -36,6 +37,8 @@ public class TestDefaultChartWithBinder extends TestCase {
         table.setCellValue(2, 0, Value.str("beta"));
         table.setCellValue(2, 1, Value.dec(3));
         table.setCellValue(2, 2, Value.dec(4));
+
+        workbook.refresh();
         System.out.println(table);
     }
 
@@ -95,6 +98,7 @@ public class TestDefaultChartWithBinder extends TestCase {
         t1.setCellValue(3, 2, Value.dec(8));
         t1.setCellValue(3, 3, Value.dec(9));
 
+        workbook.refresh();
         System.out.println(t1);
 
         // c1
@@ -194,6 +198,7 @@ public class TestDefaultChartWithBinder extends TestCase {
         t1.setCellValue(3, 2, Value.dec(8));
         t1.setCellValue(3, 3, Value.dec(9));
 
+        workbook.refresh();
         System.out.println(t1);
 
         // c1

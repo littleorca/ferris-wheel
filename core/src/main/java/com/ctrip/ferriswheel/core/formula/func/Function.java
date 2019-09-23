@@ -11,6 +11,10 @@ public interface Function {
 
     void evaluate(FuncElement element, FormulaEvaluationContext context);
 
+    default boolean isVolatile() {
+        return false;
+    }
+
     default boolean isAggregator() {
         return false;
     }

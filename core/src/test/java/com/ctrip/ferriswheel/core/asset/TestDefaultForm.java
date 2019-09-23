@@ -65,6 +65,22 @@ public class TestDefaultForm extends TestCase {
         table.addColumns(0, 3);
         table.addRows(0, 3);
         form = (DefaultForm) sheet.addAsset(Form.class, "form");
+        workbook.refresh();
+    }
+
+    public void testInitValue() {
+        table.setCellValue(0, 0, Value.str("foo"));
+        table.setCellValue(0, 1, Value.str("bar"));
+
+        form.addField(new FormFieldData("foo", VariantType.STRING, null, false, false,
+                "Foo", "A foo", null, Arrays.asList(new FormFieldBindingData("table!A1"))));
+        form.addField(new FormFieldData("bar", VariantType.STRING, Value.BLANK, false, false,
+                "Bar", "A bar", null, Arrays.asList(new FormFieldBindingData("table!B1"))));
+
+        workbook.refresh();
+
+        assertEquals("foo", form.getField("foo").getValue().strValue());
+        assertEquals("bar", form.getField("bar").getValue().strValue());
     }
 
     public void testBindToCell() {
@@ -77,6 +93,8 @@ public class TestDefaultForm extends TestCase {
         params.put("foo", Value.str("Test foo"));
         params.put("bar", Value.dec(new BigDecimal("3.14")));
         form.submit(params);
+
+        workbook.refresh();
 
         assertEquals("Test foo", table.getCell(0, 0).strValue());
         assertEquals(new BigDecimal("3.14"), table.getCell(0, 1).decimalValue());
@@ -91,6 +109,8 @@ public class TestDefaultForm extends TestCase {
         HashMap<String, Variant> params = new HashMap<>();
         params.put("foobar", Value.str("foo+bar"));
         form.submit(params);
+
+        workbook.refresh();
 
         assertTrue(table.getCell(0, 0).isBlank());
         assertTrue(table.getCell(0, 1).isBlank());
@@ -114,6 +134,8 @@ public class TestDefaultForm extends TestCase {
         params.put("foo", Value.str("Test foo"));
         params.put("bar2", Value.dec(new BigDecimal("3.14")));
         form.submit(params);
+
+        workbook.refresh();
 
         assertEquals("Test foo", table.getCell(1, 1).strValue());
         assertEquals(new BigDecimal("3.14"), table.getCell(2, 1).decimalValue());

@@ -18,13 +18,15 @@ public class FilingClerk {
     public DefaultWorkbook createWorkbook(String name) {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
 //        workbook.setName(name);
+        workbook.refresh();
         return workbook;
     }
 
     public Workbook createWorkbook(String name, Consumer<Workbook> initAction) {
         DefaultWorkbook workbook = new DefaultWorkbook(environment);
 //        workbook.setName(name);
-        workbook.batch(initAction, true);
+        workbook.batch(initAction);
+        workbook.refresh(true);
         return workbook;
     }
 

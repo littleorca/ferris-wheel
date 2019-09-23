@@ -33,6 +33,7 @@ import com.ctrip.ferriswheel.common.util.ListDataSet;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.variant.VariantType;
+import com.ctrip.ferriswheel.provider.DataProviderSupport;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -42,13 +43,13 @@ import java.util.List;
 /**
  * @author liuhaifeng
  */
-public abstract class DatabaseProviderBase implements DataProvider {
+public abstract class DatabaseProviderBase extends DataProviderSupport implements DataProvider {
     private static final String PARAM_SQL = "sql";
 
-    protected abstract Connection getConnection() throws SQLException;
+    protected abstract Connection getConnection(String scheme) throws SQLException;
 
     @Override
-    public DataSet execute(DataQuery query) throws IOException {
+    protected DataSet doExecute(DataQuery query) throws IOException {
         String sql = query.getString(PARAM_SQL);
         if (sql == null || sql.isEmpty()) {
             throw new IllegalArgumentException("SQL is empty.");
@@ -70,7 +71,7 @@ public abstract class DatabaseProviderBase implements DataProvider {
 
         Connection conn;
         try {
-            conn = getConnection();
+            conn = getConnection(query.getScheme());
         } catch (SQLException e) {
             throw new IOException(e);
         }

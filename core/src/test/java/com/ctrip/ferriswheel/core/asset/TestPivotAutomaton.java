@@ -27,6 +27,7 @@ public class TestPivotAutomaton extends TestCase {
         DefaultSheet s1 = workbook.addSheet("s1");
         normalTable = (DefaultTable) s1.addAsset(Table.class, "normal");
         autoTable = (DefaultTable) s1.addAsset(Table.class, "auto");
+        workbook.refresh();
     }
 
     public void testSimpleCase() {
@@ -63,6 +64,7 @@ public class TestPivotAutomaton extends TestCase {
         normalTable.setCellValue(row, 1, Value.str("b1"));
         normalTable.setCellValue(row, 2, Value.dec(11));
 
+        workbook.refresh();
         System.out.println(normalTable);
 
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
@@ -72,6 +74,7 @@ public class TestPivotAutomaton extends TestCase {
         pivot.setValues(Arrays.asList(new PivotValueImpl("c", AggregateType.SUMMARY, "SUM:c", "")));
         autoTable.automate(pivot);
 
+        workbook.refresh();
         System.out.println(autoTable);
 
         assertEquals("a", autoTable.getCell(0, 0).getData().strValue());
@@ -88,6 +91,7 @@ public class TestPivotAutomaton extends TestCase {
     public void testMultipleValues() {
         prepareSampleData(normalTable);
 
+        workbook.refresh();
         System.out.println(normalTable);
 
         TableAutomatonInfo.PivotAutomatonInfo pivot = new TableAutomatonInfo.PivotAutomatonInfo();
@@ -107,6 +111,7 @@ public class TestPivotAutomaton extends TestCase {
 
         autoTable.automate(pivot);
 
+        workbook.refresh();
         System.out.println(autoTable);
 
         assertEquals(5, autoTable.getRowCount());

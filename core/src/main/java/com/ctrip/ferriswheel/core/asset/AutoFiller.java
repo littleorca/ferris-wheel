@@ -1,6 +1,5 @@
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.Workbook;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
@@ -8,7 +7,7 @@ import com.ctrip.ferriswheel.core.formula.FormulaParser;
 import com.ctrip.ferriswheel.core.util.AreaPatternAnalyzer;
 
 public class AutoFiller {
-//    private Workbook workbook;
+    //    private Workbook workbook;
     private AreaPatternAnalyzer areaPatternAnalyzer = new AreaPatternAnalyzer();
 
     public AutoFiller(/*Workbook workbook*/) {

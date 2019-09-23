@@ -149,7 +149,15 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
 
     @Override
     protected EvaluationState doEvaluate(EvaluationContext context) {
-        // nothing to do at present
+        if (getEvaluatedRevision() == 0) {
+            if ((value == null || value.isBlank()) && getBindingCount() > 0) {
+                // try to initialize field value by the first binding
+                DefaultFormFieldBinding binding = getBinding(0);
+                if (binding.getData() != null) {
+                    value = Value.from(binding.getData());
+                }
+            }
+        }
         return EvaluationState.DONE;
     }
 }

@@ -26,6 +26,10 @@ public class FormulaElement {
         throw new UnsupportedOperationException();
     }
 
+    public boolean isVolatile() {
+        return false;
+    }
+
     @Override
     public String toString() {
         return "[" + getTokenString() + "," + slices + ']';

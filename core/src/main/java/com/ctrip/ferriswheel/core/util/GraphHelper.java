@@ -32,13 +32,11 @@ import com.ctrip.ferriswheel.common.query.QueryTemplate;
 import com.ctrip.ferriswheel.common.table.Cell;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.core.asset.*;
-import com.ctrip.ferriswheel.core.formula.CalcChain;
 import com.ctrip.ferriswheel.core.formula.DirectedAcyclicGraph;
 import com.ctrip.ferriswheel.core.ref.CellReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
@@ -48,12 +46,17 @@ import java.util.Stack;
 public class GraphHelper {
     private static final Logger LOG = LoggerFactory.getLogger(GraphHelper.class);
 
-    public static DirectedAcyclicGraph<Long, Asset> buildGraph(Asset root, Set<Long> volatileNodeCollector) {
+    public static DirectedAcyclicGraph<Long, Asset> buildGraph(Asset root,
+                                                               Set<Long> dirtyNodeCollector,
+                                                               Set<Long> volatileNodeCollector) {
         DirectedAcyclicGraph<Long, Asset> graph = new DirectedAcyclicGraph<>();
         Stack<Asset> stack = new Stack<>();
         stack.push(root);
         while (!stack.isEmpty()) {
             Asset node = stack.pop();
+            if (dirtyNodeCollector != null && node.isDirty()) {
+                dirtyNodeCollector.add(node.getAssetId());
+            }
             if (volatileNodeCollector != null && node.isVolatile()) {
                 volatileNodeCollector.add(node.getAssetId());
             }
@@ -78,21 +81,8 @@ public class GraphHelper {
         return graph;
     }
 
-    public static CalcChain buildCalcChain(Asset root) {
-        DirectedAcyclicGraph<Long, Asset> graph = buildGraph(root, null);
-        List<Long> ordered = graph.sort();
-        CalcChain calcChain = new CalcChain(ordered);
-
-        //// debug
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(graph.toDot(null));
-        }
-
-        return calcChain;
-    }
-
     public static String graphToDot(DefaultWorkbook workbook, AssetManager assetManager) {
-        return graphToDot(buildGraph(workbook, null), assetManager);
+        return graphToDot(buildGraph(workbook, null, null), assetManager);
     }
 
     public static String graphToDot(DirectedAcyclicGraph<Long, Asset> graph, AssetManager assetManager) {

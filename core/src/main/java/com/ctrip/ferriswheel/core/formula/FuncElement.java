@@ -34,4 +34,9 @@ public class FuncElement extends FormulaElement {
     public void evaluate(FormulaEvaluationContext context) {
         function.evaluate(this, context);
     }
+
+    @Override
+    public boolean isVolatile() {
+        return function.isVolatile();
+    }
 }

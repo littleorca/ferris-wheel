@@ -24,20 +24,20 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
-
 class DefaultTransaction implements Transaction {
+    private final DefaultWorkbook workbook;
+    private final DefaultAssetEvaluator evaluator;
     private final long id;
     private volatile TransactionPhase phase = TransactionPhase.Polluting;
-    private Set<Long> dirtyNodes = new ConcurrentSkipListSet<>();
 
-    DefaultTransaction(long id) {
+    DefaultTransaction(DefaultWorkbook workbook, DefaultAssetEvaluator evaluator, long id) {
+        this.workbook = workbook;
+        this.evaluator = evaluator;
         this.id = id;
     }
 
     @Override
-    public long getId() {
+    public long getTransactionId() {
         return id;
     }
 
@@ -47,21 +47,29 @@ class DefaultTransaction implements Transaction {
     }
 
     @Override
-    public void markDirtyNode(long assetId) {
-        if (getCurrentPhase() != TransactionPhase.Polluting) {
-            throw new IllegalStateException();
+    public void evaluate(EvaluationMode mode) {
+        if (TransactionPhase.Polluting != getCurrentPhase()) {
+            throw new IllegalStateException("Transaction is not ready for evaluating, current phase is "
+                    + getCurrentPhase());
         }
-        dirtyNodes.add(assetId);
+        this.phase = TransactionPhase.Evaluating;
+        evaluator.evaluate(workbook, mode);
     }
 
     @Override
-    public Set<Long> getDirtyNodes() {
-        return dirtyNodes;
-    }
-
-    @Override
-    public void close() {
+    public void commit() {
+        if (phase != TransactionPhase.Evaluating) {
+            throw new IllegalStateException("Cannot commit at phase: " + phase);
+        }
+        // TODO
         phase = TransactionPhase.Done;
-        dirtyNodes.clear();
+    }
+
+    @Override
+    public void rollback() {
+        if (phase == TransactionPhase.Done) {
+            throw new IllegalStateException("Cannot rollback after transaction has been done.");
+        }
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 }

@@ -32,21 +32,14 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MySQLProvider extends DatabaseProviderBase implements DataProvider {
     private static final String SCHEME_PREFIX = "mysql://";
-    private final String scheme;
-    private final String url;
-    private final String username;
-    private final String password;
-    private final DataSource dataSource;
+    private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
-    public MySQLProvider(String name, String url, String username, String password) {
-        this.scheme = SCHEME_PREFIX + name;
-        this.url = url;
-        this.username = username;
-        this.password = password;
-
+    public void add(String dataSourceName, String url, String username, String password) {
         PoolProperties poolProperties = new PoolProperties();
         poolProperties.setUrl(url);
         poolProperties.setDriverClassName("com.mysql.jdbc.Driver");
@@ -65,16 +58,26 @@ public class MySQLProvider extends DatabaseProviderBase implements DataProvider 
         poolProperties.setLogAbandoned(true);
         poolProperties.setRemoveAbandoned(true);
 
-        this.dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
+        this.add(dataSourceName, new org.apache.tomcat.jdbc.pool.DataSource(poolProperties));
+    }
+
+    public void add(String dataSourceName, DataSource dataSource) {
+        String scheme = SCHEME_PREFIX + dataSourceName;
+        this.dataSourceMap.put(scheme, dataSource);
     }
 
     @Override
     public boolean acceptsQuery(DataQuery query) {
-        return scheme.equals(query.getScheme());
+        return dataSourceMap.containsKey(query.getScheme());
     }
 
     @Override
-    protected Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+    protected Connection getConnection(String scheme) throws SQLException {
+        DataSource ds = dataSourceMap.get(scheme);
+        if (ds == null) {
+            // This should not happen since acceptsQuery will make sure of the existence.
+            throw new RuntimeException("Cannot find data source of scheme: " + scheme);
+        }
+        return ds.getConnection();
     }
 }
