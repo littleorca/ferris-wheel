@@ -4,11 +4,10 @@ import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.Workbook;
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
-import com.ctrip.ferriswheel.common.query.DataProvider;
-import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.*;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.util.DataSet;
-import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.util.DataSetBuilder;
 import com.ctrip.ferriswheel.common.variant.*;
 import com.ctrip.ferriswheel.core.asset.DefaultQueryAutomaton;
 import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
@@ -45,13 +44,14 @@ public class TestPbHelper extends TestCase {
             }
 
             @Override
-            public DataSet execute(DataQuery query) throws IOException {
-                return ListDataSet.newBuilder()
-                        .setColumnCount(1)
-                        .newRecordBuilder()
+            public QueryResult execute(DataQuery query, boolean forceRefresh) throws IOException {
+                DataSet dataSet = DataSetBuilder.withColumnCount(1)
+                        .newRecord()
                         .set(0, Value.str("hello world"))
                         .commit()
                         .build();
+                return new ImmutableQueryResult(ErrorCodes.OK, "Ok",
+                        ImmutableCacheHint.newBuilder().build(), dataSet);
             }
         });
         DefaultEnvironment env = new DefaultEnvironment.Builder()
@@ -230,15 +230,16 @@ public class TestPbHelper extends TestCase {
             }
 
             @Override
-            public DataSet execute(DataQuery query) throws IOException {
+            public QueryResult execute(DataQuery query, boolean forceRefresh) throws IOException {
                 System.out.println("Filling table by fake provider.");
-                return ListDataSet.newBuilder()
-                        .setColumnCount(2)
-                        .newRecordBuilder()
+                DataSet dataSet = DataSetBuilder.withColumnCount(2)
+                        .newRecord()
                         .set(0, Value.dec(13))
                         .set(1, Value.dec(23))
                         .commit()
                         .build();
+                return new ImmutableQueryResult(ErrorCodes.OK, "Ok",
+                        ImmutableCacheHint.newBuilder().build(), dataSet);
             }
         });
 

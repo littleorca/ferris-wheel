@@ -22,13 +22,19 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.provider;
+package com.ctrip.ferriswheel.provider.http;
 
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.QueryResult;
+import java.io.IOException;
+import java.io.InputStream;
 
-public interface CacheService {
-    QueryResult getCache(DataQuery query);
+public interface HttpResponse {
+    int getResponseCode();
 
-    void cacheIfPossible(DataQuery query, QueryResult result);
+    String getResponseMessage();
+
+    String getHeader(String name);
+
+    InputStream getInputStream() throws IOException;
+
+    String getBodyAsString() throws IOException;
 }

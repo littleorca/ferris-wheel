@@ -26,11 +26,9 @@ package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.Environment;
 import com.ctrip.ferriswheel.common.form.Form;
-import com.ctrip.ferriswheel.common.query.DataProvider;
-import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.*;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.util.DataSet;
-import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.util.DataSetBuilder;
 import com.ctrip.ferriswheel.common.variant.*;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.bean.FormFieldBindingData;
@@ -148,23 +146,23 @@ public class TestDefaultForm extends TestCase {
         }
 
         @Override
-        public DataSet execute(DataQuery query) {
+        public QueryResult execute(DataQuery query, boolean forceRefresh) {
             final int rows = query.getParamNames().size() + 1;
             final int cols = 2;
 
-            ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
-                    .setColumnCount(2);
-            dataSetBuilder.newRecordBuilder()
+            DataSetBuilder dataSetBuilder = DataSetBuilder.withColumnCount(2);
+            dataSetBuilder.newRecord()
                     .set(0, Value.str("scheme"))
                     .set(1, Value.str(query.getScheme()))
                     .commit();
             for (String name : query.getParamNames()) {
-                dataSetBuilder.newRecordBuilder()
+                dataSetBuilder.newRecord()
                         .set(0, Value.str(name))
                         .set(1, query.getParam(name))
                         .commit();
             }
-            return dataSetBuilder.build();
+            return new ImmutableQueryResult(ErrorCodes.OK, "OK",
+                    ImmutableCacheHint.newBuilder().build(), dataSetBuilder.build());
         }
     }
 }

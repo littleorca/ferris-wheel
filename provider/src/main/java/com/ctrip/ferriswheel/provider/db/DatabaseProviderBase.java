@@ -25,11 +25,10 @@
 
 package com.ctrip.ferriswheel.provider.db;
 
-import com.ctrip.ferriswheel.common.query.DataProvider;
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.util.ColumnMetaDataImpl;
+import com.ctrip.ferriswheel.common.query.*;
 import com.ctrip.ferriswheel.common.util.DataSet;
-import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.util.DataSetBuilder;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.variant.VariantType;
@@ -49,7 +48,7 @@ public abstract class DatabaseProviderBase extends DataProviderSupport implement
     protected abstract Connection getConnection(String scheme) throws SQLException;
 
     @Override
-    protected DataSet doExecute(DataQuery query) throws IOException {
+    protected QueryResult doExecute(DataQuery query) throws IOException {
         String sql = query.getString(PARAM_SQL);
         if (sql == null || sql.isEmpty()) {
             throw new IllegalArgumentException("SQL is empty.");
@@ -111,7 +110,9 @@ public abstract class DatabaseProviderBase extends DataProviderSupport implement
             DataSet dataSet = resultSetToDataSet(rs);
             rs.close();
             stmt.close();
-            return dataSet;
+            // FIXME cache control
+            CacheHint cacheHint = createCacheHint(query);
+            return new ImmutableQueryResult(ErrorCodes.OK, "Ok", cacheHint, dataSet);
 
         } catch (SQLException e) {
             throw new IOException(e);
@@ -126,25 +127,26 @@ public abstract class DatabaseProviderBase extends DataProviderSupport implement
     }
 
     private DataSet resultSetToDataSet(ResultSet rs) throws SQLException {
-        ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder();
         ResultSetMetaData md = rs.getMetaData();
+        DataSetBuilder.MetaDataBuilder metaDataBuilder = DataSetBuilder.metaDataBuilder();
 //        DefaultColumnMeta[] columnMetas = new DefaultColumnMeta[md.getColumnCount()];
         for (int i = 1; i <= md.getColumnCount(); i++) {
             String label = md.getColumnLabel(i);
 //            columnMetas[i - 1] = new DefaultColumnMeta(label, mapType(md.getColumnType(i)));
-            dataSetBuilder.addColumnMetaData(new ColumnMetaDataImpl(label, mapType(md.getColumnType(i))));
+            metaDataBuilder.addColumn(label, mapType(md.getColumnType(i)));
         }
+        DataSetBuilder dataSetBuilder = metaDataBuilder.seal();
 //        DefaultDataSetMeta meta = new DefaultDataSetMeta(false, columnMetas);
 //        List<Variant[]> rows = new ArrayList<>();
         while (rs.next()) {
 //            Variant[] row = new Variant[md.getColumnCount()];
-            ListDataSet.RecordBuilder record = dataSetBuilder.newRecordBuilder();
+            DataSetBuilder.RecordBuilder recordBuilder = dataSetBuilder.newRecord();
             for (int i = 1; i <= md.getColumnCount(); i++) {
 //                row[i - 1] = mapValue(rs, i, mapType(md.getColumnType(i)));
-                record.set(i - 1, mapValue(rs, i, mapType(md.getColumnType(i))));
+                recordBuilder.set(i - 1, mapValue(rs, i, mapType(md.getColumnType(i))));
             }
 //            rows.add(row);
-            record.commit();
+            recordBuilder.commit();
         }
 //        VariantsTable dataSet = new VariantsTable(meta, rows.toArray(new Variant[rows.size()][]));
         return dataSetBuilder.build();
@@ -201,6 +203,10 @@ public abstract class DatabaseProviderBase extends DataProviderSupport implement
                 str = rs.getString(i);
                 return str == null ? Value.BLANK : Value.str(str);
         }
+    }
+
+    protected CacheHint createCacheHint(DataQuery query) {
+        return ImmutableCacheHint.newBuilder().build(); // default cache hint, maxAge=0
     }
 
 }

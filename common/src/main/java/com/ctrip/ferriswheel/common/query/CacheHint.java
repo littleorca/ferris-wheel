@@ -22,13 +22,15 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.provider;
+package com.ctrip.ferriswheel.common.query;
 
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.QueryResult;
+import java.io.Serializable;
+import java.util.Date;
 
-public interface CacheService {
-    QueryResult getCache(DataQuery query);
+public interface CacheHint extends Serializable {
+    Date getDate();
 
-    void cacheIfPossible(DataQuery query, QueryResult result);
+    long getMaxAge();
+
+    boolean isFromCache();
 }

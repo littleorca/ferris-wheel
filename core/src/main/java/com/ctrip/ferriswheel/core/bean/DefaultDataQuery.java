@@ -27,24 +27,31 @@ package com.ctrip.ferriswheel.core.bean;
 
 import com.ctrip.ferriswheel.common.query.DataQuery;
 import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.core.util.VariantProperties;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
-public class DefaultDataQuery extends VariantProperties implements DataQuery {
+public class DefaultDataQuery implements DataQuery {
     private String scheme;
+    private Map<String, Variant> params;
 
     public DefaultDataQuery() {
+        this(null, null);
     }
 
     public DefaultDataQuery(DataQuery queryInfo) {
         this(queryInfo.getScheme(), queryInfo.getAllParams());
     }
 
-    public DefaultDataQuery(String scheme, Map<String, Variant> m) {
-        super(m);
+    public DefaultDataQuery(String scheme, Map<String, Variant> params) {
         this.scheme = scheme;
+        if (params != null) {
+            this.params = new LinkedHashMap<>(params);
+        } else {
+            this.params = new LinkedHashMap<>();
+        }
     }
 
     @Override
@@ -58,75 +65,21 @@ public class DefaultDataQuery extends VariantProperties implements DataQuery {
 
     @Override
     public Variant getParam(String name) {
-        return get(name);
+        return params.get(name);
     }
 
     @Override
     public Set<String> getParamNames() {
-        return keySet();
+        return params.keySet();
     }
 
     public Variant setParameter(String name, Variant value) {
-        return put(name, value);
+        return params.put(name, value);
     }
 
     @Override
     public Map<String, Variant> getAllParams() {
-        return Collections.unmodifiableMap(this);
-    }
-
-    @Override
-    public Integer getInteger(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.intValue();
-    }
-
-    @Override
-    public Long getLong(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.longValue();
-    }
-
-    @Override
-    public Float getFloat(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.floatValue();
-    }
-
-    @Override
-    public Double getDouble(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.doubleValue();
-    }
-
-    @Override
-    public BigDecimal getDecimal(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.decimalValue();
-    }
-
-    @Override
-    public Boolean getBoolean(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.booleanValue();
-    }
-
-    @Override
-    public Date getDate(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.dateValue();
-    }
-
-    @Override
-    public String getString(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.strValue();
-    }
-
-    @Override
-    public List<Variant> getList(String name) {
-        Variant var = getParam(name);
-        return var == null ? null : var.listValue();
+        return Collections.unmodifiableMap(params);
     }
 
 }

@@ -22,13 +22,17 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.provider;
+package com.ctrip.ferriswheel.provider.http;
 
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.QueryResult;
+import java.util.List;
+import java.util.Map;
 
-public interface CacheService {
-    QueryResult getCache(DataQuery query);
+public interface HttpRequest {
+    String getUrl();
 
-    void cacheIfPossible(DataQuery query, QueryResult result);
+    String getMethod();
+
+    Map<String, List<String>> getHeaders();
+
+    String getBody();
 }

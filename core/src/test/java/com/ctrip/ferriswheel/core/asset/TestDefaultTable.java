@@ -1,12 +1,11 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.Environment;
-import com.ctrip.ferriswheel.common.query.DataProvider;
-import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.*;
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.common.util.ColumnMetaDataImpl;
 import com.ctrip.ferriswheel.common.util.DataSet;
-import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.util.DataSetBuilder;
+import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.common.variant.VariantType;
@@ -442,9 +441,8 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         assertEquals(3, table.getRowCount());
         assertEquals(3, table.getColumnCount());
 
-        DataSet dataSet = new ListDataSet.Builder()
-                .setColumnCount(1)
-                .newRecordBuilder()
+        DataSet dataSet = DataSetBuilder.withColumnCount(1)
+                .newRecord()
                 .set(0, Value.str("foobar"))
                 .commit()
                 .build();
@@ -466,31 +464,33 @@ public class TestDefaultTable extends DefaultTableTestSupport {
         }
 
         @Override
-        public DataSet execute(DataQuery query) throws IOException {
-            ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
-                    .addColumnMetaData(new ColumnMetaDataImpl("foo", VariantType.DECIMAL))
-                    .addColumnMetaData(new ColumnMetaDataImpl("bar", VariantType.DECIMAL))
-                    .addColumnMetaData(new ColumnMetaDataImpl("foobar", VariantType.DECIMAL));
+        public QueryResult execute(DataQuery query, boolean forceRefresh) throws IOException {
+            DataSetBuilder dataSetBuilder = DataSetBuilder.metaDataBuilder()
+                    .addColumn("foo", VariantType.DECIMAL)
+                    .addColumn("bar", VariantType.DECIMAL)
+                    .addColumn("foobar", VariantType.DECIMAL)
+                    .seal();
 
-            dataSetBuilder.newRecordBuilder()
+            dataSetBuilder.newRecord()
                     .set(0, Value.dec(11))
                     .set(1, Value.dec(12))
                     .set(2, Value.dec(13))
                     .commit();
 
-            dataSetBuilder.newRecordBuilder()
+            dataSetBuilder.newRecord()
                     .set(0, Value.dec(21))
                     .set(1, Value.dec(22))
                     .set(2, Value.dec(23))
                     .commit();
 
-            dataSetBuilder.newRecordBuilder()
+            dataSetBuilder.newRecord()
                     .set(0, Value.dec(31))
                     .set(1, Value.dec(32))
                     .set(2, Value.dec(33))
                     .commit();
 
-            return dataSetBuilder.build();
+            return new ImmutableQueryResult(ErrorCodes.OK, "OK",
+                    ImmutableCacheHint.newBuilder().build(), dataSetBuilder.build());
         }
     }
 }

@@ -27,13 +27,39 @@ package com.ctrip.ferriswheel.common.util;
 
 import com.ctrip.ferriswheel.common.variant.VariantType;
 
-public class ColumnMetaDataImpl implements ColumnMetaData {
+import java.util.Objects;
+
+public final class ImmutableColumnMetaData implements ColumnMetaData {
     private final String name;
     private final VariantType type;
 
-    public ColumnMetaDataImpl(String name, VariantType type) {
+    public static ImmutableColumnMetaData from(ColumnMetaData columnMetaData) {
+        if (columnMetaData == null) {
+            return null;
+        } else if (columnMetaData instanceof ImmutableColumnMetaData) {
+            return (ImmutableColumnMetaData) columnMetaData;
+        } else {
+            return new ImmutableColumnMetaData(columnMetaData.getName(), columnMetaData.getType());
+        }
+    }
+
+    public ImmutableColumnMetaData(String name, VariantType type) {
         this.name = name;
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ImmutableColumnMetaData that = (ImmutableColumnMetaData) o;
+        return name.equals(that.name) &&
+                type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
     }
 
     @Override

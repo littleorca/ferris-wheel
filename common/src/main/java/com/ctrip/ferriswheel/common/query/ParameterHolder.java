@@ -43,22 +43,49 @@ public interface ParameterHolder {
 
     Map<String, Variant> getAllParams();
 
-    Integer getInteger(String name);
+    default Integer getInteger(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.intValue();
+    }
 
-    Long getLong(String name);
+    default Long getLong(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.longValue();
+    }
 
-    Float getFloat(String name);
+    default Float getFloat(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.floatValue();
+    }
 
-    Double getDouble(String name);
+    default Double getDouble(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.doubleValue();
+    }
 
-    BigDecimal getDecimal(String name);
+    default BigDecimal getDecimal(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.decimalValue();
+    }
 
-    Boolean getBoolean(String name);
+    default Boolean getBoolean(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.booleanValue();
+    }
 
-    Date getDate(String name);
+    default Date getDate(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.dateValue();
+    }
 
-    String getString(String name);
+    default String getString(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.strValue();
+    }
 
-    List<Variant> getList(String name);
+    default List<Variant> getList(String name) {
+        Variant variant = getParam(name);
+        return variant == null ? null : variant.listValue();
+    }
 
 }

@@ -24,31 +24,32 @@
 
 package com.ctrip.ferriswheel.provider;
 
+import com.ctrip.ferriswheel.common.query.CacheHint;
 import com.ctrip.ferriswheel.common.query.DataProvider;
 import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.util.DataSet;
+import com.ctrip.ferriswheel.common.query.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public abstract class DataProviderSupport implements DataProvider {
     private static final Logger LOG = LoggerFactory.getLogger(DataProviderSupport.class);
-    private static final Duration DEFAULT_CACHE_TTL = Duration.ofSeconds(60);
     private CacheService cacheService;
 
     @Override
-    public DataSet execute(DataQuery query) throws IOException {
-        if (cacheService != null) {
-            DataSet result = cacheService.getCache(query);
+    public QueryResult execute(DataQuery query, boolean forceRefresh) throws IOException {
+        QueryResult result;
+
+        if (!forceRefresh) {
+            result = getCachedResult(query);
             if (result != null) {
                 LOG.info("Serve cached result of query: " + query.getScheme());
                 return result;
             }
         }
 
-        DataSet result;
         long start = System.currentTimeMillis();
         try {
             result = doExecute(query);
@@ -57,36 +58,34 @@ public abstract class DataProviderSupport implements DataProvider {
             LOG.info("Executed query({}) in {}ms.", query.getScheme(), cost);
         }
 
-        if (result != null && cacheService != null && isCacheable(query, result)) {
-            Duration duration = getCacheTtl(query, result);
-            cacheService.setCache(query, result, duration);
-        }
+        cacheIfPossible(query, result);
         return result;
     }
 
-    protected abstract DataSet doExecute(DataQuery query) throws IOException;
-
-    /**
-     * Overridable method, determine if the specified query-result pair can be
-     * cached.
-     *
-     * @param query
-     * @param result
-     * @return
-     */
-    protected boolean isCacheable(DataQuery query, DataSet result) {
-        return true;
+    protected QueryResult getCachedResult(DataQuery query) {
+        if (cacheService == null) {
+            return null;
+        }
+        return cacheService.getCache(query);
     }
 
-    /**
-     * Overridable method, get TTL hint for the specified query-result pair.
-     *
-     * @param query
-     * @param result
-     * @return
-     */
-    protected Duration getCacheTtl(DataQuery query, DataSet result) {
-        return DEFAULT_CACHE_TTL;
+    protected abstract QueryResult doExecute(DataQuery query) throws IOException;
+
+    protected void cacheIfPossible(DataQuery query, QueryResult result) {
+        if (cacheService == null || result == null || result.getCacheHint() == null) {
+            return;
+        }
+        CacheHint cacheHint = result.getCacheHint();
+        if (cacheHint.getMaxAge() <= 0) {
+            return;
+        }
+        if (cacheHint.getDate() != null) {
+            long ts = cacheHint.getDate().getTime();
+            if (ts + TimeUnit.SECONDS.toMillis(cacheHint.getMaxAge()) <= System.currentTimeMillis()) {
+                return;
+            }
+        }
+        cacheService.cacheIfPossible(query, result);
     }
 
     public CacheService getCacheService() {

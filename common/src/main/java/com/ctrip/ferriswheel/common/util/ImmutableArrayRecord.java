@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Ctrip.com
+ * Copyright (c) 2018-2019 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,23 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package com.ctrip.ferriswheel.common.util;
 
-public class DataSetMetaDataImpl implements DataSetMetaData {
-    private final int columnCount;
-    private final ColumnMetaData[] columnMetaDataArray;
+public final class ImmutableArrayRecord implements DataRecord {
+    private final StylizedValue[] fields;
 
-    public DataSetMetaDataImpl(ColumnMetaData[] columnMetas) {
-        this.columnCount = columnMetas.length;
-        this.columnMetaDataArray = columnMetas;
-    }
-
-    public DataSetMetaDataImpl(int columnCount) {
-        this.columnCount = columnCount;
-        this.columnMetaDataArray = null;
+    public ImmutableArrayRecord(StylizedVariant[] fields) {
+        this.fields = new StylizedValue[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            this.fields[i] = StylizedValue.from(fields[i]);
+        }
     }
 
     @Override
-    public boolean hasColumnMeta() {
-        return columnMetaDataArray != null;
+    public StylizedVariant getColumn(int index) {
+        return this.fields[index];
     }
 
-    @Override
-    public int getColumnCount() {
-        return columnCount;
-    }
-
-    @Override
-    public ColumnMetaData getColumnMeta(int index) {
-        return columnMetaDataArray[index];
-    }
 }

@@ -25,16 +25,8 @@
 
 package com.ctrip.ferriswheel.common.util;
 
-public interface DataSet {
+public interface DataSet extends Iterable<DataRecord> {
 
-    DataSetMetaData getMetaData();
-
-    boolean next();
-
-    boolean isReusable();
-
-    void rewind() throws UnsupportedOperationException;
-
-    StylizedVariant getColumn(int index);
+    DataSetMetaData getMetadata();
 
 }

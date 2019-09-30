@@ -25,25 +25,29 @@
 
 package com.ctrip.ferriswheel.common.util;
 
+import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
 
-public class StylizedValue implements StylizedVariant {
-    private Variant value;
-    private String format;
+public final class StylizedValue implements StylizedVariant {
+    private final Value value;
+    private final String format;
 
-    public StylizedValue() {
+    public static StylizedValue from(StylizedVariant another) {
+        if (another == null) {
+            return null;
+        }
+        if (another instanceof StylizedValue) {
+            return (StylizedValue) another;
+        }
+        return new StylizedValue(another.getValue(), another.getFormat());
     }
 
     public StylizedValue(Variant value) {
         this(value, null);
     }
 
-    public StylizedValue(StylizedVariant another) {
-        this(another.getValue(), another.getFormat());
-    }
-
     public StylizedValue(Variant value, String format) {
-        this.value = value;
+        this.value = Value.from(value);
         this.format = format;
     }
 
@@ -52,16 +56,8 @@ public class StylizedValue implements StylizedVariant {
         return value;
     }
 
-    public void setValue(Variant value) {
-        this.value = value;
-    }
-
     @Override
     public String getFormat() {
         return format;
-    }
-
-    public void setFormat(String format) {
-        this.format = format;
     }
 }

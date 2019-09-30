@@ -22,13 +22,8 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.provider;
+package com.ctrip.ferriswheel.provider.http;
 
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.QueryResult;
-
-public interface CacheService {
-    QueryResult getCache(DataQuery query);
-
-    void cacheIfPossible(DataQuery query, QueryResult result);
+public interface HttpClient {
+    HttpResponse execute(HttpRequest request);
 }

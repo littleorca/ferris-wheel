@@ -5,7 +5,7 @@ import com.ctrip.ferriswheel.common.aggregate.NamedValuesSample;
 import com.ctrip.ferriswheel.common.automaton.*;
 import com.ctrip.ferriswheel.common.table.Row;
 import com.ctrip.ferriswheel.common.util.DataSet;
-import com.ctrip.ferriswheel.common.util.ListDataSet;
+import com.ctrip.ferriswheel.common.util.DataSetBuilder;
 import com.ctrip.ferriswheel.common.util.StylizedValue;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
@@ -96,7 +96,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
 
     protected DataSet doExecute() {
         if (!this.data.isValid()) {
-            return ListDataSet.Builder.emptyDataSet();
+            return DataSetBuilder.emptyDataSet();
         }
 
         RangeReferenceElement rangeElement = (RangeReferenceElement) data.getFormulaElements()[0];
@@ -106,13 +106,13 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
                 getTable().getSheet() : getTable().getWorkbook().getSheet(rangeReference.getSheetName());
         if (sourceSheet == null) {
             // TODO mark error
-            return ListDataSet.Builder.emptyDataSet();
+            return DataSetBuilder.emptyDataSet();
         }
 
         DefaultTable sourceTable = sourceSheet.getAsset(rangeReference.getAssetName());
         if (sourceTable == null) {
             // TODO mark error
-            return ListDataSet.Builder.emptyDataSet();
+            return DataSetBuilder.emptyDataSet();
         }
 
         TableRange validRange = rangeReference.getOverlappedRectangle(sourceTable);
@@ -121,7 +121,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         if (validRange != null) {
             dataSet = analyse(sourceTable, validRange.getLeft(), validRange.getTop(), validRange.getRight(), validRange.getBottom());
         } else {
-            dataSet = ListDataSet.Builder.emptyDataSet();
+            dataSet = DataSetBuilder.emptyDataSet();
         }
 
         return dataSet;
@@ -174,17 +174,17 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         }
 
         if (values.isEmpty() && allColumnDimensions.isEmpty() && allRowDimensions.isEmpty()) {
-            return ListDataSet.Builder.emptyDataSet();
+            return DataSetBuilder.emptyDataSet();
         }
 
         // prepare data set
 
-        ListDataSet.Builder dataSetBuilder = ListDataSet.newBuilder()
-                .setColumnCount((rows.isEmpty() ? 0 : 1) + allColumnDimensions.size() * values.size());
+        DataSetBuilder dataSetBuilder = DataSetBuilder.withColumnCount(
+                (rows.isEmpty() ? 0 : 1) + allColumnDimensions.size() * values.size());
 
         // add headers
 
-        ListDataSet.RecordBuilder headerBuilder = dataSetBuilder.newRecordBuilder();
+        DataSetBuilder.RecordBuilder headerBuilder = dataSetBuilder.newRecord();
 
         if (!rows.isEmpty()) {
             StringBuilder name = new StringBuilder();
@@ -228,7 +228,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
         // extract data
 
         for (Dimension[] rowDimensions : allRowDimensions) {
-            ListDataSet.RecordBuilder recordBuilder = dataSetBuilder.newRecordBuilder();
+            DataSetBuilder.RecordBuilder recordBuilder = dataSetBuilder.newRecord();
             int fieldIdx = 0;
             Map<String, Variant> rowDimMap = new HashMap<>();
 

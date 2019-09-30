@@ -198,60 +198,6 @@ public abstract class TableAutomatonInfo implements AutomateConfiguration, Seria
         public void setAllParams(Map<String, Variant> parameters) {
             this.parameters = parameters;
         }
-
-        @Override
-        public Integer getInteger(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.intValue();
-        }
-
-        @Override
-        public Long getLong(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.longValue();
-        }
-
-        @Override
-        public Float getFloat(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.floatValue();
-        }
-
-        @Override
-        public Double getDouble(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.doubleValue();
-        }
-
-        @Override
-        public BigDecimal getDecimal(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.decimalValue();
-        }
-
-        @Override
-        public Boolean getBoolean(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.booleanValue();
-        }
-
-        @Override
-        public Date getDate(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.dateValue();
-        }
-
-        @Override
-        public String getString(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.strValue();
-        }
-
-        @Override
-        public List<Variant> getList(String name) {
-            Variant var = getParam(name);
-            return var == null ? null : var.listValue();
-        }
     }
 
     public static class PivotAutomatonInfo extends TableAutomatonInfo implements PivotConfiguration {

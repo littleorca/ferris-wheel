@@ -25,8 +25,6 @@
 
 package com.ctrip.ferriswheel.common.query;
 
-import com.ctrip.ferriswheel.common.util.DataSet;
-
 import java.io.IOException;
 
 public interface DataProvider {
@@ -42,17 +40,10 @@ public interface DataProvider {
      * Execute query.
      *
      * @param query
+     * @param forceRefresh
      * @return
+     * @throws IOException
      */
-    DataSet execute(DataQuery query) throws IOException;
+    QueryResult execute(DataQuery query, boolean forceRefresh) throws IOException;
 
-    /**
-     * Determine whether this provider is volatile or not. A volatile provider
-     * may return different result for the same parameters.
-     *
-     * @return true if the provider is volatile.
-     */
-    default boolean isVolatile() {
-        return false;
-    }
 }

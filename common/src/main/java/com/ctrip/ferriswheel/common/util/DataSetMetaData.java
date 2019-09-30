@@ -30,9 +30,9 @@ package com.ctrip.ferriswheel.common.util;
  */
 public interface DataSetMetaData {
 
-    boolean hasColumnMeta();
-
     int getColumnCount();
+
+    boolean hasColumnMeta();
 
     ColumnMetaData getColumnMeta(int index);
 }

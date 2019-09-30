@@ -9,9 +9,7 @@ import com.ctrip.ferriswheel.common.chart.ChartBinder;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.common.table.*;
 import com.ctrip.ferriswheel.common.text.Text;
-import com.ctrip.ferriswheel.common.util.DataSet;
-import com.ctrip.ferriswheel.common.util.DataSetMetaData;
-import com.ctrip.ferriswheel.common.util.StylizedVariant;
+import com.ctrip.ferriswheel.common.util.*;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Parameter;
 import com.ctrip.ferriswheel.common.variant.Value;
@@ -847,7 +845,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     void doFillTable(DataSet dataSet) {
-        DataSetMetaData setMeta = dataSet.getMetaData();
+        DataSetMetaData setMeta = dataSet.getMetadata();
         int rowCount = 0;
 
         columnHeaders = new ArrayList<>(setMeta.getColumnCount());
@@ -858,7 +856,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
             for (int col = 0; col < setMeta.getColumnCount(); col++) {
                 columnHeaders.add(new HeaderInfo(/* TBD */));
                 DefaultCell cell = getOrCreateCell(rowCount, col);
-                refreshCellValue(rowCount, col, Value.str(setMeta.getColumnMeta(col).getName()));
+                ColumnMetaData colMeta = setMeta.getColumnMeta(col);
+                refreshCellValue(rowCount, col, colMeta != null ? Value.str(colMeta.getName()) : Value.BLANK);
             }
             rowCount++;
         } else {
@@ -866,11 +865,10 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 columnHeaders.add(new HeaderInfo(/* TBD */));
             }
         }
-        dataSet.rewind();
-        while (dataSet.next()) {
+        for (DataRecord record : dataSet) {
             rowHeaders.add(new HeaderInfo(/* TBD */));
             for (int col = 0; col < setMeta.getColumnCount(); col++) {
-                StylizedVariant stylizedVariant = dataSet.getColumn(col);
+                StylizedVariant stylizedVariant = record.getColumn(col);
                 Variant value = stylizedVariant.getValue();
                 if (value == null) {
                     value = Value.BLANK;

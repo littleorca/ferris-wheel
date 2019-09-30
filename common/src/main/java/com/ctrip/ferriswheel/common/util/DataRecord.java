@@ -22,13 +22,10 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.provider;
+package com.ctrip.ferriswheel.common.util;
 
-import com.ctrip.ferriswheel.common.query.DataQuery;
-import com.ctrip.ferriswheel.common.query.QueryResult;
+public interface DataRecord {
 
-public interface CacheService {
-    QueryResult getCache(DataQuery query);
+    StylizedVariant getColumn(int index);
 
-    void cacheIfPossible(DataQuery query, QueryResult result);
 }

@@ -161,7 +161,7 @@ public abstract class Value implements Variant {
     }
 
     private Value() {
-        // prevents user extended value implementations.
+        // prevents user from extending other classes.
     }
 
     @Override
