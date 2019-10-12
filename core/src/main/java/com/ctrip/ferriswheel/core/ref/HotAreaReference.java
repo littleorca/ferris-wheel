@@ -22,14 +22,32 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.asset;
+package com.ctrip.ferriswheel.core.ref;
 
-import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.asset.Asset;
 
-public interface ReferenceMaintainer extends ReferenceResolver {
-    void resolveFormulas(AssetNode asset);
+public abstract class HotAreaReference extends AbstractReference {
+    private long hotAreaId = Asset.UNSPECIFIED_ASSET_ID;
 
-    void resolveFormula(ValueNode valueNode);
+    public HotAreaReference(String sheetName, String assetName) {
+        super(sheetName, assetName);
+    }
+
+    public HotAreaReference(String sheetName, String assetName, boolean alive, boolean phantom) {
+        super(sheetName, assetName, alive, phantom);
+    }
+
+    public long getHotAreaId() {
+        return hotAreaId;
+    }
+
+    public void setHotAreaId(long hotAreaId) {
+        this.hotAreaId = hotAreaId;
+    }
+
+    public boolean isValid() {
+        return isAlive() &&
+                hotAreaId != Asset.UNSPECIFIED_ASSET_ID;
+    }
 
 }

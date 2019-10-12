@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -140,14 +141,26 @@ public class FormulaParser {
         return elements;
     }
 
-    public static String toFormula(FormulaElement[] formulaElements,
-                                   int nShiftRows,
-                                   int nShiftCols) {
-        FormulaElement topElement = formulaElements[formulaElements.length - 1];
+    public static String assemble(Iterable<FormulaElement> formulaElements,
+                                  int nShiftRows,
+                                  int nShiftCols) {
+        FormulaElement topElement = null;
+        Iterator<FormulaElement> it = formulaElements.iterator();
+        while (it.hasNext()) {
+            topElement = it.next();
+        }
+        if (topElement == null) {
+            throw new IllegalArgumentException("No valid formula element.");
+        }
         Token token = topElement.getToken();
         StringBuilder newFormula = new StringBuilder();
         int pos = topElement.getToken().getFrom();
+
         for (FormulaElement elem : formulaElements) {
+            if (elem.getToken().getSource() != token.getSource()) {
+                throw new IllegalArgumentException();
+            }
+
             if (elem instanceof ReferenceElement) {
                 if (pos < elem.getToken().getFrom()) {
                     newFormula.append(token.getSource(), pos, elem.getToken().getFrom());
@@ -169,9 +182,11 @@ public class FormulaParser {
                 pos = elem.getToken().getTo();
             }
         }
+
         if (pos < token.getTo()) {
             newFormula.append(token.getSource(), pos, token.getTo());
         }
+
         return newFormula.toString();
     }
 

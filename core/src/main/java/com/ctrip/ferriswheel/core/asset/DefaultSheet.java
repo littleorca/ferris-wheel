@@ -226,7 +226,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     DefaultTable createTable(String name) {
-        return new DefaultTable(name, this);
+        return new DefaultTable(name, getAssetManager());
     }
 
     protected DefaultChart addChart(Chart chart) {
@@ -244,7 +244,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
         final String finalChartName = chartName;
         return publicly(addChart, () -> {
             Chart chartData = addChart.getChartData();
-            DefaultChart chart = new DefaultChart(finalChartName, chartData.getType(), this);
+            DefaultChart chart = new DefaultChart(finalChartName, chartData.getType(), getAssetManager());
             assets.add(chart);
             // now fill data
             layoutNewAsset(chart);
@@ -349,7 +349,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     DefaultText createText(String name) {
-        return new DefaultText(name, this);
+        return new DefaultText(name, getAssetManager());
     }
 
     @Override
@@ -414,7 +414,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     DefaultForm createForm(String name) {
-        return new DefaultForm(name, this);
+        return new DefaultForm(name, getAssetManager());
     }
 
     public DefaultForm updateForm(Form form) {
@@ -436,7 +436,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     void fillFormData(DefaultForm form, Form data) {
         form.clearFields();
         for (FormField field : data) {
-            DefaultFormField defaultField = new DefaultFormField(field.getName(), form);
+            DefaultFormField defaultField = new DefaultFormField(field.getName(), form.getAssetManager());
             defaultField.fillFieldData(field);
             form.addField(defaultField);
         }
@@ -543,7 +543,7 @@ public class DefaultSheet extends NamedAssetNode implements Sheet {
     }
 
     @Override
-    public LayoutImpl getLayout() {
+    public SheetLayout getLayout() {
         return layout;
     }
 

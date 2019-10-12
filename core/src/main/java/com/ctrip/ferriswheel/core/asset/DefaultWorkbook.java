@@ -6,7 +6,6 @@ import com.ctrip.ferriswheel.core.action.AddSheet;
 import com.ctrip.ferriswheel.core.action.MoveSheet;
 import com.ctrip.ferriswheel.core.action.RemoveSheet;
 import com.ctrip.ferriswheel.core.action.RenameSheet;
-import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
 import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,7 +265,7 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     public void attach(Asset asset) {
         AssetReference ref = assetMap.get(asset.getAssetId());
         if (ref == null) {
-            ref = new AssetReference(asset);
+            ref = new AssetReference((AssetNode) asset);
             AssetReference previous = assetMap.putIfAbsent(asset.getAssetId(), ref);
             if (previous != null) {
                 ref = previous;
@@ -276,14 +275,9 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     }
 
     @Override
-    public Asset get(long id) {
+    public AssetNode get(long id) {
         AssetReference ref = assetMap.get(id);
         return ref == null ? null : ref.asset;
-    }
-
-    @Override
-    public ReferenceResolver getReferenceResolver() {
-        return referenceMaintainer;
     }
 
     @Override
@@ -308,6 +302,11 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     }
 
     @Override
+    public TransactionManager getTransactionManager() {
+        return this;
+    }
+
+    @Override
     public synchronized DefaultTransaction getTransaction() {
         if (transaction == null || transaction.getCurrentPhase() == TransactionPhase.Done) {
             transaction = new DefaultTransaction(this, evaluator, nextSequenceNumber());
@@ -320,10 +319,10 @@ public class DefaultWorkbook extends NamedAssetNode implements Workbook, AssetMa
     }
 
     class AssetReference {
-        Asset asset;
+        AssetNode asset;
         AtomicInteger referenceCount;
 
-        AssetReference(Asset asset) {
+        AssetReference(AssetNode asset) {
             this.asset = asset;
             this.referenceCount = new AtomicInteger(0);
         }

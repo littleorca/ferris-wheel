@@ -1,10 +1,7 @@
 package com.ctrip.ferriswheel.core.util;
 
 import com.ctrip.ferriswheel.common.variant.ErrorCodes;
-import com.ctrip.ferriswheel.core.ref.CellReference;
-import com.ctrip.ferriswheel.core.ref.NameReference;
-import com.ctrip.ferriswheel.core.ref.PositionRef;
-import com.ctrip.ferriswheel.core.ref.RangeReference;
+import com.ctrip.ferriswheel.core.ref.*;
 
 public class References {
     /**
@@ -16,10 +13,11 @@ public class References {
     public static PositionRef parsePositionRef(String refStr) {
         PositionRef positionRef = parseRangeEndRef(refStr);
 
-        if (positionRef.getRowIndex() == -1 || positionRef.getColumnIndex() == -1) {
+        if (positionRef.getRowAnchor() == null || positionRef.getColumnAnchor() == null) {
+//            throw new IllegalArgumentException();
 //            positionRef.setAlive(false);
-            positionRef.setRowIndex(-1);
-            positionRef.setColumnIndex(-1);
+            positionRef.setRowAnchor(null);
+            positionRef.setColumnAnchor(null);
         }
 
         return positionRef;
@@ -32,65 +30,61 @@ public class References {
      * @return
      */
     public static PositionRef parseRangeEndRef(String refStr) {
-        PositionRef posRef = new PositionRef();
         int pos = 0;
 
-        int col = -1;
+        Anchor columnAnchor = null;
+        Anchor rowAnchor = null;
+
+        boolean absolute = false;
         for (; pos < refStr.length(); pos++) {
             char ch = refStr.charAt(pos);
             if (ch == '$') {
-                if (col != -1) {
+                if (columnAnchor != null) {
                     break;
                 }
-                posRef.setColumnAbsolute(true);
+                absolute = true;
             } else if (ch >= 'A' && ch <= 'Z') {
-                col = col == -1 ? (ch - 'A' + 1) : col * 26 + (ch - 'A' + 1);
+                if (columnAnchor == null) {
+                    columnAnchor = new Anchor(ch - 'A' + 1, absolute);
+                } else {
+                    columnAnchor.setIndex(columnAnchor.getIndex() * 26 + (ch - 'A' + 1));
+                }
             } else {
                 break;
             }
         }
 
-        if (col == -1) {
-            posRef.setColumnAbsolute(false); // clear
+        if (columnAnchor == null) {
             pos = 0;
         }
 
-        int row = -1;
+        absolute = false;
         for (; pos < refStr.length(); pos++) {
             char ch = refStr.charAt(pos);
             if (ch == '$') {
-                if (row != -1) {
+                if (rowAnchor != null) {
                     break;
                 }
-                posRef.setRowAbsolute(true);
+                absolute = true;
             } else if (ch >= '0' && ch <= '9') {
-                row = row == -1 ? (ch - '0') : row * 10 + (ch - '0');
+                if (rowAnchor == null) {
+                    rowAnchor = new Anchor(ch - '0', absolute);
+                } else {
+                    rowAnchor.setIndex(rowAnchor.getIndex() * 10 + (ch - '0'));
+                }
             } else {
                 break;
             }
         }
 
-        posRef.setColumnIndex(col == -1 ? col : col - 1);
-        posRef.setRowIndex(row == -1 ? row : row - 1);
-
-        return posRef;
-    }
-
-    public static PositionRef shift(PositionRef originRef, int rowDrift, int columnDrift) {
-        PositionRef newRef = new PositionRef(originRef);
-        if (!originRef.isRowAbsolute()) {
-            newRef.setRowIndex(originRef.getRowIndex() + rowDrift);
+        if (rowAnchor != null) {
+            rowAnchor.setIndex(rowAnchor.getIndex() - 1);
         }
-        if (!originRef.isColumnAbsolute()) {
-            newRef.setColumnIndex(originRef.getColumnIndex() + columnDrift);
+        if (columnAnchor != null) {
+            columnAnchor.setIndex(columnAnchor.getIndex() - 1);
         }
-        return newRef;
-    }
 
-    public static RangeReference shift(RangeReference originRef, int nShiftRows, int nShiftCols) {
-        PositionRef newUpperLeft = shift(originRef.getUpperLeftRef(), nShiftRows, nShiftCols);
-        PositionRef newLowerRight = shift(originRef.getLowerRightRef(), nShiftRows, nShiftCols);
-        return new RangeReference(originRef.getSheetName(), originRef.getAssetName(), newUpperLeft, newLowerRight);
+        return new PositionRef(rowAnchor, columnAnchor);
     }
 
     public static String toColumnCode(int columnIndex) {
@@ -152,41 +146,40 @@ public class References {
         if (!rangeReference.isAlive()) {
             return ErrorCodes.REF.getName();
 
-        } else if (rangeReference.getTop() == -1 && rangeReference.getLeft() == -1) {
+        } else if (rangeReference.getTopAnchor() == null && rangeReference.getLeftAnchor() == null) {
             throw new IllegalArgumentException();
 
-        } else if (rangeReference.getTop() == -1) {
-            if (rangeReference.getBottom() != -1 || rangeReference.getRight() == -1) {
+        } else if (rangeReference.getTopAnchor() == null) {
+            if (rangeReference.getBottomAnchor() != null || rangeReference.getRightAnchor() == null) {
                 throw new IllegalArgumentException();
             }
 
-        } else if (rangeReference.getLeft() == -1) {
-            if (rangeReference.getRight() != -1 || rangeReference.getBottom() == -1) {
+        } else if (rangeReference.getLeftAnchor() == null) {
+            if (rangeReference.getRightAnchor() != null || rangeReference.getBottomAnchor() == null) {
                 throw new IllegalArgumentException();
             }
 
-        } else if (rangeReference.getRight() == -1 || rangeReference.getBottom() == -1) {
+        } else if (rangeReference.getRightAnchor() == null || rangeReference.getBottomAnchor() == null) {
             throw new IllegalArgumentException();
         }
         // TODO above check could be move to RangeReference itself.
 
         StringBuilder sb = new StringBuilder();
-        PositionRef upperLeft = rangeReference.getUpperLeftRef();
-        PositionRef lowerRight = rangeReference.getLowerRightRef();
-
-        if ((upperLeft.getRowIndex() == -1 && upperLeft.getColumnIndex() == -1)
-                || (lowerRight.getRowIndex() == -1 && lowerRight.getColumnIndex() == -1)) {
-            throw new IllegalArgumentException();
-        } else if (upperLeft.getRowIndex() == -1) {
-
-        } else if (upperLeft.getColumnIndex() == -1) {
-
-        }
 
         appendQualifier(sb, rangeReference.getSheetName(), rangeReference.getAssetName());
-        appendPosition(sb, upperLeft, nShiftRows, nShiftCols, true);
+        appendPosition(sb,
+                rangeReference.getLeftAnchor(),
+                rangeReference.getTopAnchor(),
+                nShiftRows,
+                nShiftCols,
+                true);
         sb.append(":");
-        appendPosition(sb, lowerRight, nShiftRows, nShiftCols, true);
+        appendPosition(sb,
+                rangeReference.getRightAnchor(),
+                rangeReference.getBottomAnchor(),
+                nShiftRows,
+                nShiftCols,
+                true);
         return sb.toString();
     }
 
@@ -212,37 +205,47 @@ public class References {
     }
 
     static StringBuilder appendPosition(StringBuilder sb, PositionRef positionRef, int nShiftRows, int nShiftCols) {
-        return appendPosition(sb, positionRef, nShiftRows, nShiftCols, false);
+        return appendPosition(sb,
+                positionRef.getColumnAnchor(),
+                positionRef.getRowAnchor(),
+                nShiftRows,
+                nShiftCols,
+                false);
     }
 
-    static StringBuilder appendPosition(StringBuilder sb, PositionRef positionRef, int nShiftRows, int nShiftCols, boolean allowPartial) {
+    static StringBuilder appendPosition(StringBuilder sb,
+                                        Anchor columnAnchor,
+                                        Anchor rowAnchor,
+                                        int nShiftRows,
+                                        int nShiftCols,
+                                        boolean allowPartial) {
 //        if (positionRef instanceof CellReference &&
 //                !((CellReference) positionRef).isAlive()) {
 //            sb.append("#REF!");
 //            return sb;
 //        }
 
-        if (positionRef.getColumnIndex() == -1 && positionRef.getRowIndex() == -1) {
+        if (columnAnchor == null && rowAnchor == null) {
             throw new IllegalArgumentException();
         }
 
-        if (!allowPartial && (positionRef.getColumnIndex() == -1 || positionRef.getRowIndex() == -1)) {
+        if (!allowPartial && (columnAnchor == null || rowAnchor == null)) {
             throw new IllegalArgumentException();
         }
 
-        if (positionRef.getColumnIndex() != -1) {
-            if (positionRef.isColumnAbsolute()) {
-                sb.append('$').append(toColumnCode(positionRef.getColumnIndex()));
+        if (columnAnchor != null) {
+            if (columnAnchor.isAbsolute()) {
+                sb.append('$').append(toColumnCode(columnAnchor.getIndex()));
             } else {
-                sb.append(toColumnCode(positionRef.getColumnIndex() + nShiftCols));
+                sb.append(toColumnCode(columnAnchor.getIndex() + nShiftCols));
             }
         }
 
-        if (positionRef.getRowIndex() != -1) {
-            if (positionRef.isRowAbsolute()) {
-                sb.append('$').append(toRowCode(positionRef.getRowIndex()));
+        if (rowAnchor != null) {
+            if (rowAnchor.isAbsolute()) {
+                sb.append('$').append(toRowCode(rowAnchor.getIndex()));
             } else {
-                sb.append(toRowCode(positionRef.getRowIndex() + nShiftRows));
+                sb.append(toRowCode(rowAnchor.getIndex() + nShiftRows));
             }
         }
         return sb;

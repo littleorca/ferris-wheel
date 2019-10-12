@@ -12,15 +12,15 @@ public class DefaultText extends SheetAssetNode implements Text {
     private final TextLayout layout = new TextLayout(); // FIXME layout change not tracked
     private final ValueNode content;
 
-    protected DefaultText(String name, DefaultSheet sheet) {
-        super(name, sheet);
+    protected DefaultText(String name, AssetManager assetManager) {
+        super(name, assetManager);
         this.content = new ValueNode(getAssetManager(), Value.BLANK, null);
 
         bindChild(content);
     }
 
     @Override
-    public LayoutImpl getLayout() {
+    public TextLayout getLayout() {
         return layout;
     }
 

@@ -77,7 +77,7 @@ public class DefaultRow extends AssetNode implements Row {
     }
 
     public DefaultTable getTable() {
-        return (DefaultTable) getParent();
+        return parent(DefaultTable.class);
     }
 
     void setSheet(DefaultTable sheet) {

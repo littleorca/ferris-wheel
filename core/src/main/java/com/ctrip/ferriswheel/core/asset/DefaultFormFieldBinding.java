@@ -28,8 +28,8 @@ import com.ctrip.ferriswheel.common.form.FormFieldBinding;
 
 public class DefaultFormFieldBinding extends ValueNode implements FormFieldBinding {
 
-    public DefaultFormFieldBinding(AssetNode parent, FormFieldBinding bindingData) {
-        super(parent, null, bindingData.getTarget());
+    public DefaultFormFieldBinding(AssetManager assetManager, FormFieldBinding bindingData) {
+        super(assetManager, null, bindingData.getTarget());
     }
 
     @Override

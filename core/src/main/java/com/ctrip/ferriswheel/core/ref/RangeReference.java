@@ -1,16 +1,14 @@
 package com.ctrip.ferriswheel.core.ref;
 
 import com.ctrip.ferriswheel.common.table.Table;
-import com.ctrip.ferriswheel.core.asset.Asset;
 
 import java.io.Serializable;
 
-public class RangeReference extends AbstractReference implements TableRange, Serializable {
-    private PositionRef upperLeftRef;
-    private PositionRef lowerRightRef;
-
-    private long upperLeftTargetId = Asset.UNSPECIFIED_ASSET_ID;
-    private long lowerRightTargetId = Asset.UNSPECIFIED_ASSET_ID;
+public class RangeReference extends HotAreaReference implements TableRange, Serializable {
+    private Anchor leftAnchor;
+    private Anchor topAnchor;
+    private Anchor rightAnchor;
+    private Anchor bottomAnchor;
 
     public RangeReference() {
         super(null, null);
@@ -22,67 +20,55 @@ public class RangeReference extends AbstractReference implements TableRange, Ser
                 || !lowerRight.getAssetName().equals(upperLeft.getAssetName())) {
             throw new IllegalArgumentException();
         }
-        this.upperLeftRef = upperLeft.getPositionRef();
-        this.lowerRightRef = lowerRight.getPositionRef();
-        this.upperLeftTargetId = upperLeft.getCellId();
-        this.lowerRightTargetId = lowerRight.getCellId();
+        this.leftAnchor = new Anchor(upperLeft.getPositionRef().getColumnAnchor());
+        this.topAnchor = new Anchor(upperLeft.getPositionRef().getRowAnchor());
+        this.rightAnchor = new Anchor(lowerRight.getPositionRef().getColumnAnchor());
+        this.bottomAnchor = new Anchor(lowerRight.getPositionRef().getRowAnchor());
     }
 
-    public RangeReference(String sheetName, String assetName, PositionRef upperLeftPos, PositionRef lowerRightPos) {
+    public RangeReference(String sheetName,
+                          String assetName,
+                          Integer left,
+                          Integer top,
+                          Integer right,
+                          Integer bottom) {
         super(sheetName, assetName);
-        this.upperLeftRef = upperLeftPos;
-        this.lowerRightRef = lowerRightPos;
+        if (left != null) {
+            this.leftAnchor = new Anchor(left);
+        }
+        if (top != null) {
+            this.topAnchor = new Anchor(top);
+        }
+        if (right != null) {
+            this.rightAnchor = new Anchor(right);
+        }
+        if (bottom != null) {
+            this.bottomAnchor = new Anchor(bottom);
+        }
     }
 
     public RangeReference(String sheetName,
                           String assetName,
-                          int left,
-                          int top,
-                          int right,
-                          int bottom,
-                          long upperLeftCellId,
-                          long lowerRightCellId) {
-        this(sheetName,
-                assetName,
-                left, true,
-                top, true,
-                right, true,
-                bottom, true,
-                upperLeftCellId,
-                lowerRightCellId);
+                          Anchor leftAnchor,
+                          Anchor topAnchor,
+                          Anchor rightAnchor,
+                          Anchor bottomAnchor) {
+        super(sheetName, assetName);
+        this.leftAnchor = leftAnchor == null ? null : new Anchor(leftAnchor);
+        this.topAnchor = topAnchor == null ? null : new Anchor(topAnchor);
+        this.rightAnchor = rightAnchor == null ? null : new Anchor(rightAnchor);
+        this.bottomAnchor = bottomAnchor == null ? null : new Anchor(bottomAnchor);
     }
 
-    public RangeReference(String sheetName,
-                          String tableName,
-                          int left, boolean isLeftAbsolute,
-                          int top, boolean isTopAbsolute,
-                          int right, boolean isRightAbsolute,
-                          int bottom, boolean isBottomAbsolute,
-                          long upperLeftCellId,
-                          long lowerRightCellId) {
-        this(sheetName,
-                tableName,
-                new PositionRef(top, isTopAbsolute, left, isLeftAbsolute),
-                new PositionRef(bottom, isBottomAbsolute, right, isRightAbsolute),
-                upperLeftCellId,
-                lowerRightCellId,
-                true,
-                false);
-    }
 
-    public RangeReference(String sheetName,
-                          String assetName,
-                          PositionRef upperLeftRef,
-                          PositionRef lowerRightRef,
-                          long upperLeftTargetId,
-                          long lowerRightTargetId,
-                          boolean alive,
-                          boolean phantom) {
-        super(sheetName, assetName, alive, phantom);
-        this.upperLeftRef = upperLeftRef;
-        this.lowerRightRef = lowerRightRef;
-        this.upperLeftTargetId = upperLeftTargetId;
-        this.lowerRightTargetId = lowerRightTargetId;
+    public RangeReference relativeShift(int nShiftRows, int nShiftCols) {
+        Anchor shiftedLeftAnchor = leftAnchor == null ? null : leftAnchor.relativeShift(nShiftCols);
+        Anchor shiftedTopAnchor = topAnchor == null ? null : topAnchor.relativeShift(nShiftRows);
+        Anchor shiftedRightAnchor = rightAnchor == null ? null : rightAnchor.relativeShift(nShiftCols);
+        Anchor shiftedBottomAnchor = bottomAnchor == null ? null : bottomAnchor.relativeShift(nShiftRows);
+
+        return new RangeReference(getSheetName(), getAssetName(),
+                shiftedLeftAnchor, shiftedTopAnchor, shiftedRightAnchor, shiftedBottomAnchor);
     }
 
     @Override
@@ -99,10 +85,10 @@ public class RangeReference extends AbstractReference implements TableRange, Ser
         final int rowCount = table.getRowCount();
         final int columnCount = table.getColumnCount();
 
-        final int expectedTop = getTop() == -1 ? 0 : getTop();
-        final int expectedBottom = getBottom() == -1 ? rowCount - 1 : getBottom();
-        final int expectedLeft = getLeft() == -1 ? 0 : getLeft();
-        final int expectedRight = getRight() == -1 ? columnCount - 1 : getRight();
+        final int expectedTop = getTop() == null ? 0 : getTop();
+        final int expectedBottom = getBottom() == null ? rowCount - 1 : getBottom();
+        final int expectedLeft = getLeft() == null ? 0 : getLeft();
+        final int expectedRight = getRight() == null ? columnCount - 1 : getRight();
 
         if (expectedTop >= rowCount || expectedLeft >= columnCount) {
             return null;
@@ -121,71 +107,55 @@ public class RangeReference extends AbstractReference implements TableRange, Ser
     }
 
     @Override
-    public int getTop() {
-        return upperLeftRef.getRowIndex();
+    public Integer getLeft() {
+        return leftAnchor == null ? null : leftAnchor.getIndex();
     }
 
     @Override
-    public int getLeft() {
-        return upperLeftRef.getColumnIndex();
+    public Integer getTop() {
+        return topAnchor == null ? null : topAnchor.getIndex();
     }
 
     @Override
-    public int getBottom() {
-        return lowerRightRef.getRowIndex();
+    public Integer getRight() {
+        return rightAnchor == null ? null : rightAnchor.getIndex();
     }
 
     @Override
-    public int getRight() {
-        return lowerRightRef.getColumnIndex();
+    public Integer getBottom() {
+        return bottomAnchor == null ? null : bottomAnchor.getIndex();
     }
 
-    @Override
-    public int width() {
-        return getRight() + 1 - getLeft();
+    public Anchor getLeftAnchor() {
+        return leftAnchor;
     }
 
-    @Override
-    public int height() {
-        return getBottom() + 1 - getTop();
+    public void setLeftAnchor(Anchor leftAnchor) {
+        this.leftAnchor = leftAnchor;
     }
 
-    public PositionRef getUpperLeftRef() {
-        return upperLeftRef;
+    public Anchor getTopAnchor() {
+        return topAnchor;
     }
 
-    public void setUpperLeftRef(PositionRef upperLeftRef) {
-        this.upperLeftRef = upperLeftRef;
+    public void setTopAnchor(Anchor topAnchor) {
+        this.topAnchor = topAnchor;
     }
 
-    public PositionRef getLowerRightRef() {
-        return lowerRightRef;
+    public Anchor getRightAnchor() {
+        return rightAnchor;
     }
 
-    public void setLowerRightRef(PositionRef lowerRightRef) {
-        this.lowerRightRef = lowerRightRef;
+    public void setRightAnchor(Anchor rightAnchor) {
+        this.rightAnchor = rightAnchor;
     }
 
-    public long getUpperLeftTargetId() {
-        return upperLeftTargetId;
+    public Anchor getBottomAnchor() {
+        return bottomAnchor;
     }
 
-    public void setUpperLeftTargetId(long upperLeftTargetId) {
-        this.upperLeftTargetId = upperLeftTargetId;
-    }
-
-    public long getLowerRightTargetId() {
-        return lowerRightTargetId;
-    }
-
-    public void setLowerRightTargetId(long lowerRightTargetId) {
-        this.lowerRightTargetId = lowerRightTargetId;
-    }
-
-    public boolean isValid() {
-        return isAlive() &&
-                upperLeftTargetId != Asset.UNSPECIFIED_ASSET_ID &&
-                lowerRightTargetId != Asset.UNSPECIFIED_ASSET_ID;
+    public void setBottomAnchor(Anchor bottomAnchor) {
+        this.bottomAnchor = bottomAnchor;
     }
 
 }

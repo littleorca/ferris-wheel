@@ -2,10 +2,10 @@ package com.ctrip.ferriswheel.core.formula.eval;
 
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.SheetAsset;
-import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.formula.NameReferenceElement;
+import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 
 public interface FormulaEvaluationContext {
     Sheet getCurrentSheet();
@@ -18,7 +18,7 @@ public interface FormulaEvaluationContext {
 
     Variant resolveReference(CellReferenceElement referenceElement);
 
-    Variant resolveReference(NameReferenceElement referenceElement);
+    Variant resolveReference(RangeReferenceElement referenceElement);
 
-    Table resolveTable(String sheetName, String tableName);
+    Variant resolveReference(NameReferenceElement referenceElement);
 }

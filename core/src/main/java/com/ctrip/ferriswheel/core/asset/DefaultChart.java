@@ -36,8 +36,8 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     private final ChartLayout layout = new ChartLayout();
     private DefaultChartBinder binder;
 
-    DefaultChart(String name, String type, DefaultSheet sheet) {
-        super(name, sheet);
+    DefaultChart(String name, String type, AssetManager assetManager) {
+        super(name, assetManager);
         this.type = type;
         this.title = new ValueNode(getAssetManager(), Value.BLANK, null);
         this.categories = new ValueNode(getAssetManager(), Value.BLANK, null);
@@ -153,7 +153,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
     }
 
     @Override
-    public LayoutImpl getLayout() {
+    public ChartLayout getLayout() {
         return layout;
     }
 
@@ -180,13 +180,13 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         }
 
         ValueNode data = binder.getData();
-        if (!data.isFormula() || data.getFormulaElements().length != 1
-                || !(data.getFormulaElements()[0] instanceof ReferenceElement)) {
+        if (!data.isFormula() || data.getFormula().getElementCount() != 1
+                || !(data.getFormula().getElement(0) instanceof ReferenceElement)) {
             throw new RuntimeException("Data area must be a formula with single reference element.");
         }
 
         RangeReference rangeReference = null;
-        FormulaElement elem = data.getFormulaElements()[0];
+        FormulaElement elem = data.getFormula().getElement(0);
         if (elem instanceof CellReferenceElement) {
             CellReference cellReference = ((CellReferenceElement) elem).getCellReference();
             rangeReference = new RangeReference(cellReference, cellReference);

@@ -24,9 +24,6 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.common.Sheet;
-import com.ctrip.ferriswheel.common.table.Cell;
-import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Parameter;
 import com.ctrip.ferriswheel.common.variant.Value;
@@ -34,6 +31,9 @@ import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.ref.*;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class DefaultReferenceMaintainer implements ReferenceMaintainer {
     private final DefaultWorkbook workbook;
@@ -69,11 +69,11 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
 
         if (valueNode.isFormula()) {
             Formula f = valueNode.getFormula();
-            for (FormulaElement e : f.getElements()) {
+            for (FormulaElement e : f) {
                 if (e instanceof CellReferenceElement) {
                     CellReference cellReference = ((CellReferenceElement) e).getCellReference();
                     hookCellRef(valueNode, cellReference);
-                    traceRange(valueNode, cellReference);
+//                    traceRange(valueNode, cellReference);
 
                 } else if (e instanceof NameReferenceElement) {
                     NameReference nameReference = ((NameReferenceElement) e).getNameReference();
@@ -82,14 +82,13 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
                 } else if (e instanceof RangeReferenceElement) {
                     RangeReference rangeReference = ((RangeReferenceElement) e).getRangeReference();
                     hookRangeRef(valueNode, rangeReference);
-                    traceRange(valueNode, rangeReference);
+//                    traceRange(valueNode, rangeReference);
                 }
             }
         }
     }
 
-    @Override
-    public void hookCellRef(ValueNode fromNode, CellReference cellReference) {
+    private void hookCellRef(ValueNode fromNode, CellReference cellReference) {
         if (!cellReference.isAlive()) {
             return;
         }
@@ -97,31 +96,11 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
                 fromNode.parent(DefaultSheet.class),
                 fromNode.parent(DefaultTable.class));
         if (table == null) {
+            cellReference.setHotAreaId(Asset.UNSPECIFIED_ASSET_ID);
             cellReference.setAlive(false);
             return;
         }
-        if (table.getAutomaton() != null) {
-            cellReference.setPhantom(true); // actually this only need to be done once
-        }
-        final int rowIndex = cellReference.getPositionRef().getRowIndex();
-        final int columnIndex = cellReference.getPositionRef().getColumnIndex();
-        if (rowIndex < 0 || rowIndex >= table.getRowCount() ||
-                columnIndex < 0 || columnIndex >= table.getColumnCount()) {
-            if (cellReference.isPhantom()) {
-                cellReference.setCellId(DefaultCell.UNSPECIFIED_ASSET_ID);
-                fromNode.addDependency(table);
-            } else {
-                cellReference.setAlive(false);
-            }
-            return;
-        }
-        DefaultCell depCell = table.getCell(rowIndex, columnIndex);
-        cellReference.setCellId(depCell.getAssetId()); // fill runtime id for convenience.
-        if (cellReference.isPhantom()) {
-            fromNode.addDependency(table);
-        } else {
-            fromNode.addDependency(depCell);
-        }
+        table.hookCell(cellReference, fromNode.getAssetId());
     }
 
     private void hookNameRef(ValueNode fromNode, NameReference nameReference) {
@@ -155,6 +134,7 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
                 fromNode.parent(DefaultSheet.class),
                 fromNode.parent(DefaultTable.class));
         if (table == null) {
+            rangeReference.setHotAreaId(Asset.UNSPECIFIED_ASSET_ID);
             rangeReference.setAlive(false);
             return;
 //            throw new IllegalArgumentException();
@@ -162,79 +142,7 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
         if (table.getAutomaton() != null) {
             rangeReference.setPhantom(true); // actually this only need to be done once
         }
-        // fill runtime id for convenience.
-        final int left = rangeReference.getLeft() == -1 ? 0 : rangeReference.getLeft();
-        final int top = rangeReference.getTop() == -1 ? 0 : rangeReference.getTop();
-        final int right = rangeReference.getRight() != -1 ? rangeReference.getRight() :
-                table.getColumnCount() > 0 ? table.getColumnCount() - 1 : 0;
-        final int bottom = rangeReference.getBottom() != -1 ? rangeReference.getBottom() :
-                table.getRowCount() > 0 ? table.getRowCount() - 1 : 0;
-        if (top >= 0 && top < table.getRowCount() && left >= 0 && left < table.getColumnCount()) {
-            DefaultCell upperLeft = table.getCell(top, left);
-            rangeReference.setUpperLeftTargetId(upperLeft.getAssetId());
-        }
-        if (bottom >= 0 && bottom < table.getRowCount() && right >= 0 && right < table.getColumnCount()) {
-            DefaultCell lowerRight = table.getCell(bottom, right);
-            rangeReference.setLowerRightTargetId(lowerRight.getAssetId());
-        }
-
-        if (rangeReference.isPhantom()) {
-            fromNode.addDependency(table);
-
-        } else {
-            // scan dependencies
-            for (int row = Math.max(top, 0); row <= bottom && row < table.getRowCount(); row++) {
-                for (int col = Math.max(left, 0); col <= right && col < table.getColumnCount(); col++) {
-                    DefaultCell depCell = table.getCell(row, col);
-                    if (depCell != null) {
-                        fromNode.addDependency(depCell);
-                    }
-                }
-            }
-        }
-    }
-
-    private void traceRange(ValueNode fromNode, CellReference cellReference) {
-        if (!cellReference.isAlive()) {
-            return;
-        }
-        DefaultTable referredTable = (DefaultTable) getReferredSheetAsset(cellReference,
-                fromNode.parent(DefaultSheet.class),
-                fromNode.parent(DefaultTable.class));
-        PositionRef positionRef = cellReference.getPositionRef();
-        fromNode.watchRange(referredTable,
-                positionRef.getColumnIndex(),
-                positionRef.getRowIndex(),
-                positionRef.getColumnIndex(),
-                positionRef.getRowIndex());
-    }
-
-    private void traceRange(ValueNode fromNode, RangeReference rangeReference) {
-        DefaultTable targetTable = (DefaultTable) getReferredSheetAsset(rangeReference,
-                fromNode.parent(DefaultSheet.class),
-                fromNode.parent(DefaultTable.class));
-
-        if (targetTable == null) {
-            return; // TODO is that ok?
-        }
-
-        if (rangeReference.isAlive()) {
-            fromNode.watchRange(targetTable,
-                    rangeReference.getLeft(),
-                    rangeReference.getTop(),
-                    rangeReference.getRight(),
-                    rangeReference.getBottom());
-
-//        } else if (rangeReference.getUpperLeft().isAlive()) {
-//            fromNode.watchRange(targetTable,
-//                    rangeReference.getUpperLeft().getRowIndex(),
-//                    rangeReference.getUpperLeft().getColumnIndex());
-//
-//        } else if (rangeReference.getLowerRight().isAlive()) {
-//            fromNode.watchRange(targetTable,
-//                    rangeReference.getLowerRight().getRowIndex(),
-//                    rangeReference.getLowerRight().getColumnIndex());
-        }
+        table.hookArea(rangeReference, fromNode.getAssetId());
     }
 
     private SheetAssetNode getReferredSheetAsset(AbstractReference ref, DefaultSheet currentSheet, SheetAssetNode currentAsset) {
@@ -256,17 +164,56 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
     @Override
     public Variant resolve(CellReferenceElement referenceElement, FormulaEvaluationContext context) {
         CellReference cellReference = referenceElement.getCellReference();
-        if (!cellReference.isAlive()) {
+        if (!cellReference.isValid()) {
             return Value.err(ErrorCodes.REF);
         }
-        if (cellReference.getCellId() != Asset.UNSPECIFIED_ASSET_ID) {
-            Asset asset = workbook.getAssetManager().get(cellReference.getCellId());
-            if (asset == null || !(asset instanceof Cell)) {
+        DefaultCell cell = getReferredAsset(cellReference);
+        if (cell == null) {
+            if (cellReference.isPhantom()) {
+                return Value.err(ErrorCodes.NA);
+            } else {
                 return Value.err(ErrorCodes.REF);
             }
-            return ((DefaultCell) asset).getData();
         }
-        return Value.err(ErrorCodes.REF); // cell not found
+        return cell.getData();
+    }
+
+    @Override
+    public Variant resolve(RangeReferenceElement referenceElement, FormulaEvaluationContext context) {
+        RangeReference rangeReference = referenceElement.getRangeReference();
+        if (!rangeReference.isAlive()) {
+            return Value.err(ErrorCodes.REF);
+        }
+
+        HotAreaDelegate hotArea = (HotAreaDelegate) getAssetById(rangeReference.getHotAreaId());
+
+        if (hotArea == null || !hotArea.isValid()) {
+            return Value.err(ErrorCodes.REF);
+        }
+
+        DefaultTable table = hotArea.parent(DefaultTable.class);
+
+        if (table == null) {
+            // maybe throw an exception.
+            return Value.err(ErrorCodes.REF);
+        }
+
+        SimpleTableRange validRange = hotArea.getValidRange();
+        if (validRange == null) {
+            return Value.BLANK;
+        }
+
+        List<Variant> valueList = new LinkedList<>();
+        for (int rowIndex = validRange.getTop(); rowIndex <= validRange.getBottom(); rowIndex++) {
+            DefaultRow row = table.getRow(rowIndex);
+            for (int columnIndex = validRange.getLeft(); columnIndex <= validRange.getRight(); columnIndex++) {
+                DefaultCell cell = row == null ? null : row.getCell(columnIndex);
+                Variant data = cell == null ? Value.BLANK : cell.getData();
+                valueList.add(Value.from(data));
+            }
+        }
+        final int actualResultColumns = validRange.width();
+        return new Value.ListValue(valueList, actualResultColumns);
     }
 
     // TODO compare to another resolve method, this violates DRY principle!
@@ -288,19 +235,36 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
     }
 
     @Override
-    public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
-        if (sheetName == null && tableName == null) {
-            return (Table) context.getCurrentAsset();
+    public DefaultCell getReferredAsset(CellReference cellReference) {
+        if (!cellReference.isValid()) {
+            return null;
         }
-        Sheet sheet = (sheetName != null) ? workbook.getSheet(sheetName) : context.getCurrentSheet();
-        if (sheet == null) {
-            return null; // or throw new RuntimeException();
+        HotAreaDelegate hotArea = (HotAreaDelegate) getAssetById(cellReference.getHotAreaId());
+        SimpleTableRange validRange = hotArea.getValidRange();
+        if (validRange == null) {
+            throw new IllegalStateException("Cell reference is marked as valid but actually invalid.");
         }
-        return sheet.getAsset(tableName);
+        Integer one = Integer.valueOf(1);
+        if (!one.equals(validRange.width()) || !one.equals(validRange.height())) {
+            throw new IllegalStateException("Cell reference is marked as valid but actually malformed.");
+        }
+        DefaultTable table = hotArea.parent(DefaultTable.class);
+        if (table == null) {
+            throw new IllegalStateException("Cell reference is marked as valid but table is not found.");
+        }
+        return table.getCell(validRange.getTop(), validRange.getLeft());
     }
 
     @Override
-    public Asset getAssetById(long assetId) {
+    public AssetNode getReferredAsset(NameReference nameReference) {
+        if (!nameReference.isValid()) {
+            return null;
+        }
+        return getAssetById(nameReference.getTargetId());
+    }
+
+    @Override
+    public AssetNode getAssetById(long assetId) {
         return workbook.get(assetId);
     }
 

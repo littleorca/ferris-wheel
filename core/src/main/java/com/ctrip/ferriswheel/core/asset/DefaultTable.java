@@ -4,12 +4,8 @@ import com.ctrip.ferriswheel.common.action.Action;
 import com.ctrip.ferriswheel.common.automaton.Automaton;
 import com.ctrip.ferriswheel.common.automaton.PivotConfiguration;
 import com.ctrip.ferriswheel.common.automaton.QueryConfiguration;
-import com.ctrip.ferriswheel.common.chart.Chart;
-import com.ctrip.ferriswheel.common.chart.ChartBinder;
-import com.ctrip.ferriswheel.common.chart.DataSeries;
 import com.ctrip.ferriswheel.common.table.*;
-import com.ctrip.ferriswheel.common.text.Text;
-import com.ctrip.ferriswheel.common.util.*;
+import com.ctrip.ferriswheel.common.util.DataSet;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Parameter;
 import com.ctrip.ferriswheel.common.variant.Value;
@@ -17,12 +13,14 @@ import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.action.*;
 import com.ctrip.ferriswheel.core.bean.HeaderInfo;
 import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
-import com.ctrip.ferriswheel.core.bean.TextData;
-import com.ctrip.ferriswheel.core.formula.*;
-import com.ctrip.ferriswheel.core.ref.*;
+import com.ctrip.ferriswheel.core.formula.Formula;
+import com.ctrip.ferriswheel.core.formula.FormulaElement;
+import com.ctrip.ferriswheel.core.formula.FormulaParser;
+import com.ctrip.ferriswheel.core.formula.NameReferenceElement;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.NameReference;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 import com.ctrip.ferriswheel.core.util.References;
-import com.ctrip.ferriswheel.core.util.UnmodifiableIterator;
-import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import com.ctrip.ferriswheel.core.view.TableLayout;
 
 import java.util.*;
@@ -32,20 +30,19 @@ public class DefaultTable extends SheetAssetNode implements Table {
     static final int MAX_ROWS = 65535;
     static final int MAX_COLUMNS = 255;
 
-    private List<Header> rowHeaders = new ArrayList<>();
-    private List<Header> columnHeaders = new ArrayList<>();
-    private final SparseAssetArray<DefaultRow> rows;
-    private boolean readOnly = false;
+    private final GridData gridData;
     private final TableLayout layout = new TableLayout();
+    private final HotAreaManager hotAreaManager;
     private Automaton automaton;
-    private Map<Range, Set<Long>> rangeToNodes = new HashMap<>();
-    private Map<Long, Set<Range>> nodeToRanges = new HashMap<>();
 
     private final AutoFiller autoFiller = new AutoFiller();
 
-    DefaultTable(String name, DefaultSheet sheet) {
-        super(name, sheet);
-        this.rows = new SparseAssetArray<>(this);
+    DefaultTable(String name, AssetManager assetManager) {
+        super(name, assetManager);
+        this.gridData = new GridData(assetManager);
+        this.hotAreaManager = new HotAreaManager(assetManager);
+        bindChild(this.gridData);
+        bindChild(this.hotAreaManager);
     }
 
     @Override
@@ -312,12 +309,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
             for (int i = 0; i < nRows; i++) {
                 newRowHeaders.add(new HeaderInfo(/* TBD */));
             }
-            rowHeaders.addAll(rowIndex, newRowHeaders);
+            gridData.getRowHeaders().addAll(rowIndex, newRowHeaders);
             // just move rows to make room for new rows.
             for (int i = getRowCount() - 1; i >= rowIndex; i--) {
-                DefaultRow row = rows.get(i);
+                DefaultRow row = gridData.getRows().get(i);
                 int toIdx = i + nRows;
-                rows.move(i, toIdx);
+                gridData.getRows().move(i, toIdx);
                 if (row != null) {
                     row.setRowIndex(toIdx);
                 }
@@ -328,7 +325,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             final int right = getColumnCount() - 1;
             final int bottom = getRowCount() - 1;
 
-            updateRangeReferences(left, top, right, bottom,
+            hotAreaManager.onTableAreaChange(left, top, right, bottom,
                     null, null, null, null);
             autoFiller.autoFillRowsIfPossible(this, rowIndex, nRows);
         });
@@ -353,8 +350,8 @@ public class DefaultTable extends SheetAssetNode implements Table {
             int i;
             for (i = rowIndex; i < getRowCount() - nRows; i++) {
                 int fromIdx = i + nRows;
-                DefaultRow row = rows.get(fromIdx);
-                DefaultRow oldRow = rows.move(fromIdx, i);
+                DefaultRow row = gridData.getRows().get(fromIdx);
+                DefaultRow oldRow = gridData.getRows().move(fromIdx, i);
                 if (row != null) {
                     row.setRowIndex(i);
                 }
@@ -363,17 +360,17 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 }
             }
             for (; i < rowIndex + nRows; i++) {
-                DefaultRow oldRow = rows.remove(i);
+                DefaultRow oldRow = gridData.getRows().remove(i);
                 if (oldRow != null) {
                     removedRows.add(oldRow);
                 }
             }
-            rowHeaders.subList(rowIndex, rowIndex + nRows).clear();
+            gridData.getRowHeaders().subList(rowIndex, rowIndex + nRows).clear();
 
             final int left = 0;
             final int top = rowIndex;
 
-            updateRangeReferences(left, top, null, null,
+            hotAreaManager.onTableAreaChange(left, top, null, null,
                     null, rowIndex > 0 ? rowIndex - 1 : null,
                     null, rowIndex);
 
@@ -400,7 +397,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             for (int i = 0; i < nCols; i++) {
                 newColumnHeaders.add(new HeaderInfo(/* TBD */));
             }
-            columnHeaders.addAll(colIndex, newColumnHeaders);
+            gridData.getColumnHeaders().addAll(colIndex, newColumnHeaders);
             for (int r = 0; r < getRowCount(); r++) {
                 DefaultRow row = getRow(r);
                 if (row == null) {
@@ -416,7 +413,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
             final int right = getColumnCount() - 1;
             final int bottom = getRowCount() - 1;
 
-            updateRangeReferences(left, top, right, bottom,
+            hotAreaManager.onTableAreaChange(left, top, right, bottom,
                     null, null, null, null);
             autoFiller.autoFillColumnsIfPossible(this, colIndex, nCols);
         });
@@ -458,13 +455,13 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     }
                 }
             }
-            columnHeaders.subList(colIndex, colIndex + nCols).clear();
+            gridData.getColumnHeaders().subList(colIndex, colIndex + nCols).clear();
 
 
             final int left = colIndex;
             final int top = 0;
 
-            updateRangeReferences(left, top, null, null,
+            hotAreaManager.onTableAreaChange(left, top, null, null,
                     colIndex > 0 ? colIndex - 1 : null, null,
                     colIndex, null);
 
@@ -488,6 +485,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     private Automaton createAndRegisterAutomaton(AutomateConfiguration solution) {
         if (this.automaton != null) {
             unbindChild((AssetNode) this.automaton);
+            gridData.removeDependency((AssetNode) this.automaton);
         }
 
         if (solution instanceof QueryConfiguration) {
@@ -495,6 +493,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     (QueryConfiguration) solution);
             bindChild(queryAutomaton);
             this.automaton = queryAutomaton;
+            gridData.addDependency(queryAutomaton);
             for (String name : queryAutomaton.getTemplate().getBuiltinParamNames()) {
                 Parameter param = queryAutomaton.getTemplate().getBuiltinParam(name);
                 queryAutomaton.addDependency((ValueNode) param.getValue());
@@ -506,6 +505,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
                     (PivotConfiguration) solution);
             bindChild(pivotAutomaton);
             this.automaton = pivotAutomaton;
+            gridData.addDependency(pivotAutomaton);
             return pivotAutomaton;
 
         } else {
@@ -533,12 +533,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
         }
         DefaultRow oldRow = removeRow(index);
         row.setRowIndex(index);
-        rows.set(index, row);
+        gridData.getRows().set(index, row);
         return oldRow;
     }
 
     private DefaultRow removeRow(int rowIndex) {
-        DefaultRow row = rows.remove(rowIndex);
+        DefaultRow row = gridData.getRows().remove(rowIndex);
         return row;
     }
 
@@ -578,9 +578,13 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     private void checkRowIndex(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= getRowCount()) {
+        if (!isValidRowIndex(rowIndex)) {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+    boolean isValidRowIndex(int rowIndex) {
+        return (rowIndex >= 0 && rowIndex < getRowCount());
     }
 
     private void checkRowIndexForInsert(int rowIndex) {
@@ -590,9 +594,13 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     private void checkColumnIndex(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= getColumnCount()) {
+        if (!isValidColumnIndex(columnIndex)) {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+    boolean isValidColumnIndex(int columnIndex) {
+        return (columnIndex >= 0 && columnIndex < getColumnCount());
     }
 
     private void checkColumnIndexForInsert(int columnIndex) {
@@ -602,42 +610,42 @@ public class DefaultTable extends SheetAssetNode implements Table {
     }
 
     private void checkReadOnly(boolean expected) {
-        if (readOnly != expected) {
+        if (gridData.isReadOnly() != expected) {
             throw new IllegalStateException("Read only flag not matches.");
         }
     }
 
     @Override
     public int getRowCount() {
-        return rowHeaders == null ? 0 : rowHeaders.size();
+        return gridData.getRowCount();
     }
 
     @Override
     public Header getRowHeader(int rowIndex) {
-        return rowHeaders.get(rowIndex);
+        return gridData.getRowHeader(rowIndex);
     }
 
     @Override
     public DefaultRow getRow(int index) {
-        return rows.get(index);
+        return gridData.getRow(index);
     }
 
     @Override
     public int getColumnCount() {
-        return columnHeaders == null ? 0 : columnHeaders.size();
+        return gridData.getColumnCount();
     }
 
     @Override
     public Header getColumnHeader(int columnIndex) {
-        return columnHeaders.get(columnIndex);
+        return gridData.getColumnHeader(columnIndex);
     }
 
     public boolean isReadOnly() {
-        return readOnly;
+        return gridData.isReadOnly();
     }
 
     protected void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
+        gridData.setReadOnly(readOnly);
     }
 
     //    @Override
@@ -660,11 +668,11 @@ public class DefaultTable extends SheetAssetNode implements Table {
 
     @Override
     public Iterator<Map.Entry<Integer, Row>> iterator() {
-        return new UnmodifiableIterator(rows.iterator());
+        return gridData.iterator();
     }
 
     @Override
-    public LayoutImpl getLayout() {
+    public TableLayout getLayout() {
         return layout;
     }
 
@@ -727,48 +735,23 @@ public class DefaultTable extends SheetAssetNode implements Table {
         }
     }
 
+    void hookCell(CellReference cellReference, long nodeId) {
+        hotAreaManager.hookCell(cellReference, nodeId);
+
+    }
+
     /**
      * Watch range.
      *
-     * @param range  Table range.
-     * @param nodeId ID of the node which depends on the specified range.
+     * @param rangeReference Table range reference.
+     * @param nodeId         ID of the node which depends on the specified range.
      */
-    void subscribeRange(Range range, long nodeId) {
-        Set<Long> nodeIds = rangeToNodes.get(range);
-        if (nodeIds == null) {
-            nodeIds = new HashSet<>();
-            rangeToNodes.put(range, nodeIds);
-        }
-        nodeIds.add(nodeId);
-        Set<Range> ranges = nodeToRanges.get(nodeId);
-        if (ranges == null) {
-            ranges = new HashSet<>();
-            nodeToRanges.put(nodeId, ranges);
-        }
-        ranges.add(range);
+    void hookArea(RangeReference rangeReference, long nodeId) {
+        hotAreaManager.hookRange(rangeReference, nodeId);
     }
 
     /**
-     * Clear range watchers related to the specified node ID.
-     *
-     * @param nodeId
-     */
-    void clearRangeWatcher(long nodeId) {
-        Set<Range> ranges = nodeToRanges.remove(nodeId);
-        if (ranges == null) {
-            return;
-        }
-        for (Range r : ranges) {
-            Set<Long> nodeIds = rangeToNodes.get(r);
-            nodeIds.remove(nodeId);
-            if (nodeIds.isEmpty()) {
-                rangeToNodes.remove(r);
-            }
-        }
-    }
-
-    /**
-     * Find overlapped ranges.
+     * Find overlapped areas.
      *
      * @param left
      * @param top
@@ -776,126 +759,15 @@ public class DefaultTable extends SheetAssetNode implements Table {
      * @param bottom
      * @return
      */
-    List<Range> findOverlappedRanges(Integer left,
-                                     Integer top,
-                                     Integer right,
-                                     Integer bottom) {
-        // TODO optimize algorithm
-        List<Range> ranges = new LinkedList<>();
-        for (Range range : rangeToNodes.keySet()) {
-            if (range.tableId != getAssetId()) {
-                continue;
-            }
-            if (range.isOverlap(left, top, right, bottom)) {
-                ranges.add(range);
-            }
-        }
-        return ranges;
-    }
-
-    /**
-     * Get node IDs which depend on the specified range.
-     *
-     * @param range
-     * @return
-     */
-    Set<Long> getWatchers(Range range) {
-        Set<Long> set = rangeToNodes.get(range);
-        return set == null ? Collections.emptySet() : set;
-    }
-
-    Range tableRange(int rowIndex, int colIndex) {
-        return tableRange(colIndex, rowIndex, colIndex, rowIndex);
-    }
-
-    Range tableRange(int left, int top, int right, int bottom) {
-        if (left == -1) {
-            left = 0;
-        }
-        if (top == -1) {
-            top = 0;
-        }
-        if (right == -1) {
-            right = Integer.MAX_VALUE;
-        }
-        if (bottom == -1) {
-            bottom = Integer.MAX_VALUE;
-        }
-        return new Range(getAssetId(), left, top, right, bottom);
-    }
-
-    void fillByAutomaton() {
-        setReadOnly(false);
-        try {
-            DataSet dataSet = getAutomaton().getDataSet();
-            getSheet().getNotifier().privately(() ->
-            {
-                if (dataSet != null) {
-                    doFillTable(dataSet);
-                } else {
-                    doClearTable();
-                }
-                onTableUpdate();
-            });
-        } finally {
-            setReadOnly(true);
-            publicly(new ResetTable(getSheet().getName(), this), () -> {
-            });
-        }
+    private List<HotAreaDelegate> findOverlappedAreas(Integer left,
+                                                      Integer top,
+                                                      Integer right,
+                                                      Integer bottom) {
+        return hotAreaManager.findOverlappedAreas(left, top, right, bottom);
     }
 
     void doFillTable(DataSet dataSet) {
-        DataSetMetaData setMeta = dataSet.getMetadata();
-        int rowCount = 0;
-
-        columnHeaders = new ArrayList<>(setMeta.getColumnCount());
-        rowHeaders = new ArrayList<>();
-
-        if (setMeta.hasColumnMeta()) {
-            rowHeaders.add(new HeaderInfo(/* TBD */));
-            for (int col = 0; col < setMeta.getColumnCount(); col++) {
-                columnHeaders.add(new HeaderInfo(/* TBD */));
-                DefaultCell cell = getOrCreateCell(rowCount, col);
-                ColumnMetaData colMeta = setMeta.getColumnMeta(col);
-                refreshCellValue(rowCount, col, colMeta != null ? Value.str(colMeta.getName()) : Value.BLANK);
-            }
-            rowCount++;
-        } else {
-            for (int col = 0; col < setMeta.getColumnCount(); col++) {
-                columnHeaders.add(new HeaderInfo(/* TBD */));
-            }
-        }
-        for (DataRecord record : dataSet) {
-            rowHeaders.add(new HeaderInfo(/* TBD */));
-            for (int col = 0; col < setMeta.getColumnCount(); col++) {
-                StylizedVariant stylizedVariant = record.getColumn(col);
-                Variant value = stylizedVariant.getValue();
-                if (value == null) {
-                    value = Value.BLANK;
-                }
-                String format = stylizedVariant.getFormat();
-//                refreshCellValue(row, col, Value.from(value));
-                DefaultCell cell = getOrCreateCell(rowCount, col);
-                cell.setValue(value);
-                if (format != null) {
-                    cell.setFormat(format);
-                }
-            }
-            rowCount++;
-        }
-
-        // trim rows/columns if needed
-        for (int i = getRowCount(); i < rows.size(); i++) {
-            rows.remove(i);
-        }
-        Iterator<Map.Entry<Integer, DefaultRow>> rowIter = rows.iterator();
-        while (rowIter.hasNext()) {
-            DefaultRow row = rowIter.next().getValue();
-            int count = row.getCellCount();
-            for (int i = getColumnCount(); i < count; i++) {
-                row.removeCell(i);
-            }
-        }
+        gridData.fill(dataSet);
     }
 
     void refreshCellValue(int rowIndex, int columnIndex, Value newValue) {
@@ -905,28 +777,13 @@ public class DefaultTable extends SheetAssetNode implements Table {
         }
     }
 
-    void doClearTable() {
-        if (getRowCount() > 0) {
-            removeRows(0, getRowCount());
-        }
-        if (this.rowHeaders != null) {
-            this.rowHeaders.clear();
-        }
-        if (this.columnHeaders != null) {
-            this.columnHeaders.clear();
-        }
-    }
-
     @Override
     protected EvaluationState doEvaluate(EvaluationContext context) {
-        if (getAutomaton() != null) {
-            fillByAutomaton();
-        }
         return EvaluationState.DONE;
     }
 
     void onTableUpdate() {
-        updateRangeReferences(0,
+        hotAreaManager.onTableAreaChange(0,
                 0,
                 null,
                 null,
@@ -937,366 +794,6 @@ public class DefaultTable extends SheetAssetNode implements Table {
         if (getAutomaton() instanceof DefaultQueryAutomaton) {
             updateNamedReferences((DefaultQueryAutomaton) getAutomaton());
         }
-    }
-
-    /**
-     * Find overlapped ranges and dependencies, then update there formulas.
-     * If dependency has gone, or both anchor cells of range dependency have gone,
-     * set error info to the value node.
-     * If one of the anchor cell of range dependency has gone, try to shrink the referred
-     * area.
-     * <p>
-     * Changed area specified by left/top/right/bottom, contains removed area and moved area.
-     * <p>
-     * If an area has been removed, alignLeft/alignTop/alignRight/alignBottom indicates which
-     * row/column should a removed anchor relocated to.
-     * <p>
-     *
-     * @param left
-     * @param top
-     * @param right
-     * @param bottom
-     * @param alignLeft
-     * @param alignTop
-     * @param alignRight
-     * @param alignBottom
-     */
-    private void updateRangeReferences(int left, int top, Integer right, Integer bottom,
-                                       Integer alignLeft, Integer alignTop,
-                                       Integer alignRight, Integer alignBottom) {
-        if (getWorkbook() != null && getWorkbook().isSkipWelding()) {
-            return; // should manually update later.
-        }
-        List<DefaultTable.Range> ranges = findOverlappedRanges(left, top, right, bottom);
-        if (ranges == null || ranges.isEmpty()) {
-            return; // nothing to do
-        }
-        Set<Long> nodes = new HashSet<>();
-        for (DefaultTable.Range range : ranges) {
-            nodes.addAll(getWatchers(range));
-        }
-        for (Long id : nodes) {
-            VariantNode node = getValueNodeByAssetId(id);
-            fixFormulaAfterAreaChanged((ValueNode) node, alignLeft, alignTop, alignRight, alignBottom);
-        }
-    }
-
-    private ValueNode getValueNodeByAssetId(long id) {
-        Asset asset = getAssetManager().get(id);
-        if (asset == null) {
-            return null;
-        }
-        if (asset instanceof ValueNode) {
-            return (ValueNode) asset;
-        }
-        throw new RuntimeException("Asset \"" + id
-                + "\" that expected to be a ValueNode is actually: "
-                + asset.getClass());
-    }
-
-    /**
-     * @param dependentNode
-     * @param alignLeft
-     * @param alignTop
-     * @param alignRight
-     * @param alignBottom
-     */
-    private void fixFormulaAfterAreaChanged(ValueNode dependentNode,
-                                            Integer alignLeft, Integer alignTop,
-                                            Integer alignRight, Integer alignBottom) {
-        // update references and construct new formula string, then parse
-        // the new formula string and set to the cell.
-        // the formula elements keep reference to formula string for
-        // convenience of shifting reference by just update reference
-        // token, that's why the flow looks redundant and inefficient.
-        // TODO review and optimize formula update process
-        // probably this can be optimized by simplify token string
-        // reference, just keep references refer to it's position in
-        // the formula string, and update elements and formula string
-        // could be done simultaneously without re-parse.
-
-        boolean modified = false;
-
-        // this loop check and update elements for construct new formula
-        for (FormulaElement elem : dependentNode.getFormulaElements()) {
-            if (!(elem instanceof ReferenceElement)) {
-                continue;
-            }
-            if (elem instanceof CellReferenceElement) {
-                CellReference cellReference = ((CellReferenceElement) elem).getCellReference();
-                modified |= fixCellRef(dependentNode, cellReference);
-
-            } else if (elem instanceof RangeReferenceElement) {
-                RangeReference rangeReference = ((RangeReferenceElement) elem).getRangeReference();
-                modified |= fixRangeRef(dependentNode,
-                        rangeReference,
-                        alignLeft,
-                        alignTop,
-                        alignRight,
-                        alignBottom);
-
-            } else {
-                throw new RuntimeException("What? I don't recognize the reference: " + elem.getClass());
-            }
-        }
-
-//        if (!modified) {
-//            return; // FIXME 如果采用 table!A:D这样的公式，行数变化时公式并无变化，但引用的数据实际需要刷新的。
-//        }
-
-        // now lets construct new formula
-        String newFormula = FormulaParser.toFormula(dependentNode.getFormulaElements(), 0, 0);
-        if (dependentNode instanceof DefaultCell) {
-            DefaultCell cell = (DefaultCell) dependentNode;
-            cell.getRow().getTable().setCellFormula(cell.getRowIndex(), cell.getColumnIndex(), newFormula); // this will trigger onCellUpdate, some other businesses will be done there.
-
-        } else if (dependentNode.getParent() instanceof Chart
-                || dependentNode.getParent() instanceof DataSeries
-                || dependentNode.getParent() instanceof ChartBinder) {
-            // chart property update is not as easy as a cell, property of chart may be a little
-            // difficult to trace as it doesn't has row/column index. a chart property can be
-            // a categories formula, or one property of any series.
-            // Of cause it's not hard to update chart property itself, however, what changes
-            // should we notify the listeners (especially the revise collector)?
-            // currently just tell listeners the chart has changed, either model or data.
-            DefaultChart chart = (DefaultChart)
-                    (((dependentNode.getParent() instanceof DataSeries)
-                            || dependentNode.getParent() instanceof ChartBinder) ?
-                            dependentNode.getParent().getParent() : dependentNode.getParent());
-            UpdateChart action = new UpdateChart(chart.getSheet().getName(), chart.getName(), null);
-            publicly(action, () -> {
-                dependentNode.setFormula(new Formula(newFormula));
-//                onValueNodeUpdate(dependentNode);
-                return chart;
-            });
-
-        } else if (dependentNode.getParent() instanceof Text) {
-            DefaultText text = (DefaultText) dependentNode.getParent();
-            text.getSheet().updateText(text.getName(), new TextData(text.getName(), new DynamicValue(newFormula), null));
-
-        } else if (dependentNode.getParent() instanceof DefaultQueryAutomaton
-                || dependentNode.getParent() instanceof DefaultPivotAutomaton
-                || dependentNode.getParent() instanceof DefaultQueryTemplate) {
-            AbstractAutomaton auto = dependentNode.parent(AbstractAutomaton.class);
-            AutomateTable automateTable = new AutomateTable(auto.getTable().getSheet().getName(),
-                    auto.getTable().getName(), null);
-            publicly(automateTable, () -> {
-                dependentNode.setDynamicVariant(new DynamicValue(newFormula));
-//                onValueNodeUpdate(dependentNode);
-                automateTable.setSolution(auto instanceof DefaultQueryAutomaton ?
-                        ((DefaultQueryAutomaton) auto).getQueryAutomatonInfo() :
-                        ((DefaultPivotAutomaton) auto).getPivotAutomatonInfo());
-            });
-
-        } else if (dependentNode.getParent() instanceof DefaultFormField
-                || dependentNode.getParent() instanceof DefaultFormFieldBinding) {
-            dependentNode.setDynamicVariant(new DynamicValue(newFormula));
-            DefaultForm form = dependentNode.parent(DefaultForm.class);
-            UpdateForm action = new UpdateForm(form.getSheet().getName(), form.getName(), form);
-            publicly(action, () -> {
-                dependentNode.setFormula(new Formula(newFormula));
-                return form;
-            });
-
-        } else {
-            throw new RuntimeException("Unsupported value node: " + dependentNode);
-        }
-    }
-
-    private boolean fixRangeRef(ValueNode sourceNode,
-                                RangeReference rangeReference,
-                                Integer alignLeft,
-                                Integer alignTop,
-                                Integer alignRight,
-                                Integer alignBottom) {
-        if (!rangeReference.isPhantom()) {
-            return fixNormalRangeRef(sourceNode, rangeReference, alignLeft, alignTop, alignRight, alignBottom);
-        } else {
-            return fixPhantomRangeRef(sourceNode, rangeReference, alignLeft, alignTop, alignRight, alignBottom);
-        }
-    }
-
-    private boolean fixNormalRangeRef(ValueNode sourceNode,
-                                      RangeReference rangeReference,
-                                      Integer alignLeft,
-                                      Integer alignTop,
-                                      Integer alignRight,
-                                      Integer alignBottom) {
-        boolean modified = false;
-        CellReference upperLeftRef = new CellReference(rangeReference.getSheetName(),
-                rangeReference.getAssetName(),
-                rangeReference.getUpperLeftRef(),
-                rangeReference.getUpperLeftTargetId(),
-                rangeReference.isAlive(),
-                rangeReference.isPhantom());
-        CellReference lowerRightRef = new CellReference(rangeReference.getSheetName(),
-                rangeReference.getAssetName(),
-                rangeReference.getLowerRightRef(),
-                rangeReference.getLowerRightTargetId(),
-                rangeReference.isAlive(),
-                rangeReference.isPhantom());
-        modified |= fixCellRef(sourceNode, upperLeftRef);
-        modified |= fixCellRef(sourceNode, lowerRightRef);
-
-        // FIXME cut/paste cells not supported yet, but if once supported, upper left cell and lower right cell may resident in different table.
-
-        if (!upperLeftRef.isValid() && !lowerRightRef.isValid()) {
-            // invalid range reference
-
-        } else if (!upperLeftRef.isValid()) { // shrink to bottom/right
-            if (alignBottom != null) {
-                moveToAnotherInternalCell(upperLeftRef,
-                        getOrCreateCell(alignBottom,
-                                Math.max(upperLeftRef.getPositionRef().getColumnIndex(), 0)));
-                modified = true;
-
-            } else if (alignRight != null) {
-                moveToAnotherInternalCell(upperLeftRef,
-                        getOrCreateCell(
-                                Math.max(upperLeftRef.getPositionRef().getRowIndex(), 0),
-                                alignRight));
-                modified = true;
-
-            } else {
-                throw new RuntimeException("Failed to fix formula.");
-            }
-
-        } else if (!lowerRightRef.isValid()) { // shrink to top/left
-            if (alignTop != null) {
-                int columnIndex = lowerRightRef.getPositionRef().getColumnIndex();
-                if (columnIndex == -1) {
-                    columnIndex = getColumnCount() - 1;
-                }
-                if (columnIndex == -1) {
-                    columnIndex = 0; // Default
-                }
-                moveToAnotherInternalCell(lowerRightRef,
-                        getOrCreateCell(alignTop, columnIndex));
-                modified = true;
-
-            } else if (alignLeft != null) {
-                int rowIndex = lowerRightRef.getPositionRef().getRowIndex();
-                if (rowIndex == -1) {
-                    rowIndex = getRowCount() - 1;
-                }
-                if (rowIndex == -1) {
-                    rowIndex = 0; // Default
-                }
-                moveToAnotherInternalCell(lowerRightRef,
-                        getOrCreateCell(rowIndex, alignLeft));
-                modified = true;
-
-            } else {
-                throw new RuntimeException("Failed to fix formula.");
-            }
-        }
-
-        if (modified) {
-            rangeReference.setSheetName(upperLeftRef.getSheetName());
-            rangeReference.setAssetName(upperLeftRef.getAssetName());
-
-            rangeReference.setUpperLeftRef(upperLeftRef.getPositionRef());
-            rangeReference.setUpperLeftTargetId(upperLeftRef.getCellId());
-            rangeReference.setLowerRightRef(lowerRightRef.getPositionRef());
-            rangeReference.setLowerRightTargetId(lowerRightRef.getCellId());
-            rangeReference.setAlive(upperLeftRef.isAlive() && lowerRightRef.isAlive());
-        }
-
-        return modified;
-    }
-
-    /**
-     * Update row/column index of the reference by the cell's runtime ID. When a cell has moved,
-     * use this method to keep the row/column index up to date.
-     *
-     * @param sourceNode    Source node that the <code>cellReference</code> comes from.
-     * @param cellReference
-     * @return true if reference has been modified, false otherwise.
-     */
-    private boolean fixCellRef(ValueNode sourceNode, CellReference cellReference) {
-        if (!cellReference.isAlive()) {
-            return false;
-        }
-        if (!cellReference.isPhantom()) {
-            DefaultCell referredCell = getCellByAssetId(cellReference.getCellId());
-            if (referredCell == null) {
-                cellReference.setAlive(false);
-                cellReference.setCellId(UNSPECIFIED_ASSET_ID);
-                return true;
-            }
-
-            boolean modified = false;
-            DefaultTable table = referredCell.getRow().getTable();
-
-            String oldRefSheetName = cellReference.getSheetName() == null ?
-                    sourceNode.parent(DefaultSheet.class).getName() : cellReference.getSheetName();
-            String oldRefTableName = cellReference.getAssetName() == null ?
-                    sourceNode.parent(SheetAssetNode.class).getName() : cellReference.getAssetName();
-
-            if (!oldRefSheetName.equals(table.getSheet().getName())) {
-                cellReference.setSheetName(table.getSheet().getName());
-                modified = true;
-            }
-
-            if (!oldRefTableName.equals(table.getName())) {
-                cellReference.setAssetName(table.getName());
-                modified = true;
-            }
-
-            PositionRef positionRef = cellReference.getPositionRef();
-            if (positionRef.getRowIndex() != referredCell.getRowIndex()
-                    && positionRef.getRowIndex() != -1) {
-                positionRef.setRowIndex(referredCell.getRowIndex());
-                modified = true;
-            }
-            if (positionRef.getColumnIndex() != referredCell.getColumnIndex()
-                    && positionRef.getColumnIndex() != -1) {
-                positionRef.setColumnIndex(referredCell.getColumnIndex());
-                modified = true;
-            }
-
-            return modified;
-
-        } else { // phantom reference, just try to re-hook
-            if (cellReference.getPositionRef().getRowIndex() != -1 &&
-                    cellReference.getPositionRef().getColumnIndex() != -1) {
-                getAssetManager().getReferenceMaintainer().hookCellRef(sourceNode, cellReference);
-            } else {
-                cellReference.setCellId(UNSPECIFIED_ASSET_ID);
-            }
-
-            return true; // FIXME
-        }
-    }
-
-    private DefaultCell getCellByAssetId(long id) {
-        Asset asset = getAssetManager().get(id);
-        if (asset == null) {
-            return null;
-        }
-        if (asset instanceof DefaultCell) {
-            return (DefaultCell) asset;
-        }
-        throw new RuntimeException("Asset \"" + id
-                + "\" that expected to be a DefaultCell is actually: "
-                + asset.getClass());
-    }
-
-
-    private boolean fixPhantomRangeRef(ValueNode sourceNode,
-                                       RangeReference rangeReference,
-                                       Integer alignLeft,
-                                       Integer alignTop,
-                                       Integer alignRight,
-                                       Integer alignBottom) {
-        rangeReference.setAssetName(getName());
-        if (!getSheet().getName().equals(sourceNode.parent(DefaultSheet.class).getName())) {
-            rangeReference.setSheetName(getSheet().getName());
-        } else {
-            rangeReference.setSheetName(null);
-        }
-
-        return true;
     }
 
     private void updateNamedReferences(DefaultQueryAutomaton queryAutomaton) {
@@ -1319,11 +816,11 @@ public class DefaultTable extends SheetAssetNode implements Table {
         String sheetName = param.parent(DefaultSheet.class).getName();
         String assetName = param.parent(DefaultTable.class).getName();
         ValueNode vn = (ValueNode) node;
-        FormulaElement[] elems = vn.getFormulaElements();
-        if (elems == null) {
+        Formula formula = vn.getFormula();
+        if (formula == null) {
             return; // raise warning?
         }
-        for (FormulaElement e : elems) {
+        for (FormulaElement e : formula) {
             if (e instanceof NameReferenceElement) {
                 NameReference nameRef = ((NameReferenceElement) e).getNameReference();
                 if (nameRef.getTargetId() == param.getAssetId()) {
@@ -1333,7 +830,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
                 }
             }
         }
-        String newFormula = FormulaParser.toFormula(elems, 0, 0);
+        String newFormula = FormulaParser.assemble(formula, 0, 0);
         if (!newFormula.equals(vn.getFormulaString())) {
             DefaultForm form = vn.parent(DefaultForm.class);
             publicly(new UpdateForm(
@@ -1346,42 +843,12 @@ public class DefaultTable extends SheetAssetNode implements Table {
         }
     }
 
-    private void moveToAnotherInternalCell(CellReference cellReference, DefaultCell newCell) {
-        cellReference.setCellId(newCell.getAssetId());
-        PositionRef positionRef = cellReference.getPositionRef();
-        if (positionRef.getRowIndex() != -1) {
-            positionRef.setRowIndex(newCell.getRowIndex());
-        }
-        if (positionRef.getColumnIndex() != -1) {
-            positionRef.setColumnIndex(newCell.getColumnIndex());
-        }
-        cellReference.setAlive(true);
+    GridData getGridData() {
+        return gridData;
     }
 
-    class Range extends SimpleTableRange {
-        long tableId;
-
-        Range() {
-        }
-
-        Range(long tableId, int left, int top, int right, int bottom) {
-            super(left, top, right, bottom);
-            this.tableId = tableId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            Range range = (Range) o;
-            return Objects.equals(tableId, range.tableId);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), tableId);
-        }
+    HotAreaManager getHotAreaManager() {
+        return hotAreaManager;
     }
 
 }

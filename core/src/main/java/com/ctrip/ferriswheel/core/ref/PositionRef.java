@@ -3,54 +3,81 @@ package com.ctrip.ferriswheel.core.ref;
 import java.io.Serializable;
 
 public class PositionRef implements Serializable {
-    private int rowIndex;
-    private boolean isRowAbsolute = false;
-    private int columnIndex;
-    private boolean isColumnAbsolute = false;
+    private Anchor rowAnchor;
+    private Anchor columnAnchor;
 
     public PositionRef() {
     }
 
     public PositionRef(PositionRef another) {
-        this(another.getRowIndex(), another.isRowAbsolute(), another.getColumnIndex(), another.isColumnAbsolute());
+        this(another.getRowAnchor(), another.getColumnAnchor());
+    }
+
+    public PositionRef(int rowIndex, int columnIndex) {
+        this(new Anchor(rowIndex), new Anchor(columnIndex));
     }
 
     public PositionRef(int rowIndex, boolean isRowAbsolute, int columnIndex, boolean isColumnAbsolute) {
-        this.rowIndex = rowIndex;
-        this.isRowAbsolute = isRowAbsolute;
-        this.columnIndex = columnIndex;
-        this.isColumnAbsolute = isColumnAbsolute;
+        this(new Anchor(rowIndex, isRowAbsolute), new Anchor(columnIndex, isColumnAbsolute));
+    }
+
+    public PositionRef(Anchor rowAnchor, Anchor columnAnchor) {
+        this.rowAnchor = rowAnchor;
+        this.columnAnchor = columnAnchor;
+    }
+
+    public PositionRef relativeShift(int nShiftRows, int nShiftColumns) {
+        return new PositionRef(
+                rowAnchor.relativeShift(nShiftRows),
+                columnAnchor.relativeShift(nShiftColumns)
+        );
     }
 
     public int getRowIndex() {
-        return rowIndex;
+        return rowAnchor.getIndex();
     }
 
     public void setRowIndex(int rowIndex) {
-        this.rowIndex = rowIndex;
+        rowAnchor.setIndex(rowIndex);
     }
 
     public boolean isRowAbsolute() {
-        return isRowAbsolute;
+        return rowAnchor.isAbsolute();
     }
 
     public void setRowAbsolute(boolean rowAbsolute) {
-        isRowAbsolute = rowAbsolute;
+        rowAnchor.setAbsolute(rowAbsolute);
     }
 
     public int getColumnIndex() {
-        return columnIndex;
+        return columnAnchor.getIndex();
     }
 
     public void setColumnIndex(int columnIndex) {
-        this.columnIndex = columnIndex;
+        columnAnchor.setIndex(columnIndex);
     }
 
     public boolean isColumnAbsolute() {
-        return isColumnAbsolute;
+        return columnAnchor.isAbsolute();
     }
 
     public void setColumnAbsolute(boolean columnAbsolute) {
-        isColumnAbsolute = columnAbsolute;
+        columnAnchor.setAbsolute(columnAbsolute);
+    }
+
+    public Anchor getRowAnchor() {
+        return rowAnchor;
+    }
+
+    public void setRowAnchor(Anchor rowAnchor) {
+        this.rowAnchor = rowAnchor;
+    }
+
+    public Anchor getColumnAnchor() {
+        return columnAnchor;
+    }
+
+    public void setColumnAnchor(Anchor columnAnchor) {
+        this.columnAnchor = columnAnchor;
     }
 }

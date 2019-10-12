@@ -284,6 +284,11 @@ public class TestAssetManagement extends TestCase {
 
     void checkAssetMap(Map<Long, DefaultWorkbook.AssetReference> assetMap,
                        Set<Long> pendingAssetIds, DefaultTable table) {
+        GridData grid = table.getGridData();
+        assertEquals(table, grid.getParent());
+        assertTrue(pendingAssetIds.remove(grid.getAssetId()));
+        assertEquals(1, assetMap.get(grid.getAssetId()).referenceCount.get());
+
         for (Map.Entry<Integer, Row> rowEntry : table) {
             DefaultRow row = (DefaultRow) rowEntry.getValue();
             assertEquals(table, row.getTable());
@@ -291,6 +296,12 @@ public class TestAssetManagement extends TestCase {
             assertEquals(1, assetMap.get(row.getAssetId()).referenceCount.get());
             checkAssetMap(assetMap, pendingAssetIds, row);
         }
+
+        HotAreaManager hotAreaManager = table.getHotAreaManager();
+        assertEquals(table, hotAreaManager.getParent());
+        assertTrue(pendingAssetIds.remove(hotAreaManager.getAssetId()));
+        assertEquals(1, assetMap.get(hotAreaManager.getAssetId()).referenceCount.get());
+        checkAssetMap(assetMap, pendingAssetIds, hotAreaManager);
 
         Automaton automaton = table.getAutomaton();
         if (automaton != null) {
@@ -330,6 +341,16 @@ public class TestAssetManagement extends TestCase {
 
         } else {
             throw new RuntimeException("Unknown automaton: " + automaton.getClass() + ", probably a bug.");
+        }
+    }
+
+    void checkAssetMap(Map<Long, DefaultWorkbook.AssetReference> assetMap,
+                       Set<Long> pendingAssetIds, HotAreaManager hotAreaManager) {
+        for (AssetNode child : hotAreaManager.getChildren()) {
+            assertTrue(child instanceof HotAreaDelegate);
+            assertEquals(hotAreaManager, child.getParent());
+            assertTrue(pendingAssetIds.remove(child.getAssetId()));
+            assertEquals(1, assetMap.get(child.getAssetId()).referenceCount.get());
         }
     }
 

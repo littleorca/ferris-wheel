@@ -9,7 +9,6 @@ abstract class AssetNode implements Asset {
     private Set<AssetNode> children = new LinkedHashSet<>(); // bound children
     private Set<AssetNode> dependencies = new HashSet<>();
     private Set<AssetNode> dependents = new HashSet<>();
-    private Map<DefaultTable, Set<DefaultTable.Range>> watchedRanges = new HashMap<>();
     private volatile long currentRevision = 0;
     private volatile long evaluatedRevision = 0;
     private boolean valid = true;
@@ -17,11 +16,6 @@ abstract class AssetNode implements Asset {
     protected AssetNode(AssetManager assetManager) {
         this.assetManager = assetManager;
         this.assetId = assetManager.nextAssetId();
-    }
-
-    protected AssetNode(AssetNode parent) {
-        this(parent.getAssetManager());
-        // parent.bindChild(this); // bind should be proceed while it is added to parent.
     }
 
     /**
@@ -47,9 +41,12 @@ abstract class AssetNode implements Asset {
                 || selfChanged
                 || isVolatile()
                 || EvaluationMode.Aggressive == context.getEvaluationMode()) {
-            setCurrentRevision(getAssetManager().getTransaction().getTransactionId());
+            setCurrentRevision(getAssetManager().getTransactionManager().getTransaction().getTransactionId());
+            beforeEvaluating(context);
             resultState = doEvaluate(context);
-            // TODO FIXME for async evaluation, the job may still running, shall we update eval revision after it really done?
+            afterEvaluating(context);
+            // TODO FIXME for async evaluation, the job may still running,
+            //  shall we update eval revision after it really done?
             setEvaluatedRevision(getCurrentRevision());
         }
         return resultState;
@@ -70,7 +67,25 @@ abstract class AssetNode implements Asset {
         return maxRevision;
     }
 
+    /**
+     * Overridable.
+     *
+     * @param context
+     */
+    protected void beforeEvaluating(EvaluationContext context) {
+        // dummy
+    }
+
     protected abstract EvaluationState doEvaluate(EvaluationContext context);
+
+    /**
+     * Overridable.
+     *
+     * @param context
+     */
+    protected void afterEvaluating(EvaluationContext context) {
+        // dummy
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -124,7 +139,7 @@ abstract class AssetNode implements Asset {
         // mark all dependent nodes as dirty.
         // TODO mark dirty is not enough, should fix reference
         for (AssetNode node : getDependents()) {
-            node.markDirty();
+            node.onExternalDependencyChange();
         }
 
         clearDependencies();
@@ -172,8 +187,7 @@ abstract class AssetNode implements Asset {
     }
 
     protected void markDirty() {
-        AssetManager am = getAssetManager();
-        Transaction tx = am.getTransaction();
+        Transaction tx = getTransaction();
         setCurrentRevision(tx.getTransactionId());
     }
 
@@ -224,8 +238,21 @@ abstract class AssetNode implements Asset {
     }
 
     void addDependency(AssetNode dependency) {
+        requireTransactionPhase(TransactionPhase.Polluting);
         this.dependencies.add(dependency);
         dependency.addDependent(this);
+    }
+
+    private void requireTransactionPhase(TransactionPhase phase) {
+        Transaction tx = getTransaction();
+        if (!phase.equals(tx.getCurrentPhase())) {
+            throw new IllegalStateException("Operation require transaction phase " +
+                    phase + " but current phase is " + tx.getCurrentPhase());
+        }
+    }
+
+    private Transaction getTransaction() {
+        return getAssetManager().getTransactionManager().getTransaction();
     }
 
     void removeDependency(AssetNode dependency) {
@@ -242,7 +269,6 @@ abstract class AssetNode implements Asset {
             dependency.removeDependent(this);
         }
         this.dependencies = new HashSet<>();
-        endWatch();
     }
 
     @Override
@@ -250,35 +276,42 @@ abstract class AssetNode implements Asset {
         return Collections.unmodifiableSet(dependents);
     }
 
+    /**
+     * Do not call for self instance.
+     *
+     * @param dependent
+     */
     void addDependent(AssetNode dependent) {
         this.dependents.add(dependent);
+        onExternalDependentChange();
     }
 
+    /**
+     * Do not call for self instance.
+     *
+     * @param dependent
+     */
     private void removeDependent(AssetNode dependent) {
         if (this.dependents.remove(dependent)) {
             if (this.dependents.isEmpty()) {
                 this.dependents = new HashSet<>();
             }
+            onExternalDependentChange();
         }
     }
 
-    void watchRange(DefaultTable table, int left, int top, int right, int bottom) {
-        DefaultTable.Range range = table.tableRange(left, top, right, bottom);
-        table.subscribeRange(range, getAssetId());
-        Set<DefaultTable.Range> rangeSet = watchedRanges.get(table);
-        if (rangeSet == null) {
-            rangeSet = new HashSet<>();
-            watchedRanges.put(table, rangeSet);
-        }
-        rangeSet.add(range);
+    /**
+     * Overridable
+     */
+    protected void onExternalDependencyChange() {
+        markDirty();
     }
 
-    void endWatch() {
-        for (Map.Entry<DefaultTable, Set<DefaultTable.Range>> entry : watchedRanges.entrySet()) {
-            DefaultTable table = entry.getKey();
-            table.clearRangeWatcher(getAssetId());
-        }
-        watchedRanges = new HashMap<>();
+    /**
+     * Overridable
+     */
+    protected void onExternalDependentChange() {
+        // dummy
     }
 
     @Override
@@ -286,7 +319,4 @@ abstract class AssetNode implements Asset {
         return Collections.unmodifiableList(new ArrayList<>(children));
     }
 
-    protected void setChildren(Set<AssetNode> children) {
-        this.children = children;
-    }
 }

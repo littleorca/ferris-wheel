@@ -51,12 +51,12 @@ public class FakeEvalContext implements FormulaEvaluationContext {
     }
 
     @Override
-    public Variant resolveReference(NameReferenceElement referenceElement) {
+    public Variant resolveReference(RangeReferenceElement referenceElement) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Table resolveTable(String sheetName, String tableName) {
+    public Variant resolveReference(NameReferenceElement referenceElement) {
         throw new UnsupportedOperationException();
     }
 }

@@ -1,20 +1,16 @@
 package com.ctrip.ferriswheel.core.formula;
 
 import com.ctrip.ferriswheel.common.Environment;
-import com.ctrip.ferriswheel.common.Sheet;
-import com.ctrip.ferriswheel.common.Workbook;
 import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
-import com.ctrip.ferriswheel.core.asset.Asset;
+import com.ctrip.ferriswheel.core.asset.DefaultReferenceMaintainer;
 import com.ctrip.ferriswheel.core.asset.DefaultTable;
+import com.ctrip.ferriswheel.core.asset.DefaultWorkbook;
 import com.ctrip.ferriswheel.core.asset.FilingClerk;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
-import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
-import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.ref.CellReference;
 import junit.framework.TestCase;
 
 public class TestFormulaEvaluator extends TestCase {
@@ -26,12 +22,11 @@ public class TestFormulaEvaluator extends TestCase {
     }
 
     public void testEvaluator() {
-        Workbook book = new FilingClerk(environment).createWorkbook("test-workbook");
+        DefaultWorkbook book = new FilingClerk(environment).createWorkbook("test-workbook");
         Table table = book.addSheet("sheet1").addAsset(Table.class, "test");
         table.addRows(2);
         table.addColumns(2);
-        ResolverMock resolver = new ResolverMock(book);
-        FormulaEvaluator evaluator = new FormulaEvaluator(resolver);
+        FormulaEvaluator evaluator = new FormulaEvaluator(new DefaultReferenceMaintainer(book));
 
         FormulaElement[] elements = FormulaParser.parse("1+1");
         Variant value = evaluator.evaluate(elements);
@@ -85,46 +80,4 @@ public class TestFormulaEvaluator extends TestCase {
         System.out.println(value.dateValue());
     }
 
-    class ResolverMock implements ReferenceResolver {
-        Workbook workbook;
-
-        public ResolverMock(Workbook workbook) {
-            this.workbook = workbook;
-        }
-
-        @Override
-        public Variant resolve(CellReferenceElement referenceElement, FormulaEvaluationContext context) {
-            CellReference cellReference = referenceElement.getCellReference();
-            Sheet sheet = cellReference.getSheetName() == null ?
-                    context.getCurrentSheet() : workbook.getSheet(cellReference.getSheetName());
-            Table table = cellReference.getAssetName() == null ?
-                    (Table) context.getCurrentAsset() : sheet.getAsset(cellReference.getAssetName());
-
-            return table.getCell(cellReference.getPositionRef().getRowIndex(),
-                    cellReference.getPositionRef().getColumnIndex()).getData();
-        }
-
-        @Override
-        public Variant resolve(NameReferenceElement referenceElement, FormulaEvaluationContext context) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
-            if (sheetName == null && tableName == null) {
-                return (Table) context.getCurrentAsset();
-            }
-            Sheet sheet = sheetName == null ? context.getCurrentSheet() : workbook.getSheet(sheetName);
-            if (sheet == null) {
-                return null;
-            }
-            return sheet.getAsset(tableName);
-        }
-
-        @Override
-        public Asset getAssetById(long assetId) {
-            throw new UnsupportedOperationException();
-        }
-
-    }
 }

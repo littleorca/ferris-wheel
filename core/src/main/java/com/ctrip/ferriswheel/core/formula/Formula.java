@@ -1,21 +1,17 @@
 package com.ctrip.ferriswheel.core.formula;
 
-public class Formula {
-    private String string;
-    private FormulaElement[] elements;
-    private boolean resolved = false;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-    public Formula() {
-    }
+public class Formula implements Iterable<FormulaElement> {
+    private transient String string;
+    private FormulaElement[] elements;
+    private int modCount = 0;
 
     public Formula(String string) {
-        this(string, FormulaParser.parse(string), true);
-    }
-
-    public Formula(String string, FormulaElement[] elements, boolean resolved) {
         this.string = string;
-        this.elements = elements;
-        this.resolved = resolved;
+        this.elements = FormulaParser.parse(string);
     }
 
     public boolean isVolatile() {
@@ -38,19 +34,40 @@ public class Formula {
         this.string = string;
     }
 
-    public FormulaElement[] getElements() {
-        return elements;
+    public int getElementCount() {
+        return elements.length;
     }
 
-    public void setElements(FormulaElement[] elements) {
-        this.elements = elements;
+    public FormulaElement getElement(int index) {
+        return elements[index];
     }
 
-    public boolean isResolved() {
-        return resolved;
+    @Override
+    public Iterator<FormulaElement> iterator() {
+        return new ElementIterator();
     }
 
-    public void setResolved(boolean resolved) {
-        this.resolved = resolved;
+    private class ElementIterator implements Iterator<FormulaElement> {
+        private int index = 0;
+        private int expectedModCount = modCount;
+
+        @Override
+        public boolean hasNext() {
+            checkForComodification();
+            return index < Formula.this.elements.length;
+        }
+
+        @Override
+        public FormulaElement next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return Formula.this.elements[index++];
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
     }
 }

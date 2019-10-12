@@ -24,44 +24,58 @@
 
 package com.ctrip.ferriswheel.core.ref;
 
-import com.ctrip.ferriswheel.core.asset.Asset;
+import java.util.Objects;
 
-import java.io.Serializable;
+public class Anchor {
+    private int index;
+    private boolean absolute;
 
-public class NameReference extends AbstractReference implements Serializable {
-    private String targetName;
-    private long targetId = Asset.UNSPECIFIED_ASSET_ID;
-
-    public NameReference() {
-        super(null, null);
+    public Anchor(int index) {
+        this(index, false);
     }
 
-    public NameReference(String sheetName, String assetName, String targetName) {
-        super(sheetName, assetName);
-        this.targetName = targetName;
+    public Anchor(Anchor another) {
+        this.index = another.index;
+        this.absolute = another.absolute;
     }
 
-    public String getTargetName() {
-        return targetName;
+    public Anchor(int index, boolean absolute) {
+        this.index = index;
+        this.absolute = absolute;
     }
 
-    public void setTargetName(String targetName) {
-        this.targetName = targetName;
+    public Anchor relativeShift(int delta) {
+        int shiftedIndex = absolute ? index : index + delta;
+        return new Anchor(shiftedIndex, absolute);
     }
 
-    public long getTargetId() {
-        return targetId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Anchor anchor = (Anchor) o;
+        return index == anchor.index &&
+                absolute == anchor.absolute;
     }
 
-    public void setTargetId(long targetId) {
-        this.targetId = targetId;
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, absolute);
     }
 
-    public boolean isValid() {
-        // FIXME it is not clear that should a name reference acts as exactly hooked reference or
-        //  just a name for resolve in the future (like phantom reference), or both should be supported?
-        //  For now ignore target id.
-        return isAlive();
+    public int getIndex() {
+        return index;
     }
 
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public boolean isAbsolute() {
+        return absolute;
+    }
+
+    public void setAbsolute(boolean absolute) {
+        this.absolute = absolute;
+    }
 }

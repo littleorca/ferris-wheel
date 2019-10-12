@@ -1,9 +1,12 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.variant.*;
-import com.ctrip.ferriswheel.core.formula.Formula;
-import com.ctrip.ferriswheel.core.formula.FormulaElement;
+import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.HotAreaReference;
+import com.ctrip.ferriswheel.core.ref.NameReference;
+import com.ctrip.ferriswheel.core.ref.RangeReference;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -25,10 +28,21 @@ public class ValueNode extends AssetNode implements VariantNode {
         this.formula = data.isFormula() ? new Formula(data.getFormulaString()) : null;
     }
 
-    ValueNode(AssetNode parent, Value value, String formulaString) {
-        super(parent);
-        this.data = new DynamicValue(formulaString, value);
-        this.formula = (formulaString == null || formulaString.isEmpty()) ? null : new Formula(formulaString);
+    @Override
+    protected void beforeEvaluating(EvaluationContext context) {
+        if (!isFormula()) {
+            return;
+        }
+
+        for (FormulaElement fe : formula) {
+            if (fe instanceof CellReferenceElement) {
+                // TODO check reference and formula string
+            } else if (fe instanceof RangeReferenceElement) {
+                // TODO check reference and formula string
+            } else if (fe instanceof NameReferenceElement) {
+                // TODO check reference and formula string
+            }
+        }
     }
 
     @Override
@@ -36,14 +50,14 @@ public class ValueNode extends AssetNode implements VariantNode {
         if (!isFormula()) {
             return EvaluationState.DONE;
         }
-        if (getFormulaElements() == null) {
+        if (getFormula() == null) {
             throw new IllegalArgumentException();
         }
-        SheetAssetNode sheet = parent(SheetAssetNode.class);
+        SheetAssetNode sheetAsset = parent(SheetAssetNode.class);
         FormulaEvaluator evaluator = context.getFormulaEvaluator();
-        evaluator.setCurrentSheet(sheet.getSheet());
-        evaluator.setCurrentAsset(sheet);
-        Variant value = evaluator.evaluate(getFormulaElements());
+        evaluator.setCurrentSheet(sheetAsset.getSheet());
+        evaluator.setCurrentAsset(sheetAsset);
+        Variant value = evaluator.evaluate(getFormula());
         if (!value.equals(getData())) {
             doUpdateValue(value);
         }
@@ -104,14 +118,6 @@ public class ValueNode extends AssetNode implements VariantNode {
         }
     }
 
-//    public boolean isDirty() {
-//        return getEvaluatedRevision() < getCurrentRevision();
-//    }
-
-    protected FormulaElement[] getFormulaElements() {
-        return getFormula() == null ? null : getFormula().getElements();
-    }
-
     protected void erase() {
         setFormula(null);
         setValue(Value.BLANK);
@@ -120,6 +126,46 @@ public class ValueNode extends AssetNode implements VariantNode {
     @Override
     protected void afterAttached() {
         getAssetManager().getReferenceMaintainer().resolveFormula(this);
+    }
+
+    @Override
+    protected void onExternalDependencyChange() {
+        super.onExternalDependencyChange();
+
+        if (isFormula()) {
+            for (FormulaElement fe : formula) {
+                if (fe instanceof CellReferenceElement) {
+                    CellReference ref = ((CellReferenceElement) fe).getCellReference();
+                    checkHotAreaReference(ref);
+
+                } else if (fe instanceof RangeReferenceElement) {
+                    RangeReference ref = ((RangeReferenceElement) fe).getRangeReference();
+                    checkHotAreaReference(ref);
+
+                } else if (fe instanceof NameReferenceElement) {
+                    NameReference ref = ((NameReferenceElement) fe).getNameReference();
+                    checkNameReference(ref);
+                }
+            }
+        }
+    }
+
+    protected void checkHotAreaReference(HotAreaReference ref) {
+        if (!ref.isValid()) {
+            return;
+        }
+        if (getAssetManager().get(ref.getHotAreaId()) == null) {
+            ref.setHotAreaId(Asset.UNSPECIFIED_ASSET_ID);
+        }
+    }
+
+    protected void checkNameReference(NameReference ref) {
+        if (!ref.isValid()) {
+            return;
+        }
+        if (getAssetManager().get(ref.getTargetId())==null) {
+            ref.setTargetId(Asset.UNSPECIFIED_ASSET_ID);
+        }
     }
 
     @Override

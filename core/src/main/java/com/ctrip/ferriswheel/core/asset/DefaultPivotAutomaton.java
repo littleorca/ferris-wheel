@@ -57,9 +57,9 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
             throw new IllegalArgumentException("Missing at least one of the required fields: [data, rows, values].");
         }
         this.data.setDynamicVariant(pivot.getData());
-        if (this.data.getFormulaElements() == null
-                || this.data.getFormulaElements().length != 1
-                || !(this.data.getFormulaElements()[0] instanceof RangeReferenceElement)) {
+        if (this.data.getFormula() == null
+                || this.data.getFormula().getElementCount() != 1
+                || !(this.data.getFormula().getElement(0) instanceof RangeReferenceElement)) {
             this.data.setValid(false);
             //throw new IllegalArgumentException("Data area formula must be a simple range reference.");
         }
@@ -99,7 +99,7 @@ public class DefaultPivotAutomaton extends AbstractAutomaton implements PivotAut
             return DataSetBuilder.emptyDataSet();
         }
 
-        RangeReferenceElement rangeElement = (RangeReferenceElement) data.getFormulaElements()[0];
+        RangeReferenceElement rangeElement = (RangeReferenceElement) data.getFormula().getElement(0);
         RangeReference rangeReference = rangeElement.getRangeReference();
 
         DefaultSheet sourceSheet = rangeReference.getSheetName() == null ?

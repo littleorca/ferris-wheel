@@ -25,15 +25,26 @@
 package com.ctrip.ferriswheel.core.ref;
 
 public interface TableRange {
-    int getLeft();
+    Integer getLeft();
 
-    int getTop();
+    Integer getTop();
 
-    int getRight();
+    Integer getRight();
 
-    int getBottom();
+    Integer getBottom();
 
-    int width();
+    default Integer width() {
+        if (getLeft() == null || getRight() == null) {
+            return null;
+        }
+        return getRight() + 1 - getLeft();
+    }
 
-    int height();
+    default Integer height() {
+        if (getTop() == null || getBottom() == null) {
+            return null;
+        }
+        return getBottom() + 1 - getTop();
+    }
+
 }

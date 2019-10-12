@@ -1,6 +1,5 @@
 package com.ctrip.ferriswheel.core.formula.symbol;
 
-import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.ref.*;
 import com.ctrip.ferriswheel.core.util.References;
@@ -106,8 +105,7 @@ public class SymbolHandlers {
                     null,
                     null,
                     positionRef,
-                    Asset.UNSPECIFIED_ASSET_ID,
-                    positionRef.getRowIndex() != -1 && positionRef.getColumnIndex() != -1,
+                    positionRef.getRowAnchor() != null && positionRef.getColumnAnchor() != null,
                     false));
             elem.setSlices(1);
             elem.setToken(identifier.getToken());
@@ -124,28 +122,31 @@ public class SymbolHandlers {
             FormulaElement from = stack.pop();
 
             RangeReference rangeReference = new RangeReference();
-
-            rangeReference.setUpperLeftRef(References.parseRangeEndRef(from.getTokenString()));
-            rangeReference.setLowerRightRef(References.parseRangeEndRef(to.getTokenString()));
+            PositionRef upperLeft = References.parseRangeEndRef(from.getTokenString());
+            PositionRef lowerRight = References.parseRangeEndRef(to.getTokenString());
+            rangeReference.setLeftAnchor(upperLeft.getColumnAnchor());
+            rangeReference.setTopAnchor(upperLeft.getRowAnchor());
+            rangeReference.setRightAnchor(lowerRight.getColumnAnchor());
+            rangeReference.setBottomAnchor(lowerRight.getRowAnchor());
 
             if (!rangeReference.isAlive()) {
                 throw new FormulaParserException("Invalid range reference(1).");
             }
 
             // either of row or column index must be set
-            if (rangeReference.getLeft() == -1 && rangeReference.getTop() == -1) {
+            if (rangeReference.getLeftAnchor() == null && rangeReference.getTopAnchor() == null) {
                 throw new FormulaParserException("Invalid range reference(2).");
             }
 
             // row count part
-            if ((rangeReference.getTop() == -1 && rangeReference.getBottom() != -1)
-                    || (rangeReference.getTop() != -1 && rangeReference.getBottom() == -1)) {
+            if ((rangeReference.getTopAnchor() == null && rangeReference.getBottomAnchor() != null)
+                    || (rangeReference.getTopAnchor() != null && rangeReference.getBottomAnchor() == null)) {
                 throw new FormulaParserException("Invalid range reference(3).");
             }
 
             // column count part
-            if ((rangeReference.getLeft() == -1 && rangeReference.getRight() != -1)
-                    || (rangeReference.getLeft() != -1 && rangeReference.getRight() == -1)) {
+            if ((rangeReference.getLeftAnchor() == null && rangeReference.getRightAnchor() != null)
+                    || (rangeReference.getLeftAnchor() != null && rangeReference.getRightAnchor() == null)) {
                 throw new FormulaParserException("Invalid range reference(4).");
             }
 

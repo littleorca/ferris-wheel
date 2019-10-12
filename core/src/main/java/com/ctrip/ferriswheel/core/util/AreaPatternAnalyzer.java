@@ -1,6 +1,5 @@
 package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.asset.VariantNode;
 import com.ctrip.ferriswheel.core.ref.RangeReference;
 
 public class AreaPatternAnalyzer {
@@ -67,9 +66,7 @@ public class AreaPatternAnalyzer {
                 getEndArea().getLeft() + getColumnDelta(),
                 getEndArea().getTop() + getRowDelta(),
                 getEndArea().getRight() + getColumnDelta(),
-                getEndArea().getBottom() + getRowDelta(),
-                VariantNode.UNSPECIFIED_ASSET_ID,
-                VariantNode.UNSPECIFIED_ASSET_ID);
+                getEndArea().getBottom() + getRowDelta());
     }
 
     public void reset() {

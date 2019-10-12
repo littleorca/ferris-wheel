@@ -25,8 +25,6 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-
 public interface AssetManager {
 
     /**
@@ -51,8 +49,6 @@ public interface AssetManager {
      */
     Asset get(long id);
 
-    ReferenceResolver getReferenceResolver();
-
     ReferenceMaintainer getReferenceMaintainer();
 
     /**
@@ -71,9 +67,9 @@ public interface AssetManager {
     void detach(Asset asset);
 
     /**
-     * Get transaction.
+     * Get transaction manager.
      *
      * @return
      */
-    Transaction getTransaction();
+    TransactionManager getTransactionManager();
 }

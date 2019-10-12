@@ -29,13 +29,14 @@ import com.ctrip.ferriswheel.common.aggregate.AggregateType;
 import com.ctrip.ferriswheel.common.aggregate.Aggregator;
 import com.ctrip.ferriswheel.common.aggregate.NamedValuesSample;
 import com.ctrip.ferriswheel.common.aggregate.Sample;
-import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.formula.*;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluator;
 import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
+import com.ctrip.ferriswheel.core.ref.CellReference;
+import com.ctrip.ferriswheel.core.ref.NameReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,12 +183,22 @@ public class ThreePhaseAggregator implements Aggregator {
         }
 
         @Override
+        public Variant resolve(RangeReferenceElement referenceElement, FormulaEvaluationContext context) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public Variant resolve(NameReferenceElement referenceElement, FormulaEvaluationContext context) {
             return sample.getValue(referenceElement.getTokenString());
         }
 
         @Override
-        public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
+        public Asset getReferredAsset(CellReference cellReference) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Asset getReferredAsset(NameReference nameReference) {
             throw new UnsupportedOperationException();
         }
 
@@ -204,12 +215,22 @@ public class ThreePhaseAggregator implements Aggregator {
         }
 
         @Override
+        public Variant resolve(RangeReferenceElement referenceElement, FormulaEvaluationContext context) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public Variant resolve(NameReferenceElement referenceElement, FormulaEvaluationContext context) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Table resolveTable(String sheetName, String tableName, FormulaEvaluationContext context) {
+        public Asset getReferredAsset(CellReference cellReference) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Asset getReferredAsset(NameReference nameReference) {
             throw new UnsupportedOperationException();
         }
 

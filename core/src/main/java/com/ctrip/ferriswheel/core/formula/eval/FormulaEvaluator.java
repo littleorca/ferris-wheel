@@ -2,12 +2,12 @@ package com.ctrip.ferriswheel.core.formula.eval;
 
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.SheetAsset;
-import com.ctrip.ferriswheel.common.table.Table;
 import com.ctrip.ferriswheel.common.variant.Variant;
 import com.ctrip.ferriswheel.core.asset.Asset;
 import com.ctrip.ferriswheel.core.formula.CellReferenceElement;
 import com.ctrip.ferriswheel.core.formula.FormulaElement;
 import com.ctrip.ferriswheel.core.formula.NameReferenceElement;
+import com.ctrip.ferriswheel.core.formula.RangeReferenceElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,27 @@ public class FormulaEvaluator {
         return ret;
     }
 
+    public Variant evaluate(Iterable<FormulaElement> elements) {
+        Context context = new Context();
+        for (FormulaElement elem : elements) {
+            elem.evaluate(context);
+        }
+        Variant ret = context.operands.pop();
+        if (!context.operands.isEmpty()) {
+            throw new RuntimeException("Abnormal stack state.");
+        }
+        return ret;
+    }
+
     public List<Variant> evaluatePartial(FormulaElement[] partialElements) {
+        Context context = new Context();
+        for (FormulaElement elem : partialElements) {
+            elem.evaluate(context);
+        }
+        return new ArrayList<>(context.operands);
+    }
+
+    public List<Variant> evaluatePartial(Iterable<FormulaElement> partialElements) {
         Context context = new Context();
         for (FormulaElement elem : partialElements) {
             elem.evaluate(context);
@@ -99,13 +119,13 @@ public class FormulaEvaluator {
         }
 
         @Override
-        public Variant resolveReference(NameReferenceElement referenceElement) {
+        public Variant resolveReference(RangeReferenceElement referenceElement) {
             return resolver.resolve(referenceElement, this);
         }
 
         @Override
-        public Table resolveTable(String sheetName, String tableName) {
-            return resolver.resolveTable(sheetName, tableName, this);
+        public Variant resolveReference(NameReferenceElement referenceElement) {
+            return resolver.resolve(referenceElement, this);
         }
     }
 }

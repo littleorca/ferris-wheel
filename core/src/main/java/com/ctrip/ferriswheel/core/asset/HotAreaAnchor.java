@@ -24,12 +24,54 @@
 
 package com.ctrip.ferriswheel.core.asset;
 
-import com.ctrip.ferriswheel.core.formula.eval.ReferenceResolver;
-import com.ctrip.ferriswheel.core.ref.CellReference;
+class HotAreaAnchor {
+    private EndpointAnchor start;
+    private EndpointAnchor end;
 
-public interface ReferenceMaintainer extends ReferenceResolver {
-    void resolveFormulas(AssetNode asset);
+    boolean isValid() {
+        return start != null && start.isValid() &&
+                end != null && end.isValid();
+    }
 
-    void resolveFormula(ValueNode valueNode);
+    public EndpointAnchor getStart() {
+        return start;
+    }
 
+    public void setStart(EndpointAnchor start) {
+        this.start = start;
+    }
+
+    public EndpointAnchor getEnd() {
+        return end;
+    }
+
+    public void setEnd(EndpointAnchor end) {
+        this.end = end;
+    }
+
+
+    static abstract class EndpointAnchor {
+        abstract boolean isValid();
+    }
+
+    static class CellAnchor extends EndpointAnchor {
+        private long cellId;
+
+        @Override
+        boolean isValid() {
+            return cellId != Asset.UNSPECIFIED_ASSET_ID;
+        }
+
+        CellAnchor(long cellId) {
+            this.cellId = cellId;
+        }
+
+        public long getCellId() {
+            return cellId;
+        }
+
+        public void setCellId(long cellId) {
+            this.cellId = cellId;
+        }
+    }
 }

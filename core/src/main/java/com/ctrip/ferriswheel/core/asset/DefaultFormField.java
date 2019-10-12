@@ -41,10 +41,10 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
     private final ValueNode options;
     private final AssetList<DefaultFormFieldBinding> bindings;
 
-    DefaultFormField(String name, DefaultForm form) {
-        super(name, form);
+    DefaultFormField(String name, AssetManager assetManager) {
+        super(name, assetManager);
         this.value = Value.BLANK;
-        this.options = new ValueNode(getAssetManager(), Value.BLANK, null);
+        this.options = new ValueNode(assetManager, Value.BLANK, null);
         this.bindings = new AssetList<>(this);
 
         bindChild(options);
@@ -61,7 +61,7 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
 
         bindings.clear();
         for (int i = 0; i < fieldData.getBindingCount(); i++) {
-            bindings.add(i, new DefaultFormFieldBinding(this,
+            bindings.add(i, new DefaultFormFieldBinding(getAssetManager(),
                     fieldData.getBinding(i)));
         }
     }
