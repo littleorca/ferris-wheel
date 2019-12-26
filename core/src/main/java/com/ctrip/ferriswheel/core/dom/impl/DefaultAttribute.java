@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Ctrip.com
+ * Copyright (c) 2018-2019 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,55 +20,64 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package com.ctrip.ferriswheel.common.variant;
+package com.ctrip.ferriswheel.core.dom.impl;
 
-public enum ErrorCodes implements ErrorCode {
-    OK("OK"),
-    NULL("#NULL!")                /* = 1 */,
-    DIV("#DIV/0!")                /* = 2 */,
-    VALUE("#VALUE!")              /* = 3 */,
-    REF("#REF!")                  /* = 4 */,
-    NAME("#NAME?")                /* = 5 */,
-    NUM("#NUM!")                  /* = 6 */,
-    NA("#N/A")                    /* = 7 */,
-    GETTING_DATA("#GETTING_DATA") /* = 8 */;
+import com.ctrip.ferriswheel.core.dom.Attribute;
 
-    public static ErrorCodes valueOf(int code) {
-        if (code < 0 || code >= values().length) {
-            throw new IndexOutOfBoundsException("Invalid code: " + code);
-        }
-        return values()[code];
-    }
-
-    public static ErrorCodes parse(String errorName) {
-        for (ErrorCodes errorCode : values()) {
-            if (errorCode.getName().equals(errorName)) {
-                return errorCode;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
+public class DefaultAttribute extends AbstractNode implements Attribute {
     private final String name;
+    private String value;
 
-    ErrorCodes(String name) {
+    public DefaultAttribute(String name) {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return getName();
+    public DefaultAttribute(String name, String value) {
+        this.name = name;
+        this.value = value;
     }
 
     @Override
-    public int getCode() {
-        return ordinal();
+    public String getNodeName() {
+        return name;
     }
 
+    @Override
+    public String getTextContent() {
+        return getValue();
+    }
+
+    @Override
+    public void setTextContent(String textContent) {
+        setValue(textContent);
+    }
+
+    @Override
+    public String getNodeValue() {
+        return getValue();
+    }
+
+    @Override
+    public void setNodeValue(String nodeValue) {
+        setValue(nodeValue);
+    }
+
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(String value) {
+//        withTransaction(() -> {
+            this.value = value;
+//        });
     }
 }

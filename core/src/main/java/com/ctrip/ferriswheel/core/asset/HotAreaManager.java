@@ -152,16 +152,6 @@ class HotAreaManager extends AssetNode {
         return EvaluationState.DONE;
     }
 
-    void updateHotAreaRange(SimpleTableRange oldRange, SimpleTableRange newRange) {
-        HotAreaDelegate hotArea = hotAreaMap.remove(oldRange);
-        HotAreaDelegate existedHotArea = hotAreaMap.get(newRange);
-        if (existedHotArea == null) {
-            hotAreaMap.put(newRange, hotArea);
-        } else { // merge
-            // FIXME merge hot area
-        }
-    }
-
     /**
      * Find overlapped ranges and dependencies, then update there formulas.
      * If dependency has gone, or both anchor cells of range dependency have gone,
@@ -196,6 +186,7 @@ class HotAreaManager extends AssetNode {
             area.refresh(alignLeft, alignTop, alignRight, alignBottom);
             affectedNodes.addAll(area.getDependents());
         }
+        checkAndMergeAreasIfNeeded();
 
         // scan for cell references
         if (right == null) {
@@ -228,6 +219,42 @@ class HotAreaManager extends AssetNode {
         for (AssetNode node : affectedNodes) {
             fixFormulaAfterAreaChanged((ValueNode) node);
         }
+    }
+
+    private void checkAndMergeAreasIfNeeded() {
+        Map<SimpleTableRange, HotAreaDelegate> newHotAreaMap = new HashMap<>(hotAreaMap.size());
+        for (HotAreaDelegate area : hotAreaMap.values()) {
+            HotAreaDelegate previous = newHotAreaMap.get(area.getRange());
+            if (previous == null) {
+                newHotAreaMap.put(area.getRange(), area);
+            } else {
+                mergeHotArea(area, previous);
+            }
+        }
+        this.hotAreaMap = newHotAreaMap;
+    }
+
+    private void mergeHotArea(HotAreaDelegate from, HotAreaDelegate to) {
+        for (AssetNode assetNode : from.getDependents()) {
+            assetNode.removeDependency(from);
+            assetNode.addDependency(to); // dep to 'from' will be removed after unbind 'from' hot area.
+            if (!(assetNode instanceof ValueNode)) {
+                continue;
+            }
+            Formula f = ((ValueNode) assetNode).getFormula();
+            if (f == null) {
+                continue;
+            }
+
+            for (FormulaElement el : f) {
+                if (el instanceof CellReferenceElement) {
+                    ((CellReferenceElement) el).getCellReference().setHotAreaId(to.getAssetId());
+                } else if (el instanceof RangeReferenceElement) {
+                    ((RangeReferenceElement) el).getRangeReference().setHotAreaId(to.getAssetId());
+                }
+            }
+        }
+        unbindChild(from);
     }
 
     private void fixFormulaAfterAreaChanged(ValueNode dependentNode) {

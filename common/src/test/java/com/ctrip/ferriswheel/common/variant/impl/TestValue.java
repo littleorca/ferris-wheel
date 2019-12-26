@@ -368,4 +368,28 @@ public class TestValue extends TestCase {
         } catch (UnsupportedOperationException e) {
         }
     }
+
+    public void testParse() {
+        checkToStrAndParseBack(Value.str(""));
+        checkToStrAndParseBack(Value.str("hello world"));
+
+        checkToStrAndParseBack(Value.dec(0));
+        checkToStrAndParseBack(Value.dec(10));
+        checkToStrAndParseBack(Value.dec(12.5));
+
+        checkToStrAndParseBack(Value.date(new Date()));
+
+        checkToStrAndParseBack(Value.BLANK);
+
+        checkToStrAndParseBack(Value.bool(true));
+        checkToStrAndParseBack(Value.bool(false));
+
+        for (ErrorCodes ec : ErrorCodes.values()) {
+            checkToStrAndParseBack(Value.err(ec));
+        }
+    }
+
+    private void checkToStrAndParseBack(Value value) {
+        assertEquals(value, Value.parse(value.valueType(), value.strValue()));
+    }
 }

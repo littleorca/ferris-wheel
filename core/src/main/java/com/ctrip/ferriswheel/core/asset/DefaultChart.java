@@ -19,7 +19,6 @@ import com.ctrip.ferriswheel.core.ref.CellReference;
 import com.ctrip.ferriswheel.core.ref.RangeReference;
 import com.ctrip.ferriswheel.core.ref.TableRange;
 import com.ctrip.ferriswheel.core.view.ChartLayout;
-import com.ctrip.ferriswheel.core.view.LayoutImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;

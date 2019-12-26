@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class HtmlHelper {
+
     public enum Option {
         FULL_HTML,
         WITH_STYLE
@@ -208,4 +209,66 @@ public class HtmlHelper {
     public void setChartRenderer(Function<Chart, String> chartRenderer) {
         this.chartRenderer = chartRenderer;
     }
+
+
+    /**
+     * Symbol (name) Escape Sequence
+     * <p>
+     * < (less-than) &#60; or &lt;
+     * > (greater-than) &#62; or  &gt;
+     * & (ampersand) &#38;
+     * ' (apostrophe or single quote) &#39;
+     * " (double-quote) &#34;
+     *
+     * @param str
+     * @param from
+     * @param to
+     * @return
+     */
+    public static String unescapeHtml(String str, int from, int to) {
+        StringBuilder sb = new StringBuilder();
+        int segmentStart = from;
+        int segmentEnd;
+        for (int pos = from; pos < to; pos++) {
+            if ('&' == str.charAt(pos)) {
+                segmentEnd = pos;
+                if (segmentEnd > segmentStart) {
+                    sb.append(str, segmentStart, segmentEnd);
+                }
+
+                if (str.startsWith("#", pos)) {
+                    // TODO
+                    throw new UnsupportedOperationException("Sorry, str like \"&#xx;\" is not supported yet!");
+
+                } else if (str.startsWith("quot;", pos)) {
+                    sb.append("\"");
+                    segmentStart = pos + 5;
+
+                } else if (str.startsWith("amp;", pos)) {
+                    sb.append("&");
+                    segmentStart = pos + 4;
+
+                } else if (str.startsWith("apos;", pos)) {
+                    sb.append("'");
+                    segmentStart = pos + 5;
+
+                } else if (str.startsWith("lt;", pos)) {
+                    sb.append("<");
+                    segmentStart = pos + 3;
+
+                } else if (str.startsWith("gt;", pos)) {
+                    sb.append(">");
+                    segmentStart = pos + 3;
+
+                } else {
+                    throw new IllegalArgumentException("Malformed string: failed to unescape: " + pos + "@" + str);
+                }
+            }
+        }
+        if (segmentStart < to) {
+            sb.append(str, segmentStart, to);
+        }
+        return sb.toString();
+    }
+
 }

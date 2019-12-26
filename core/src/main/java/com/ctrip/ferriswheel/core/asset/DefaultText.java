@@ -5,7 +5,6 @@ import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.core.action.UpdateText;
 import com.ctrip.ferriswheel.core.bean.TextData;
-import com.ctrip.ferriswheel.core.view.LayoutImpl;
 import com.ctrip.ferriswheel.core.view.TextLayout;
 
 public class DefaultText extends SheetAssetNode implements Text {

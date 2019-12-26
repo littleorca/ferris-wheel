@@ -27,7 +27,15 @@ package com.ctrip.ferriswheel.core.view;
 
 import com.ctrip.ferriswheel.common.view.*;
 
+import java.util.Objects;
+
 public class LayoutImpl implements Layout {
+    private static final String ATTR_FIELDS_DELIMITER = ";";
+    private static final String ATTR_KEY_VALUE_DELIMITER = ":";
+    private static final String ATTR_VALUES_DELIMITER = " ";
+
+    private static final String ATTR_PATTERN = "()[\\s*;\\s*()]*";
+
     private Display display;
     private int width;
     private int height;
@@ -61,6 +69,16 @@ public class LayoutImpl implements Layout {
         this.setGrid(grid);
     }
 
+    public LayoutImpl(String serialized) {
+        if (serialized == null) {
+            return;
+        }
+        String[] fields = serialized.split(ATTR_FIELDS_DELIMITER);
+        for (String field : fields) {
+            field.split(ATTR_KEY_VALUE_DELIMITER);
+        }
+    }
+
     public void copy(Layout layout) {
         this.display = layout.getDisplay();
         this.width = layout.getWidth();
@@ -76,6 +94,24 @@ public class LayoutImpl implements Layout {
                 this.grid.copy(layout.getGrid());
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Layout)) return false;
+        Layout layout = (Layout) o;
+        return getWidth() == layout.getWidth() &&
+                getHeight() == layout.getHeight() &&
+                getDisplay() == layout.getDisplay() &&
+                getAlign() == layout.getAlign() &&
+                getVerticalAlign() == layout.getVerticalAlign() &&
+                Objects.equals(getGrid(), layout.getGrid());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDisplay(), getWidth(), getHeight(), getAlign(), getVerticalAlign(), getGrid());
     }
 
     public Display getDisplay() {
@@ -169,6 +205,22 @@ public class LayoutImpl implements Layout {
             }
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Grid)) return false;
+            Grid grid = (Grid) o;
+            return getColumns() == grid.getColumns() &&
+                    getRows() == grid.getRows() &&
+                    Objects.equals(getColumn(), grid.getColumn()) &&
+                    Objects.equals(getRow(), grid.getRow());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getColumns(), getRows(), getColumn(), getRow());
+        }
+
         public int getColumns() {
             return columns;
         }
@@ -224,6 +276,20 @@ public class LayoutImpl implements Layout {
         public void copy(Span span) {
             this.start = span.getStart();
             this.end = span.getEnd();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Span)) return false;
+            Span span = (Span) o;
+            return getStart() == span.getStart() &&
+                    getEnd() == span.getEnd();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getStart(), getEnd());
         }
 
         public int getStart() {

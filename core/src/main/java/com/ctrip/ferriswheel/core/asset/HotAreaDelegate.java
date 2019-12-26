@@ -109,9 +109,7 @@ class HotAreaDelegate extends AssetNode {
             return;
         }
 
-        SimpleTableRange newRange = recalculateRange();
-        manager.updateHotAreaRange(range, newRange);
-        range = newRange;
+        range = recalculateRange();
         updateDependencies();
     }
 

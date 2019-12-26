@@ -3,6 +3,7 @@ package com.ctrip.ferriswheel.core.formula.func;
 import com.ctrip.ferriswheel.common.variant.ErrorCodes;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.common.variant.Variant;
+import com.ctrip.ferriswheel.common.variant.VariantType;
 import com.ctrip.ferriswheel.core.formula.FuncElement;
 import com.ctrip.ferriswheel.core.formula.eval.FormulaEvaluationContext;
 
@@ -31,6 +32,15 @@ public class VLookup implements Function {
         final int colIndexNum = context.popOperand().intValue() - 1;
         Variant tableArray = context.popOperand();
         Variant lookupValue = context.popOperand();
+
+        // TODO review this.
+        if (VariantType.ERROR.equals(tableArray.valueType())) {
+            context.pushOperand(Value.err(tableArray.errorValue()));
+            return;
+        } else if (VariantType.ERROR.equals(lookupValue)) {
+            context.pushOperand(Value.err(lookupValue.errorValue()));
+            return;
+        }
 
         final int columnCount = tableArray.columnCount();
         final int rowCount = tableArray.rowCount();

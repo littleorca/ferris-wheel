@@ -137,22 +137,43 @@ public abstract class Value implements Variant {
             return (Value) var;
         }
         switch (var.valueType()) {
-            case ERROR:
-                return err(var.errorValue());
-            case BLANK:
-                return BLANK;
             case DECIMAL:
                 return dec(var.decimalValue());
-            case BOOL:
-                return bool(var.booleanValue());
-            case DATE:
-                return date(var.dateValue());
             case STRING:
                 return str(var.strValue());
+            case DATE:
+                return date(var.dateValue());
+            case BOOL:
+                return bool(var.booleanValue());
+            case BLANK:
+                return BLANK;
+            case ERROR:
+                return err(var.errorValue());
             case LIST:
                 return list(var.listValue());
             default:
-                throw new RuntimeException("Unrecognized variant type: " + var.valueType());
+                throw new RuntimeException("Unrecognized variant type: " + var.valueType() + ", probably a bug.");
+        }
+    }
+
+    public static Value parse(VariantType type, String strValue) {
+        switch (type) {
+            case DECIMAL:
+                return Value.dec(new BigDecimal(strValue, DecimalValue.mathContext));
+            case STRING:
+                return Value.str(strValue);
+            case DATE:
+                return Value.date(strValue);
+            case BOOL:
+                return Value.bool(Boolean.parseBoolean(strValue));
+            case BLANK:
+                return Value.BLANK;
+            case ERROR:
+                return Value.err(ErrorCodes.parse(strValue));
+            case LIST:
+                throw new UnsupportedOperationException("Parsing list variant from string is not supported.");
+            default:
+                throw new RuntimeException("Unrecognized variant type: " + type + ", probably a bug.");
         }
     }
 
@@ -326,7 +347,7 @@ public abstract class Value implements Variant {
 
     public static final class ErrorValue extends Value {
         private static final Map<Integer, ErrorValue> ERROR_VALUES = new ConcurrentHashMap<>();
-        private ErrorCode errorCode;
+        private final ErrorCode errorCode;
 
         public static ErrorValue valueOf(ErrorCode errorCode) {
             ErrorValue val = ERROR_VALUES.get(errorCode.getCode());
