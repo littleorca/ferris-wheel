@@ -27,13 +27,13 @@ package com.ctrip.ferriswheel.core.dom;
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
 import com.ctrip.ferriswheel.core.dom.helper.Serializer;
-import com.ctrip.ferriswheel.core.dom.impl.*;
+import com.ctrip.ferriswheel.core.dom.impl.WorkbookDocumentImpl;
 
 import java.util.Arrays;
 
 public class Test {
     public static void main(String[] args) {
-        WorkbookDocument d = new WorkbookDocument();
+        WorkbookDocument d = new WorkbookDocumentImpl();
         WorkbookElement w = d.getDocumentElement();
         w.setAttribute("version", "0.1");
         System.out.println(Serializer.serialize(w));

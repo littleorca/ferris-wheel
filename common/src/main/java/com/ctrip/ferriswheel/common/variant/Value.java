@@ -125,12 +125,12 @@ public abstract class Value implements Variant {
         }
         List<Variant> copyList = new ArrayList<>(list.size());
         for (Variant var : list) {
-            copyList.add(from(var));
+            copyList.add(of(var));
         }
         return new ListValue(copyList, columnCount);
     }
 
-    public static Value from(Variant var) {
+    public static Value of(Variant var) {
         if (var == null) {
             return null;
         } else if (var instanceof Value) {

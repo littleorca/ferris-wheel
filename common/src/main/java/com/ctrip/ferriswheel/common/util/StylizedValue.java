@@ -47,7 +47,7 @@ public final class StylizedValue implements StylizedVariant {
     }
 
     public StylizedValue(Variant value, String format) {
-        this.value = Value.from(value);
+        this.value = Value.of(value);
         this.format = format;
     }
 

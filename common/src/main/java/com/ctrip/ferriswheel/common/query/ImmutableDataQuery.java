@@ -51,7 +51,7 @@ public final class ImmutableDataQuery implements DataQuery {
 
         } else {
             this.params = new LinkedHashMap<>(params.size());
-            params.forEach((k, v) -> this.params.put(k, Value.from(v)));
+            params.forEach((k, v) -> this.params.put(k, Value.of(v)));
         }
     }
 

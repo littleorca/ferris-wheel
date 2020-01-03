@@ -30,9 +30,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class DynamicValue implements DynamicVariant {
+public final class DynamicValue implements DynamicVariant {
     private String formulaString;
     private Variant variant;
+
+    public static DynamicValue of(DynamicVariant dynamicVariant) {
+        if (dynamicVariant instanceof DynamicValue) {
+            return (DynamicValue) dynamicVariant;
+        } else {
+            return new DynamicValue(dynamicVariant);
+        }
+    }
 
     public DynamicValue() {
         this(null, Value.BLANK);
@@ -57,7 +65,7 @@ public class DynamicValue implements DynamicVariant {
                         null : variable.getFormulaString(),
 
                 (variable != null && variable instanceof DynamicValue) ?
-                        Value.from(((DynamicValue) variable).getVariant()) : Value.from(variable)
+                        Value.of(((DynamicValue) variable).getVariant()) : Value.of(variable)
         );
     }
 

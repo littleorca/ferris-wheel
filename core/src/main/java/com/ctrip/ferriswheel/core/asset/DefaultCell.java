@@ -39,7 +39,7 @@ public class DefaultCell extends ValueNode implements Cell {
                 table.getName(),
                 getRowIndex(),
                 getColumnIndex(),
-                Value.from(newValue));
+                Value.of(newValue));
         table.publicly(action, () -> setValue(newValue));
     }
 

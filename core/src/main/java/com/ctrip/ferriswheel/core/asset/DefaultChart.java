@@ -75,7 +75,8 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         return type;
     }
 
-    void setType(String type) {
+    @Override
+    public void setType(String type) {
         this.type = type;
         markDirty();
     }
@@ -85,6 +86,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         return title;
     }
 
+    @Override
     public void setTitle(DynamicVariant title) {
         this.title.setDynamicVariant(title);
     }
@@ -94,6 +96,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
         return categories;
     }
 
+    @Override
     public void setCategories(DynamicVariant categories) {
         this.categories.setDynamicVariant(categories);
     }
@@ -302,7 +305,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             }
 
             if (columnIdx != -1) {
-                name = new DynamicValue(Value.from(table.getCell(rowIdx, columnIdx).getData()));
+                name = new DynamicValue(Value.of(table.getCell(rowIdx, columnIdx).getData()));
             }
 
             List<Variant> ls = new ArrayList<>(dataEndColumn - dataStartColumn + 1);
@@ -381,7 +384,7 @@ public class DefaultChart extends SheetAssetNode implements Chart {
             }
 
             if (rowIdx != -1) {
-                name = new DynamicValue(Value.from(table.getCell(rowIdx, columnIdx).getData()));
+                name = new DynamicValue(Value.of(table.getCell(rowIdx, columnIdx).getData()));
             }
 
             List<Variant> ls = new ArrayList<>(dataEndRow - dataStartRow + 1);

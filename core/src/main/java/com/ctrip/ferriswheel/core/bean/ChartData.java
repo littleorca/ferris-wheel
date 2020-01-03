@@ -121,6 +121,7 @@ public class ChartData implements Chart, Serializable {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
@@ -130,8 +131,9 @@ public class ChartData implements Chart, Serializable {
         return title;
     }
 
-    public void setTitle(DynamicValue title) {
-        this.title = title;
+    @Override
+    public void setTitle(DynamicVariant title) {
+        this.title = DynamicValue.of(title);
     }
 
     @Override
@@ -139,8 +141,9 @@ public class ChartData implements Chart, Serializable {
         return categories;
     }
 
-    public void setCategories(DynamicValue categories) {
-        this.categories = categories;
+    @Override
+    public void setCategories(DynamicVariant categories) {
+        this.categories = DynamicValue.of(categories);
     }
 
     @Override

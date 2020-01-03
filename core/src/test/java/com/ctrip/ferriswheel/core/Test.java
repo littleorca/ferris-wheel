@@ -10,11 +10,8 @@ import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
 import com.ctrip.ferriswheel.core.util.ChartConsultantHelper;
 
-import java.net.MalformedURLException;
-
 public class Test {
-
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args) {
         Workbook wb = new FilingClerk(new DefaultEnvironment.Builder().build()).createWorkbook("test-workbook");
         Table t1 = wb.addSheet("Sheet1").addAsset(Table.class, "Table1");
         t1.setCellValue(0, 0, new Value.DecimalValue(10));

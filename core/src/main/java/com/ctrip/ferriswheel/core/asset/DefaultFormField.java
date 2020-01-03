@@ -81,7 +81,7 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
     }
 
     void setValue(Variant value) {
-        this.value = Value.from(value);
+        this.value = Value.of(value);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
         if (options instanceof DynamicVariant) {
             this.options.setDynamicVariant((DynamicVariant) options);
         } else {
-            this.options.setDynamicVariant(new DynamicValue(null, Value.from(options)));
+            this.options.setDynamicVariant(new DynamicValue(null, Value.of(options)));
         }
     }
 
@@ -154,7 +154,7 @@ public class DefaultFormField extends NamedAssetNode implements FormField {
                 // try to initialize field value by the first binding
                 DefaultFormFieldBinding binding = getBinding(0);
                 if (binding.getData() != null) {
-                    value = Value.from(binding.getData());
+                    value = Value.of(binding.getData());
                 }
             }
         }

@@ -39,7 +39,7 @@ public class NodeList<N extends Node> implements Iterable<N> {
         return array.isEmpty() ? null : array.get(0);
     }
 
-    public <T extends N> T first(Class<T> clazz) {
+    public <T> T first(Class<T> clazz) {
         return clazz.cast(first(clazz::isInstance));
     }
 
@@ -56,7 +56,7 @@ public class NodeList<N extends Node> implements Iterable<N> {
         return array.isEmpty() ? null : array.get(array.size() - 1);
     }
 
-    public <T extends N> T last(Class<T> clazz) {
+    public <T> T last(Class<T> clazz) {
         return clazz.cast(last(clazz::isInstance));
     }
 
@@ -70,7 +70,7 @@ public class NodeList<N extends Node> implements Iterable<N> {
         return null;
     }
 
-    public <T extends N> List<T> filter(Class<T> clazz) {
+    public <T> List<T> filter(Class<T> clazz) {
         return array.stream().filter(clazz::isInstance).map(clazz::cast).collect(Collectors.toList());
     }
 

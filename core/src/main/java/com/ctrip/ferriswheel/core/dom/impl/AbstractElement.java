@@ -33,7 +33,7 @@ import java.util.Collection;
 public abstract class AbstractElement extends AbstractContainerNode implements Element {
     protected static final String ATTR_NAME = "name";
 
-    private AttributeMap<DefaultAttribute> attributes = new AttributeMap<>();
+    private AttributeMap<AttributeImpl> attributes = new AttributeMap<>();
 
     @Override
     public String getNodeName() {
@@ -43,7 +43,7 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
     @Override
     public String getTextContent() {
         if (getChildCount() == 0) {
-            return DefaultTextNode.DEFAULT_TEXT_CONTENT;
+            return TextNodeImpl.DEFAULT_TEXT_CONTENT;
 
         } else if (getChildCount() == 1) {
             return firstChild().getTextContent();
@@ -83,7 +83,7 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
 
     @Override
     public String getAttribute(String name) {
-        DefaultAttribute attr = attributes.get(name);
+        AttributeImpl attr = attributes.get(name);
         return attr == null ? null : attr.getValue();
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
     public String setAttribute(String name, String value) {
         // TODO consider create attribute node first and pass it to beforeSetAttribute
         beforeSetAttribute(name, value);
-        DefaultAttribute attr = getOwnerDocument().createAttribute(name);
+        AttributeImpl attr = getOwnerDocument().createAttribute(name);
         attr.setValue(value);
 //        return withTransaction(() -> {
         Attribute oldAttr = attributes.put(attr);
@@ -105,7 +105,7 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
     public String removeAttribute(String name) {
 //        return withTransaction(() -> {
         beforeRemoveAttribute(name);
-        DefaultAttribute attr = attributes.remove(name);
+        AttributeImpl attr = attributes.remove(name);
         String removedValue = attr == null ? null : attr.getValue();
         afterRemoveAttribute(name, removedValue);
         return removedValue;
@@ -113,7 +113,7 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
     }
 
     @Override
-    public Collection<DefaultAttribute> getAttributes() {
+    public Collection<AttributeImpl> getAttributes() {
         return attributes.all();
     }
 

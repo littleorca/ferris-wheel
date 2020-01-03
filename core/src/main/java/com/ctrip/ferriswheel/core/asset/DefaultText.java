@@ -33,7 +33,7 @@ public class DefaultText extends SheetAssetNode implements Text {
         UpdateText action = new UpdateText(getSheet().getName(), getName(),
                 new TextData(getName(),
                         new DynamicValue(content.getFormulaString(),
-                                Value.from(content.getData())), layout));
+                                Value.of(content.getData())), layout));
         getSheet().publicly(action, () -> {
         }); // TODO refactor revise logger
         return EvaluationState.DONE;

@@ -101,7 +101,7 @@ public class DefaultQueryTemplate extends AssetNode implements QueryTemplate {
         if (var instanceof Value) {
             return var;
         }
-        return Value.from(var); // unknown implementation, maybe throw exception?
+        return Value.of(var); // unknown implementation, maybe throw exception?
     }
 
     public TableAutomatonInfo.QueryTemplateInfo getQueryTemplateInfo() {

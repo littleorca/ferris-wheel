@@ -63,7 +63,7 @@ public class DefaultTable extends SheetAssetNode implements Table {
     @Override
     public Variant setCellValue(int rowIndex, int columnIndex, Variant value) {
         return handleAction(new CellAction.SetCellValue(getSheet().getName(), getName(),
-                rowIndex, columnIndex, Value.from(value)));
+                rowIndex, columnIndex, Value.of(value)));
     }
 
     Variant handleAction(CellAction.SetCellValue setCellValue) {

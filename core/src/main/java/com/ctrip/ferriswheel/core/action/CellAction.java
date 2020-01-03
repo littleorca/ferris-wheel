@@ -44,7 +44,7 @@ public abstract class CellAction extends TableAction implements Action {
 
         public SetCellValue(String sheetName, String tableName, int rowIndex, int columnIndex, Variant value) {
             super(sheetName, tableName, rowIndex, columnIndex);
-            this.value = Value.from(value);
+            this.value = Value.of(value);
         }
 
         public Value getValue() {

@@ -113,7 +113,7 @@ public class TableData implements Table, Serializable {
         if (value instanceof DynamicVariant) {
             ((CellData) cell).setData((DynamicVariant) value);
         } else {
-            ((CellData) cell).setData(new DynamicValue(Value.from(value)));
+            ((CellData) cell).setData(new DynamicValue(Value.of(value)));
         }
         return oldValue;
     }

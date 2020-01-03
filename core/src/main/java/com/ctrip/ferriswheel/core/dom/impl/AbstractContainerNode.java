@@ -27,6 +27,7 @@ package com.ctrip.ferriswheel.core.dom.impl;
 import com.ctrip.ferriswheel.core.dom.ContainerNode;
 import com.ctrip.ferriswheel.core.dom.Node;
 import com.ctrip.ferriswheel.core.dom.helper.NodeList;
+import com.ctrip.ferriswheel.core.dom.helper.WithTransaction;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -36,6 +37,7 @@ import java.util.function.Predicate;
 public abstract class AbstractContainerNode extends AbstractNode implements ContainerNode {
     private NodeList<AbstractNode> children = new NodeList<>();
 
+    @WithTransaction
     @Override
     public void insertChild(Node child, Node ref) {
         if (child.getOwnerDocument() != getOwnerDocument()) {
@@ -44,8 +46,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         if (ref != null && ref.getOwnerDocument() != getOwnerDocument()) {
             throw new IllegalArgumentException("Invalid referrer node.");
         }
-
-        applyInsertChild((AbstractNode) child, (AbstractNode) ref);
+        applyInsertChild(toAbstractNode(child), toAbstractNode(ref));
     }
 
     protected void applyInsertChild(AbstractNode child, AbstractNode ref) {
@@ -67,12 +68,13 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         // overridable
     }
 
+    @WithTransaction
     @Override
     public void appendChild(Node child) {
         if (child.getOwnerDocument() != getOwnerDocument()) {
             throw new IllegalArgumentException("Given child node is not create by the same document.");
         }
-        applyAppendChild((AbstractNode) child);
+        applyAppendChild(toAbstractNode(child));
     }
 
     protected void applyAppendChild(AbstractNode child) {
@@ -98,16 +100,16 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         child.setParentNode(this);
     }
 
+    @WithTransaction
     @Override
     public boolean removeChild(Node child) {
         if (child.getOwnerDocument() != getOwnerDocument()) {
             throw new IllegalArgumentException("Given child node is not create by the same document.");
         }
-        AbstractNode castedChild = (AbstractNode) child;
+        AbstractNode castedChild = toAbstractNode(child);
         if (!children.contains(castedChild)) {
             return false;
         }
-
         applyRemoveChild(castedChild);
         return true;
     }
@@ -141,6 +143,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         child.setParentNode(null);
     }
 
+    @WithTransaction
     @Override
     public Node replaceChild(Node newChild, Node oldChild) {
         if (newChild.getOwnerDocument() != getOwnerDocument() ||
@@ -166,7 +169,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         if (otherNode.getOwnerDocument() != getOwnerDocument()) {
             return false;
         }
-        return children.contains((AbstractNode) otherNode);
+        return children.contains(toAbstractNode(otherNode));
     }
 
     @Override
@@ -204,13 +207,13 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         return child == null ? null : mapper.apply(child);
     }
 
-    protected <N extends AbstractNode> N firstChild(Class<N> clazz) {
+    protected <N> N firstChild(Class<N> clazz) {
         return children.first(clazz);
     }
 
-    protected <N extends AbstractNode, R> R mapFirstChild(Class<N> clazz,
-                                                          Function<? super N, R> mapper,
-                                                          R defaultValue) {
+    protected <N, R> R mapFirstChild(Class<N> clazz,
+                                     Function<? super N, R> mapper,
+                                     R defaultValue) {
         N node = firstChild(clazz);
         return node == null ? defaultValue : mapper.apply(node);
     }
@@ -231,7 +234,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         return children.last();
     }
 
-    protected <N extends AbstractNode> N lastChild(Class<N> clazz) {
+    protected <N> N lastChild(Class<N> clazz) {
         return children.last(clazz);
     }
 
@@ -239,7 +242,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         return children.last(predicate);
     }
 
-    protected <N extends AbstractNode> List<N> filterChildren(Class<N> clazz) {
+    protected <N> List<N> filterChildren(Class<N> clazz) {
         return children.filter(clazz);
     }
 

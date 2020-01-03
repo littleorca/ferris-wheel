@@ -24,7 +24,7 @@ public class CellData implements Cell, Serializable {
     }
 
     public CellData(Variant data, String format) {
-        this.data = data instanceof DynamicVariant ? (DynamicVariant) data : new DynamicValue(Value.from(data));
+        this.data = data instanceof DynamicVariant ? (DynamicVariant) data : new DynamicValue(Value.of(data));
         this.format = format;
     }
 

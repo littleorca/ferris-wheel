@@ -35,15 +35,21 @@ public interface Chart extends SheetAsset, Displayable {
 
     String getType();
 
+    void setType(String type);
+
     DynamicVariant getTitle();
 
+    void setTitle(DynamicVariant title);
+
     DynamicVariant getCategories();
+
+    void setCategories(DynamicVariant categories);
 
     int getSeriesCount();
 
     DataSeries getSeries(int i);
 
-    List<DataSeries> getSeriesList();
+    List<? extends DataSeries> getSeriesList();
 
     ChartBinder getBinder();
 

@@ -209,7 +209,7 @@ public class DefaultReferenceMaintainer implements ReferenceMaintainer {
             for (int columnIndex = validRange.getLeft(); columnIndex <= validRange.getRight(); columnIndex++) {
                 DefaultCell cell = row == null ? null : row.getCell(columnIndex);
                 Variant data = cell == null ? Value.BLANK : cell.getData();
-                valueList.add(Value.from(data));
+                valueList.add(Value.of(data));
             }
         }
         final int actualResultColumns = validRange.width();

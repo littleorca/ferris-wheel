@@ -28,9 +28,9 @@ import com.ctrip.ferriswheel.core.dom.Document;
 import com.ctrip.ferriswheel.core.dom.Element;
 import com.ctrip.ferriswheel.core.dom.Node;
 
-public abstract class AbstractDocument<T extends Element> extends AbstractContainerNode implements Document {
+public abstract class AbstractDocument extends AbstractContainerNode implements Document {
     public static final String NODE_NAME = "#document";
-    private transient T documentElement;
+    private transient Element documentElement;
 
     @Override
     public String getNodeName() {
@@ -78,9 +78,9 @@ public abstract class AbstractDocument<T extends Element> extends AbstractContai
     }
 
     @Override
-    public T getDocumentElement() {
+    public Element getDocumentElement() {
         if (documentElement == null) {
-            documentElement = (T) firstChild();
+            documentElement = lastChild(Element.class);
         }
         if (documentElement == null) {
             documentElement = createDocumentElement();
@@ -89,18 +89,18 @@ public abstract class AbstractDocument<T extends Element> extends AbstractContai
         return documentElement;
     }
 
-    protected abstract T createDocumentElement();
+    protected abstract Element createDocumentElement();
 
     @Override
-    public DefaultAttribute createAttribute(String name) {
-        DefaultAttribute attrNode = new DefaultAttribute(name);
+    public AttributeImpl createAttribute(String name) {
+        AttributeImpl attrNode = new AttributeImpl(name);
         attrNode.initialize(this);
         return attrNode;
     }
 
     @Override
-    public DefaultTextNode createTextNode(String textContent) {
-        DefaultTextNode textNode = new DefaultTextNode(textContent);
+    public TextNodeImpl createTextNode(String textContent) {
+        TextNodeImpl textNode = new TextNodeImpl(textContent);
         textNode.initialize(this);
         return textNode;
     }
