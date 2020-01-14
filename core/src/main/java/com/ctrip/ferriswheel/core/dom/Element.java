@@ -27,6 +27,11 @@ package com.ctrip.ferriswheel.core.dom;
 import java.util.Collection;
 
 public interface Element extends ContainerNode {
+    @Override
+    default NodeType getNodeType() {
+        return NodeType.ELEMENT_NODE;
+    }
+
     String getTagName();
 
     boolean hasAttribute(String name);

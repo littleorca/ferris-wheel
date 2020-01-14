@@ -25,6 +25,11 @@
 package com.ctrip.ferriswheel.core.dom;
 
 public interface Attribute extends Node {
+    @Override
+    default NodeType getNodeType() {
+        return NodeType.ATTRIBUTE_NODE;
+    }
+
     String getName();
 
     String getValue();

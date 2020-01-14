@@ -26,13 +26,13 @@ package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.Node;
 import com.ctrip.ferriswheel.core.dom.NodeWrapper;
-import com.ctrip.ferriswheel.core.dom.helper.WithTransaction;
 
 import java.io.Serializable;
 
 public abstract class AbstractNode implements Node, Serializable {
     private transient AbstractDocument ownerDocument;
     private transient AbstractNode parentNode;
+    private transient boolean dirty = false;
 
     void initialize(AbstractDocument document) {
         if (ownerDocument != null) {
@@ -78,25 +78,21 @@ public abstract class AbstractNode implements Node, Serializable {
         return false;
     }
 
-    @WithTransaction
     @Override
     public void insertChild(Node child, Node ref) {
         throw new UnsupportedOperationException();
     }
 
-    @WithTransaction
     @Override
     public void appendChild(Node child) {
         throw new UnsupportedOperationException();
     }
 
-    @WithTransaction
     @Override
     public boolean removeChild(Node child) {
         throw new UnsupportedOperationException();
     }
 
-    @WithTransaction
     @Override
     public Node replaceChild(Node newChild, Node oldChild) {
         throw new UnsupportedOperationException();
@@ -152,4 +148,16 @@ public abstract class AbstractNode implements Node, Serializable {
         throw new ClassCastException("Cannot cast Node to AbstractNode, node=" + node.getClass());
     }
 
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+        if (dirty && getParentNode() != null) {
+            getParentNode().setDirty(true);
+        }
+    }
 }

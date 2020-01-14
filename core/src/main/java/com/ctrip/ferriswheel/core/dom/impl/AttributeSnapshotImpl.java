@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018-2019 Ctrip.com
+ * Copyright (c) 2018-2020 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,49 +22,37 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom.helper;
+package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.Attribute;
+import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.function.Consumer;
+public class AttributeSnapshotImpl extends AbstractNodeSnapshot implements AttributeSnapshot {
+    private final String name;
+    private final String value;
 
-public class AttributeMap<A extends Attribute> implements Iterable<A> {
-    private LinkedHashMap<String, A> map = new LinkedHashMap<>();
-
-    public int size() {
-        return map.size();
+    public AttributeSnapshotImpl(Attribute attribute, AttributeSnapshot previousSnapshot) {
+        this(attribute.getName(), attribute.getValue(), previousSnapshot);
     }
 
-    public boolean contains(String name) {
-        return map.containsKey(name);
-    }
-
-    public A get(String name) {
-        return map.get(name);
-    }
-
-    public A put(A attr) {
-        return map.put(attr.getName(), attr);
-    }
-
-    public A remove(String name) {
-        return map.remove(name);
+    public AttributeSnapshotImpl(String name, String value, AttributeSnapshot previousSnapshot) {
+        super(previousSnapshot);
+        this.name = name;
+        this.value = value;
     }
 
     @Override
-    public Iterator<A> iterator() {
-        return all().iterator();
+    public String getName() {
+        return name;
     }
 
-    public void forEach(Consumer<? super A> action) {
-        map.values().forEach(action);
+    @Override
+    public String getValue() {
+        return value;
     }
 
-    public Collection<A> all() {
-        return Collections.unmodifiableCollection(map.values());
+    @Override
+    public AttributeSnapshot getPreviousSnapshot() {
+        return (AttributeSnapshot) super.getPreviousSnapshot();
     }
 }

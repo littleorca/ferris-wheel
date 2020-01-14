@@ -22,42 +22,30 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom;
+package com.ctrip.ferriswheel.core.dom.impl;
 
-import java.io.Serializable;
+import com.ctrip.ferriswheel.core.dom.TextNode;
+import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
 
-public interface NodeRevision extends Serializable {
+public class TextNodeSnapshotImpl extends AbstractNodeSnapshot implements TextNodeSnapshot {
+    private final String data;
 
-    String getNodeName();
+    public TextNodeSnapshotImpl(TextNode textNode, TextNodeSnapshot previousSnapshot) {
+        this(textNode.getData(), previousSnapshot);
+    }
 
-    String getTextContent();
+    public TextNodeSnapshotImpl(String data, TextNodeSnapshot previousSnapshot) {
+        super(previousSnapshot);
+        this.data = data;
+    }
 
-    void setTextContent(String textContent);
+    @Override
+    public String getData() {
+        return data;
+    }
 
-    String getNodeValue();
-
-    void setNodeValue(String nodeValue);
-
-    boolean hasChildNodes();
-
-    boolean contains(NodeRevision otherNode);
-
-    int getChildCount();
-
-    NodeRevision getChild(int index);
-
-    NodeRevision getChild(String name);
-
-    NodeRevision firstChild();
-
-    NodeRevision lastChild();
-
-    void insertChild(NodeRevision child, NodeRevision ref);
-
-    void appendChild(NodeRevision child);
-
-    boolean removeChild(NodeRevision child);
-
-    NodeRevision replaceChild(NodeRevision newChild, NodeRevision oldChild);
-
+    @Override
+    public TextNodeSnapshot getPreviousSnapshot() {
+        return (TextNodeSnapshot) super.getPreviousSnapshot();
+    }
 }

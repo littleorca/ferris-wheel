@@ -27,7 +27,6 @@ package com.ctrip.ferriswheel.core.dom.impl;
 import com.ctrip.ferriswheel.core.dom.ContainerNode;
 import com.ctrip.ferriswheel.core.dom.Node;
 import com.ctrip.ferriswheel.core.dom.helper.NodeList;
-import com.ctrip.ferriswheel.core.dom.helper.WithTransaction;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,7 +36,6 @@ import java.util.function.Predicate;
 public abstract class AbstractContainerNode extends AbstractNode implements ContainerNode {
     private NodeList<AbstractNode> children = new NodeList<>();
 
-    @WithTransaction
     @Override
     public void insertChild(Node child, Node ref) {
         if (child.getOwnerDocument() != getOwnerDocument()) {
@@ -51,6 +49,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
 
     protected void applyInsertChild(AbstractNode child, AbstractNode ref) {
         beforeInsertChild(child, ref);
+        setDirty(true);
         doInsertChild(child, ref);
         afterInsertChild(child, ref);
     }
@@ -68,7 +67,6 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         // overridable
     }
 
-    @WithTransaction
     @Override
     public void appendChild(Node child) {
         if (child.getOwnerDocument() != getOwnerDocument()) {
@@ -79,6 +77,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
 
     protected void applyAppendChild(AbstractNode child) {
         beforeAppendChild(child);
+        setDirty(true);
         doAppendChild(child);
         afterAppendChild(child);
     }
@@ -100,7 +99,6 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         child.setParentNode(this);
     }
 
-    @WithTransaction
     @Override
     public boolean removeChild(Node child) {
         if (child.getOwnerDocument() != getOwnerDocument()) {
@@ -116,6 +114,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
 
     protected void applyRemoveChild(AbstractNode child) {
         beforeRemoveChild(child);
+        setDirty(true);
         boolean removed = doRemoveChild(child);
         if (!removed) {
             throw new RuntimeException("Failed to remove child.");
@@ -143,7 +142,6 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         child.setParentNode(null);
     }
 
-    @WithTransaction
     @Override
     public Node replaceChild(Node newChild, Node oldChild) {
         if (newChild.getOwnerDocument() != getOwnerDocument() ||
@@ -254,8 +252,4 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
         children.forEach(action);
     }
 
-//    @Override
-//    public Node cloneNode() {
-//        return null; // TODO FIXME
-//    }
 }

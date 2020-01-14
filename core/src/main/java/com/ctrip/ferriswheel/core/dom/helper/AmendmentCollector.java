@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018-2019 Ctrip.com
+ * Copyright (c) 2018-2020 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,47 +24,31 @@
 
 package com.ctrip.ferriswheel.core.dom.helper;
 
-import com.ctrip.ferriswheel.core.dom.Attribute;
+import com.ctrip.ferriswheel.core.dom.Amendment;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.function.Consumer;
+import java.util.LinkedList;
+import java.util.List;
 
-public class AttributeMap<A extends Attribute> implements Iterable<A> {
-    private LinkedHashMap<String, A> map = new LinkedHashMap<>();
+public class AmendmentCollector {
+    private List<Amendment> amendments = new LinkedList<>();
 
-    public int size() {
-        return map.size();
+    public void add(String pathname) {
+        amendments.add(new AmendmentImpl.AddImpl(pathname));
     }
 
-    public boolean contains(String name) {
-        return map.containsKey(name);
+    public void del(String pathname) {
+        amendments.add(new AmendmentImpl.DelImpl(pathname));
     }
 
-    public A get(String name) {
-        return map.get(name);
+    public void rename(String pathname, String newPathname) {
+        amendments.add(new AmendmentImpl.RenameImpl(pathname, newPathname));
     }
 
-    public A put(A attr) {
-        return map.put(attr.getName(), attr);
+    public void putAttr(String pathname, String attrName, String attrValue) {
+        amendments.add(new AmendmentImpl.PutAttrImpl(pathname, attrName, attrValue));
     }
 
-    public A remove(String name) {
-        return map.remove(name);
-    }
-
-    @Override
-    public Iterator<A> iterator() {
-        return all().iterator();
-    }
-
-    public void forEach(Consumer<? super A> action) {
-        map.values().forEach(action);
-    }
-
-    public Collection<A> all() {
-        return Collections.unmodifiableCollection(map.values());
+    public void delAttr(String pathname, String attrName) {
+        amendments.add(new AmendmentImpl.DelAttrImpl(pathname, attrName));
     }
 }

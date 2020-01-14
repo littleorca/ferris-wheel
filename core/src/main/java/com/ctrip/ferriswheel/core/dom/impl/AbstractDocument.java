@@ -27,6 +27,7 @@ package com.ctrip.ferriswheel.core.dom.impl;
 import com.ctrip.ferriswheel.core.dom.Document;
 import com.ctrip.ferriswheel.core.dom.Element;
 import com.ctrip.ferriswheel.core.dom.Node;
+import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 
 public abstract class AbstractDocument extends AbstractContainerNode implements Document {
     public static final String NODE_NAME = "#document";
@@ -104,4 +105,5 @@ public abstract class AbstractDocument extends AbstractContainerNode implements 
         textNode.initialize(this);
         return textNode;
     }
+
 }

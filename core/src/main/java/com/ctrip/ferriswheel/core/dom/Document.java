@@ -25,6 +25,11 @@
 package com.ctrip.ferriswheel.core.dom;
 
 public interface Document extends ContainerNode {
+    @Override
+    default NodeType getNodeType() {
+        return NodeType.DOCUMENT_NODE;
+    }
+
     Element getDocumentElement();
 
     Element createElement(String tagName);

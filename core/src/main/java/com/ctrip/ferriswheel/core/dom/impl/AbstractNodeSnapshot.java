@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018-2019 Ctrip.com
+ * Copyright (c) 2018-2020 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,49 +22,21 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom.helper;
+package com.ctrip.ferriswheel.core.dom.impl;
 
-import com.ctrip.ferriswheel.core.dom.Attribute;
+import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.function.Consumer;
+import java.lang.ref.WeakReference;
 
-public class AttributeMap<A extends Attribute> implements Iterable<A> {
-    private LinkedHashMap<String, A> map = new LinkedHashMap<>();
+public abstract class AbstractNodeSnapshot implements NodeSnapshot {
+    private final WeakReference<NodeSnapshot> previous;
 
-    public int size() {
-        return map.size();
-    }
-
-    public boolean contains(String name) {
-        return map.containsKey(name);
-    }
-
-    public A get(String name) {
-        return map.get(name);
-    }
-
-    public A put(A attr) {
-        return map.put(attr.getName(), attr);
-    }
-
-    public A remove(String name) {
-        return map.remove(name);
+    AbstractNodeSnapshot(NodeSnapshot previous) {
+        this.previous = new WeakReference<>(previous);
     }
 
     @Override
-    public Iterator<A> iterator() {
-        return all().iterator();
-    }
-
-    public void forEach(Consumer<? super A> action) {
-        map.values().forEach(action);
-    }
-
-    public Collection<A> all() {
-        return Collections.unmodifiableCollection(map.values());
+    public NodeSnapshot getPreviousSnapshot() {
+        return previous.get();
     }
 }

@@ -25,6 +25,11 @@
 package com.ctrip.ferriswheel.core.dom;
 
 public interface TextNode extends Node {
+    @Override
+    default NodeType getNodeType() {
+        return NodeType.TEXT_NODE;
+    }
+
     String getData();
 
     void setData(String data);

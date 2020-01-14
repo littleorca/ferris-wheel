@@ -27,28 +27,25 @@ package com.ctrip.ferriswheel.core.dom.impl;
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.Version;
 import com.ctrip.ferriswheel.common.action.ActionListener;
-import com.ctrip.ferriswheel.core.dom.*;
-import com.ctrip.ferriswheel.core.dom.helper.NodeInvocationHandler;
+import com.ctrip.ferriswheel.core.dom.Element;
+import com.ctrip.ferriswheel.core.dom.WorkbookDocument;
+import com.ctrip.ferriswheel.core.dom.WorkbookElement;
 import com.ctrip.ferriswheel.core.dom.helper.Tag;
 
-import java.lang.reflect.Proxy;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class WorkbookDocumentImpl extends AbstractDocument implements WorkbookDocument {
     private static final Map<String, Class<? extends Element>> TAG_NAMES = new ConcurrentHashMap();
-    private static final Map<Class<? extends Element>, Class<? extends Element>> INTERFACES = new ConcurrentHashMap();
+    private static final Map<Class<? extends Element>, Class<? extends Element>> IMPLEMENTATIONS = new ConcurrentHashMap();
 
     static {
         for (Tag tag : Tag.values()) {
             TAG_NAMES.put(tag.getTagName(), tag.getInterface());
-            INTERFACES.put(tag.getInterface(), tag.getImplementation());
+            IMPLEMENTATIONS.put(tag.getInterface(), tag.getImplementation());
         }
     }
-
-    private Map<Node, Node> wrappers = new WeakHashMap();
 
     @Override
     public WorkbookElement getDocumentElement() {
@@ -66,9 +63,13 @@ public final class WorkbookDocumentImpl extends AbstractDocument implements Work
 
     @Override
     public <E extends Element> E createElement(Class<E> elementInterface) {
-        Class<? extends Element> elementClass = INTERFACES.get(elementInterface);
-        if (!AbstractElement.class.isAssignableFrom(elementClass)) {
-            throw new IllegalArgumentException();
+        Class<? extends Element> elementClass = IMPLEMENTATIONS.get(elementInterface);
+        if (elementClass == null) {
+            throw new IllegalArgumentException("Invalid element interface.");
+        }
+        if (!AbstractElement.class.isAssignableFrom(elementClass) ||
+                !elementInterface.isAssignableFrom(elementClass)) {
+            throw new RuntimeException("Invalid element implementation, probably a bug.");
         }
 
         AbstractElement element;
@@ -78,14 +79,7 @@ public final class WorkbookDocumentImpl extends AbstractDocument implements Work
             throw new RuntimeException(e);
         }
         element.initialize(this);
-        return createProxy(elementInterface, element);
-    }
-
-    private <T extends Node> T createProxy(Class<T> nodeInterface, AbstractNode nodeInstance) {
-        Object proxyInstance = Proxy.newProxyInstance(getClass().getClassLoader(),
-                new Class<?>[]{nodeInterface, NodeWrapper.class},
-                new NodeInvocationHandler<>(nodeInstance));
-        return (T) proxyInstance;
+        return elementInterface.cast(element);
     }
 
     @Override

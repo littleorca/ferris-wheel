@@ -36,6 +36,8 @@ public interface Node {
 
     Node nextSibling();
 
+    NodeType getNodeType();
+
     String getNodeName();
 
     String getTextContent();
@@ -68,6 +70,7 @@ public interface Node {
 
     Node replaceChild(Node newChild, Node oldChild);
 
-//    Node cloneNode();
+    boolean isDirty();
 
+    void setDirty(boolean dirty);
 }

@@ -26,6 +26,8 @@ package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.Attribute;
 
+import java.util.Objects;
+
 public final class AttributeImpl extends AbstractNode implements Attribute {
     private final String name;
     private String value;
@@ -76,8 +78,14 @@ public final class AttributeImpl extends AbstractNode implements Attribute {
 
     @Override
     public void setValue(String value) {
-//        withTransaction(() -> {
-        this.value = value;
-//        });
+        if (!Objects.equals(this.value, value)) {
+            setDirty(true);
+            this.value = value;
+        }
     }
+
+//    // FIXME @Override
+//    AttributeSnapshotImpl snapshot() {
+//        return new AttributeSnapshotImpl(getName(), getValue());
+//    }
 }

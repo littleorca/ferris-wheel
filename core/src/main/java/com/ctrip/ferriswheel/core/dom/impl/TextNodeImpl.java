@@ -26,6 +26,8 @@ package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.TextNode;
 
+import java.util.Objects;
+
 public final class TextNodeImpl extends AbstractNode implements TextNode {
     public static final String TEXT_NODE_NAME = "#text";
     public static final String DEFAULT_TEXT_CONTENT = "";
@@ -48,7 +50,7 @@ public final class TextNodeImpl extends AbstractNode implements TextNode {
 
     @Override
     public void setTextContent(String textContent) {
-        setNodeValue(textContent);
+        setData(textContent);
     }
 
     @Override
@@ -68,6 +70,17 @@ public final class TextNodeImpl extends AbstractNode implements TextNode {
 
     @Override
     public void setData(String data) {
-        this.data = data == null ? DEFAULT_TEXT_CONTENT : data;
+        if (data == null) {
+            data = DEFAULT_TEXT_CONTENT;
+        }
+        if (!Objects.equals(this.data, data)) {
+            setDirty(true);
+            this.data = data;
+        }
     }
+
+//    // FIXME @Override
+//    TextNodeSnapshot snapshot() {
+//        return new TextNodeSnapshotImpl(getData());
+//    }
 }

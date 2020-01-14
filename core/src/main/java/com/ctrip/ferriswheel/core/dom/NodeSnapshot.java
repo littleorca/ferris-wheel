@@ -22,14 +22,10 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom.helper;
+package com.ctrip.ferriswheel.core.dom;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface NodeSnapshot {
+    NodeType getNodeType();
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface WithTransaction {
+    NodeSnapshot getPreviousSnapshot();
 }

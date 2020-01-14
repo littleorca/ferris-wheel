@@ -94,6 +94,8 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
         AttributeImpl attr = getOwnerDocument().createAttribute(name);
         attr.setValue(value);
 //        return withTransaction(() -> {
+        // TODO check if new value equals to old value to skip unnecessary update.
+        setDirty(true);
         Attribute oldAttr = attributes.put(attr);
         String oldValue = oldAttr == null ? null : oldAttr.getValue();
         afterSetAttribute(name, value, oldValue);
@@ -103,8 +105,12 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
 
     @Override
     public String removeAttribute(String name) {
+        if (!hasAttribute(name)) {
+            return null;
+        }
 //        return withTransaction(() -> {
         beforeRemoveAttribute(name);
+        setDirty(true);
         AttributeImpl attr = attributes.remove(name);
         String removedValue = attr == null ? null : attr.getValue();
         afterRemoveAttribute(name, removedValue);
@@ -132,4 +138,15 @@ public abstract class AbstractElement extends AbstractContainerNode implements E
     protected void afterRemoveAttribute(String name, String value) {
         // override this method to hook removeAttribute
     }
+
+//    // FIXME @Override
+//    ElementSnapshot snapshot() {
+//        Collection<AttributeSnapshotImpl> attrs = new ArrayList<>(attributes.size());
+//        for (AttributeImpl attr : attributes) {
+//            attrs.add(attr.snapshot());
+//        }
+//        List<NodeSnapshot> children = new ArrayList<>(getChildCount());
+//        forEachChild(c -> children.add(c.snapshot()));
+//        return new ElementSnapshotImpl(getTagName(), attrs, children);
+//    }
 }
