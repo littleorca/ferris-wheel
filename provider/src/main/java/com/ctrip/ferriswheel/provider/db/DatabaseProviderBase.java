@@ -95,7 +95,7 @@ public abstract class DatabaseProviderBase extends DataProviderSupport implement
                         stmt.setBoolean(i + 1, p.booleanValue());
                         break;
                     case DATE:
-                        stmt.setDate(i + 1, new java.sql.Date(p.dateValue().getTime()));
+                        stmt.setTimestamp(i + 1, new java.sql.Timestamp(p.dateValue().getTime()));
                         break;
                     case STRING:
                         stmt.setString(i + 1, p.strValue());
