@@ -32,6 +32,19 @@ public class DefaultCell extends ValueNode implements Cell {
 
 
     @Override
+    protected void onFormulaReassembled() {
+        DefaultTable table = getRow().getTable();
+        CellAction.SetCellFormula action = new CellAction.SetCellFormula(
+                table.getSheet().getName(),
+                table.getName(),
+                getRowIndex(),
+                getColumnIndex(),
+                getFormulaString());
+        table.publicly(action, () -> {
+        });
+    }
+
+    @Override
     protected void doUpdateValue(Variant newValue) {
         DefaultTable table = getRow().getTable();
         CellAction.RefreshCellValue action = new CellAction.RefreshCellValue(

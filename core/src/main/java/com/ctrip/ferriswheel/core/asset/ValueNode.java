@@ -35,14 +35,17 @@ public class ValueNode extends AssetNode implements VariantNode {
         }
 
         // Maybe we should trace Formula changing and make this simple.
-        String newFormula = FormulaParser.assemble(getFormula(), 0, 0);
-        if (newFormula.equals(getFormulaString())) {
+        Formula newFormula = FormulaParser.reassemble(getFormula(), 0, 0);
+        if (newFormula.getString().equals(getFormulaString())) {
             return;
         }
-        if (data != null) {
-            data.setFormulaString(newFormula);
-        }
-        getFormula().setString(newFormula); // FIXME 1. publish changes, 2. find out why refs invalidated.
+        data.setFormulaString(newFormula.getString());
+        formula = newFormula;
+        onFormulaReassembled();
+    }
+
+    protected void onFormulaReassembled() {
+        // TODO override this method to reveal data change.
     }
 
     @Override

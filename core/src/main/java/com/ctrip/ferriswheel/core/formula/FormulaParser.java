@@ -190,6 +190,40 @@ public class FormulaParser {
         return newFormula.toString();
     }
 
+    public static Formula reassemble(Formula oldFormula,
+                                     int nShiftRows,
+                                     int nShiftCols) {
+        String newFormulaString = assemble(oldFormula, nShiftRows, nShiftCols);
+        Formula newFormula = new Formula(newFormulaString);
+        if (newFormula.getElementCount() != oldFormula.getElementCount()) {
+            throw new RuntimeException("Formula element count not matches, probably a bug!");
+        }
+
+        for (int i = 0; i < newFormula.getElementCount(); i++) {
+            FormulaElement newElement = newFormula.getElement(i);
+            if (!(newElement instanceof ReferenceElement)) {
+                continue;
+            }
+
+            FormulaElement oldElement = oldFormula.getElement(i);
+            if (!newElement.getClass().equals(oldElement.getClass())) {
+                throw new RuntimeException("Formula element not matches, probably a bug.");
+            }
+
+            if (newElement instanceof CellReferenceElement) {
+                ((CellReferenceElement) newElement).setCellReference(((CellReferenceElement) oldElement).getCellReference());
+            } else if (newElement instanceof RangeReferenceElement) {
+                ((RangeReferenceElement) newElement).setRangeReference(((RangeReferenceElement) oldElement).getRangeReference());
+            } else if (newElement instanceof NameReferenceElement) {
+                ((NameReferenceElement) newElement).setNameReference(((NameReferenceElement) oldElement).getNameReference());
+            } else {
+                throw new RuntimeException("Unexpected reference element, probably a bug.");
+            }
+        }
+
+        return newFormula;
+    }
+
     class Listener implements LREventListener {
         @Override
         public void onBegin() {
