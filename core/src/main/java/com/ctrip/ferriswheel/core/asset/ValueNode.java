@@ -34,15 +34,15 @@ public class ValueNode extends AssetNode implements VariantNode {
             return;
         }
 
-        for (FormulaElement fe : formula) {
-            if (fe instanceof CellReferenceElement) {
-                // TODO check reference and formula string
-            } else if (fe instanceof RangeReferenceElement) {
-                // TODO check reference and formula string
-            } else if (fe instanceof NameReferenceElement) {
-                // TODO check reference and formula string
-            }
+        // Maybe we should trace Formula changing and make this simple.
+        String newFormula = FormulaParser.assemble(getFormula(), 0, 0);
+        if (newFormula.equals(getFormulaString())) {
+            return;
         }
+        if (data != null) {
+            data.setFormulaString(newFormula);
+        }
+        getFormula().setString(newFormula); // FIXME 1. publish changes, 2. find out why refs invalidated.
     }
 
     @Override
@@ -163,7 +163,7 @@ public class ValueNode extends AssetNode implements VariantNode {
         if (!ref.isValid()) {
             return;
         }
-        if (getAssetManager().get(ref.getTargetId())==null) {
+        if (getAssetManager().get(ref.getTargetId()) == null) {
             ref.setTargetId(Asset.UNSPECIFIED_ASSET_ID);
         }
     }

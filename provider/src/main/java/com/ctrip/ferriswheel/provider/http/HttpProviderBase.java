@@ -260,7 +260,7 @@ public abstract class HttpProviderBase extends DataProviderSupport implements Da
 
         @Override
         public Map<String, List<String>> getHeaders() {
-            return Collections.unmodifiableMap(headers);
+            return headers == null ? Collections.emptyMap() : Collections.unmodifiableMap(headers);
         }
 
         @Override

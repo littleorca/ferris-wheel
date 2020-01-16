@@ -1,17 +1,31 @@
 package com.ctrip.ferriswheel.core.asset;
 
 import com.ctrip.ferriswheel.common.Environment;
+import com.ctrip.ferriswheel.common.ProviderManager;
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.chart.Chart;
 import com.ctrip.ferriswheel.common.chart.DataSeries;
+import com.ctrip.ferriswheel.common.query.DataProvider;
+import com.ctrip.ferriswheel.common.query.DataQuery;
+import com.ctrip.ferriswheel.common.query.ImmutableQueryResult;
+import com.ctrip.ferriswheel.common.query.QueryResult;
 import com.ctrip.ferriswheel.common.table.Table;
+import com.ctrip.ferriswheel.common.util.DataSetBuilder;
+import com.ctrip.ferriswheel.common.util.StylizedValue;
 import com.ctrip.ferriswheel.common.variant.*;
+import com.ctrip.ferriswheel.common.view.Orientation;
+import com.ctrip.ferriswheel.common.view.Placement;
 import com.ctrip.ferriswheel.core.bean.ChartData;
 import com.ctrip.ferriswheel.core.bean.DefaultEnvironment;
+import com.ctrip.ferriswheel.core.bean.TableAutomatonInfo;
+import com.ctrip.ferriswheel.core.bean.TableData;
+import com.ctrip.ferriswheel.core.loader.DefaultProviderManager;
 import junit.framework.TestCase;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TestDefaultWorkbook extends TestCase {
@@ -19,7 +33,35 @@ public class TestDefaultWorkbook extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        environment = new DefaultEnvironment.Builder().build();
+        ProviderManager pm = new DefaultProviderManager();
+        pm.register(new DataProvider() {
+            @Override
+            public boolean acceptsQuery(DataQuery query) {
+                return "test".equals(query.getScheme());
+            }
+
+            @Override
+            public QueryResult execute(DataQuery query, boolean forceRefresh) throws IOException {
+                DataSetBuilder dsBuilder = DataSetBuilder.withColumnCount(3);
+                dsBuilder.newRecord()
+                        .set(new StylizedValue(Value.dec(11)),
+                                new StylizedValue(Value.dec(12)),
+                                new StylizedValue(Value.dec(13)))
+                        .commit()
+                        .newRecord()
+                        .set(new StylizedValue(Value.dec(21)),
+                                new StylizedValue(Value.dec(22)),
+                                new StylizedValue(Value.dec(23)))
+                        .commit()
+                        .newRecord()
+                        .set(new StylizedValue(Value.dec(31)),
+                                new StylizedValue(Value.dec(32)),
+                                new StylizedValue(Value.dec(33)))
+                        .commit();
+                return new ImmutableQueryResult(ErrorCodes.OK, "OK", null, dsBuilder.build());
+            }
+        });
+        environment = new DefaultEnvironment.Builder().setProviderManager(pm).build();
     }
 
     public void testSimpleCase() {
@@ -537,6 +579,33 @@ public class TestDefaultWorkbook extends TestCase {
 
         assertFalse(t2.getCell(0, 0).getData().isValid());
         assertFalse(t2.getCell(0, 1).getData().isValid());
+    }
+
+    public void testRenameAutomatedTableWithDependency() {
+        DefaultWorkbook workbook = new DefaultWorkbook(environment);
+        DefaultSheet s1 = workbook.addSheet("s1");
+        TableData td = new TableData();
+        td.setName("table1");
+        td.setAutomateConfiguration(new TableAutomatonInfo.QueryAutomatonInfo(
+                new TableAutomatonInfo.QueryTemplateInfo("test", Collections.emptyMap())
+        ));
+        s1.addTable(td);
+        ChartData cd = new ChartData();
+        cd.setName("c1");
+        cd.setTitle(new DynamicValue(null, Value.str("chart 1")));
+        cd.setType("line");
+        cd.setBinder(new ChartData.BinderImpl(new DynamicValue("table1!A:C"),
+                Orientation.HORIZONTAL, Placement.LEFT, Placement.TOP));
+        DefaultChart c1 = s1.addChart(cd);
+        workbook.refresh();
+
+        s1.renameAsset("table1", "t1");
+        workbook.refresh();
+        assertEquals("t1!A:C", c1.getBinder().getData().getFormulaString());
+
+        s1.renameAsset("t1", "t2");
+        workbook.refresh();
+        assertEquals("t2!A:C", c1.getBinder().getData().getFormulaString());
     }
 
     private DefaultWorkbook createWorkbookWithTable33() {
