@@ -28,104 +28,118 @@ package com.ctrip.ferriswheel.core.dom.helper;
 import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
 import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.diff.AttributeDiff;
+import com.ctrip.ferriswheel.core.dom.diff.ElementDiff;
+import com.ctrip.ferriswheel.core.dom.diff.NodeLocation;
 
 import java.util.*;
 
 public class AmendHelper {
-    private AmendmentCollector collector;
-    private final String pathname;
-    private final NodeSnapshot newNode;
-    private final NodeSnapshot oldNode;
 
-    /**
-     * Make amendment by difference between new node and old node. If old node is null, the amendment
-     * contains actions to create refresh new node.
-     *
-     * @param collector
-     * @param pathname  pathname of the starting node, it MUST contains the node's name,
-     *                  and the name property of node object will be ignored.
-     * @param newNode   node that will be create or update to.
-     * @param oldNode   if old node is specified, the amendment means to update old node to new node,
-     *                  otherwise the amendment means to create refresh new node.
-     * @return
-     */
-    public static AmendmentCollector diff(AmendmentCollector collector,
-                                          String pathname,
-                                          NodeSnapshot newNode,
-                                          NodeSnapshot oldNode) {
-        if (collector == null) {
-            collector = new AmendmentCollector();
+    AmendHelper() {
+    }
+
+    public ChangeCollector diff(NodeSnapshot negativeNode,
+                                NodeSnapshot positiveNode) {
+        return diff(null, negativeNode, positiveNode);
+    }
+
+    public ChangeCollector diff(ChangeCollector changeCollector, NodeSnapshot negativeNode, NodeSnapshot positiveNode) {
+        if (changeCollector == null) {
+            changeCollector = new ChangeCollectorImpl();
         }
-        return new AmendHelper(collector, pathname, newNode, oldNode).getCollector();
+
+        DiffContext context = new DiffContext();
+        context.collector = changeCollector;
+        context.negativeIndexer = new TreeIndexer(negativeNode);
+        context.positiveLocation = new NodeLocation(0);
+
+        diffNode(context, negativeNode, positiveNode);
+        return changeCollector;
     }
 
-    private AmendHelper(AmendmentCollector collector,
-                        String pathname,
-                        final NodeSnapshot newNode,
-                        final NodeSnapshot oldNode) {
-        this.collector = collector;
-        this.pathname = pathname;
-        this.newNode = newNode;
-        this.oldNode = oldNode;
-    }
+    void diffNode(DiffContext context, NodeSnapshot negativeNode, NodeSnapshot positiveNode) {
+        if (negativeNode == null && positiveNode == null) {
+            throw new IllegalArgumentException("Negative node and positive node cannot be both null, " +
+                    "this is probably a bug.");
 
-    private AmendmentCollector getCollector() {
-        if (oldNode != null) { // TODO disclaim rename operations. probably a ID map of old tree is needed
-            diffRecursively(pathname, newNode, oldNode);
+        } else if ((negativeNode == null || negativeNode instanceof ElementSnapshot) &&
+                (positiveNode == null || positiveNode instanceof ElementSnapshot)) {
+            diffElement(context, (ElementSnapshot) negativeNode, (ElementSnapshot) positiveNode);
+
+        } else if ((negativeNode == null || negativeNode instanceof TextNodeSnapshot) &&
+                (positiveNode == null || positiveNode instanceof TextNodeSnapshot)) {
+            diffTextNode(context, (TextNodeSnapshot) negativeNode, (TextNodeSnapshot) positiveNode);
+
         } else {
-//            addNewNodeRecursively(pathname, newNode);
+            throw new IllegalArgumentException("Negative node and positive node are not comparable, " +
+                    "this is probably a bug.");
         }
-        return collector;
     }
 
-    private void diffRecursively(String pathname, NodeSnapshot newNode, NodeSnapshot oldNode) {
-        if (newNode instanceof ElementSnapshot) {
-            if (!(oldNode instanceof ElementSnapshot)) {
-                throw new RuntimeException("Node type not match, probably a bug.");
+    void diffElement(DiffContext context, ElementSnapshot negativeElement, ElementSnapshot positiveElement) {
+        if (!(positiveElement instanceof ElementSnapshot)) {
+            throw new RuntimeException("Node type not match, probably a bug.");
+        }
+
+        ElementDiff elementDiff = new ElementDiff();
+        diffAttributes(elementDiff, negativeElement, positiveElement);
+
+        if (negativeElement != null) {
+            elementDiff.setNegativeLocation(context.negativeIndexer.getTreeLocation(negativeElement));
+        }
+        if (positiveElement != null) {
+            elementDiff.setPositiveLocation(context.positiveLocation);
+        }
+
+        diffChildList(context, negativeElement, positiveElement);
+
+        diffChildItems(context, positiveElement);
+    }
+
+    void diffTextNode(DiffContext context, TextNodeSnapshot negativeTextNode, TextNodeSnapshot positiveTextNode) {
+// TODO line diff
+    }
+
+    void diffAttributes(ElementDiff elementDiff, ElementSnapshot negativeElement, ElementSnapshot positiveElement) {
+        Collection<? extends AttributeSnapshot> negativeAttrs = negativeElement == null ?
+                Collections.emptyList() : negativeElement.getAttributes();
+        Collection<? extends AttributeSnapshot> positiveAttrs = positiveElement == null ?
+                Collections.emptyList() : positiveElement.getAttributes();
+        Map<String, String> negativeAttrMap = new HashMap<>(negativeAttrs.size());
+        Map<String, String> positiveAttrMap = new HashMap<>(positiveAttrs.size());
+        positiveAttrs.forEach(a -> positiveAttrMap.put(a.getName(), a.getValue()));
+        negativeAttrs.forEach(a -> negativeAttrMap.put(a.getName(), a.getValue()));
+
+        ArrayList<AttributeDiff> attrDiffList = new ArrayList<>();
+        for (Map.Entry<String, String> negativeEntry : negativeAttrMap.entrySet()) {
+            String positiveValue = positiveAttrMap.get(negativeEntry.getKey());
+            if (!Objects.equals(negativeEntry.getValue(), positiveValue)) {
+                attrDiffList.add(new AttributeDiff(false, negativeEntry.getKey(), negativeEntry.getValue()));
             }
-            Collection<? extends AttributeSnapshot> newAttrs = ((ElementSnapshot) newNode).getAttributes();
-            Collection<? extends AttributeSnapshot> oldAttrs = ((ElementSnapshot) oldNode).getAttributes();
-            Map<String, String> newAttrMap = new HashMap<>(newAttrs.size());
-            Map<String, String> oldAttrMap = new HashMap<>(oldAttrs.size());
-            newAttrs.forEach(a -> newAttrMap.put(a.getName(), a.getValue()));
-            oldAttrs.forEach(a -> oldAttrMap.put(a.getName(), a.getValue()));
-
-            diffAttributes(pathname, newAttrMap, oldAttrMap);
-            diffChildList((ElementSnapshot) oldNode, (ElementSnapshot) newNode);
         }
-    }
-
-    private void diffAttributes(String pathname, Map<String, String> newAttrs,
-                                Map<String, String> oldAttrs) {
-        if (newAttrs == null) {
-            newAttrs = Collections.emptyMap();
-        }
-        if (oldAttrs == null) {
-            oldAttrs = Collections.emptyMap();
-        }
-//        if (!attrIncremental) {
-        Set<String> delAttrs = new HashSet<>(oldAttrs.keySet());
-        delAttrs.removeAll(newAttrs.keySet());
-        for (String attrName : delAttrs) {
-            collector.delAttr(pathname, attrName);
-        }
-//        }
-        for (Map.Entry<String, String> newAttrEntry : newAttrs.entrySet()) {
-            String oldAttr = oldAttrs.get(newAttrEntry.getKey());
-            if (oldAttr == null || !oldAttr.equals(newAttrEntry.getValue())) {
-                collector.putAttr(pathname, newAttrEntry.getKey(), newAttrEntry.getValue());
+        for (Map.Entry<String, String> positiveEntry : positiveAttrMap.entrySet()) {
+            String negativeValue = negativeAttrMap.get(positiveEntry.getKey());
+            if (!Objects.equals(positiveEntry.getValue(), negativeValue)) {
+                attrDiffList.add(new AttributeDiff(true, positiveEntry.getKey(), positiveEntry.getValue()));
             }
         }
+        elementDiff.setAttributes(attrDiffList);
     }
 
-    static List<LDAction> diffChildList(ElementSnapshot nodeA, ElementSnapshot nodeB) {
-        List<? extends NodeSnapshot> childListA = nodeA.getChildren();
-        List<? extends NodeSnapshot> childListB = nodeB.getChildren();
+    void diffChildList(DiffContext context, ElementSnapshot negativeElement, ElementSnapshot positiveElement) {
+        ChangeCollector changeCollector = context.collector;
+        TreeIndexer negativeIndexer = context.negativeIndexer;
+        NodeLocation positiveLocation = context.positiveLocation;
 
-        int[][] matrix = new int[childListA.size() + 1][childListB.size() + 1];
+        List<? extends NodeSnapshot> negativeChildren = negativeElement.getChildren();
+        List<? extends NodeSnapshot> positiveChildren = positiveElement.getChildren();
 
-        for (int i = 0; i <= childListA.size(); i++) {
-            for (int j = 0; j <= childListB.size(); j++) {
+        int[][] matrix = new int[negativeChildren.size() + 1][positiveChildren.size() + 1];
+
+        for (int i = 0; i <= negativeChildren.size(); i++) {
+            for (int j = 0; j <= positiveChildren.size(); j++) {
                 if (i == 0) {
                     matrix[i][j] = j;
                 } else if (j == 0) {
@@ -133,15 +147,16 @@ public class AmendHelper {
                 } else {
                     int min = Math.min(matrix[i - 1][j], matrix[i][j - 1]);
                     min = Math.min(min, matrix[i - 1][j - 1]);
-                    matrix[i][j] = (isSameNode(childListA.get(i - 1), childListB.get(j - 1))) ? min : min + 1;
+                    NodeSnapshot negativeChild = negativeChildren.get(i - 1);
+                    NodeSnapshot positiveChild = positiveChildren.get(j - 1);
+                    matrix[i][j] = isSameNode(negativeChild, positiveChild) ? min : min + 1;
                 }
             }
         }
 
-        int i = childListA.size();
-        int j = childListB.size();
+        int i = negativeChildren.size();
+        int j = positiveChildren.size();
         int current = matrix[i][j];
-        LinkedList<LDAction> ldActions = new LinkedList<>();
 
         while (i > 0 && j > 0) {
             int corner = matrix[i - 1][j - 1];
@@ -149,82 +164,122 @@ public class AmendHelper {
             int left = matrix[i][j - 1];
 
             if (corner <= upper && corner <= left) {
-                if (current != corner) {
-                    ldActions.add(new LDAction(j - 1, true, childListB.get(j - 1)));
-                    ldActions.add(new LDAction(i - 1, false, childListA.get(i - 1)));
-                    current = corner;
-                }
                 i--;
                 j--;
+
+                if (current != corner) {
+                    changeCollector.add(new ElementDiff(null, new NodeLocation(positiveLocation, j)));
+
+                    NodeLocation negativeLocation = negativeIndexer.getTreeLocation(negativeChildren.get(i));
+                    changeCollector.add(new ElementDiff(negativeLocation, null));
+                    current = corner;
+                }
 
             } else if (upper <= left) {
                 i--;
                 if (current != upper) {
-                    ldActions.add(new LDAction(i, false, childListA.get(i)));
+                    NodeLocation negativeLocation = negativeIndexer.getTreeLocation(negativeChildren.get(i));
+                    changeCollector.add(new ElementDiff(negativeLocation, null));
                     current = upper;
                 }
             } else {
                 j--;
                 if (current != left) {
-                    ldActions.add(new LDAction(j, true, childListB.get(j)));
+                    changeCollector.add(new ElementDiff(null, new NodeLocation(positiveLocation, j)));
                     current = left;
                 }
             }
         }
         while (i > 0) {
             i--;
-            ldActions.add(new LDAction(i, false, childListA.get(i)));
+            NodeLocation negativeLocation = negativeIndexer.getTreeLocation(negativeChildren.get(i));
+            changeCollector.add(new ElementDiff(negativeLocation, null));
         }
         while (j > 0) {
             j--;
-            ldActions.add(new LDAction(j, true, childListB.get(j)));
+            changeCollector.add(new ElementDiff(null, new NodeLocation(positiveLocation, j)));
         }
-
-        Collections.reverse(ldActions);
-        return ldActions;
     }
 
-    static boolean isSameNode(NodeSnapshot nodeA, NodeSnapshot nodeB) {
+    boolean isSameNode(NodeSnapshot nodeA, NodeSnapshot nodeB) {
         if (nodeA == nodeB) {
             return true;
         }
-
-        NodeSnapshot temp = nodeA.getPreviousSnapshot();
-        while (temp != null) {
-            if (temp == nodeB) {
-                return true;
-            }
-            temp = temp.getPreviousSnapshot();
-        }
-
-        temp = nodeB.getPreviousSnapshot();
-        while (temp != null) {
-            if (temp == nodeA) {
-                return true;
-            }
-            temp = temp.getPreviousSnapshot();
-        }
-
-        return false;
+        return nodeA.getOriginalSnapshot() == nodeB.getOriginalSnapshot();
     }
 
-    static class LDAction {
-        int index;
-        boolean positive;
-        NodeSnapshot node;
+    private void diffChildItems(DiffContext context, ElementSnapshot element) {
+        List<? extends NodeSnapshot> children = element.getChildren();
+        for (int i = 0; i < children.size(); i++) {
+            NodeSnapshot child = children.get(i);
+            NodeSnapshot negativeChild = context.negativeIndexer.getTreeNode(child);
+            diffNode(context, negativeChild, child);
+        }
+    }
 
-        public LDAction(int index, boolean positive, NodeSnapshot node) {
-            this.index = index;
-            this.positive = positive;
-            this.node = node;
+    static class DiffContext {
+        ChangeCollector collector;
+        TreeIndexer negativeIndexer;
+        NodeLocation positiveLocation;
+    }
+
+    static class TreeIndexer {
+        private NodeSnapshot rootNode;
+        private NodeLocation rootLocation;
+        private Map<NodeSnapshot, NodeSnapshot> originalToTreeNode = new HashMap<>();
+        private Map<NodeSnapshot, NodeLocation> originalToTreeLocation = new HashMap<>();
+
+        TreeIndexer(NodeSnapshot startNode) {
+            this(startNode, new NodeLocation(new int[]{0}));
         }
 
-        @Override
-        public String toString() {
-            String nodeDesc = node instanceof ElementSnapshot ?
-                    ((ElementSnapshot) node).getTagName() :
-                    node.toString();
-            return (positive ? "+" : "-") + "@" + index + "\t" + nodeDesc;
+        TreeIndexer(NodeSnapshot startNode, NodeLocation startLocation) {
+            this.rootNode = startNode;
+            this.rootLocation = startLocation;
+
+            NodeSnapshot originalOfStartNode = startNode.getOriginalSnapshot();
+            originalToTreeNode.put(originalOfStartNode, startNode);
+            originalToTreeLocation.put(originalOfStartNode, startLocation);
+
+            if (!(startNode instanceof ElementSnapshot)) {
+                return;
+            }
+
+            Stack<ElementSnapshot> stack = new Stack<>();
+            stack.push((ElementSnapshot) startNode);
+
+            while (!stack.isEmpty()) {
+                ElementSnapshot parentElem = stack.pop();
+                ElementSnapshot parentOriginal = parentElem.getOriginalSnapshot();
+                NodeLocation parentLocation = originalToTreeLocation.get(parentOriginal);
+
+                List<? extends NodeSnapshot> childList = parentElem.getChildren();
+                for (int i = 0; i < childList.size(); i++) {
+                    NodeSnapshot child = childList.get(i);
+                    NodeSnapshot childOriginal = child.getOriginalSnapshot();
+                    originalToTreeNode.put(childOriginal, child);
+                    originalToTreeLocation.put(childOriginal, new NodeLocation(parentLocation, i));
+                    if (child instanceof ElementSnapshot) {
+                        stack.push((ElementSnapshot) child);
+                    }
+                }
+            }
+        }
+
+        NodeSnapshot getTreeNodeByOriginal(NodeSnapshot original) {
+            return originalToTreeNode.get(original);
+        }
+
+        NodeSnapshot getTreeNode(NodeSnapshot node) {
+            return originalToTreeNode.get(node.getOriginalSnapshot());
+        }
+
+        NodeLocation getTreeLocationByOriginal(NodeSnapshot original) {
+            return originalToTreeLocation.get(original);
+        }
+
+        NodeLocation getTreeLocation(NodeSnapshot node) {
+            return originalToTreeLocation.get(node.getOriginalSnapshot());
         }
     }
 }

@@ -22,26 +22,19 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom;
+package com.ctrip.ferriswheel.core.dom.diff;
 
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.List;
 
-public interface ElementSnapshot extends NodeSnapshot {
-    @Override
-    default NodeType getNodeType() {
-        return NodeType.ELEMENT_NODE;
+public class Patch implements Serializable {
+    private List<Diff> diffList;
+
+    public List<Diff> getDiffList() {
+        return diffList;
     }
 
-    String getTagName();
-
-    Collection<? extends AttributeSnapshot> getAttributes();
-
-    List<? extends NodeSnapshot> getChildren();
-
-    @Override
-    ElementSnapshot getPreviousSnapshot();
-
-    @Override
-    ElementSnapshot getOriginalSnapshot();
+    public void setDiffList(List<Diff> diffList) {
+        this.diffList = diffList;
+    }
 }

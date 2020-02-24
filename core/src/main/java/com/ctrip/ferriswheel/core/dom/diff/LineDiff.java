@@ -22,33 +22,10 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom.helper;
+package com.ctrip.ferriswheel.core.dom.diff;
 
-import com.ctrip.ferriswheel.core.dom.Amendment;
-
-import java.util.LinkedList;
-import java.util.List;
-
-public class AmendmentCollector {
-    private List<Amendment> amendments = new LinkedList<>();
-
-    public void add(String pathname) {
-        amendments.add(new AmendmentImpl.AddImpl(pathname));
-    }
-
-    public void del(String pathname) {
-        amendments.add(new AmendmentImpl.DelImpl(pathname));
-    }
-
-    public void rename(String pathname, String newPathname) {
-        amendments.add(new AmendmentImpl.RenameImpl(pathname, newPathname));
-    }
-
-    public void putAttr(String pathname, String attrName, String attrValue) {
-        amendments.add(new AmendmentImpl.PutAttrImpl(pathname, attrName, attrValue));
-    }
-
-    public void delAttr(String pathname, String attrName) {
-        amendments.add(new AmendmentImpl.DelAttrImpl(pathname, attrName));
-    }
+public class LineDiff {
+    private boolean positive;
+    private int index;
+    private String line;
 }

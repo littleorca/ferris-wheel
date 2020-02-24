@@ -22,26 +22,38 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom;
+package com.ctrip.ferriswheel.core.dom.diff;
 
-import java.util.Collection;
-import java.util.List;
+public class Diff {
+    private NodeLocation negativeLocation;
+    private NodeLocation positiveLocation;
 
-public interface ElementSnapshot extends NodeSnapshot {
-    @Override
-    default NodeType getNodeType() {
-        return NodeType.ELEMENT_NODE;
+    public Diff() {
     }
 
-    String getTagName();
-
-    Collection<? extends AttributeSnapshot> getAttributes();
-
-    List<? extends NodeSnapshot> getChildren();
-
-    @Override
-    ElementSnapshot getPreviousSnapshot();
+    public Diff(NodeLocation negativeLocation, NodeLocation positiveLocation) {
+        this.negativeLocation = negativeLocation;
+        this.positiveLocation = positiveLocation;
+    }
 
     @Override
-    ElementSnapshot getOriginalSnapshot();
+    public String toString() {
+        return "--- " + negativeLocation + "\n+++ " + positiveLocation + "\n";
+    }
+
+    public NodeLocation getNegativeLocation() {
+        return negativeLocation;
+    }
+
+    public void setNegativeLocation(NodeLocation negativeLocation) {
+        this.negativeLocation = negativeLocation;
+    }
+
+    public NodeLocation getPositiveLocation() {
+        return positiveLocation;
+    }
+
+    public void setPositiveLocation(NodeLocation positiveLocation) {
+        this.positiveLocation = positiveLocation;
+    }
 }

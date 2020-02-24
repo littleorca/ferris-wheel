@@ -1,11 +1,34 @@
 package com.ctrip.ferriswheel.core.dom.diff;
 
+import java.util.Collections;
 import java.util.List;
 
-public class ElementDiff {
-    private List<AttributeDiff> attributes;
-    private TextDiff text;
-    private List<ChildDiff> children;
+public class ElementDiff extends Diff {
+    private List<AttributeDiff> attributes = Collections.emptyList();
+
+    public ElementDiff() {
+    }
+
+    public ElementDiff(NodeLocation negative, NodeLocation positive) {
+        super(negative, positive);
+    }
+
+    public ElementDiff(NodeLocation negative, NodeLocation positive, List<AttributeDiff> attributes) {
+        super(negative, positive);
+        this.attributes = attributes;
+    }
+
+    @Override
+    public String toString() {
+        if (attributes == null || attributes.isEmpty())
+            return super.toString();
+
+        StringBuilder sb = new StringBuilder(super.toString());
+        for (AttributeDiff attrDiff : attributes) {
+            sb.append(attrDiff).append("\n");
+        }
+        return sb.toString();
+    }
 
     public List<AttributeDiff> getAttributes() {
         return attributes;
@@ -15,19 +38,4 @@ public class ElementDiff {
         this.attributes = attributes;
     }
 
-    public TextDiff getText() {
-        return text;
-    }
-
-    public void setText(TextDiff text) {
-        this.text = text;
-    }
-
-    public List<ChildDiff> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<ChildDiff> children) {
-        this.children = children;
-    }
 }

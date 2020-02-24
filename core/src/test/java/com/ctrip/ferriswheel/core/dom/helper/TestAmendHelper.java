@@ -1,11 +1,15 @@
 package com.ctrip.ferriswheel.core.dom.helper;
 
 import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
+import com.ctrip.ferriswheel.core.dom.diff.ElementDiff;
+import com.ctrip.ferriswheel.core.dom.diff.NodeLocation;
+import com.ctrip.ferriswheel.core.dom.diff.TextNodeDiff;
 import com.ctrip.ferriswheel.core.dom.impl.ElementSnapshotImpl;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class TestAmendHelper extends TestCase {
@@ -16,171 +20,158 @@ public class TestAmendHelper extends TestCase {
         ElementSnapshot d = createElement("d");
         ElementSnapshot e = createElement("e");
 
-        List<AmendHelper.LDAction> ldActions;
-        AmendHelper.LDAction action;
+        List<ElementDiff> elementDiffList;
+        ElementDiff elementDiff;
 
         // both empty
-        ldActions = runDiffChildList(Collections.emptyList(), Collections.emptyList());
-        assertTrue(ldActions.isEmpty());
+        elementDiffList = runDiffChildList(Collections.emptyList(), Collections.emptyList());
+        assertTrue(elementDiffList.isEmpty());
 
         // empty A
-        ldActions = runDiffChildList(Collections.emptyList(), Arrays.asList(a));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertTrue(action.positive);
-        assertSame(a, action.node);
-        ldActions = runDiffChildList(Collections.emptyList(), Arrays.asList(a, b));
-        assertEquals(2, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertTrue(action.positive);
-        assertSame(a, action.node);
-        action = ldActions.get(1);
-        assertEquals(1, action.index);
-        assertTrue(action.positive);
-        assertSame(b, action.node);
+        elementDiffList = runDiffChildList(Collections.emptyList(), Arrays.asList(a));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(0), elementDiff.getPositiveLocation());
+        elementDiffList = runDiffChildList(Collections.emptyList(), Arrays.asList(a, b));
+        assertEquals(2, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(0), elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertEquals(new NodeLocation(1), elementDiff.getPositiveLocation());
 
         // empty B
-        ldActions = runDiffChildList(Arrays.asList(a), Collections.emptyList());
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertFalse(action.positive);
-        assertSame(a, action.node);
-        ldActions = runDiffChildList(Arrays.asList(a, b), Collections.emptyList());
-        assertEquals(2, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertFalse(action.positive);
-        assertSame(a, action.node);
-        action = ldActions.get(1);
-        assertEquals(1, action.index);
-        assertFalse(action.positive);
-        assertSame(b, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a), Collections.emptyList());
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(0), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiffList = runDiffChildList(Arrays.asList(a, b), Collections.emptyList());
+        assertEquals(2, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(0), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertEquals(new NodeLocation(1), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
 
         // simple replace
-        ldActions = runDiffChildList(Arrays.asList(a), Arrays.asList(b));
-        assertEquals(2, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertFalse(action.positive);
-        assertSame(a, action.node);
-        action = ldActions.get(1);
-        assertEquals(0, action.index);
-        assertTrue(action.positive);
-        assertSame(b, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a), Arrays.asList(b));
+        assertEquals(2, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(0), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(0), elementDiff.getPositiveLocation());
 
         // insert to the first place
-        ldActions = runDiffChildList(Arrays.asList(a, b), Arrays.asList(c, a, b));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertTrue(action.positive);
-        assertSame(c, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b), Arrays.asList(c, a, b));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(0), elementDiff.getPositiveLocation());
 
         // insert to the middle place
-        ldActions = runDiffChildList(Arrays.asList(a, b), Arrays.asList(a, c, b));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(1, action.index);
-        assertTrue(action.positive);
-        assertSame(c, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b), Arrays.asList(a, c, b));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(1), elementDiff.getPositiveLocation());
 
         // insert to the end (append)
-        ldActions = runDiffChildList(Arrays.asList(a, b), Arrays.asList(a, b, c));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(2, action.index);
-        assertTrue(action.positive);
-        assertSame(c, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b), Arrays.asList(a, b, c));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(2), elementDiff.getPositiveLocation());
 
         // remove first element
-        ldActions = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(b, c));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertFalse(action.positive);
-        assertSame(a, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(b, c));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(0), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
 
         // remove middle element
-        ldActions = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, c));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(1, action.index);
-        assertFalse(action.positive);
-        assertSame(b, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, c));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(1), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
 
         // remove last element
-        ldActions = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, b));
-        assertEquals(1, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(2, action.index);
-        assertFalse(action.positive);
-        assertSame(c, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, b));
+        assertEquals(1, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(2), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
 
         // replace first element
-        ldActions = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(d, b, c));
-        assertEquals(2, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(0, action.index);
-        assertFalse(action.positive);
-        assertSame(a, action.node);
-        action = ldActions.get(1);
-        assertEquals(0, action.index);
-        assertTrue(action.positive);
-        assertSame(d, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(d, b, c));
+        assertEquals(2, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(0), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(0), elementDiff.getPositiveLocation());
 
         // replace middle element
-        ldActions = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, d, c));
-        assertEquals(2, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(1, action.index);
-        assertFalse(action.positive);
-        assertSame(b, action.node);
-        action = ldActions.get(1);
-        assertEquals(1, action.index);
-        assertTrue(action.positive);
-        assertSame(d, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, d, c));
+        assertEquals(2, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(1), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(1), elementDiff.getPositiveLocation());
 
         // replace last element
-        ldActions = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, b, d));
-        assertEquals(2, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(2, action.index);
-        assertFalse(action.positive);
-        assertSame(c, action.node);
-        action = ldActions.get(1);
-        assertEquals(2, action.index);
-        assertTrue(action.positive);
-        assertSame(d, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c), Arrays.asList(a, b, d));
+        assertEquals(2, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(2), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(2), elementDiff.getPositiveLocation());
 
         // complex case
-        ldActions = runDiffChildList(Arrays.asList(a, b, c, d), Arrays.asList(a, d, c, e));
-        ldActions.forEach(act -> System.out.println(act.toString()));
-        assertEquals(4, ldActions.size());
-        action = ldActions.get(0);
-        assertEquals(1, action.index);
-        assertFalse(action.positive);
-        assertSame(b, action.node);
-        action = ldActions.get(1);
-        assertEquals(1, action.index);
-        assertTrue(action.positive);
-        assertSame(d, action.node);
-        action = ldActions.get(2);
-        assertEquals(3, action.index);
-        assertFalse(action.positive);
-        assertSame(d, action.node);
-        action = ldActions.get(3);
-        assertEquals(3, action.index);
-        assertTrue(action.positive);
-        assertSame(e, action.node);
+        elementDiffList = runDiffChildList(Arrays.asList(a, b, c, d), Arrays.asList(a, d, c, e));
+        elementDiffList.forEach(act -> System.out.println(act.toString()));
+        assertEquals(4, elementDiffList.size());
+        elementDiff = elementDiffList.get(0);
+        assertEquals(new NodeLocation(1), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(1);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(1), elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(2);
+        assertEquals(new NodeLocation(3), elementDiff.getNegativeLocation());
+        assertNull(elementDiff.getPositiveLocation());
+        elementDiff = elementDiffList.get(3);
+        assertNull(elementDiff.getNegativeLocation());
+        assertEquals(new NodeLocation(3), elementDiff.getPositiveLocation());
     }
 
-    private List<AmendHelper.LDAction> runDiffChildList(List<ElementSnapshot> childListA, List<ElementSnapshot> childListB) {
+    private List<ElementDiff> runDiffChildList(List<ElementSnapshot> childListA, List<ElementSnapshot> childListB) {
         ElementSnapshot nodeA = new ElementSnapshotImpl("row", Collections.emptyList(), childListA, null);
         ElementSnapshot nodeB = new ElementSnapshotImpl("row", Collections.emptyList(), childListB, null);
-        return AmendHelper.diffChildList(nodeA, nodeB);
+
+        FakeChangeCollector changeCollector = new FakeChangeCollector();
+        AmendHelper.TreeIndexer negativeTreeIndexer = new AmendHelper.TreeIndexer(nodeA, new NodeLocation());
+        AmendHelper.DiffContext context = new AmendHelper.DiffContext();
+        context.collector = changeCollector;
+        context.negativeIndexer = negativeTreeIndexer;
+        context.positiveLocation = new NodeLocation();
+
+        new AmendHelper().diffChildList(context, nodeA, nodeB);
+
+        LinkedList<ElementDiff> list = changeCollector.elementDiffList;
+        Collections.reverse(changeCollector.elementDiffList);
+        return list;
     }
 
     public void testIsSameNode() {
@@ -190,13 +181,15 @@ public class TestAmendHelper extends TestCase {
         ElementSnapshot c2 = createElement("c", c);
         ElementSnapshot c3 = createElement("c", c2);
 
-        assertFalse(AmendHelper.isSameNode(a, b));
+        AmendHelper amendHelper = new AmendHelper();
 
-        assertTrue(AmendHelper.isSameNode(c, c));
-        assertTrue(AmendHelper.isSameNode(c, c2));
-        assertTrue(AmendHelper.isSameNode(c2, c));
-        assertTrue(AmendHelper.isSameNode(c, c3));
-        assertTrue(AmendHelper.isSameNode(c3, c));
+        assertFalse(amendHelper.isSameNode(a, b));
+
+        assertTrue(amendHelper.isSameNode(c, c));
+        assertTrue(amendHelper.isSameNode(c, c2));
+        assertTrue(amendHelper.isSameNode(c2, c));
+        assertTrue(amendHelper.isSameNode(c, c3));
+        assertTrue(amendHelper.isSameNode(c3, c));
     }
 
     private ElementSnapshot createElement(String tagName) {
@@ -207,4 +200,17 @@ public class TestAmendHelper extends TestCase {
         return new ElementSnapshotImpl(tagName, Collections.emptyList(), Collections.emptyList(), previous);
     }
 
+    class FakeChangeCollector implements ChangeCollector {
+        LinkedList<ElementDiff> elementDiffList = new LinkedList<>();
+
+        @Override
+        public void add(ElementDiff elementDiff) {
+            elementDiffList.add(elementDiff);
+        }
+
+        @Override
+        public void add(TextNodeDiff textNodeDiff) {
+            throw new RuntimeException();
+        }
+    }
 }

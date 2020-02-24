@@ -28,4 +28,6 @@ public interface NodeSnapshot {
     NodeType getNodeType();
 
     NodeSnapshot getPreviousSnapshot();
+
+    NodeSnapshot getOriginalSnapshot();
 }

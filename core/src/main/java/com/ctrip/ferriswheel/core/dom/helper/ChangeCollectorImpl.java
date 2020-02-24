@@ -22,26 +22,25 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom;
+package com.ctrip.ferriswheel.core.dom.helper;
 
-import java.util.Collection;
+import com.ctrip.ferriswheel.core.dom.diff.ElementDiff;
+import com.ctrip.ferriswheel.core.dom.diff.TextNodeDiff;
+
+import java.util.LinkedList;
 import java.util.List;
 
-public interface ElementSnapshot extends NodeSnapshot {
+public class ChangeCollectorImpl implements ChangeCollector {
+    private List<ElementDiff> elementDiffList = new LinkedList<>();
+    private List<TextNodeDiff> textNodeDiffList = new LinkedList<>();
+
     @Override
-    default NodeType getNodeType() {
-        return NodeType.ELEMENT_NODE;
+    public void add(ElementDiff elementDiff) {
+        elementDiffList.add(elementDiff);
     }
 
-    String getTagName();
-
-    Collection<? extends AttributeSnapshot> getAttributes();
-
-    List<? extends NodeSnapshot> getChildren();
-
     @Override
-    ElementSnapshot getPreviousSnapshot();
-
-    @Override
-    ElementSnapshot getOriginalSnapshot();
+    public void add(TextNodeDiff textNodeDiff) {
+        textNodeDiffList.add(textNodeDiff);
+    }
 }

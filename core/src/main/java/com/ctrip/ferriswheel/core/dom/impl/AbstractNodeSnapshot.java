@@ -39,4 +39,14 @@ public abstract class AbstractNodeSnapshot implements NodeSnapshot {
     public NodeSnapshot getPreviousSnapshot() {
         return previous.get();
     }
+
+    @Override
+    public NodeSnapshot getOriginalSnapshot() {
+        NodeSnapshot originalSnapshot = this;
+        NodeSnapshot temp;
+        while ((temp = originalSnapshot.getPreviousSnapshot()) != null) {
+            originalSnapshot = temp;
+        }
+        return originalSnapshot;
+    }
 }

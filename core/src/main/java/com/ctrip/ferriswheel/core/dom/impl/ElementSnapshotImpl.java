@@ -65,4 +65,9 @@ public class ElementSnapshotImpl extends AbstractNodeSnapshot implements Element
     public ElementSnapshot getPreviousSnapshot() {
         return (ElementSnapshot) super.getPreviousSnapshot();
     }
+
+    @Override
+    public ElementSnapshot getOriginalSnapshot() {
+        return (ElementSnapshot) super.getOriginalSnapshot();
+    }
 }

@@ -5,6 +5,20 @@ public class AttributeDiff {
     private String name;
     private String value;
 
+    public AttributeDiff() {
+    }
+
+    public AttributeDiff(boolean positive, String name, String value) {
+        this.positive = positive;
+        this.name = name;
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return (positive ? "+ " : "- ") + name + "=" + value;
+    }
+
     public boolean isPositive() {
         return positive;
     }
