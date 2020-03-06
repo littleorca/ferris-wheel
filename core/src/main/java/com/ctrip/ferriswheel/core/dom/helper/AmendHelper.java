@@ -34,6 +34,7 @@ import com.ctrip.ferriswheel.core.dom.diff.ElementDiff;
 import com.ctrip.ferriswheel.core.dom.diff.NodeLocation;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class AmendHelper {
 
