@@ -24,7 +24,6 @@
 
 package com.ctrip.ferriswheel.core.util;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -49,7 +48,7 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
                 // black hole
             };
         }
-        return shortestEditScript(negativeSequence,
+        return linearSpaceDiff(negativeSequence,
                 positiveSequence,
                 0, 0,
                 negativeSequence.size(),
@@ -58,59 +57,53 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
                 editScriptConsumer);
     }
 
-    private <T> int shortestEditScript(List<T> negativeSequence,
-                                       List<T> positiveSequence,
-                                       int offX, int offY,
-                                       int n, int m,
-                                       Comparator<T> comparator,
-                                       Consumer<Integer> editScriptConsumer) {
-        if (n < 0 || m < 0) {
-            return 0; // TODO review
+    private <T> int linearSpaceDiff(List<T> negativeSequence,
+                                    List<T> positiveSequence,
+                                    int offX, int offY,
+                                    int n, int m,
+                                    Comparator<T> comparator,
+                                    Consumer<Integer> editScriptConsumer) {
+        if (n < 0 || m < 0 || (n == 0 && m == 0)) {
+            return 0;
         }
 
         int delta = n - m;
         boolean odd = (delta & 0x1) != 0;
-        int d;
         int max = (m + n + 1) / 2;
         int[] vf = new int[2 * max + 1];
         int[] vb = new int[2 * max + 1];
-        vf[max + 1] = 0;
-        vb[max - 1] = n;
 
         int totalDistance = -1;
-        int x = 0, y = 0, u = 0, v = 0, act = 0;
+        int x = 0, y = 0, u = 0, v = 0;
+
+        // System.out.println(String.format("# >>> { %d, %d, %d, %d }, odd=%b", offX, offY, n, m, odd));
 
         // find the middle snake
 
-        for (d = 0; d <= max; d++) {
+        for (int d = 0; d <= max; d++) {
 
             // forward
-            for (int k = -d; k <= d; k += 2) {
-                act = 0;
-
+            for (int k = d; k >= -d; k -= 2) {
                 // find the end of the furthest reaching forward
                 // D-path in diagonal k
-                if (k == -d || (k != d && vf[max + k - 1] < vf[max + k + 1])) {
-                    x = u = vf[max + k + 1];
-                    y = x - (k + 1);
-                    v = x - k;
-                    if (v > 0) {
-                        act = v; // insert
-                    }
-                } else {
+                if (d == 0) {
+                    x = y = u = v = 0;
+
+                } else if (k == d || (k != -d && vf[max + k - 1] >= vf[max + k + 1])) {
                     x = vf[max + k - 1];
                     u = x + 1;
                     y = v = x - (k - 1);
-                    if (u > 0) {
-                        act = -u; // delete
-                    }
+
+                } else {
+                    x = u = vf[max + k + 1];
+                    y = x - (k + 1);
+                    v = x - k;
                 }
-//                y = x - k;
 
                 while (u < n && v < m &&
                         comparator.compare(
                                 negativeSequence.get(offX + u),
-                                positiveSequence.get(offX + v)
+                                positiveSequence.get(offY + v)
                         ) == 0) {
                     u++;
                     v++;
@@ -120,7 +113,7 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
 
                 if (odd && k >= delta - (d - 1) && k <= delta + (d - 1)) {
                     // check if overlaps
-                    if (u == vb[max + k - delta]) {
+                    if (u >= vb[max + k - delta]) {
                         totalDistance = 2 * d - 1;
                         break;
                     }
@@ -133,25 +126,21 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
 
             // backward
             for (int k = d; k >= -d; k -= 2) {
-                act = 0;
-
                 // find the end of the furthest reaching reverse
                 // D-path in diagonal k+delta
-                if (k == d || (k != -d && vb[max + k + 1] < vb[max + k - 1])) {
+                if (d == 0) {
+                    x = u = n;
+                    y = v = m;
+
+                } else if (k == d || (k != -d && vb[max + k - 1] < vb[max + k + 1])) {
                     u = x = vb[max + k - 1];
                     v = u - (k - 1 + delta);
                     y = u - (k + delta);
-                    if (v > 0) {
-                        act = v; // insert
-                    }
 
                 } else {
                     u = vb[max + k + 1];
                     x = u - 1;
-                    v = y = x - (k + 1 + delta);
-                    if (u > 0) {
-                        act = -u; // delete
-                    }
+                    v = y = x - (k + delta);
                 }
 
                 while (x > 0 && y > 0 &&
@@ -167,7 +156,7 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
 
                 if (!odd && k + delta >= -d && k + delta <= d) {
                     // check if overlaps
-                    if (x == vf[max+k + delta]) {
+                    if (x <= vf[max + k + delta]) {
                         totalDistance = 2 * d;
                         break;
                     }
@@ -183,42 +172,39 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
             throw new RuntimeException();
         }
 
+        // System.out.println(String.format("## >|< { %d, %d, %d, %d }, d=%d", x, y, u, v, totalDistance));
+
         // divide and conquer
 
-        if (d > 1) {
-            shortestEditScript(negativeSequence,
+        if (totalDistance > 1) {
+            linearSpaceDiff(negativeSequence,
                     positiveSequence,
-                    offX, offY, x - offX, y - offY,
-                    comparator,
-                    editScriptConsumer);
-            if (act != 0) { // always be true?
-                editScriptConsumer.accept(act);
-            }
-            shortestEditScript(negativeSequence,
-                    positiveSequence,
-                    u, v,
-                    n - (u - offX), m - (v - offY),
+                    offX, offY, x, y,
                     comparator,
                     editScriptConsumer);
 
-        } else if (m > n) {
-            if (act != 0) {
-                editScriptConsumer.accept(act);
+            if (u - x > v - y) {
+                editScriptConsumer.accept(odd ? -(offX + x + 1) : -(offX + u));
+            } else {
+                editScriptConsumer.accept(odd ? offY + y + 1 : offY + v);
             }
-        } else {
-            if (act != 0) {
-                editScriptConsumer.accept(act);
+
+            linearSpaceDiff(negativeSequence,
+                    positiveSequence,
+                    offX + u, offY + v,
+                    n - u, m - v,
+                    comparator,
+                    editScriptConsumer);
+
+        } else if (totalDistance > 0) {
+            if (m > n) {
+                editScriptConsumer.accept(offY + y + 1);
+            } else {
+                editScriptConsumer.accept(-(offX + x + 1));
             }
         }
 
         return totalDistance;
     }
 
-    public static void main(String[] args) {
-        MyersDifferenceAnalyzer analyzer = new MyersDifferenceAnalyzer();
-        int d = analyzer.analyze(Arrays.asList("a","b"),
-                Arrays.asList(),
-                null, System.out::println);
-        System.out.println("distance=" + d);
-    }
 }
