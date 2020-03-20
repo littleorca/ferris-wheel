@@ -22,29 +22,10 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom;
+package com.ctrip.ferriswheel.core.util;
 
-import java.util.Collection;
-import java.util.List;
+public interface Sequence<T> {
+    int size();
 
-public interface ElementSnapshot extends NodeSnapshot {
-    @Override
-    default NodeType getNodeType() {
-        return NodeType.ELEMENT_NODE;
-    }
-
-    String getTagName();
-
-    Collection<AttributeSnapshot> getAttributes();
-
-    List<NodeSnapshot> getChildren();
-
-    @Override
-    ElementSnapshot getPreviousSnapshot();
-
-    @Override
-    ElementSnapshot getOriginalSnapshot();
-
-    @Override
-    ElementSnapshot duplicate(boolean linked);
+    T get(int index);
 }

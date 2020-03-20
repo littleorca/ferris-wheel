@@ -30,4 +30,6 @@ public interface NodeSnapshot {
     NodeSnapshot getPreviousSnapshot();
 
     NodeSnapshot getOriginalSnapshot();
+
+    NodeSnapshot duplicate(boolean linked);
 }

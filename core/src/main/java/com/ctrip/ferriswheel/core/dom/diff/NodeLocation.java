@@ -24,13 +24,18 @@
 
 package com.ctrip.ferriswheel.core.dom.diff;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
-public final class NodeLocation {
+public final class NodeLocation implements Comparable<NodeLocation>, Iterable<Integer> {
+    private static final NodeLocation SHARED_EMPTY_LOCATION = new NodeLocation();
+
     private final int[] indices;
+    private transient int hash;
     private transient String descriptor;
+
+    public static NodeLocation empty() {
+        return SHARED_EMPTY_LOCATION;
+    }
 
     public NodeLocation() {
         this.indices = new int[0];
@@ -76,16 +81,15 @@ public final class NodeLocation {
         return indices[level];
     }
 
+    public Integer leafIndex() {
+        if (indices.length < 1) {
+            throw new IllegalStateException("Location is empty.");
+        }
+        return indices[indices.length - 1];
+    }
+
     public boolean contains(NodeLocation another) {
-        if (another.getDepth() <= this.getDepth()) {
-            return false;
-        }
-        for (int i = 0; i < this.getDepth(); i++) {
-            if (this.indices[i] != another.indices[i]) {
-                return false;
-            }
-        }
-        return true;
+        return isAncestorOf(another);
     }
 
     public NodeLocation getParent() {
@@ -93,6 +97,41 @@ public final class NodeLocation {
             return null;
         }
         return new NodeLocation(indices, 0, indices.length - 1);
+    }
+
+    public boolean isAncestorOf(NodeLocation another) {
+        return another.getDepth() > getDepth() &&
+                partialCompareTo(another, 0, getDepth()) == 0;
+    }
+
+    public boolean isParentOf(NodeLocation another) {
+        return another.getDepth() == getDepth() + 1 &&
+                partialCompareTo(another, 0, getDepth()) == 0;
+    }
+
+    public boolean isSibling(NodeLocation another) {
+        return partialCompareTo(another, 0, getDepth() - 1) == 0;
+    }
+
+    public boolean isDescendantOf(NodeLocation another) {
+        return another.isAncestorOf(this);
+    }
+
+    private int partialCompareTo(NodeLocation another, int from, int to) {
+        if (from > to) {
+            throw new IllegalArgumentException();
+        }
+        if (from >= getDepth() || from >= another.getDepth() || to < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        for (int i = from; i < to; i++) {
+            if (getIndexOfLevel(i) > another.getIndexOfLevel(i)) {
+                return 1;
+            } else if (getIndexOfLevel(i) < another.getIndexOfLevel(i)) {
+                return -1;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -105,7 +144,10 @@ public final class NodeLocation {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(indices);
+        if (hash == 0 && indices.length > 0) {
+            hash = Arrays.hashCode(indices);
+        }
+        return hash;
     }
 
     @Override
@@ -121,6 +163,48 @@ public final class NodeLocation {
             descriptor = sb.substring(1);
         }
         return descriptor;
+    }
+
+    @Override
+    public int compareTo(NodeLocation o) {
+        int pos = 0;
+        for (int index : this) {
+            if (pos >= o.indices.length) {
+                return 1;
+            }
+            int anotherIndex = o.indices[pos++];
+            if (index != anotherIndex) {
+                return index > anotherIndex ? 1 : -1;
+            }
+        }
+        if (pos < o.indices.length) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new ReadOnlyIterator();
+    }
+
+
+    final class ReadOnlyIterator implements Iterator<Integer> {
+        private int pos = 0;
+
+        @Override
+        public boolean hasNext() {
+            return pos < indices.length;
+        }
+
+        @Override
+        public Integer next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return indices[pos++];
+        }
     }
 
     public static class Builder {

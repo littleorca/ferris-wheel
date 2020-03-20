@@ -55,4 +55,15 @@ public class AttributeSnapshotImpl extends AbstractNodeSnapshot implements Attri
     public AttributeSnapshot getPreviousSnapshot() {
         return (AttributeSnapshot) super.getPreviousSnapshot();
     }
+
+    @Override
+    public AttributeSnapshotImpl duplicate(boolean linked) {
+        return new AttributeSnapshotImpl(name, value, linked ? this : null);
+    }
+
+    @Override
+    protected String toSingleLineString() {
+        return name + "=" + value.replaceAll("\\r", "\\\\r")
+                .replaceAll("\\n", "\\\\n");
+    }
 }

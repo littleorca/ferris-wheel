@@ -24,36 +24,68 @@
 
 package com.ctrip.ferriswheel.core.dom.diff;
 
-public class Diff {
-    private NodeLocation negativeLocation;
-    private NodeLocation positiveLocation;
+import java.util.Objects;
 
-    public Diff() {
-    }
+public class Diff {
+    private final NodeLocation negativeLocation;
+    private final NodeLocation positiveLocation;
 
     public Diff(NodeLocation negativeLocation, NodeLocation positiveLocation) {
         this.negativeLocation = negativeLocation;
         this.positiveLocation = positiveLocation;
     }
 
+    public boolean isDelete() {
+        return negativeLocation != null && positiveLocation == null;
+    }
+
+    public boolean isInsert() {
+        return negativeLocation == null && positiveLocation != null;
+    }
+
+    public boolean isUpdate() {
+        return negativeLocation != null && positiveLocation != null;
+    }
+
+    public boolean hasContent() {
+        return false;
+    }
+
+    public void merge(Diff another) {
+        if (!this.equals(another)) {
+            throw new IllegalArgumentException("Merge operation only purposed for same locations.");
+        }
+        doMerge(another);
+    }
+
+    protected void doMerge(Diff another) {
+        // override this to do merge
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Diff)) return false;
+        Diff diff = (Diff) o;
+        return Objects.equals(getNegativeLocation(), diff.getNegativeLocation()) &&
+                Objects.equals(getPositiveLocation(), diff.getPositiveLocation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNegativeLocation(), getPositiveLocation());
+    }
+
     @Override
     public String toString() {
-        return "--- " + negativeLocation + "\n+++ " + positiveLocation + "\n";
+        return negativeLocation + " -> " + positiveLocation;
     }
 
     public NodeLocation getNegativeLocation() {
         return negativeLocation;
     }
 
-    public void setNegativeLocation(NodeLocation negativeLocation) {
-        this.negativeLocation = negativeLocation;
-    }
-
     public NodeLocation getPositiveLocation() {
         return positiveLocation;
-    }
-
-    public void setPositiveLocation(NodeLocation positiveLocation) {
-        this.positiveLocation = positiveLocation;
     }
 }

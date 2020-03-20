@@ -25,7 +25,6 @@
 package com.ctrip.ferriswheel.core.util;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -36,8 +35,8 @@ import java.util.function.Consumer;
 public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
 
     @Override
-    public <T> int analyze(List<T> negativeSequence,
-                           List<T> positiveSequence,
+    public <T> int analyze(Sequence<T> negativeSequence,
+                           Sequence<T> positiveSequence,
                            Comparator<T> comparator,
                            Consumer<Integer> editScriptConsumer) {
         if (comparator == null) {
@@ -57,8 +56,8 @@ public class MyersDifferenceAnalyzer implements SequenceDifferenceAnalyzer {
                 editScriptConsumer);
     }
 
-    private <T> int linearSpaceDiff(List<T> negativeSequence,
-                                    List<T> positiveSequence,
+    private <T> int linearSpaceDiff(Sequence<T> negativeSequence,
+                                    Sequence<T> positiveSequence,
                                     int offX, int offY,
                                     int n, int m,
                                     Comparator<T> comparator,

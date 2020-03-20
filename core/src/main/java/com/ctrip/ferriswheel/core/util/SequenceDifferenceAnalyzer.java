@@ -25,7 +25,6 @@
 package com.ctrip.ferriswheel.core.util;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Consumer;
 
 public interface SequenceDifferenceAnalyzer {
@@ -59,8 +58,8 @@ public interface SequenceDifferenceAnalyzer {
      * @param <T>
      * @return The shortest edit distance.
      */
-    <T> int analyze(List<T> negativeSequence,
-                    List<T> positiveSequence,
+    <T> int analyze(Sequence<T> negativeSequence,
+                    Sequence<T> positiveSequence,
                     Comparator<T> comparator,
                     Consumer<Integer> editScriptConsumer);
 

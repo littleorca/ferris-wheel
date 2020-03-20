@@ -24,15 +24,10 @@
 
 package com.ctrip.ferriswheel.core.dom.impl;
 
-import com.ctrip.ferriswheel.core.dom.TextNode;
 import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
 
 public class TextNodeSnapshotImpl extends AbstractNodeSnapshot implements TextNodeSnapshot {
     private final String data;
-
-    public TextNodeSnapshotImpl(TextNode textNode, TextNodeSnapshot previousSnapshot) {
-        this(textNode.getData(), previousSnapshot);
-    }
 
     public TextNodeSnapshotImpl(String data, TextNodeSnapshot previousSnapshot) {
         super(previousSnapshot);
@@ -47,5 +42,52 @@ public class TextNodeSnapshotImpl extends AbstractNodeSnapshot implements TextNo
     @Override
     public TextNodeSnapshot getPreviousSnapshot() {
         return (TextNodeSnapshot) super.getPreviousSnapshot();
+    }
+
+    @Override
+    public TextNodeSnapshotImpl duplicate(boolean linked) {
+        return new TextNodeSnapshotImpl(data, linked ? this : null);
+    }
+
+    @Override
+    protected String toSingleLineString() {
+        return data == null ? "" : data.replaceAll("\\r", "\\\\r")
+                .replaceAll("\\n", "\\\\n");
+    }
+
+    public static class Builder extends AbstractNodeSnapshot.Builder {
+        private String data;
+
+        public Builder setData(String data) {
+            if (this.data != data) {
+                this.data = data;
+                markDirty();
+            }
+            return this;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public Builder setPreviousNode(TextNodeSnapshot previousNode) {
+            return (Builder) super.setPreviousNode(previousNode);
+        }
+
+        public TextNodeSnapshot getPreviousNode() {
+            return (TextNodeSnapshot) super.getPreviousNode();
+        }
+
+        @Override
+        public TextNodeSnapshot build() {
+            if (!isDirty() && getLatestBuild() != null) {
+                return (TextNodeSnapshot) getLatestBuild();
+            }
+            TextNodeSnapshotImpl node = new TextNodeSnapshotImpl(data, getPreviousNode());
+            setPreviousNode(null);
+            setLatestBuild(node);
+            setDirty(false);
+            return node;
+        }
     }
 }

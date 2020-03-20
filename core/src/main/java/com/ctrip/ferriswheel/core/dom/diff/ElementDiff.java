@@ -1,41 +1,80 @@
 package com.ctrip.ferriswheel.core.dom.diff;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 public class ElementDiff extends Diff {
-    private List<AttributeDiff> attributes = Collections.emptyList();
-
-    public ElementDiff() {
-    }
+    private Map<String, String> negativeAttributes;
+    private Map<String, String> positiveAttributes;
 
     public ElementDiff(NodeLocation negative, NodeLocation positive) {
         super(negative, positive);
     }
 
-    public ElementDiff(NodeLocation negative, NodeLocation positive, List<AttributeDiff> attributes) {
+    public ElementDiff(NodeLocation negative, NodeLocation positive, Map<String, String> negativeAttributes, Map<String, String> positiveAttributes) {
         super(negative, positive);
-        this.attributes = attributes;
+        this.negativeAttributes = negativeAttributes;
+        this.positiveAttributes = positiveAttributes;
+    }
+
+    @Override
+    public boolean hasContent() {
+        return hasAttributeChanges();
+    }
+
+    @Override
+    protected void doMerge(Diff another) {
+        if (!(another instanceof ElementDiff)) {
+            throw new IllegalArgumentException("Cannot merge between different classes.");
+        }
+        ElementDiff anotherElementDiff = (ElementDiff) another;
+        if (hasAttributeChanges()) {
+            if (anotherElementDiff.hasAttributeChanges()) {
+                throw new RuntimeException("Cannot merge attribute changes, this is probably a bug!");
+            }
+        } else if (anotherElementDiff.hasAttributeChanges()) {
+            setNegativeAttributes(anotherElementDiff.negativeAttributes);
+            setPositiveAttributes(anotherElementDiff.positiveAttributes);
+        }
+    }
+
+    public boolean hasAttributeChanges() {
+        return (negativeAttributes != null && !negativeAttributes.isEmpty()) ||
+                (positiveAttributes != null && !positiveAttributes.isEmpty());
     }
 
     @Override
     public String toString() {
-        if (attributes == null || attributes.isEmpty())
-            return super.toString();
-
-        StringBuilder sb = new StringBuilder(super.toString());
-        for (AttributeDiff attrDiff : attributes) {
-            sb.append(attrDiff).append("\n");
+        StringBuilder sb = new StringBuilder("# ").append(super.toString()).append("\n");
+        if (negativeAttributes != null) {
+            for (Map.Entry<String, String> negativeEntry : negativeAttributes.entrySet()) {
+                sb.append("  - ").append(negativeEntry.getKey())
+                        .append("=").append(negativeEntry.getValue())
+                        .append("\n");
+            }
+        }
+        if (positiveAttributes != null) {
+            for (Map.Entry<String, String> positiveEntry : positiveAttributes.entrySet()) {
+                sb.append("  + ").append(positiveEntry.getKey())
+                        .append("=").append(positiveEntry.getValue())
+                        .append("\n");
+            }
         }
         return sb.toString();
     }
 
-    public List<AttributeDiff> getAttributes() {
-        return attributes;
+    public Map<String, String> getNegativeAttributes() {
+        return negativeAttributes;
     }
 
-    public void setAttributes(List<AttributeDiff> attributes) {
-        this.attributes = attributes;
+    public void setNegativeAttributes(Map<String, String> negativeAttributes) {
+        this.negativeAttributes = negativeAttributes;
     }
 
+    public Map<String, String> getPositiveAttributes() {
+        return positiveAttributes;
+    }
+
+    public void setPositiveAttributes(Map<String, String> positiveAttributes) {
+        this.positiveAttributes = positiveAttributes;
+    }
 }

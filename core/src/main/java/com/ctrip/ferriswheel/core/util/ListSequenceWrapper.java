@@ -22,13 +22,36 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom.helper;
+package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.dom.diff.ElementDiff;
-import com.ctrip.ferriswheel.core.dom.diff.TextNodeDiff;
+import java.util.List;
 
-public interface ChangeCollector {
-    void add(ElementDiff elementDiff);
+public final class ListSequenceWrapper<T> implements Sequence<T> {
+    private List<T> delegate;
 
-    void add(TextNodeDiff textNodeDiff);
+    public ListSequenceWrapper(List<T> delegate) {
+        if (delegate == null) {
+            throw new NullPointerException();
+        }
+        this.delegate = delegate;
+    }
+
+    public List<T> wrap(List<T> delegate) {
+        if (delegate == null) {
+            throw new NullPointerException();
+        }
+        List<T> old = this.delegate;
+        this.delegate = delegate;
+        return old;
+    }
+
+    @Override
+    public int size() {
+        return delegate.size();
+    }
+
+    @Override
+    public T get(int index) {
+        return delegate.get(index);
+    }
 }

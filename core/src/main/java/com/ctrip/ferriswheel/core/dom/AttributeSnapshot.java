@@ -33,4 +33,7 @@ public interface AttributeSnapshot extends NodeSnapshot {
     String getName();
 
     String getValue();
+
+    @Override
+    AttributeSnapshot duplicate(boolean linked);
 }

@@ -31,4 +31,7 @@ public interface TextNodeSnapshot extends NodeSnapshot {
     }
 
     String getData();
+
+    @Override
+    TextNodeSnapshot duplicate(boolean linked);
 }

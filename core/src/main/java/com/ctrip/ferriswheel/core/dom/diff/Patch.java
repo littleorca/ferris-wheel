@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Patch implements Serializable {
+    // TODO add other meta information.
     private List<Diff> diffList;
 
     public List<Diff> getDiffList() {
@@ -36,5 +37,14 @@ public class Patch implements Serializable {
 
     public void setDiffList(List<Diff> diffList) {
         this.diffList = diffList;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Diff diff : diffList) {
+            sb.append(diff).append("\n");
+        }
+        return sb.toString();
     }
 }

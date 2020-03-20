@@ -24,14 +24,11 @@
 
 package com.ctrip.ferriswheel.core.dom.helper;
 
-import com.ctrip.ferriswheel.core.dom.*;
-import com.ctrip.ferriswheel.core.dom.impl.AttributeSnapshotImpl;
-import com.ctrip.ferriswheel.core.dom.impl.ElementSnapshotImpl;
-import com.ctrip.ferriswheel.core.dom.impl.TextNodeSnapshotImpl;
+import com.ctrip.ferriswheel.core.dom.Attribute;
+import com.ctrip.ferriswheel.core.dom.Element;
+import com.ctrip.ferriswheel.core.dom.Node;
+import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Stack;
 
 public class SnapshotHelper {
@@ -68,34 +65,7 @@ public class SnapshotHelper {
 
     private static NodeSnapshot snapshotSingleNode(Node n, NodeSnapshotMapper mapper) {
         NodeSnapshot previousSnapshot = mapper.map(n);
-        NodeSnapshot newSnapshot;
-        if (n instanceof Attribute) {
-            newSnapshot = new AttributeSnapshotImpl((Attribute) n, (AttributeSnapshot) previousSnapshot);
-
-        } else if (n instanceof TextNode) {
-            newSnapshot = new TextNodeSnapshotImpl((TextNode) n, (TextNodeSnapshot) previousSnapshot);
-
-        } else if (n instanceof Element) {
-            Collection<? extends Attribute> attrs = ((Element) n).getAttributes();
-            List<AttributeSnapshot> attrSnapshots = new ArrayList<>(attrs.size());
-            for (Attribute attr : attrs) {
-                attrSnapshots.add((AttributeSnapshot) mapper.map(attr));
-            }
-
-            List<NodeSnapshot> childSnapshots = new ArrayList<>(n.getChildCount());
-            for (int i = 0; i < n.getChildCount(); i++) {
-                childSnapshots.add(mapper.map(n.getChild(i)));
-            }
-
-            newSnapshot = new ElementSnapshotImpl(((Element) n).getTagName(),
-                    attrSnapshots,
-                    childSnapshots,
-                    (ElementSnapshot) previousSnapshot);
-
-        } else {
-            throw new RuntimeException("Unsupported node: " + n + ", probably a bug.");
-        }
-
+        NodeSnapshot newSnapshot = previousSnapshot.duplicate(true);
         mapper.map(n, newSnapshot);
         return newSnapshot;
     }

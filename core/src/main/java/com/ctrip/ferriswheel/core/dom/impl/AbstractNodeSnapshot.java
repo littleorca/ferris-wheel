@@ -49,4 +49,68 @@ public abstract class AbstractNodeSnapshot implements NodeSnapshot {
         }
         return originalSnapshot;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        buildStringDescriptor(sb, "");
+        return sb.toString();
+    }
+
+    protected void buildStringDescriptor(StringBuilder sb, String linePrefix) {
+        sb.append(linePrefix).append(toSingleLineString()).append("\n");
+    }
+
+    protected String toSingleLineString() {
+        return String.valueOf(getNodeType());
+    }
+
+    public static abstract class Builder {
+        private Builder parent;
+        private NodeSnapshot previousNode;
+        private NodeSnapshot latestBuild;
+        private boolean dirty = false;
+
+        public Builder getParent() {
+            return parent;
+        }
+
+        protected void setParent(Builder parent) {
+            this.parent = parent;
+        }
+
+        public Builder setPreviousNode(NodeSnapshot previousNode) {
+            if (this.previousNode != previousNode) {
+                markDirty();
+            }
+            this.previousNode = previousNode;
+            return this;
+        }
+
+        public NodeSnapshot getPreviousNode() {
+            return previousNode;
+        }
+
+        public NodeSnapshot getLatestBuild() {
+            return latestBuild;
+        }
+
+        protected void setLatestBuild(NodeSnapshot latestBuild) {
+            this.latestBuild = latestBuild;
+        }
+
+        public boolean isDirty() {
+            return dirty;
+        }
+
+        protected void setDirty(boolean dirty) {
+            this.dirty = dirty;
+        }
+
+        protected void markDirty() {
+            setDirty(true);
+        }
+
+        public abstract NodeSnapshot build();
+    }
 }

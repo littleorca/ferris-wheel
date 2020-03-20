@@ -25,7 +25,27 @@
 package com.ctrip.ferriswheel.core.dom.diff;
 
 public class LineDiff {
-    private boolean positive;
-    private int index;
-    private String line;
+    private int op;
+    private String content;
+
+    public LineDiff(int op, String content) {
+        this.op = op;
+        this.content = content;
+    }
+
+    public int getOp() {
+        return op;
+    }
+
+    public void setOp(int op) {
+        this.op = op;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

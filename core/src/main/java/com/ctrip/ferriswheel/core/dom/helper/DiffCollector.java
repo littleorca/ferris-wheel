@@ -24,23 +24,13 @@
 
 package com.ctrip.ferriswheel.core.dom.helper;
 
-import com.ctrip.ferriswheel.core.dom.diff.ElementDiff;
-import com.ctrip.ferriswheel.core.dom.diff.TextNodeDiff;
+import com.ctrip.ferriswheel.core.dom.diff.Diff;
+import com.ctrip.ferriswheel.core.dom.diff.Patch;
 
-import java.util.LinkedList;
-import java.util.List;
+public interface DiffCollector {
+    void add(Diff diff);
 
-public class ChangeCollectorImpl implements ChangeCollector {
-    private List<ElementDiff> elementDiffList = new LinkedList<>();
-    private List<TextNodeDiff> textNodeDiffList = new LinkedList<>();
+    Patch toPatch();
 
-    @Override
-    public void add(ElementDiff elementDiff) {
-        elementDiffList.add(elementDiff);
-    }
-
-    @Override
-    public void add(TextNodeDiff textNodeDiff) {
-        textNodeDiffList.add(textNodeDiff);
-    }
+    void clear();
 }
