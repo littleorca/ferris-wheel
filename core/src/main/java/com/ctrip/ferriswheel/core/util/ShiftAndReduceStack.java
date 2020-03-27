@@ -22,41 +22,61 @@
  * SOFTWARE.
  */
 
-package com.ctrip.ferriswheel.core.dom.impl;
+package com.ctrip.ferriswheel.core.util;
 
-import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
+import java.util.Stack;
 
-public class TextNodeSnapshotImpl extends AbstractNodeSnapshot implements TextNodeSnapshot {
-    private final String data;
+public abstract class ShiftAndReduceStack<T> {
+    private Stack<T> stack = new Stack<>();
 
-    public TextNodeSnapshotImpl(String data, TextNodeSnapshot previousSnapshot) {
-        super(previousSnapshot);
-        this.data = data;
+    /**
+     * Feed new input and try to shift or reduce the input item.
+     *
+     * @param input
+     */
+    public void feed(T input) {
+        while (tryReduce(input)) ;
+        if (!isTerminator(input)) {
+            shift(input);
+        }
     }
 
-    @Override
-    public String getData() {
-        return data;
+    public void terminate() {
+        feed(null);
     }
 
-    @Override
-    public TextNodeSnapshot getPreviousSnapshot() {
-        return (TextNodeSnapshot) super.getPreviousSnapshot();
+    protected boolean isTerminator(T input) {
+        return input == null;
     }
 
-    @Override
-    public TextNodeSnapshot getOriginalSnapshot() {
-        return (TextNodeSnapshot) super.getOriginalSnapshot();
+    protected void shift(T inputElement) {
+        stack.push(inputElement);
     }
 
-    @Override
-    public TextNodeSnapshotImpl duplicate(boolean linked) {
-        return new TextNodeSnapshotImpl(data, linked ? this : null);
+    /**
+     * Reduce items on top of the stack with out shift the input to the stack.
+     * If no reduce can be done at the moment, false value will be returned,
+     * otherwise the return value is true.
+     *
+     * @param input
+     * @return
+     */
+    protected abstract boolean tryReduce(T input);
+
+    public T push(T item) {
+        return stack.push(item);
     }
 
-    @Override
-    protected String toSingleLineString() {
-        return data == null ? "" : data.replaceAll("\\r", "\\\\r")
-                .replaceAll("\\n", "\\\\n");
+    public T pop() {
+        return stack.pop();
     }
+
+    public T peek() {
+        return stack.peek();
+    }
+
+    public boolean isEmpty() {
+        return stack.isEmpty();
+    }
+
 }

@@ -1,17 +1,20 @@
 package com.ctrip.ferriswheel.core.dom.diff;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class ElementDiff extends Diff {
+    private String tagName;
     private Map<String, String> negativeAttributes;
     private Map<String, String> positiveAttributes;
 
-    public ElementDiff(NodeLocation negative, NodeLocation positive) {
-        super(negative, positive);
+    public ElementDiff(String tagName, NodeLocation negative, NodeLocation positive) {
+        this(tagName, negative, positive, null, null);
     }
 
-    public ElementDiff(NodeLocation negative, NodeLocation positive, Map<String, String> negativeAttributes, Map<String, String> positiveAttributes) {
+    public ElementDiff(String tagName, NodeLocation negative, NodeLocation positive, Map<String, String> negativeAttributes, Map<String, String> positiveAttributes) {
         super(negative, positive);
+        this.tagName = tagName;
         this.negativeAttributes = negativeAttributes;
         this.positiveAttributes = positiveAttributes;
     }
@@ -62,8 +65,16 @@ public class ElementDiff extends Diff {
         return sb.toString();
     }
 
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
+    }
+
     public Map<String, String> getNegativeAttributes() {
-        return negativeAttributes;
+        return negativeAttributes == null ? Collections.emptyMap() : negativeAttributes;
     }
 
     public void setNegativeAttributes(Map<String, String> negativeAttributes) {
@@ -71,7 +82,7 @@ public class ElementDiff extends Diff {
     }
 
     public Map<String, String> getPositiveAttributes() {
-        return positiveAttributes;
+        return positiveAttributes == null ? Collections.emptyMap() : positiveAttributes;
     }
 
     public void setPositiveAttributes(Map<String, String> positiveAttributes) {

@@ -25,11 +25,12 @@
 package com.ctrip.ferriswheel.core.dom.diff;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 public class Patch implements Serializable {
     // TODO add other meta information.
-    private List<Diff> diffList;
+    private List<Diff> diffList = Collections.emptyList();
 
     public List<Diff> getDiffList() {
         return diffList;

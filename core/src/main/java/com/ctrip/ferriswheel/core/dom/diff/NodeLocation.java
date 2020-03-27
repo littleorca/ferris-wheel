@@ -28,6 +28,7 @@ import java.util.*;
 
 public final class NodeLocation implements Comparable<NodeLocation>, Iterable<Integer> {
     private static final NodeLocation SHARED_EMPTY_LOCATION = new NodeLocation();
+    private static final NodeLocation SHARED_ROOT_LOCATION = new NodeLocation(0);
 
     private final int[] indices;
     private transient int hash;
@@ -35,6 +36,10 @@ public final class NodeLocation implements Comparable<NodeLocation>, Iterable<In
 
     public static NodeLocation empty() {
         return SHARED_EMPTY_LOCATION;
+    }
+
+    public static NodeLocation root() {
+        return SHARED_ROOT_LOCATION;
     }
 
     public NodeLocation() {
@@ -68,6 +73,10 @@ public final class NodeLocation implements Comparable<NodeLocation>, Iterable<In
         }
         this.indices = Arrays.copyOf(base.indices, base.indices.length + 1);
         this.indices[this.indices.length - 1] = index;
+    }
+
+    public NodeLocation append(int index) {
+        return new NodeLocation(this, index);
     }
 
     public int getDepth() {
@@ -110,7 +119,8 @@ public final class NodeLocation implements Comparable<NodeLocation>, Iterable<In
     }
 
     public boolean isSibling(NodeLocation another) {
-        return partialCompareTo(another, 0, getDepth() - 1) == 0;
+        return getDepth() == another.getDepth() &&
+                partialCompareTo(another, 0, getDepth() - 1) == 0;
     }
 
     public boolean isDescendantOf(NodeLocation another) {

@@ -32,26 +32,29 @@ import com.ctrip.ferriswheel.core.dom.diff.*;
 import com.ctrip.ferriswheel.core.dom.impl.AttributeSnapshotImpl;
 import com.ctrip.ferriswheel.core.dom.impl.ElementSnapshotImpl;
 import com.ctrip.ferriswheel.core.dom.impl.TextNodeSnapshotImpl;
+import com.ctrip.ferriswheel.core.util.ShiftAndReduceStack;
 
 import java.util.*;
-import java.util.function.BiFunction;
 
 public class PatchHelper {
-    public NodeSnapshot applyPatch(ElementSnapshot tree, Patch patch) {
+    public ElementSnapshot applyPatch(ElementSnapshot tree, Patch patch) {
         if (tree == null || patch == null) {
             throw new IllegalArgumentException();
+        }
+
+        if (patch.getDiffList().isEmpty()) {
+            return tree;
         }
 
         TreeSet<NodeLocation> deletions = new TreeSet<>();
         TreeMap<NodeLocation, Diff> insertions = new TreeMap<>();
         Map<NodeLocation, NodeSnapshot> negativeDirtyNodes = new HashMap<>();
-        analysePatch(tree, patch, deletions, insertions);
-        NodeSnapshot middleTree = applyDeletions(tree, deletions, negativeDirtyNodes);
-        return applyInsertions(tree, middleTree, insertions, negativeDirtyNodes);
+        analysePatch(patch, deletions, insertions);
+        applyDeletions(tree, deletions, negativeDirtyNodes);
+        return applyInsertions(tree, negativeDirtyNodes, insertions);
     }
 
-    private void analysePatch(ElementSnapshot tree,
-                              Patch patch,
+    private void analysePatch(Patch patch,
                               TreeSet<NodeLocation> deletions,
                               TreeMap<NodeLocation, Diff> insertions) {
         for (Diff diff : patch.getDiffList()) {
@@ -69,188 +72,149 @@ public class PatchHelper {
         }
     }
 
-    private NodeSnapshot applyDeletions(NodeSnapshot tree,
-                                        SortedSet<NodeLocation> deletions,
-                                        Map<NodeLocation, NodeSnapshot> dirtyNodes) {
-        return shiftAndReduce(deletions, (location, deletedIndices) -> {
-            ElementSnapshot element = (ElementSnapshot) getNodeByLocation(tree, location);
-            List<NodeSnapshot> priorChildren = element.getChildren();
-            List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() - deletedIndices.size());
-            for (int i = 0; i < priorChildren.size(); i++) {
-                if (deletedIndices.contains(i)) {
-                    continue;
-                }
-                NodeSnapshot child = dirtyNodes.get(new NodeLocation(location, i));
-                if (child == null) {
-                    child = priorChildren.get(i);
-                }
-                nextChildren.add(child);
-            }
-            ElementSnapshotImpl dirtyElement = new ElementSnapshotImpl(
-                    element.getTagName(),
-                    element.getAttributes(),
-                    nextChildren,
-                    element);
-            dirtyNodes.put(location, dirtyElement);
-            return dirtyElement;
-        });
+    ElementSnapshot applyDeletions(ElementSnapshot negativeTree,
+                                   NavigableSet<NodeLocation> deletions,
+                                   Map<NodeLocation, NodeSnapshot> dirtyNodes) {
+        TreeDeleteStack treeDeleteStack = new TreeDeleteStack(negativeTree, deletions, dirtyNodes);
+        for (NodeLocation deleteLocation : deletions) {
+            treeDeleteStack.feed(deleteLocation);
+        }
+        treeDeleteStack.terminate();
+        if (dirtyNodes.isEmpty()) {
+            return negativeTree;
+        }
+        return (ElementSnapshot) dirtyNodes.get(NodeLocation.root());
     }
 
-    private NodeSnapshot applyInsertions(NodeSnapshot negativeTree,
-                                         NodeSnapshot middleTree,
-                                         TreeMap<NodeLocation, Diff> insertions,
-                                         Map<NodeLocation, NodeSnapshot> negativeDirtyNodes) {
-        final Map<NodeLocation, NodeSnapshot> dirtyNodes = new HashMap<>();
+    ElementSnapshot applyInsertions(ElementSnapshot negativeTree,
+                                    Map<NodeLocation, NodeSnapshot> negativeDirtyNodes,
+                                    NavigableMap<NodeLocation, Diff> insertions) {
+        NavigableMap<NodeLocation, NodeSnapshot> positiveDirtyNodes = new TreeMap<>();
 
-        return shiftAndReduce(insertions.keySet(), (location, insertedIndices) -> {
-            ElementSnapshot element = (ElementSnapshot) getNodeByLocation(middleTree, location);
-            List<NodeSnapshot> priorChildren = element.getChildren();
-            List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() + insertedIndices.size());
-
-            int pos = 0;
-            for (int insertedIndex : insertedIndices) {
-                for (int i = nextChildren.size(); i < insertedIndex; i++, pos++) {
-                    NodeSnapshot child = dirtyNodes.get(new NodeLocation(location, i));
-                    if (child == null) {
-                        child = priorChildren.get(pos);
-                    }
-                    nextChildren.add(child);
+        // init positive dirty nodes
+        for (Map.Entry<NodeLocation, Diff> insertionEntry : insertions.entrySet()) {
+            NodeSnapshot negativeNode = null;
+            Diff diff = insertionEntry.getValue();
+            boolean reservePreviousRef = false;
+            if (diff.getNegativeLocation() != null) {
+                negativeNode = negativeDirtyNodes.get(diff.getNegativeLocation());
+                if (negativeNode != null) {
+                    reservePreviousRef = true;
+                } else {
+                    negativeNode = getNodeByLocation(negativeTree, diff.getNegativeLocation());
                 }
-
-                NodeLocation insertLocation = new NodeLocation(location, insertedIndex);
-                NodeSnapshot child = dirtyNodes.get(insertLocation);
-                if (child == null) {
-                    Diff diff = insertions.get(insertLocation);
-                    if (diff.getNegativeLocation() != null) {
-                        child = negativeDirtyNodes.get(diff.getNegativeLocation());
-                        if (child == null) {
-                            child = getNodeByLocation(negativeTree, diff.getNegativeLocation());
-                        }
-                    }
-                    child = applyNodePatch(child, diff);
+                if (negativeNode == null) {
+                    throw new IllegalStateException();
                 }
-                nextChildren.add(child);
             }
 
-            for (; pos < priorChildren.size(); pos++) {
-                NodeSnapshot child = dirtyNodes.get(new NodeLocation(location, nextChildren.size()));
-                if (child == null) {
-                    child = priorChildren.get(pos);
-                }
-                nextChildren.add(child);
+            NodeSnapshot positiveNode = applyNodePatch(negativeNode, diff, reservePreviousRef);
+            if (positiveNode == null) {
+                throw new IllegalStateException();
             }
+            positiveDirtyNodes.put(insertionEntry.getKey(), positiveNode);
+        }
 
+        TreeInsertStack treeInsertStack = new TreeInsertStack(negativeTree,
+                negativeDirtyNodes,
+                insertions,
+                positiveDirtyNodes);
+        for (NodeLocation insertLocation : insertions.keySet()) {
+            treeInsertStack.feed(insertLocation);
+        }
+        treeInsertStack.terminate();
 
-            for (int i = 0; i < priorChildren.size(); i++) {
-                if (insertedIndices.contains(i)) {
-                    continue;
-                }
-                NodeSnapshot child = dirtyNodes.remove(new NodeLocation(location, i));
-                if (child == null) {
-                    child = priorChildren.get(i);
-                }
-                nextChildren.add(child);
-            }
-            ElementSnapshotImpl dirtyElement = new ElementSnapshotImpl(
-                    element.getTagName(),
-                    element.getAttributes(),
-                    nextChildren,
-                    element);
-            dirtyNodes.put(location, dirtyElement);
-            return dirtyElement;
-        });
+        ElementSnapshot newTree = (ElementSnapshot) positiveDirtyNodes.get(NodeLocation.root());
+        if (newTree == null) {
+            newTree = (ElementSnapshot) negativeDirtyNodes.get(NodeLocation.root());
+        }
+        if (newTree == null) {
+            newTree = negativeTree;
+        }
+        return newTree;
     }
 
-    private <T> T shiftAndReduce(Collection<NodeLocation> locations,
-                                 BiFunction<NodeLocation, Collection<Integer>, T> callback) {
-        Stack<NodeLocation> stack = new Stack<>();
-        T lastResult = null;
-
-        for (NodeLocation location : locations) {
-            if (stack.isEmpty() || location.isSibling(stack.peek())) {
-                stack.push(location);
-            } else {
-                lastResult = reduce(stack, location, callback);
-            }
-        }
-
-        if (!stack.isEmpty()) {
-            lastResult = reduce(stack, null, callback);
-        }
-
-        if (!stack.isEmpty()) {
-            throw new RuntimeException("Unexpected state, this is probably a bug.");
-        }
-
-        return lastResult;
-    }
-
-    private <T> T reduce(Stack<NodeLocation> stack,
-                         NodeLocation pendingLocation,
-                         BiFunction<NodeLocation, Collection<Integer>, T> callback) {
-        T lastResult;
-        NodeLocation location = stack.pop();
-        LinkedList<Integer> collection = new LinkedList<>();
-        collection.add(location.leafIndex());
-        while (location.isSibling(stack.peek())) {
-            collection.add(stack.pop().leafIndex());
-        }
-        NodeLocation parentLocation = location.getParent();
-        if (parentLocation == null) {
-            if (!collection.isEmpty()) {
-                throw new RuntimeException("Unexpected state encountered, this is probably a bug.");
-            }
-            return null; // FIXME
-        }
-
-        lastResult = callback.apply(parentLocation, collection);
-
-        if (stack.isEmpty() || !stack.peek().isParentOf(location)) {
-            stack.push(parentLocation);
-        }
-        if (pendingLocation == null || !pendingLocation.isSibling(stack.peek())) {
-            lastResult = reduce(stack, pendingLocation, callback);
-        } else if (pendingLocation != null) {
-            stack.push(pendingLocation);
-        }
-
-        return lastResult;
-    }
-
-    NodeSnapshot applyNodePatch(NodeSnapshot negativeNode, Diff diff) {
+    /**
+     * Apply patch to a node, and return new patched node.
+     *
+     * @param negativeNode
+     * @param diff
+     * @param reservePreviousRef
+     * @return A new patched node object, with previous node reference refer to
+     * the specified <code>negativeNode</code>
+     */
+    NodeSnapshot applyNodePatch(NodeSnapshot negativeNode, Diff diff, boolean reservePreviousRef) {
         if (diff instanceof ElementDiff) {
-            return applyElementPatch((ElementSnapshot) negativeNode, (ElementDiff) diff);
+            return applyElementPatch((ElementSnapshot) negativeNode, (ElementDiff) diff, reservePreviousRef);
         } else if (diff instanceof TextNodeDiff) {
-            return applyTextNodePatch(((TextNodeSnapshot) negativeNode), (TextNodeDiff) diff);
+            return applyTextNodePatch(((TextNodeSnapshot) negativeNode), (TextNodeDiff) diff, reservePreviousRef);
         } else {
             throw new RuntimeException();
         }
     }
 
-    ElementSnapshot applyElementPatch(ElementSnapshot negativeElement, ElementDiff diff) {
-        if (!diff.hasAttributeChanges()) {
-            return negativeElement;
+    /**
+     * Apply patch to element, return new patched element.
+     *
+     * @param negativeElement
+     * @param diff
+     * @param reservePreviousRef
+     * @return A new patched element object, with previous node reference refer
+     * to the <code>negativeElement</code>.
+     */
+    ElementSnapshot applyElementPatch(ElementSnapshot negativeElement, ElementDiff diff, boolean reservePreviousRef) {
+        if (diff == null || (reservePreviousRef && negativeElement == null)) {
+            throw new IllegalArgumentException();
         }
 
-        List<AttributeSnapshot> attrs = new ArrayList<>();
-        for (AttributeSnapshot nAttr : negativeElement.getAttributes()) {
-            if (!diff.getNegativeAttributes().containsKey(nAttr.getName())) {
-                attrs.add(nAttr);
+        String tagName = diff.getTagName();
+
+        Map<String, String> attrs = new LinkedHashMap<>();
+        if (negativeElement != null) {
+            for (AttributeSnapshot attr : negativeElement.getAttributes()) {
+                attrs.put(attr.getName(), attr.getValue());
             }
         }
-        for (Map.Entry<String, String> pAttr : diff.getPositiveAttributes().entrySet()) {
-            attrs.add(new AttributeSnapshotImpl(pAttr.getKey(), pAttr.getValue(), null));
+
+        for (Map.Entry<String, String> negAttrEntry : diff.getNegativeAttributes().entrySet()) {
+            if (!attrs.containsKey(negAttrEntry.getKey())) {
+                throw new IllegalStateException();
+            }
+            String removed = attrs.remove(negAttrEntry.getKey());
+            // check removed.equals(negAttrEntry.getValue()); ?
         }
 
-        return new ElementSnapshotImpl(negativeElement.getTagName(),
-                attrs,
-                new ArrayList<>(negativeElement.getChildren()),
-                negativeElement);
+        for (Map.Entry<String, String> posAttr : diff.getPositiveAttributes().entrySet()) {
+            if (attrs.containsKey(posAttr.getKey())) {
+                throw new IllegalStateException();
+            }
+            attrs.put(posAttr.getKey(), posAttr.getValue());
+        }
+
+        List<AttributeSnapshot> attrList = new ArrayList<>(attrs.size());
+        attrs.forEach((name, value) -> attrList.add(new AttributeSnapshotImpl(name, value, null)));
+
+        List<NodeSnapshot> childList = negativeElement == null ?
+                Collections.emptyList() : new ArrayList<>(negativeElement.getChildren());
+
+        ElementSnapshot previousNode = reservePreviousRef ?
+                negativeElement.getPreviousSnapshot() : negativeElement;
+
+        return new ElementSnapshotImpl(tagName, attrList, childList, previousNode);
     }
 
-    TextNodeSnapshot applyTextNodePatch(TextNodeSnapshot negativeText, TextNodeDiff diff) {
-        if (!diff.hasTextChanges()) {
-            return negativeText;
+    /**
+     * Apply patch to text node, return new patched text node.
+     *
+     * @param negativeText
+     * @param diff
+     * @param reservePreviousRef
+     * @return A new patched text node object, with previous node reference
+     * refer to the <code>negativeText</code>.
+     */
+    TextNodeSnapshot applyTextNodePatch(TextNodeSnapshot negativeText, TextNodeDiff diff, boolean reservePreviousRef) {
+        if (diff == null || (reservePreviousRef && negativeText == null)) {
+            throw new IllegalArgumentException();
         }
 
         LineArrayWrapper nSeq = new LineArrayWrapper(negativeText == null ?
@@ -284,28 +248,231 @@ public class PatchHelper {
             sb.append(ln.getOriginText(), ln.getStart(), ln.getEnd());
         }
 
-        return new TextNodeSnapshotImpl(sb.toString(), negativeText);
+        String data = sb.toString();
+        if (data.isEmpty() && negativeText != null && negativeText.getData() == null) {
+            data = null; // TODO treat null as empty string?
+        }
+
+        NodeSnapshot previous = reservePreviousRef ?
+                negativeText.getPreviousSnapshot() : negativeText;
+
+        return new TextNodeSnapshotImpl(data, negativeText);
     }
 
     private NodeSnapshot getNodeByLocation(NodeSnapshot root, NodeLocation location) {
-        Iterator<Integer> it = location.iterator();
-        if (it.next() != 0) {
-            throw new RuntimeException();
-        }
-        NodeSnapshot n = root;
-        while (it.hasNext()) {
-            n = ((ElementSnapshot) n).getChildren().get(it.next());
-        }
-        return n;
+        return getNodeByLocation(root, NodeLocation.root(), location);
     }
 
-    class PendingAddNode {
-        NodeSnapshot origin;
-        NodeSnapshot revised;
+    private NodeSnapshot getNodeByLocation(NodeSnapshot node, NodeLocation nodeLocation, NodeLocation targetLocation) {
+        if (nodeLocation.equals(targetLocation)) {
+            return node;
+        }
 
-        public PendingAddNode(NodeSnapshot origin, NodeSnapshot revised) {
-            this.origin = origin;
-            this.revised = revised;
+        if (!nodeLocation.isAncestorOf(targetLocation)) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int i = nodeLocation.getDepth();
+             i < targetLocation.getDepth() && node != null;
+             i++) {
+            int index = targetLocation.getIndexOfLevel(i);
+            List<NodeSnapshot> children = ((ElementSnapshot) node).getChildren();
+            if (index >= children.size()) {
+                return null;
+            }
+            node = children.get(index);
+        }
+
+        return node;
+    }
+
+    abstract class TreePatchStack extends ShiftAndReduceStack<NodeLocation> {
+        @Override
+        protected boolean tryReduce(NodeLocation inputLocation) {
+            if (isEmpty()) {
+                return false;
+            }
+
+            if (inputLocation != null) {
+                if (inputLocation.isSibling(peek()) ||
+                        inputLocation.isDescendantOf(peek())) {
+                    return false;
+                }
+            }
+
+            NodeLocation location = pop();
+            TreeSet<Integer> collection = new TreeSet<>();
+            collection.add(location.leafIndex());
+            while (!isEmpty() && location.isSibling(peek())) {
+                collection.add(pop().leafIndex());
+            }
+
+            NodeLocation parentLocation = location.getParent();
+            if (parentLocation == null) {
+                if (inputLocation != null) {
+                    throw new RuntimeException("Unexpected state encountered, this is probably a bug.");
+                }
+                return false;
+            }
+
+            doReduce(parentLocation, collection);
+
+            return true;
+        }
+
+        protected abstract void doReduce(NodeLocation parentLocation, NavigableSet<Integer> collection);
+    }
+
+    class TreeDeleteStack extends TreePatchStack {
+        private ElementSnapshot negativeTree;
+        private NavigableSet<NodeLocation> deletions;
+        private Map<NodeLocation, NodeSnapshot> dirtyNodes;
+
+        /**
+         * Construct a stack for deleting tree nodes.
+         *
+         * @param negativeTree original tree.
+         * @param deletions    sorted deletion list.
+         * @param dirtyNodes   used to hold dirty nodes after deleting.
+         *                     a dirty node is always a new object with
+         *                     previous node reference refer to the origin
+         *                     node in the <code>negativeTree</code>
+         */
+        TreeDeleteStack(ElementSnapshot negativeTree,
+                        NavigableSet<NodeLocation> deletions,
+                        Map<NodeLocation, NodeSnapshot> dirtyNodes) {
+            this.negativeTree = negativeTree;
+            this.deletions = deletions;
+            this.dirtyNodes = dirtyNodes;
+        }
+
+        @Override
+        protected void doReduce(NodeLocation parentLocation, NavigableSet<Integer> deletedIndices) {
+            ElementSnapshot element = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
+            List<NodeSnapshot> priorChildren = element.getChildren();
+            List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() - deletedIndices.size());
+            for (int i = 0; i < priorChildren.size(); i++) {
+                NodeLocation childLocation = parentLocation.append(i);
+                if (deletions.contains(childLocation)) {
+                    continue;
+                }
+                NodeSnapshot child = dirtyNodes.get(childLocation);
+                if (child == null) {
+                    child = priorChildren.get(i);
+                }
+                nextChildren.add(child);
+            }
+
+            ElementSnapshotImpl dirtyElement = new ElementSnapshotImpl(
+                    element.getTagName(),
+                    element.getAttributes(),
+                    nextChildren,
+                    element);
+            dirtyNodes.put(parentLocation, dirtyElement);
+
+            if (isEmpty() || !parentLocation.equals(peek())) {
+                feed(parentLocation);
+            }
         }
     }
+
+    class TreeInsertStack extends TreePatchStack {
+        private ElementSnapshot negativeTree;
+        private NavigableMap<NodeLocation, Diff> insertions;
+        private Map<NodeLocation, NodeSnapshot> negativeDirtyNodes;
+        private NavigableMap<NodeLocation, NodeSnapshot> positiveDirtyNodes;
+
+        /**
+         * Construct a stack for tree nodes insertion.
+         *
+         * @param negativeTree       the origin tree before any update.
+         * @param negativeDirtyNodes dirty nodes generated by deletion stage.
+         * @param insertions         sorted insertion map of location-diff pairs.
+         * @param positiveDirtyNodes used to hold dirty nodes generated by insertion stage.
+         */
+        public TreeInsertStack(ElementSnapshot negativeTree,
+                               Map<NodeLocation, NodeSnapshot> negativeDirtyNodes,
+                               NavigableMap<NodeLocation, Diff> insertions,
+                               NavigableMap<NodeLocation, NodeSnapshot> positiveDirtyNodes) {
+            this.negativeTree = negativeTree;
+            this.insertions = insertions;
+            this.negativeDirtyNodes = negativeDirtyNodes;
+            this.positiveDirtyNodes = positiveDirtyNodes;
+        }
+
+        // TODO review for previous ref
+        @Override
+        protected void doReduce(NodeLocation parentLocation, NavigableSet<Integer> insertIndices) {
+            boolean reservePreviousRef = false;
+            ElementSnapshot parentElem = (ElementSnapshot) positiveDirtyNodes.get(parentLocation);
+            if (parentElem != null) {
+                reservePreviousRef = true;
+            } else {
+                Map.Entry<NodeLocation, NodeSnapshot> ancestor = positiveDirtyNodes.floorEntry(parentLocation);
+                if (ancestor != null) {
+                    parentElem = (ElementSnapshot) getNodeByLocation(ancestor.getValue(),
+                            ancestor.getKey(), parentLocation);
+                    // is there a chance that the node from ancestor is also in negativeDirtyNodes?
+                    if (negativeDirtyNodes.get(parentLocation) != null) {
+                        //throw new RuntimeException();
+                    }
+                } else {
+                    parentElem = (ElementSnapshot) negativeDirtyNodes.get(parentLocation);
+                    if (parentElem != null) {
+                        reservePreviousRef = true;
+                    } else {
+                        parentElem = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
+                    }
+                }
+            }
+
+            if (parentElem == null) {
+                throw new IllegalStateException();
+            }
+
+            List<NodeSnapshot> priorChildren = parentElem.getChildren();
+            List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() + insertIndices.size());
+
+            int endIndex = priorChildren.size() + insertIndices.size();
+            for (int negativeIndex = 0, positiveIndex = 0;
+                 positiveIndex < endIndex;
+                 positiveIndex++) {
+
+                NodeLocation childLocation = parentLocation.append(positiveIndex);
+                NodeSnapshot child = positiveDirtyNodes.get(childLocation);
+                if (child == null) {
+                    if (insertIndices.contains(positiveIndex)) {
+                        Diff diff = insertions.get(childLocation);
+                        if (diff.getNegativeLocation() == null) {
+                            throw new IllegalStateException();
+                        }
+                        child = negativeDirtyNodes.get(diff.getNegativeLocation());
+                        if (child == null) {
+                            child = getNodeByLocation(negativeTree, diff.getNegativeLocation());
+                        }
+                    } else {
+                        child = priorChildren.get(negativeIndex++);
+                    }
+                }
+
+                if (child == null) {
+                    throw new IllegalStateException();
+                }
+
+                nextChildren.add(child);
+            }
+
+            parentElem = new ElementSnapshotImpl(parentElem.getTagName(),
+                    parentElem.getAttributes(),
+                    nextChildren,
+                    parentElem.getPreviousSnapshot()); // FIXME previous node is not correct
+
+            positiveDirtyNodes.put(parentLocation, parentElem);
+
+            if (isEmpty() || !parentLocation.equals(peek())) {
+                feed(parentLocation);
+            }
+        }
+    }
+
 }

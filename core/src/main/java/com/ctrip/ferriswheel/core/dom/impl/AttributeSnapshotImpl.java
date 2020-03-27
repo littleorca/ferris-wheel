@@ -35,6 +35,10 @@ public class AttributeSnapshotImpl extends AbstractNodeSnapshot implements Attri
         this(attribute.getName(), attribute.getValue(), previousSnapshot);
     }
 
+    public AttributeSnapshotImpl(String name, String value) {
+        this(name, value, null);
+    }
+
     public AttributeSnapshotImpl(String name, String value, AttributeSnapshot previousSnapshot) {
         super(previousSnapshot);
         this.name = name;

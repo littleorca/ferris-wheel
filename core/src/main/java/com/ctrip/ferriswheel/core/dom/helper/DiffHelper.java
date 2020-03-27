@@ -118,10 +118,10 @@ public class DiffHelper {
             throw new IllegalArgumentException("Collector cannot be both null.");
         }
         if (negativeBaseLocation == null) {
-            negativeBaseLocation = new NodeLocation(0);
+            negativeBaseLocation = NodeLocation.root();
         }
         if (positiveBaseLocation == null) {
-            positiveBaseLocation = new NodeLocation(0);
+            positiveBaseLocation = NodeLocation.root();
         }
 
         DiffContext context = new DiffContext(negativeRoot, negativeBaseLocation,
@@ -160,6 +160,11 @@ public class DiffHelper {
     }
 
     void diffElement(DiffContext context, ElementSnapshot negativeElement, ElementSnapshot positiveElement) {
+        ElementSnapshot nonNullElem = positiveElement == null ? negativeElement : positiveElement;
+        if (nonNullElem == null) {
+            throw new IllegalArgumentException();
+        }
+
         Collection<AttributeSnapshot> negativeAttrs = negativeElement == null ?
                 null : negativeElement.getAttributes();
         Collection<AttributeSnapshot> positiveAttrs = positiveElement == null ?
@@ -180,7 +185,7 @@ public class DiffHelper {
                 positiveLocation = context.getCurrentLocation();
             }
 
-            ElementDiff elementDiff = createElementDiff(negativeLocation, positiveLocation);
+            ElementDiff elementDiff = createElementDiff(nonNullElem.getTagName(), negativeLocation, positiveLocation);
             elementDiff.setNegativeAttributes(delMap);
             elementDiff.setPositiveAttributes(addMap);
             context.collect(elementDiff);
@@ -289,7 +294,8 @@ public class DiffHelper {
         NodeSnapshot nonNullNode = positiveNode == null ? negativeNode : positiveNode;
 
         if (nonNullNode instanceof ElementSnapshot) {
-            return createElementDiff(negativeLocation, positiveLocation);
+            return createElementDiff(((ElementSnapshot) nonNullNode).getTagName(),
+                    negativeLocation, positiveLocation);
 
         } else if (nonNullNode instanceof TextNodeSnapshot) {
             return createTextNodeDiff(negativeLocation, positiveLocation);
@@ -299,8 +305,8 @@ public class DiffHelper {
         }
     }
 
-    private ElementDiff createElementDiff(NodeLocation negativeLocation, NodeLocation positiveLocation) {
-        return new ElementDiff(negativeLocation, positiveLocation);
+    private ElementDiff createElementDiff(String tagName, NodeLocation negativeLocation, NodeLocation positiveLocation) {
+        return new ElementDiff(tagName, negativeLocation, positiveLocation);
     }
 
     private TextNodeDiff createTextNodeDiff(NodeLocation negativeLocation, NodeLocation positiveLocation) {
@@ -378,7 +384,7 @@ public class DiffHelper {
         private Map<NodeSnapshot, NodeLocation> originalToTreeLocation = new HashMap<>();
 
         TreeIndexer(NodeSnapshot startNode) {
-            this(startNode, new NodeLocation(new int[]{0}));
+            this(startNode, NodeLocation.root());
         }
 
         TreeIndexer(NodeSnapshot startNode, NodeLocation startLocation) {
@@ -406,7 +412,7 @@ public class DiffHelper {
                     NodeSnapshot child = childList.get(i);
                     NodeSnapshot childOriginal = child.getOriginalSnapshot();
                     originalToTreeNode.put(childOriginal, child);
-                    originalToTreeLocation.put(childOriginal, new NodeLocation(parentLocation, i));
+                    originalToTreeLocation.put(childOriginal, parentLocation.append(i));
                     if (child instanceof ElementSnapshot) {
                         stack.push((ElementSnapshot) child);
                     }

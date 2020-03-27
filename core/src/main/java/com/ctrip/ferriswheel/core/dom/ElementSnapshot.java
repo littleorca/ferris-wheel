@@ -33,6 +33,11 @@ public interface ElementSnapshot extends NodeSnapshot {
         return NodeType.ELEMENT_NODE;
     }
 
+    @Override
+    default String getNodeName() {
+        return getTagName();
+    }
+
     String getTagName();
 
     Collection<AttributeSnapshot> getAttributes();

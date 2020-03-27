@@ -500,6 +500,30 @@ public class TestDiffHelper extends TestCase {
         assertTrue(diffHelper.isSameNode(c3, c));
     }
 
+    public void testSomething() {
+        /**
+         * <E id=0>
+         *  |-n\nw\n
+         *  |-<E b=2 t=48 z=77 id=1 l=1>
+         *  |  |-<E p=86 f=56 g=93 z=42 id=3>
+         *  |  `-y\nz\nw\nt\nj\na\nu\nl\na\nm\nt\nr\ny\ni\n
+         *  |-<E id=2>
+         *  |  `-<E q=92 i=29 id=5 n=94>
+         *  `-<E id=4>
+         *
+         * # positive tree:
+         * <E id=0>
+         *  |-n\nw\n
+         *  |-<E b=2 t=48 z=77 id=1 l=1>
+         *  |  |-<E q=92 i=29 id=5 n=94>
+         *  |  |  `-<E id=4>
+         *  |  |     `-o\nh\nb\n
+         *  |  |-<E p=86 f=56 g=93 z=42 id=3>
+         *  |  `-y\nz\nw\nt\nj\na\nu\nl\na\nm\nt\nr\ny\ni\n
+         *  `-<E id=2>
+         */
+    }
+
     private ElementSnapshot e(String name, ElementSnapshot... children) {
         return e(null, name, children);
     }

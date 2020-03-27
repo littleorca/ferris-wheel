@@ -30,6 +30,11 @@ public interface AttributeSnapshot extends NodeSnapshot {
         return NodeType.ATTRIBUTE_NODE;
     }
 
+    @Override
+    default String getNodeName() {
+        return getName();
+    }
+
     String getName();
 
     String getValue();

@@ -1,5 +1,6 @@
 package com.ctrip.ferriswheel.core.dom.diff;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TextNodeDiff extends Diff {
@@ -34,7 +35,7 @@ public class TextNodeDiff extends Diff {
     }
 
     public List<LineDiff> getLines() {
-        return lines;
+        return lines == null ? Collections.emptyList() : lines;
     }
 
     public void setLines(List<LineDiff> lines) {
