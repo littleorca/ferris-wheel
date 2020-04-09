@@ -37,6 +37,7 @@ import com.ctrip.ferriswheel.core.util.ShiftAndReduceStack;
 import java.util.*;
 
 public class PatchHelper {
+
     public ElementSnapshot applyPatch(ElementSnapshot tree, Patch patch) {
         if (tree == null || patch == null) {
             throw new IllegalArgumentException();
@@ -48,85 +49,98 @@ public class PatchHelper {
 
         TreeSet<NodeLocation> deletions = new TreeSet<>();
         TreeMap<NodeLocation, Diff> insertions = new TreeMap<>();
-        Map<NodeLocation, NodeSnapshot> negativeDirtyNodes = new HashMap<>();
         analysePatch(patch, deletions, insertions);
-        applyDeletions(tree, deletions, negativeDirtyNodes);
-        return applyInsertions(tree, negativeDirtyNodes, insertions);
+        NavigableMap<NodeLocation, NodeSnapshot> tempNodes = applyDeletions(tree, deletions);
+        tempNodes = applyStaticPatch(tempNodes, patch.getDiffList());
+        return applyInsertions(tree, tempNodes, insertions);
     }
 
-    private void analysePatch(Patch patch,
-                              TreeSet<NodeLocation> deletions,
-                              TreeMap<NodeLocation, Diff> insertions) {
+    void analysePatch(Patch patch,
+                      TreeSet<NodeLocation> deletions,
+                      TreeMap<NodeLocation, Diff> insertions) {
         for (Diff diff : patch.getDiffList()) {
             if (diff.getNegativeLocation() != null) {
                 deletions.add(diff.getNegativeLocation());
             }
             if (diff.getPositiveLocation() != null) {
                 Diff priorDiff = insertions.get(diff.getPositiveLocation());
-                if (priorDiff != null && priorDiff.hasContent()) {
-                    insertions.put(diff.getPositiveLocation(), priorDiff);
-                } else {
+                if (priorDiff == null || !priorDiff.hasContent()) {
                     insertions.put(diff.getPositiveLocation(), diff);
                 }
             }
         }
     }
 
-    ElementSnapshot applyDeletions(ElementSnapshot negativeTree,
-                                   NavigableSet<NodeLocation> deletions,
-                                   Map<NodeLocation, NodeSnapshot> dirtyNodes) {
+    NavigableMap<NodeLocation, NodeSnapshot> applyDeletions(ElementSnapshot negativeTree,
+                                                            NavigableSet<NodeLocation> deletions) {
+        NavigableMap<NodeLocation, NodeSnapshot> dirtyNodes = new TreeMap<>();
         TreeDeleteStack treeDeleteStack = new TreeDeleteStack(negativeTree, deletions, dirtyNodes);
         for (NodeLocation deleteLocation : deletions) {
             treeDeleteStack.feed(deleteLocation);
         }
         treeDeleteStack.terminate();
-        if (dirtyNodes.isEmpty()) {
-            return negativeTree;
-        }
-        return (ElementSnapshot) dirtyNodes.get(NodeLocation.root());
+        return dirtyNodes;
     }
 
-    ElementSnapshot applyInsertions(ElementSnapshot negativeTree,
-                                    Map<NodeLocation, NodeSnapshot> negativeDirtyNodes,
-                                    NavigableMap<NodeLocation, Diff> insertions) {
-        NavigableMap<NodeLocation, NodeSnapshot> positiveDirtyNodes = new TreeMap<>();
+    /**
+     * Patch nodes without dealing with there structure, and convert negative
+     * temporary node map to positive temporary node map.
+     *
+     * @param negativeTempNodes
+     * @param diffList
+     * @return
+     */
+    NavigableMap<NodeLocation, NodeSnapshot> applyStaticPatch(NavigableMap<NodeLocation, NodeSnapshot> negativeTempNodes,
+                                                              List<Diff> diffList) {
+        NavigableMap<NodeLocation, NodeSnapshot> newTempNodes = new TreeMap<>();
 
-        // init positive dirty nodes
-        for (Map.Entry<NodeLocation, Diff> insertionEntry : insertions.entrySet()) {
+        for (Diff diff : diffList) {
+            if (diff.getPositiveLocation() == null) {
+                continue;
+            }
+
             NodeSnapshot negativeNode = null;
-            Diff diff = insertionEntry.getValue();
             boolean reservePreviousRef = false;
             if (diff.getNegativeLocation() != null) {
-                negativeNode = negativeDirtyNodes.get(diff.getNegativeLocation());
-                if (negativeNode != null) {
-                    reservePreviousRef = true;
-                } else {
-                    negativeNode = getNodeByLocation(negativeTree, diff.getNegativeLocation());
-                }
+                negativeNode = negativeTempNodes.get(diff.getNegativeLocation());
                 if (negativeNode == null) {
                     throw new IllegalStateException();
                 }
             }
 
+            // FIXME reservePreviousRef
             NodeSnapshot positiveNode = applyNodePatch(negativeNode, diff, reservePreviousRef);
             if (positiveNode == null) {
                 throw new IllegalStateException();
             }
-            positiveDirtyNodes.put(insertionEntry.getKey(), positiveNode);
+            newTempNodes.put(diff.getPositiveLocation(), positiveNode);
         }
 
+        if (!newTempNodes.containsKey(NodeLocation.root()) && !diffList.isEmpty()) {
+            NodeSnapshot root = negativeTempNodes.get(NodeLocation.root());
+            if (root == null) {
+                throw new IllegalStateException();
+            }
+            newTempNodes.put(NodeLocation.root(), root);
+        }
+
+        return newTempNodes;
+    }
+
+    ElementSnapshot applyInsertions(ElementSnapshot negativeTree,
+                                    NavigableMap<NodeLocation, NodeSnapshot> positiveTempNodes,
+                                    NavigableMap<NodeLocation, Diff> insertions) {
         TreeInsertStack treeInsertStack = new TreeInsertStack(negativeTree,
-                negativeDirtyNodes,
-                insertions,
-                positiveDirtyNodes);
+                positiveTempNodes,
+                insertions);
         for (NodeLocation insertLocation : insertions.keySet()) {
             treeInsertStack.feed(insertLocation);
         }
         treeInsertStack.terminate();
 
-        ElementSnapshot newTree = (ElementSnapshot) positiveDirtyNodes.get(NodeLocation.root());
+        ElementSnapshot newTree = (ElementSnapshot) positiveTempNodes.get(NodeLocation.root());
         if (newTree == null) {
-            newTree = (ElementSnapshot) negativeDirtyNodes.get(NodeLocation.root());
+            newTree = (ElementSnapshot) positiveTempNodes.get(NodeLocation.root());
         }
         if (newTree == null) {
             newTree = negativeTree;
@@ -312,6 +326,7 @@ public class PatchHelper {
                 if (inputLocation != null) {
                     throw new RuntimeException("Unexpected state encountered, this is probably a bug.");
                 }
+                doReduce(null, collection);
                 return false;
             }
 
@@ -348,6 +363,16 @@ public class PatchHelper {
 
         @Override
         protected void doReduce(NodeLocation parentLocation, NavigableSet<Integer> deletedIndices) {
+            if (parentLocation == null) {
+                if (deletedIndices.size() != 1) {
+                    throw new IllegalStateException();
+                }
+                if (dirtyNodes.isEmpty()) {
+                    dirtyNodes.put(NodeLocation.root(), negativeTree);
+                }
+                return;
+            }
+
             ElementSnapshot element = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
             List<NodeSnapshot> priorChildren = element.getChildren();
             List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() - deletedIndices.size());
@@ -379,49 +404,44 @@ public class PatchHelper {
     class TreeInsertStack extends TreePatchStack {
         private ElementSnapshot negativeTree;
         private NavigableMap<NodeLocation, Diff> insertions;
-        private Map<NodeLocation, NodeSnapshot> negativeDirtyNodes;
-        private NavigableMap<NodeLocation, NodeSnapshot> positiveDirtyNodes;
+        private NavigableMap<NodeLocation, NodeSnapshot> positiveTempNodes;
 
         /**
          * Construct a stack for tree nodes insertion.
          *
-         * @param negativeTree       the origin tree before any update.
-         * @param negativeDirtyNodes dirty nodes generated by deletion stage.
-         * @param insertions         sorted insertion map of location-diff pairs.
-         * @param positiveDirtyNodes used to hold dirty nodes generated by insertion stage.
+         * @param negativeTree      the origin tree before any update.
+         * @param positiveTempNodes temp nodes indexed by positive locations.
+         * @param insertions        sorted insertion map of location-diff pairs.
          */
         public TreeInsertStack(ElementSnapshot negativeTree,
-                               Map<NodeLocation, NodeSnapshot> negativeDirtyNodes,
-                               NavigableMap<NodeLocation, Diff> insertions,
-                               NavigableMap<NodeLocation, NodeSnapshot> positiveDirtyNodes) {
+                               NavigableMap<NodeLocation, NodeSnapshot> positiveTempNodes,
+                               NavigableMap<NodeLocation, Diff> insertions) {
             this.negativeTree = negativeTree;
+            this.positiveTempNodes = positiveTempNodes;
             this.insertions = insertions;
-            this.negativeDirtyNodes = negativeDirtyNodes;
-            this.positiveDirtyNodes = positiveDirtyNodes;
         }
 
         // TODO review for previous ref
         @Override
         protected void doReduce(NodeLocation parentLocation, NavigableSet<Integer> insertIndices) {
+            if (parentLocation == null) {
+                return; // last reduce
+            }
+
             boolean reservePreviousRef = false;
-            ElementSnapshot parentElem = (ElementSnapshot) positiveDirtyNodes.get(parentLocation);
+            ElementSnapshot parentElem = (ElementSnapshot) positiveTempNodes.get(parentLocation);
             if (parentElem != null) {
                 reservePreviousRef = true;
             } else {
-                Map.Entry<NodeLocation, NodeSnapshot> ancestor = positiveDirtyNodes.floorEntry(parentLocation);
+                Map.Entry<NodeLocation, NodeSnapshot> ancestor = positiveTempNodes.floorEntry(parentLocation);
                 if (ancestor != null) {
                     parentElem = (ElementSnapshot) getNodeByLocation(ancestor.getValue(),
                             ancestor.getKey(), parentLocation);
-                    // is there a chance that the node from ancestor is also in negativeDirtyNodes?
-                    if (negativeDirtyNodes.get(parentLocation) != null) {
-                        //throw new RuntimeException();
-                    }
+
                 } else {
-                    parentElem = (ElementSnapshot) negativeDirtyNodes.get(parentLocation);
+                    parentElem = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
                     if (parentElem != null) {
                         reservePreviousRef = true;
-                    } else {
-                        parentElem = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
                     }
                 }
             }
@@ -439,20 +459,9 @@ public class PatchHelper {
                  positiveIndex++) {
 
                 NodeLocation childLocation = parentLocation.append(positiveIndex);
-                NodeSnapshot child = positiveDirtyNodes.get(childLocation);
+                NodeSnapshot child = positiveTempNodes.get(childLocation);
                 if (child == null) {
-                    if (insertIndices.contains(positiveIndex)) {
-                        Diff diff = insertions.get(childLocation);
-                        if (diff.getNegativeLocation() == null) {
-                            throw new IllegalStateException();
-                        }
-                        child = negativeDirtyNodes.get(diff.getNegativeLocation());
-                        if (child == null) {
-                            child = getNodeByLocation(negativeTree, diff.getNegativeLocation());
-                        }
-                    } else {
-                        child = priorChildren.get(negativeIndex++);
-                    }
+                    child = priorChildren.get(negativeIndex++);
                 }
 
                 if (child == null) {
@@ -467,7 +476,7 @@ public class PatchHelper {
                     nextChildren,
                     parentElem.getPreviousSnapshot()); // FIXME previous node is not correct
 
-            positiveDirtyNodes.put(parentLocation, parentElem);
+            positiveTempNodes.put(parentLocation, parentElem);
 
             if (isEmpty() || !parentLocation.equals(peek())) {
                 feed(parentLocation);

@@ -38,26 +38,30 @@ public class RandomTestOfDiffAndPatch {
         new RandomTestOfDiffAndPatch().runTests();
     }
 
-    private static final int TOTAL_ROUND = 10000;
+    private static final int TOTAL_ROUND = 100000;
     private static final int INITIAL_TREE_COMPLEXITY = 100;
     private static final int UPDATE_COMPLEXITY = 30;
+    private static final long SLEEP_EVERY_HUNDRED_ROUND = 50L;
 
     private Random random = new Random();
     private DiffHelper diffHelper = new DiffHelper();
     private PatchHelper patchHelper = new PatchHelper();
 
     public void runTests() {
-        System.out.println("# starting random diff & patch test for " +
+        System.out.println("# Starting random diff & patch test for " +
                 TOTAL_ROUND + " times...");
 
         for (int i = 1; i <= TOTAL_ROUND; i++) {
-            System.out.println("# round " + i + "/" + TOTAL_ROUND);
+            System.out.println("# Round " + i + "/" + TOTAL_ROUND);
             try {
                 runRandomCase();
-            } catch (RuntimeException e) {
+                Thread.sleep(SLEEP_EVERY_HUNDRED_ROUND);
+            } catch (RuntimeException | InterruptedException e) {
                 e.printStackTrace();
                 System.err.println("# Failed to complete random test!");
                 System.exit(1);
+            } finally {
+                System.out.println("# End of " + i + "/" + TOTAL_ROUND + "\n");
             }
         }
 
