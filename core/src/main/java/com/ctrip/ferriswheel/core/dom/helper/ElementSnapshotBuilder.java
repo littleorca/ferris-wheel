@@ -28,6 +28,7 @@ import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
 import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 import com.ctrip.ferriswheel.core.dom.NodeType;
+import com.ctrip.ferriswheel.core.dom.impl.AttributeSnapshotImpl;
 
 import java.util.*;
 
@@ -36,6 +37,33 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
     private String tagName;
     private Map<String, String> attributes;
     private List<NodeSnapshot> children;
+
+    public ElementSnapshotBuilder() {
+        this.attributes = new HashMap<>();
+        this.children = new LinkedList<>();
+    }
+
+    /**
+     * Create builder based on the specified origin node snapshot. The previous
+     * node will be set to the specified origin node.
+     *
+     * @param origin
+     */
+    public ElementSnapshotBuilder(ElementSnapshot origin) {
+        if (origin instanceof ElementSnapshotBuilder) {
+            throw new IllegalArgumentException();
+        }
+        this.tagName = origin.getTagName();
+        Collection<AttributeSnapshot> attrs = origin.getAttributes();
+        if (attrs == null) {
+            this.attributes = new HashMap<>();
+        } else {
+            this.attributes = new HashMap<>(attrs.size());
+            attrs.forEach(a -> this.attributes.put(a.getName(), a.getValue()));
+        }
+        setChildren(origin.getChildren());
+        setPreviousSnapshot(origin);
+    }
 
     @Override
     public NodeType getNodeType() {
@@ -59,13 +87,23 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
 
     @Override
     public Collection<AttributeSnapshot> getAttributes() {
-        return null; // FIXME
+        // TODO review this
+        List<AttributeSnapshot> attrList = new ArrayList<>(attributes.size());
+        attributes.forEach((n, v) -> attrList.add(new AttributeSnapshotImpl(n, v, null)));
+        return attrList;
     }
 
     public ElementSnapshotBuilder setAttribute(String name, String value) {
-        ensureAttrMapNotEmpty();
         this.attributes.put(name, value);
         return this;
+    }
+
+    public boolean hasAttr(String name) {
+        return this.attributes.containsKey(name);
+    }
+
+    public String removeAttr(String name) {
+        return this.attributes.remove(name);
     }
 
     @Override
@@ -73,18 +111,20 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
         return children;
     }
 
+    public void setChildren(List<NodeSnapshot> children) {
+        this.children = children == null ? new LinkedList<>() : new LinkedList<>(children);
+    }
+
     public ElementSnapshotBuilder addChild(int index, NodeSnapshot child) {
-        ensureChildrenNotEmpty();
         this.children.add(index, child);
         return this;
     }
 
-    public ElementSnapshotBuilder removeChild(int index) {
+    public NodeSnapshot removeChild(int index) {
         if (children == null) {
             throw new IllegalStateException();
         }
-        children.remove(index);
-        return this;
+        return children.remove(index);
     }
 
     @Override
@@ -93,8 +133,8 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
     }
 
     @Override
-    public ElementSnapshotBuilder getPreviousSnapshot() {
-        return (ElementSnapshotBuilder) super.getPreviousSnapshot();
+    public ElementSnapshot getPreviousSnapshot() {
+        return (ElementSnapshot) super.getPreviousSnapshot();
     }
 
     @Override
@@ -105,18 +145,6 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
     @Override
     public ElementSnapshot getOriginalSnapshot() {
         return (ElementSnapshot) super.getOriginalSnapshot();
-    }
-
-    private void ensureAttrMapNotEmpty() {
-        if (this.attributes == null) {
-            this.attributes = new HashMap<>();
-        }
-    }
-
-    private void ensureChildrenNotEmpty() {
-        if (this.children == null) {
-            this.children = new LinkedList<>();
-        }
     }
 
 }

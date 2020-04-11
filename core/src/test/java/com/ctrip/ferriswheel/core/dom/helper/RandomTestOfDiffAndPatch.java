@@ -38,7 +38,7 @@ public class RandomTestOfDiffAndPatch {
         new RandomTestOfDiffAndPatch().runTests();
     }
 
-    private static final int TOTAL_ROUND = 100000;
+    private static final int TOTAL_ROUND = 10000;
     private static final int INITIAL_TREE_COMPLEXITY = 100;
     private static final int UPDATE_COMPLEXITY = 30;
     private static final long SLEEP_EVERY_HUNDRED_ROUND = 50L;

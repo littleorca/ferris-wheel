@@ -123,9 +123,11 @@ public class TestPatchHelper extends TestCase {
     public void testAnalyseDiff() {
         Patch patch = new Patch();
         TreeSet<NodeLocation> deletions = new TreeSet<>();
+        TreeSet<NodeLocation> renames = new TreeSet<>();
         TreeMap<NodeLocation, Diff> insertions = new TreeMap<>();
-        patchHelper.analysePatch(patch, deletions, insertions);
+        patchHelper.analysePatch(patch, deletions, renames, insertions);
         assertTrue(deletions.isEmpty());
+        assertTrue(renames.isEmpty());
         assertTrue(insertions.isEmpty());
 
         ElementDiff diff1 = new ElementDiff("E", new NodeLocation(0, 0), null);
@@ -138,10 +140,12 @@ public class TestPatchHelper extends TestCase {
         ElementDiff diff3 = new ElementDiff("E3", null, new NodeLocation(0, 3));
         patch.setDiffList(Arrays.asList(diff1, diff2_1, diff2_2, diff2_3, diff3));
 
-        patchHelper.analysePatch(patch, deletions, insertions);
+        patchHelper.analysePatch(patch, deletions, renames, insertions);
         assertEquals(2, deletions.size());
         assertTrue(deletions.contains(new NodeLocation(0, 0)));
         assertTrue(deletions.contains(new NodeLocation(0, 1)));
+        assertEquals(1, renames.size());
+        assertTrue(renames.contains(new NodeLocation(0, 1)));
         assertEquals(2, insertions.size());
         ElementDiff diff2 = (ElementDiff) insertions.get(new NodeLocation(0, 2));
         assertEquals(new NodeLocation(0, 1), diff2.getNegativeLocation());
@@ -154,13 +158,13 @@ public class TestPatchHelper extends TestCase {
     public void testApplyDeletions() {
         ElementSnapshot nTree1 = TreeSnapshotUtil.buildTree("E");
         NavigableMap<NodeLocation, NodeSnapshot> tempNodes = patchHelper.applyDeletions(nTree1,
-                Collections.emptyNavigableSet());
+                Collections.emptyNavigableSet(), Collections.emptyNavigableSet());
         assertTrue(tempNodes.isEmpty());
 
         ElementSnapshot nTree2 = TreeSnapshotUtil.buildTree("E(E2)");
         NavigableSet<NodeLocation> deletions = new TreeSet<>();
         deletions.add(new NodeLocation(0, 0));
-        tempNodes = patchHelper.applyDeletions(nTree2, deletions);
+        tempNodes = patchHelper.applyDeletions(nTree2, deletions, Collections.emptyNavigableSet());
         ElementSnapshot pTree2 = (ElementSnapshot) tempNodes.get(NodeLocation.root());
         assertTreeEquals(nTree1, pTree2);
         assertEquals(1, tempNodes.size());
@@ -169,7 +173,7 @@ public class TestPatchHelper extends TestCase {
         ElementSnapshot nTree3 = TreeSnapshotUtil.buildTree("E(E2(E3))");
         deletions = new TreeSet<>();
         deletions.add(new NodeLocation(0, 0, 0));
-        tempNodes = patchHelper.applyDeletions(nTree3, deletions);
+        tempNodes = patchHelper.applyDeletions(nTree3, deletions, Collections.emptyNavigableSet());
         ElementSnapshot pTree3 = (ElementSnapshot) tempNodes.get(NodeLocation.root());
         assertTreeEquals(nTree2, pTree3);
         assertEquals(2, tempNodes.size());
@@ -178,7 +182,7 @@ public class TestPatchHelper extends TestCase {
         ElementSnapshot nTree4 = TreeSnapshotUtil.buildTree("E(E2(E3))");
         deletions = new TreeSet<>();
         deletions.add(new NodeLocation(0, 0));
-        tempNodes = patchHelper.applyDeletions(nTree4, deletions);
+        tempNodes = patchHelper.applyDeletions(nTree4, deletions, Collections.emptyNavigableSet());
         ElementSnapshot pTree4 = (ElementSnapshot) tempNodes.get(NodeLocation.root());
         assertTreeEquals(nTree1, pTree4);
         assertEquals(1, tempNodes.size());
@@ -187,7 +191,7 @@ public class TestPatchHelper extends TestCase {
         deletions = new TreeSet<>();
         deletions.add(new NodeLocation(0, 0));
         deletions.add(new NodeLocation(0, 0, 0));
-        tempNodes = patchHelper.applyDeletions(nTree5, deletions);
+        tempNodes = patchHelper.applyDeletions(nTree5, deletions, Collections.emptyNavigableSet());
         ElementSnapshot pTree5 = (ElementSnapshot) tempNodes.get(NodeLocation.root());
         assertTreeEquals(nTree1, pTree5);
         assertEquals(2, tempNodes.size());
@@ -198,10 +202,24 @@ public class TestPatchHelper extends TestCase {
         deletions.add(new NodeLocation(0, 0));
         deletions.add(new NodeLocation(0, 2));
         deletions.add(new NodeLocation(0, 3));
-        tempNodes = patchHelper.applyDeletions(nTree6, deletions);
+        tempNodes = patchHelper.applyDeletions(nTree6, deletions, Collections.emptyNavigableSet());
         ElementSnapshot pTree6 = (ElementSnapshot) tempNodes.get(NodeLocation.root());
         assertTreeEquals(TreeSnapshotUtil.buildTree("E(E3)"), pTree6);
         assertEquals(1, tempNodes.size());
+
+        ElementSnapshot nTree7 = TreeSnapshotUtil.buildTree("E(E2,E3,E4(E6),E5)");
+        deletions = new TreeSet<>();
+        deletions.add(new NodeLocation(0, 0));
+        deletions.add(new NodeLocation(0, 2));
+        deletions.add(new NodeLocation(0, 3));
+        TreeSet<NodeLocation> renames = new TreeSet();
+        renames.add(new NodeLocation(0, 2));
+        tempNodes = patchHelper.applyDeletions(nTree7, deletions, renames);
+        ElementSnapshot pTree7 = (ElementSnapshot) tempNodes.get(NodeLocation.root());
+        assertTreeEquals(TreeSnapshotUtil.buildTree("E(E3)"), pTree7);
+        assertEquals(2, tempNodes.size());
+        ElementSnapshot pE6 = (ElementSnapshot) tempNodes.get(new NodeLocation(0, 2));
+        assertTreeEquals(TreeSnapshotUtil.buildTree("E4(E6)"), pE6);
     }
 
     public void testApplyStaticPatch() {
@@ -227,9 +245,7 @@ public class TestPatchHelper extends TestCase {
                 new ElementDiff("E", new NodeLocation(0, 0), new NodeLocation(0, 1)),
                 new ElementDiff("NEW", null, new NodeLocation(0, 2))
         ));
-        assertEquals(3, positiveTempNodes.size());
-        ElementSnapshot readRoot = (ElementSnapshot) positiveTempNodes.get(NodeLocation.root());
-        assertTreeEquals(r, readRoot);
+        assertEquals(2, positiveTempNodes.size());
         ElementSnapshot readE = (ElementSnapshot) positiveTempNodes.get(new NodeLocation(0, 1));
         assertTreeEquals(e, readE);
         ElementSnapshot readNew = (ElementSnapshot) positiveTempNodes.get(new NodeLocation(0, 2));
@@ -289,7 +305,7 @@ public class TestPatchHelper extends TestCase {
                 negativeElement.getTagName(),
                 NodeLocation.root(), NodeLocation.root(),
                 negAttrs, posAttrs);
-        ElementSnapshot positiveElement = (ElementSnapshot) patchHelper.applyNodePatch(negativeElement, elementDiff, false);
+        ElementSnapshot positiveElement = (ElementSnapshot) patchHelper.applyNodePatch(negativeElement, elementDiff);
         assertNotSame(negativeElement, positiveElement);
         assertSame(negativeElement, positiveElement.getPreviousSnapshot());
         assertTrue(positiveElement.getAttributes().isEmpty());
@@ -297,7 +313,7 @@ public class TestPatchHelper extends TestCase {
         TextNodeSnapshot negativeText = new TextNodeSnapshotImpl("hello world", null);
         TextNodeDiff textDiff = new TextNodeDiff(NodeLocation.root(), NodeLocation.root());
         textDiff.setLines(Arrays.asList(new LineDiff(-1, "hello world")));
-        TextNodeSnapshot positiveText = (TextNodeSnapshot) patchHelper.applyNodePatch(negativeText, textDiff, false);
+        TextNodeSnapshot positiveText = (TextNodeSnapshot) patchHelper.applyNodePatch(negativeText, textDiff);
         assertNotSame(negativeText, positiveText);
         assertSame(negativeText, positiveText.getPreviousSnapshot());
         assertEquals("", positiveText.getData());
@@ -311,7 +327,7 @@ public class TestPatchHelper extends TestCase {
         ElementDiff emptyDiff = new ElementDiff(
                 negativeElement.getTagName(),
                 NodeLocation.root(), NodeLocation.root());
-        ElementSnapshot positiveElement = patchHelper.applyElementPatch(negativeElement, emptyDiff, false);
+        ElementSnapshot positiveElement = patchHelper.applyElementPatch(negativeElement, emptyDiff);
         assertSame(negativeElement, positiveElement.getPreviousSnapshot());
         assertEquals(negativeElement.getTagName(), positiveElement.getTagName());
         assertTrue(positiveElement.getAttributes().isEmpty());
@@ -324,7 +340,7 @@ public class TestPatchHelper extends TestCase {
                 ),
                 Arrays.asList(), null);
 
-        positiveElement = patchHelper.applyElementPatch(negativeElement, emptyDiff, false);
+        positiveElement = patchHelper.applyElementPatch(negativeElement, emptyDiff);
         assertSame(negativeElement, positiveElement.getPreviousSnapshot());
         assertEquals(negativeElement.getTagName(), positiveElement.getTagName());
         assertEquals(3, positiveElement.getAttributes().size());
@@ -343,7 +359,7 @@ public class TestPatchHelper extends TestCase {
         diff.setNegativeAttributes(negativeAttrs);
         diff.setPositiveAttributes(positiveAttrs);
 
-        positiveElement = patchHelper.applyElementPatch(negativeElement, diff, false);
+        positiveElement = patchHelper.applyElementPatch(negativeElement, diff);
         assertNotSame(negativeElement, positiveElement);
         assertSame(negativeElement, positiveElement.getPreviousSnapshot());
         assertEquals(3, positiveElement.getAttributes().size());
@@ -359,13 +375,13 @@ public class TestPatchHelper extends TestCase {
     public void testApplyTextNodePatch() {
         TextNodeSnapshot negativeText = new TextNodeSnapshotImpl(null, null);
         TextNodeDiff emptyDiff = new TextNodeDiff(NodeLocation.root(), NodeLocation.root());
-        TextNodeSnapshot positiveText = patchHelper.applyTextNodePatch(negativeText, emptyDiff, false);
+        TextNodeSnapshot positiveText = patchHelper.applyTextNodePatch(negativeText, emptyDiff);
         assertSame(negativeText, positiveText.getPreviousSnapshot());
         assertEquals(negativeText.getData(), positiveText.getData());
         assertNull(positiveText.getData());
 
         negativeText = new TextNodeSnapshotImpl("hello\nworld", null);
-        positiveText = patchHelper.applyTextNodePatch(negativeText, emptyDiff, false);
+        positiveText = patchHelper.applyTextNodePatch(negativeText, emptyDiff);
         assertSame(negativeText, positiveText.getPreviousSnapshot());
         assertEquals("hello\nworld", positiveText.getData());
 
@@ -374,7 +390,7 @@ public class TestPatchHelper extends TestCase {
                 new LineDiff(-2, "world"),
                 new LineDiff(2, "world\n!!")
         ));
-        positiveText = patchHelper.applyTextNodePatch(negativeText, diff, false);
+        positiveText = patchHelper.applyTextNodePatch(negativeText, diff);
         assertNotSame(negativeText, positiveText);
         assertSame(negativeText, positiveText.getPreviousSnapshot());
         assertEquals("hello\nworld\n!!", positiveText.getData());

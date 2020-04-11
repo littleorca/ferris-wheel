@@ -31,6 +31,23 @@ public class TextNodeSnapshotBuilder extends AbstractNodeSnapshotBuilder
         implements TextNodeSnapshot {
     private String data;
 
+    public TextNodeSnapshotBuilder() {
+    }
+
+    /**
+     * Create builder based on the specified origin node snapshot. The previous
+     * node will be set to the specified origin node.
+     *
+     * @param origin
+     */
+    public TextNodeSnapshotBuilder(TextNodeSnapshot origin) {
+        if (origin instanceof TextNodeSnapshotBuilder) {
+            throw new IllegalArgumentException();
+        }
+        this.data = origin.getData();
+        setPreviousSnapshot(origin);
+    }
+
     @Override
     public String getData() {
         return data;

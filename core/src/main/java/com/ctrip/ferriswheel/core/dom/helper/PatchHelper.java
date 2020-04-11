@@ -47,16 +47,28 @@ public class PatchHelper {
             return tree;
         }
 
+        // Deletions contains all renames plus the nodes that really deleted, indexed by negative location.
         TreeSet<NodeLocation> deletions = new TreeSet<>();
+        // Renames contains all updated/moved nodes, indexed by negative location.
+        TreeSet<NodeLocation> renames = new TreeSet<>();
+        // Insertions contains all renames plus the case of pure new node, indexed by positive location.
         TreeMap<NodeLocation, Diff> insertions = new TreeMap<>();
-        analysePatch(patch, deletions, insertions);
-        NavigableMap<NodeLocation, NodeSnapshot> tempNodes = applyDeletions(tree, deletions);
+
+        analysePatch(patch, deletions, renames, insertions);
+        // tempNodes contains all useful nodes that has either child changes or self updates, indexed by negative location.
+        NavigableMap<NodeLocation, NodeSnapshot> tempNodes = applyDeletions(tree, deletions, renames);
+        ElementSnapshot tempTree = (ElementSnapshot) tempNodes.get(NodeLocation.root());
+        if (tempTree == null) {
+            tempTree = tree;
+        }
+        // tempNodes will be patched if needed, and the index will changed to positive location.
         tempNodes = applyStaticPatch(tempNodes, patch.getDiffList());
-        return applyInsertions(tree, tempNodes, insertions);
+        return applyInsertions(tempTree, tempNodes, insertions);
     }
 
     void analysePatch(Patch patch,
                       TreeSet<NodeLocation> deletions,
+                      TreeSet<NodeLocation> renames,
                       TreeMap<NodeLocation, Diff> insertions) {
         for (Diff diff : patch.getDiffList()) {
             if (diff.getNegativeLocation() != null) {
@@ -67,14 +79,19 @@ public class PatchHelper {
                 if (priorDiff == null || !priorDiff.hasContent()) {
                     insertions.put(diff.getPositiveLocation(), diff);
                 }
+
+                if (diff.getNegativeLocation() != null) {
+                    renames.add(diff.getNegativeLocation());
+                }
             }
         }
     }
 
     NavigableMap<NodeLocation, NodeSnapshot> applyDeletions(ElementSnapshot negativeTree,
-                                                            NavigableSet<NodeLocation> deletions) {
+                                                            NavigableSet<NodeLocation> deletions,
+                                                            NavigableSet<NodeLocation> renames) {
         NavigableMap<NodeLocation, NodeSnapshot> dirtyNodes = new TreeMap<>();
-        TreeDeleteStack treeDeleteStack = new TreeDeleteStack(negativeTree, deletions, dirtyNodes);
+        TreeDeleteStack treeDeleteStack = new TreeDeleteStack(negativeTree, deletions, renames, dirtyNodes);
         for (NodeLocation deleteLocation : deletions) {
             treeDeleteStack.feed(deleteLocation);
         }
@@ -100,7 +117,6 @@ public class PatchHelper {
             }
 
             NodeSnapshot negativeNode = null;
-            boolean reservePreviousRef = false;
             if (diff.getNegativeLocation() != null) {
                 negativeNode = negativeTempNodes.get(diff.getNegativeLocation());
                 if (negativeNode == null) {
@@ -108,20 +124,11 @@ public class PatchHelper {
                 }
             }
 
-            // FIXME reservePreviousRef
-            NodeSnapshot positiveNode = applyNodePatch(negativeNode, diff, reservePreviousRef);
+            NodeSnapshot positiveNode = applyNodePatch(negativeNode, diff);
             if (positiveNode == null) {
                 throw new IllegalStateException();
             }
             newTempNodes.put(diff.getPositiveLocation(), positiveNode);
-        }
-
-        if (!newTempNodes.containsKey(NodeLocation.root()) && !diffList.isEmpty()) {
-            NodeSnapshot root = negativeTempNodes.get(NodeLocation.root());
-            if (root == null) {
-                throw new IllegalStateException();
-            }
-            newTempNodes.put(NodeLocation.root(), root);
         }
 
         return newTempNodes;
@@ -153,81 +160,70 @@ public class PatchHelper {
      *
      * @param negativeNode
      * @param diff
-     * @param reservePreviousRef
      * @return A new patched node object, with previous node reference refer to
      * the specified <code>negativeNode</code>
      */
-    NodeSnapshot applyNodePatch(NodeSnapshot negativeNode, Diff diff, boolean reservePreviousRef) {
+    AbstractNodeSnapshotBuilder applyNodePatch(NodeSnapshot negativeNode, Diff diff) {
         if (diff instanceof ElementDiff) {
-            return applyElementPatch((ElementSnapshot) negativeNode, (ElementDiff) diff, reservePreviousRef);
+            return applyElementPatch((ElementSnapshot) negativeNode, (ElementDiff) diff);
         } else if (diff instanceof TextNodeDiff) {
-            return applyTextNodePatch(((TextNodeSnapshot) negativeNode), (TextNodeDiff) diff, reservePreviousRef);
+            return applyTextNodePatch(((TextNodeSnapshot) negativeNode), (TextNodeDiff) diff);
         } else {
             throw new RuntimeException();
         }
     }
 
     /**
-     * Apply patch to element, return new patched element.
+     * Apply patch to element, return new patched element builder.
      *
      * @param negativeElement
      * @param diff
-     * @param reservePreviousRef
-     * @return A new patched element object, with previous node reference refer
-     * to the <code>negativeElement</code>.
+     * @return A new patched element builder object.
      */
-    ElementSnapshot applyElementPatch(ElementSnapshot negativeElement, ElementDiff diff, boolean reservePreviousRef) {
-        if (diff == null || (reservePreviousRef && negativeElement == null)) {
+    ElementSnapshotBuilder applyElementPatch(ElementSnapshot negativeElement, ElementDiff diff) {
+        if (diff == null) {
             throw new IllegalArgumentException();
         }
 
-        String tagName = diff.getTagName();
+        ElementSnapshotBuilder newElement;
 
-        Map<String, String> attrs = new LinkedHashMap<>();
-        if (negativeElement != null) {
-            for (AttributeSnapshot attr : negativeElement.getAttributes()) {
-                attrs.put(attr.getName(), attr.getValue());
-            }
+        if (negativeElement == null) {
+            newElement = new ElementSnapshotBuilder();
+            newElement.setTagName(diff.getTagName());
+
+        } else {
+            newElement = negativeElement instanceof ElementSnapshotBuilder ?
+                    (ElementSnapshotBuilder) negativeElement :
+                    new ElementSnapshotBuilder(negativeElement);
         }
 
         for (Map.Entry<String, String> negAttrEntry : diff.getNegativeAttributes().entrySet()) {
-            if (!attrs.containsKey(negAttrEntry.getKey())) {
+            if (!newElement.hasAttr(negAttrEntry.getKey())) {
                 throw new IllegalStateException();
             }
-            String removed = attrs.remove(negAttrEntry.getKey());
+            String removed = newElement.removeAttr(negAttrEntry.getKey());
             // check removed.equals(negAttrEntry.getValue()); ?
         }
 
         for (Map.Entry<String, String> posAttr : diff.getPositiveAttributes().entrySet()) {
-            if (attrs.containsKey(posAttr.getKey())) {
+            if (newElement.hasAttr(posAttr.getKey())) {
                 throw new IllegalStateException();
             }
-            attrs.put(posAttr.getKey(), posAttr.getValue());
+            newElement.setAttribute(posAttr.getKey(), posAttr.getValue());
         }
 
-        List<AttributeSnapshot> attrList = new ArrayList<>(attrs.size());
-        attrs.forEach((name, value) -> attrList.add(new AttributeSnapshotImpl(name, value, null)));
-
-        List<NodeSnapshot> childList = negativeElement == null ?
-                Collections.emptyList() : new ArrayList<>(negativeElement.getChildren());
-
-        ElementSnapshot previousNode = reservePreviousRef ?
-                negativeElement.getPreviousSnapshot() : negativeElement;
-
-        return new ElementSnapshotImpl(tagName, attrList, childList, previousNode);
+        return newElement;
     }
 
     /**
-     * Apply patch to text node, return new patched text node.
+     * Apply patch to text node, return new patched text node builder.
      *
      * @param negativeText
      * @param diff
-     * @param reservePreviousRef
-     * @return A new patched text node object, with previous node reference
-     * refer to the <code>negativeText</code>.
+     * @return A new patched text node builder object.
      */
-    TextNodeSnapshot applyTextNodePatch(TextNodeSnapshot negativeText, TextNodeDiff diff, boolean reservePreviousRef) {
-        if (diff == null || (reservePreviousRef && negativeText == null)) {
+    TextNodeSnapshotBuilder applyTextNodePatch(TextNodeSnapshot negativeText, TextNodeDiff diff) {
+        if (diff == null) {
             throw new IllegalArgumentException();
         }
 
@@ -267,10 +263,12 @@ public class PatchHelper {
             data = null; // TODO treat null as empty string?
         }
 
-        NodeSnapshot previous = reservePreviousRef ?
-                negativeText.getPreviousSnapshot() : negativeText;
-
-        return new TextNodeSnapshotImpl(data, negativeText);
+        TextNodeSnapshotBuilder newTextNode = negativeText instanceof TextNodeSnapshotBuilder ?
+                (TextNodeSnapshotBuilder) negativeText : negativeText != null ?
+                new TextNodeSnapshotBuilder(negativeText) :
+                new TextNodeSnapshotBuilder();
+        newTextNode.setData(data);
+        return newTextNode;
     }
 
     private NodeSnapshot getNodeByLocation(NodeSnapshot root, NodeLocation location) {
@@ -341,6 +339,7 @@ public class PatchHelper {
     class TreeDeleteStack extends TreePatchStack {
         private ElementSnapshot negativeTree;
         private NavigableSet<NodeLocation> deletions;
+        private NavigableSet<NodeLocation> renames;
         private Map<NodeLocation, NodeSnapshot> dirtyNodes;
 
         /**
@@ -348,6 +347,7 @@ public class PatchHelper {
          *
          * @param negativeTree original tree.
          * @param deletions    sorted deletion list.
+         * @param renames      renamed node locations, a subset of deletions.
          * @param dirtyNodes   used to hold dirty nodes after deleting.
          *                     a dirty node is always a new object with
          *                     previous node reference refer to the origin
@@ -355,9 +355,11 @@ public class PatchHelper {
          */
         TreeDeleteStack(ElementSnapshot negativeTree,
                         NavigableSet<NodeLocation> deletions,
+                        NavigableSet<NodeLocation> renames,
                         Map<NodeLocation, NodeSnapshot> dirtyNodes) {
             this.negativeTree = negativeTree;
             this.deletions = deletions;
+            this.renames = renames;
             this.dirtyNodes = dirtyNodes;
         }
 
@@ -367,33 +369,38 @@ public class PatchHelper {
                 if (deletedIndices.size() != 1) {
                     throw new IllegalStateException();
                 }
-                if (dirtyNodes.isEmpty()) {
+                if (dirtyNodes.isEmpty() && renames.contains(NodeLocation.root())) {
                     dirtyNodes.put(NodeLocation.root(), negativeTree);
                 }
                 return;
             }
 
             ElementSnapshot element = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
-            List<NodeSnapshot> priorChildren = element.getChildren();
-            List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() - deletedIndices.size());
-            for (int i = 0; i < priorChildren.size(); i++) {
+            // TODO review
+            // probably there is not need to worry about element's class, it comes from negative tree,
+            // should always be real snapshot instead of a builder.
+            ElementSnapshotBuilder elementBuilder = element instanceof ElementSnapshotBuilder ?
+                    (ElementSnapshotBuilder) element :
+                    new ElementSnapshotBuilder(element);
+            int originChildCount = element.getChildren().size();
+            for (int i = originChildCount - 1; i >= 0; i--) {
                 NodeLocation childLocation = parentLocation.append(i);
                 if (deletions.contains(childLocation)) {
+                    NodeSnapshot removedChild = elementBuilder.removeChild(i);
+                    if (renames.contains(childLocation) && !dirtyNodes.containsKey(childLocation)) {
+                        dirtyNodes.put(childLocation, removedChild);
+                    }
                     continue;
                 }
+
                 NodeSnapshot child = dirtyNodes.get(childLocation);
-                if (child == null) {
-                    child = priorChildren.get(i);
+                if (child != null) {
+                    elementBuilder.removeChild(i);
+                    elementBuilder.addChild(i, child);
                 }
-                nextChildren.add(child);
             }
 
-            ElementSnapshotImpl dirtyElement = new ElementSnapshotImpl(
-                    element.getTagName(),
-                    element.getAttributes(),
-                    nextChildren,
-                    element);
-            dirtyNodes.put(parentLocation, dirtyElement);
+            dirtyNodes.put(parentLocation, elementBuilder);
 
             if (isEmpty() || !parentLocation.equals(peek())) {
                 feed(parentLocation);
@@ -421,18 +428,14 @@ public class PatchHelper {
             this.insertions = insertions;
         }
 
-        // TODO review for previous ref
         @Override
         protected void doReduce(NodeLocation parentLocation, NavigableSet<Integer> insertIndices) {
             if (parentLocation == null) {
                 return; // last reduce
             }
 
-            boolean reservePreviousRef = false;
             ElementSnapshot parentElem = (ElementSnapshot) positiveTempNodes.get(parentLocation);
-            if (parentElem != null) {
-                reservePreviousRef = true;
-            } else {
+            if (parentElem == null) {
                 Map.Entry<NodeLocation, NodeSnapshot> ancestor = positiveTempNodes.floorEntry(parentLocation);
                 if (ancestor != null) {
                     parentElem = (ElementSnapshot) getNodeByLocation(ancestor.getValue(),
@@ -440,9 +443,6 @@ public class PatchHelper {
 
                 } else {
                     parentElem = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
-                    if (parentElem != null) {
-                        reservePreviousRef = true;
-                    }
                 }
             }
 
@@ -450,33 +450,20 @@ public class PatchHelper {
                 throw new IllegalStateException();
             }
 
-            List<NodeSnapshot> priorChildren = parentElem.getChildren();
-            List<NodeSnapshot> nextChildren = new ArrayList<>(priorChildren.size() + insertIndices.size());
+            ElementSnapshotBuilder newParent = parentElem instanceof ElementSnapshotBuilder ?
+                    (ElementSnapshotBuilder) parentElem :
+                    new ElementSnapshotBuilder(parentElem);
 
-            int endIndex = priorChildren.size() + insertIndices.size();
-            for (int negativeIndex = 0, positiveIndex = 0;
-                 positiveIndex < endIndex;
-                 positiveIndex++) {
-
+            int endIndex = parentElem.getChildren().size() + insertIndices.size();
+            for (int positiveIndex = 0; positiveIndex < endIndex; positiveIndex++) {
                 NodeLocation childLocation = parentLocation.append(positiveIndex);
                 NodeSnapshot child = positiveTempNodes.get(childLocation);
-                if (child == null) {
-                    child = priorChildren.get(negativeIndex++);
+                if (child != null) {
+                    newParent.addChild(positiveIndex, child);
                 }
-
-                if (child == null) {
-                    throw new IllegalStateException();
-                }
-
-                nextChildren.add(child);
             }
 
-            parentElem = new ElementSnapshotImpl(parentElem.getTagName(),
-                    parentElem.getAttributes(),
-                    nextChildren,
-                    parentElem.getPreviousSnapshot()); // FIXME previous node is not correct
-
-            positiveTempNodes.put(parentLocation, parentElem);
+            positiveTempNodes.put(parentLocation, newParent);
 
             if (isEmpty() || !parentLocation.equals(peek())) {
                 feed(parentLocation);
