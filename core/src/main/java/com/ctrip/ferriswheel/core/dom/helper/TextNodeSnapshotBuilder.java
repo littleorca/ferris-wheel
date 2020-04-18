@@ -26,6 +26,7 @@ package com.ctrip.ferriswheel.core.dom.helper;
 
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.impl.TextNodeSnapshotImpl;
 
 public class TextNodeSnapshotBuilder extends AbstractNodeSnapshotBuilder
         implements TextNodeSnapshot {
@@ -76,5 +77,10 @@ public class TextNodeSnapshotBuilder extends AbstractNodeSnapshotBuilder
     @Override
     public TextNodeSnapshot duplicate(boolean linked) {
         return null; // FIXME
+    }
+
+    @Override
+    public TextNodeSnapshot build() {
+        return new TextNodeSnapshotImpl(data, getPreviousSnapshot());
     }
 }

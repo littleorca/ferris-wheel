@@ -24,7 +24,7 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-public interface AttributeSnapshot extends NodeSnapshot {
+public interface AttributeSnapshot extends NodeSnapshot, AttributeEssential {
     @Override
     default NodeType getNodeType() {
         return NodeType.ATTRIBUTE_NODE;

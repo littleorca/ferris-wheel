@@ -34,7 +34,7 @@ public abstract class AbstractNodeSnapshotBuilder implements NodeSnapshot {
         return previousSnapshot;
     }
 
-    public AbstractNodeSnapshotBuilder setPreviousSnapshot(NodeSnapshot previousSnapshot) {
+    public NodeSnapshot setPreviousSnapshot(NodeSnapshot previousSnapshot) {
         this.previousSnapshot = previousSnapshot;
         return this;
     }
@@ -49,4 +49,5 @@ public abstract class AbstractNodeSnapshotBuilder implements NodeSnapshot {
         return originalSnapshot;
     }
 
+    public abstract NodeSnapshot build();
 }

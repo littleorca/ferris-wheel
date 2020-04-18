@@ -24,14 +24,5 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-public interface NodeSnapshot {
-    NodeType getNodeType();
-
-    String getNodeName();
-
-    NodeSnapshot getPreviousSnapshot();
-
-    NodeSnapshot getOriginalSnapshot();
-
-    NodeSnapshot duplicate(boolean linked);
+public interface NodeSnapshot extends NodeSnapshotOrBuilder {
 }

@@ -25,10 +25,7 @@
 package com.ctrip.ferriswheel.core.dom.helper;
 
 
-import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
-import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
-import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
-import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.*;
 import com.ctrip.ferriswheel.core.dom.diff.*;
 import com.ctrip.ferriswheel.core.util.ListSequenceWrapper;
 import com.ctrip.ferriswheel.core.util.MyersDifferenceAnalyzer;
@@ -46,12 +43,12 @@ public class DiffHelper {
      * @param negativeRoot
      * @param positiveRoot
      * @return
-     * @see #diff(NodeSnapshot, NodeSnapshot, DiffCollector)
-     * @see #diff(NodeSnapshot, NodeLocation, NodeSnapshot, NodeLocation)
-     * @see #diff(NodeSnapshot, NodeLocation, NodeSnapshot, NodeLocation, DiffCollector)
+     * @see #diff(NodeEssential, NodeEssential, DiffCollector)
+     * @see #diff(NodeEssential, NodeLocation, NodeEssential, NodeLocation)
+     * @see #diff(NodeEssential, NodeLocation, NodeEssential, NodeLocation, DiffCollector)
      */
-    public Patch diff(NodeSnapshot negativeRoot,
-                      NodeSnapshot positiveRoot) {
+    public Patch diff(NodeEssential negativeRoot,
+                      NodeEssential positiveRoot) {
         DefaultDiffCollector collector = new DefaultDiffCollector();
         diff(negativeRoot, positiveRoot, collector);
         return collector.toPatch();
@@ -63,12 +60,12 @@ public class DiffHelper {
      * @param negativeRoot
      * @param positiveRoot
      * @param collector
-     * @see #diff(NodeSnapshot, NodeSnapshot)
-     * @see #diff(NodeSnapshot, NodeLocation, NodeSnapshot, NodeLocation)
-     * @see #diff(NodeSnapshot, NodeLocation, NodeSnapshot, NodeLocation, DiffCollector)
+     * @see #diff(NodeEssential, NodeEssential)
+     * @see #diff(NodeEssential, NodeLocation, NodeEssential, NodeLocation)
+     * @see #diff(NodeEssential, NodeLocation, NodeEssential, NodeLocation, DiffCollector)
      */
-    public void diff(NodeSnapshot negativeRoot,
-                     NodeSnapshot positiveRoot,
+    public void diff(NodeEssential negativeRoot,
+                     NodeEssential positiveRoot,
                      DiffCollector collector) {
         diff(negativeRoot, null, positiveRoot, null, collector);
     }
@@ -81,13 +78,13 @@ public class DiffHelper {
      * @param positiveRoot
      * @param positiveBaseLocation
      * @return
-     * @see #diff(NodeSnapshot, NodeSnapshot)
-     * @see #diff(NodeSnapshot, NodeSnapshot, DiffCollector)
-     * @see #diff(NodeSnapshot, NodeLocation, NodeSnapshot, NodeLocation, DiffCollector)
+     * @see #diff(NodeEssential, NodeEssential)
+     * @see #diff(NodeEssential, NodeEssential, DiffCollector)
+     * @see #diff(NodeEssential, NodeLocation, NodeEssential, NodeLocation, DiffCollector)
      */
-    public Patch diff(NodeSnapshot negativeRoot,
+    public Patch diff(NodeEssential negativeRoot,
                       NodeLocation negativeBaseLocation,
-                      NodeSnapshot positiveRoot,
+                      NodeEssential positiveRoot,
                       NodeLocation positiveBaseLocation) {
         DefaultDiffCollector collector = new DefaultDiffCollector();
         diff(negativeRoot, negativeBaseLocation, positiveRoot, positiveBaseLocation, collector);
@@ -102,13 +99,13 @@ public class DiffHelper {
      * @param positiveRoot
      * @param positiveBaseLocation
      * @param collector
-     * @see #diff(NodeSnapshot, NodeSnapshot)
-     * @see #diff(NodeSnapshot, NodeSnapshot, DiffCollector)
-     * @see #diff(NodeSnapshot, NodeLocation, NodeSnapshot, NodeLocation)
+     * @see #diff(NodeEssential, NodeEssential)
+     * @see #diff(NodeEssential, NodeEssential, DiffCollector)
+     * @see #diff(NodeEssential, NodeLocation, NodeEssential, NodeLocation)
      */
-    public void diff(NodeSnapshot negativeRoot,
+    public void diff(NodeEssential negativeRoot,
                      NodeLocation negativeBaseLocation,
-                     NodeSnapshot positiveRoot,
+                     NodeEssential positiveRoot,
                      NodeLocation positiveBaseLocation,
                      DiffCollector collector) {
         if (negativeRoot == null && positiveRoot == null) {
@@ -129,7 +126,7 @@ public class DiffHelper {
         diffNode(context, negativeRoot, positiveRoot);
     }
 
-    void diffNode(DiffContext context, NodeSnapshot negativeNode, NodeSnapshot positiveNode) {
+    void diffNode(DiffContext context, NodeEssential negativeNode, NodeEssential positiveNode) {
         if (negativeNode == null && positiveNode == null) {
             throw new IllegalArgumentException("Negative node and positive node cannot be both null, " +
                     "this is probably a bug.");
@@ -249,8 +246,8 @@ public class DiffHelper {
     }
 
     void diffChildList(DiffContext context, ElementSnapshot negativeElement, ElementSnapshot positiveElement) {
-        Sequence<NodeSnapshot> negativeSeq = createChildSequence(negativeElement);
-        Sequence<NodeSnapshot> positiveSeq = createChildSequence(positiveElement);
+        Sequence<NodeEssential> negativeSeq = createChildSequence(negativeElement);
+        Sequence<NodeEssential> positiveSeq = createChildSequence(positiveElement);
         List<Integer> ops = new LinkedList<>();
 
         analyzer.analyze(negativeSeq, positiveSeq,
@@ -258,9 +255,9 @@ public class DiffHelper {
                 op -> ops.add(op));
 
         for (int op : ops) {
-            NodeSnapshot nChild;
+            NodeEssential nChild;
             NodeLocation nLocation;
-            NodeSnapshot pChild = null;
+            NodeEssential pChild = null;
             NodeLocation pLocation = null;
 
             if (op > 0) {
@@ -283,15 +280,20 @@ public class DiffHelper {
         }
     }
 
-    private Sequence<NodeSnapshot> createChildSequence(ElementSnapshot element) {
-        List<NodeSnapshot> list = element == null ?
-                Collections.emptyList() : element.getChildren();
+    private Sequence<NodeEssential> createChildSequence(ElementEssential element) {
+        int count = element == null ? 0 : element.getChildCount();
+        List<NodeEssential> list = new ArrayList<>(count);
+        if (element != null) {
+            for (int i = 0; i < element.getChildCount(); i++) {
+                list.add(element.getChild(i));
+            }
+        }
         return new ListSequenceWrapper<>(list);
     }
 
-    private Diff createDiff(NodeSnapshot negativeNode, NodeLocation negativeLocation,
-                            NodeSnapshot positiveNode, NodeLocation positiveLocation) {
-        NodeSnapshot nonNullNode = positiveNode == null ? negativeNode : positiveNode;
+    private Diff createDiff(NodeEssential negativeNode, NodeLocation negativeLocation,
+                            NodeEssential positiveNode, NodeLocation positiveLocation) {
+        NodeEssential nonNullNode = positiveNode == null ? negativeNode : positiveNode;
 
         if (nonNullNode instanceof ElementSnapshot) {
             return createElementDiff(((ElementSnapshot) nonNullNode).getTagName(),
@@ -313,18 +315,21 @@ public class DiffHelper {
         return new TextNodeDiff(negativeLocation, positiveLocation);
     }
 
-    boolean isSameNode(NodeSnapshot nodeA, NodeSnapshot nodeB) {
+    boolean isSameNode(NodeEssential nodeA, NodeEssential nodeB) {
         if (nodeA == nodeB) {
             return true;
         }
-        return nodeA.getOriginalSnapshot() == nodeB.getOriginalSnapshot();
+        if (nodeA instanceof NodeSnapshot && nodeB instanceof NodeSnapshot) {
+            return ((NodeSnapshot) nodeA).getOriginalSnapshot() == ((NodeSnapshot) nodeB).getOriginalSnapshot();
+        }
+        return false;
     }
 
     private void diffChildItems(DiffContext context, ElementSnapshot element) {
         List<? extends NodeSnapshot> children = element.getChildren();
         for (int i = 0; i < children.size(); i++) {
-            NodeSnapshot child = children.get(i);
-            NodeSnapshot negativeChild = context.getNegativeNode(child);
+            NodeEssential child = children.get(i);
+            NodeEssential negativeChild = context.getNegativeNode(child);
             context.pushLocation(i);
             diffNode(context, negativeChild, child);
             context.popLocation();
@@ -336,8 +341,9 @@ public class DiffHelper {
         TreeIndexer negativeIndexer;
         NodeLocationStack positiveLocation;
 
-        DiffContext(NodeSnapshot negativeNode, NodeLocation negativeLocation,
-                    NodeSnapshot positiveNode, NodeLocation positiveLocation, DiffCollector collector) {
+        DiffContext(NodeEssential negativeNode, NodeLocation negativeLocation,
+                    NodeEssential positiveNode, NodeLocation positiveLocation,
+                    DiffCollector collector) {
             this.collector = collector;
             this.negativeIndexer = new TreeIndexer(negativeNode, negativeLocation);
             this.positiveLocation = new NodeLocationStack();
@@ -348,7 +354,7 @@ public class DiffHelper {
             }
         }
 
-        NodeLocation getNegativeLocation(NodeSnapshot node) {
+        NodeLocation getNegativeLocation(NodeEssential node) {
             return negativeIndexer.getTreeLocation(node);
         }
 
@@ -360,7 +366,7 @@ public class DiffHelper {
             collector.add(diff);
         }
 
-        public NodeSnapshot getNegativeNode(NodeSnapshot node) {
+        public NodeEssential getNegativeNode(NodeEssential node) {
             return negativeIndexer.getTreeNode(node);
         }
 
@@ -378,20 +384,25 @@ public class DiffHelper {
     }
 
     static class TreeIndexer {
-        private NodeSnapshot rootNode;
+        private NodeEssential rootNode;
         private NodeLocation rootLocation;
-        private Map<NodeSnapshot, NodeSnapshot> originalToTreeNode = new HashMap<>();
-        private Map<NodeSnapshot, NodeLocation> originalToTreeLocation = new HashMap<>();
+        private Map<NodeEssential, NodeEssential> originalToTreeNode = new HashMap<>();
+        private Map<NodeEssential, NodeLocation> originalToTreeLocation = new HashMap<>();
 
-        TreeIndexer(NodeSnapshot startNode) {
+        TreeIndexer(NodeEssential startNode) {
             this(startNode, NodeLocation.root());
         }
 
-        TreeIndexer(NodeSnapshot startNode, NodeLocation startLocation) {
+        TreeIndexer(NodeEssential startNode, NodeLocation startLocation) {
             this.rootNode = startNode;
             this.rootLocation = startLocation;
 
-            NodeSnapshot originalOfStartNode = startNode.getOriginalSnapshot();
+            NodeEssential originalOfStartNode;
+            if (startNode instanceof NodeSnapshotOrBuilder) {
+                originalOfStartNode = ((NodeSnapshotOrBuilder) startNode).getOriginalSnapshot();
+            } else {
+                originalOfStartNode = startNode;
+            }
             originalToTreeNode.put(originalOfStartNode, startNode);
             originalToTreeLocation.put(originalOfStartNode, startLocation);
 
@@ -420,23 +431,20 @@ public class DiffHelper {
             }
         }
 
-        NodeSnapshot getTreeNodeByOriginal(NodeSnapshot original) {
-            return originalToTreeNode.get(original);
+        NodeEssential getTreeNode(NodeEssential node) {
+            if (node instanceof NodeSnapshot) {
+                node = ((NodeSnapshot) node).getOriginalSnapshot();
+            }
+            return originalToTreeNode.get(node);
         }
 
-        NodeSnapshot getTreeNode(NodeSnapshot node) {
-            return originalToTreeNode.get(node.getOriginalSnapshot());
-        }
-
-        NodeLocation getTreeLocationByOriginal(NodeSnapshot original) {
-            return originalToTreeLocation.get(original);
-        }
-
-        NodeLocation getTreeLocation(NodeSnapshot node) {
+        NodeLocation getTreeLocation(NodeEssential node) {
             if (node == null) {
                 return null;
+            } else if (node instanceof NodeSnapshot) {
+                node = ((NodeSnapshot) node).getOriginalSnapshot();
             }
-            return originalToTreeLocation.get(node.getOriginalSnapshot());
+            return originalToTreeLocation.get(node);
         }
     }
 

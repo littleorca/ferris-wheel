@@ -133,21 +133,21 @@ public class TreeSnapshotUtil {
     }
 
 
-    public static void assertTreeEquals(ElementSnapshot expected, ElementSnapshot actual) {
-        Stack<NodeSnapshot> stackExpected = new Stack<>();
-        Stack<NodeSnapshot> stackActual = new Stack<>();
+    public static void assertTreeEquals(ElementSnapshot expected, ElementSnapshotOrBuilder actual) {
+        Stack<NodeSnapshotOrBuilder> stackExpected = new Stack<>();
+        Stack<NodeSnapshotOrBuilder> stackActual = new Stack<>();
         stackExpected.push(expected);
         stackActual.push(actual);
         while (!stackExpected.isEmpty()) {
             assertFalse(stackActual.isEmpty());
-            NodeSnapshot expectedOne = stackExpected.pop();
-            NodeSnapshot actualOne = stackActual.pop();
+            NodeSnapshotOrBuilder expectedOne = stackExpected.pop();
+            NodeSnapshotOrBuilder actualOne = stackActual.pop();
 
-            if (expectedOne instanceof ElementSnapshot) {
-                assertTrue(actualOne instanceof ElementSnapshot);
+            if (expectedOne instanceof ElementSnapshotOrBuilder) {
+                assertTrue(actualOne instanceof ElementSnapshotOrBuilder);
 
-                ElementSnapshot expectedElem = (ElementSnapshot) expectedOne;
-                ElementSnapshot actualElem = (ElementSnapshot) actualOne;
+                ElementSnapshotOrBuilder expectedElem = (ElementSnapshotOrBuilder) expectedOne;
+                ElementSnapshotOrBuilder actualElem = (ElementSnapshotOrBuilder) actualOne;
                 assertElementContentEquals(expectedElem, actualElem);
 
                 assertEquals(expectedElem.getChildren().size(), actualElem.getChildren().size());
@@ -167,7 +167,8 @@ public class TreeSnapshotUtil {
         assertTrue(stackActual.isEmpty());
     }
 
-    public static void assertElementContentEquals(ElementSnapshot expectedElem, ElementSnapshot actualElem) {
+    public static void assertElementContentEquals(ElementSnapshotOrBuilder expectedElem,
+                                                  ElementSnapshotOrBuilder actualElem) {
         assertEquals(expectedElem.getTagName(), actualElem.getTagName());
         Map<String, String> expectedAttrs = new HashMap<>();
         Map<String, String> actualAttrs = new HashMap<>();

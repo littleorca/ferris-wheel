@@ -262,7 +262,7 @@ public class RandomTestOfDiffAndPatch {
             if (!(node instanceof ElementSnapshot)) {
                 return node;
             }
-            List<NodeSnapshot> children = ((ElementSnapshot) node).getChildren();
+            List<? extends NodeSnapshot> children = ((ElementSnapshot) node).getChildren();
             if (children.isEmpty()) {
                 node = tree;
             } else {

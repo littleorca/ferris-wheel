@@ -24,19 +24,17 @@
 
 package com.ctrip.ferriswheel.core.dom.helper;
 
-import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
-import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
-import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
-import com.ctrip.ferriswheel.core.dom.NodeType;
+import com.ctrip.ferriswheel.core.dom.*;
 import com.ctrip.ferriswheel.core.dom.impl.AttributeSnapshotImpl;
+import com.ctrip.ferriswheel.core.dom.impl.ElementSnapshotImpl;
 
 import java.util.*;
 
 public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
-        implements ElementSnapshot {
+        implements ElementSnapshotOrBuilder {
     private String tagName;
     private Map<String, String> attributes;
-    private List<NodeSnapshot> children;
+    private List<NodeSnapshotOrBuilder> children;
 
     public ElementSnapshotBuilder() {
         this.attributes = new HashMap<>();
@@ -66,13 +64,58 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
     }
 
     @Override
-    public NodeType getNodeType() {
-        return NodeType.ELEMENT_NODE;
+    public String getNodeName() {
+        return getTagName();
     }
 
     @Override
-    public String getNodeName() {
-        return getTagName();
+    public String getTextContent() {
+        return null;//TODO
+    }
+
+    @Override
+    public String getNodeValue() {
+        return null;//TODO
+    }
+
+    @Override
+    public boolean hasChildNodes() {
+        return !children.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Node otherNode) {
+        return children.contains(otherNode);
+    }
+
+    @Override
+    public int getChildCount() {
+        return children.size();
+    }
+
+    @Override
+    public NodeEssential getChild(int index) {
+        return children.get(index);
+    }
+
+    @Override
+    public NodeEssential getChild(String name) {
+        for (NodeSnapshotOrBuilder child : children) {
+            if (child.getNodeName().equals(name)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public NodeEssential firstChild() {
+        return children.isEmpty() ? null : children.get(0);
+    }
+
+    @Override
+    public NodeEssential lastChild() {
+        return children.isEmpty() ? null : children.get(children.size() - 1);
     }
 
     @Override
@@ -83,6 +126,16 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
     public ElementSnapshotBuilder setTagName(String tagName) {
         this.tagName = tagName;
         return this;
+    }
+
+    @Override
+    public boolean hasAttribute(String name) {
+        return this.attributes.containsKey(name);
+    }
+
+    @Override
+    public String getAttribute(String name) {
+        return attributes.get(name);
     }
 
     @Override
@@ -98,29 +151,25 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
         return this;
     }
 
-    public boolean hasAttr(String name) {
-        return this.attributes.containsKey(name);
-    }
-
     public String removeAttr(String name) {
         return this.attributes.remove(name);
     }
 
     @Override
-    public List<NodeSnapshot> getChildren() {
+    public List<? extends NodeSnapshotOrBuilder> getChildren() {
         return children;
     }
 
-    public void setChildren(List<NodeSnapshot> children) {
+    public void setChildren(List<? extends NodeSnapshotOrBuilder> children) {
         this.children = children == null ? new LinkedList<>() : new LinkedList<>(children);
     }
 
-    public ElementSnapshotBuilder addChild(int index, NodeSnapshot child) {
+    public ElementSnapshotBuilder addChild(int index, NodeSnapshotOrBuilder child) {
         this.children.add(index, child);
         return this;
     }
 
-    public NodeSnapshot removeChild(int index) {
+    public NodeSnapshotOrBuilder removeChild(int index) {
         if (children == null) {
             throw new IllegalStateException();
         }
@@ -147,4 +196,16 @@ public class ElementSnapshotBuilder extends AbstractNodeSnapshotBuilder
         return (ElementSnapshot) super.getOriginalSnapshot();
     }
 
+    @Override
+    public ElementSnapshot build() {
+        ArrayList<NodeSnapshot> builtChildren = new ArrayList<>(children.size());
+        children.forEach(child -> {
+            if (child instanceof AbstractNodeSnapshotBuilder) {
+                builtChildren.add(((AbstractNodeSnapshotBuilder) child).build());
+            } else {
+                builtChildren.add((NodeSnapshot) child);
+            }
+        });
+        return new ElementSnapshotImpl(tagName, getAttributes(), builtChildren, getPreviousSnapshot());
+    }
 }

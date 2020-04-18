@@ -24,7 +24,7 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-public interface Node {
+public interface Node extends NodeEssential {
 
     Document getOwnerDocument();
 
@@ -36,39 +36,45 @@ public interface Node {
 
     Node nextSibling();
 
-    NodeType getNodeType();
-
-    String getNodeName();
-
-    String getTextContent();
-
     void setTextContent(String textContent);
-
-    String getNodeValue();
 
     void setNodeValue(String nodeValue);
 
-    boolean hasChildNodes();
+    @Override
+    default Node getChild(int index) {
+        throw new UnsupportedOperationException();
+    }
 
-    boolean contains(Node otherNode);
+    @Override
+    default Node getChild(String name) {
+        throw new UnsupportedOperationException();
+    }
 
-    int getChildCount();
+    @Override
+    default Node firstChild() {
+        throw new UnsupportedOperationException();
+    }
 
-    Node getChild(int index);
+    @Override
+    default Node lastChild() {
+        throw new UnsupportedOperationException();
+    }
 
-    Node getChild(String name);
+    default void insertChild(Node child, Node ref) {
+        throw new UnsupportedOperationException();
+    }
 
-    Node firstChild();
+    default void appendChild(Node child) {
+        throw new UnsupportedOperationException();
+    }
 
-    Node lastChild();
+    default boolean removeChild(Node child) {
+        throw new UnsupportedOperationException();
+    }
 
-    void insertChild(Node child, Node ref);
-
-    void appendChild(Node child);
-
-    boolean removeChild(Node child);
-
-    Node replaceChild(Node newChild, Node oldChild);
+    default Node replaceChild(Node newChild, Node oldChild) {
+        throw new UnsupportedOperationException();
+    }
 
     boolean isDirty();
 

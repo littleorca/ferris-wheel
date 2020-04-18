@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018-2019 Ctrip.com
+ * Copyright (c) 2018-2020 Ctrip.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,10 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-import java.util.Collection;
+public interface NodeSnapshotOrBuilder extends NodeEssential {
+    NodeSnapshot getPreviousSnapshot();
 
-public interface Element extends ContainerNode, ElementEssential {
+    NodeSnapshot getOriginalSnapshot();
 
-    @Override
-    String getTagName();
-
-    @Override
-    boolean hasAttribute(String name);
-
-    @Override
-    String getAttribute(String name);
-
-    String setAttribute(String name, String value);
-
-    String removeAttribute(String name);
-
-    @Override
-    Collection<? extends Attribute> getAttributes();
-
+    NodeSnapshotOrBuilder duplicate(boolean linked);
 }

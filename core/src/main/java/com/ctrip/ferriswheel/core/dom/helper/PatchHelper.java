@@ -24,14 +24,8 @@
 
 package com.ctrip.ferriswheel.core.dom.helper;
 
-import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
-import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
-import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
-import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.*;
 import com.ctrip.ferriswheel.core.dom.diff.*;
-import com.ctrip.ferriswheel.core.dom.impl.AttributeSnapshotImpl;
-import com.ctrip.ferriswheel.core.dom.impl.ElementSnapshotImpl;
-import com.ctrip.ferriswheel.core.dom.impl.TextNodeSnapshotImpl;
 import com.ctrip.ferriswheel.core.util.ShiftAndReduceStack;
 
 import java.util.*;
@@ -56,14 +50,21 @@ public class PatchHelper {
 
         analysePatch(patch, deletions, renames, insertions);
         // tempNodes contains all useful nodes that has either child changes or self updates, indexed by negative location.
-        NavigableMap<NodeLocation, NodeSnapshot> tempNodes = applyDeletions(tree, deletions, renames);
-        ElementSnapshot tempTree = (ElementSnapshot) tempNodes.get(NodeLocation.root());
+        NavigableMap<NodeLocation, NodeSnapshotOrBuilder> tempNodes = applyDeletions(tree, deletions, renames);
+        ElementSnapshotOrBuilder tempTree = (ElementSnapshotOrBuilder) tempNodes.get(NodeLocation.root());
         if (tempTree == null) {
             tempTree = tree;
         }
         // tempNodes will be patched if needed, and the index will changed to positive location.
         tempNodes = applyStaticPatch(tempNodes, patch.getDiffList());
-        return applyInsertions(tempTree, tempNodes, insertions);
+        tempTree = applyInsertions(tempTree, tempNodes, insertions);
+        if (tempTree instanceof ElementSnapshot) {
+            return (ElementSnapshot) tempTree;
+        } else if (tempTree instanceof ElementSnapshotBuilder) {
+            return ((ElementSnapshotBuilder) tempTree).build();
+        } else {
+            throw new RuntimeException();
+        }
     }
 
     void analysePatch(Patch patch,
@@ -87,10 +88,10 @@ public class PatchHelper {
         }
     }
 
-    NavigableMap<NodeLocation, NodeSnapshot> applyDeletions(ElementSnapshot negativeTree,
-                                                            NavigableSet<NodeLocation> deletions,
-                                                            NavigableSet<NodeLocation> renames) {
-        NavigableMap<NodeLocation, NodeSnapshot> dirtyNodes = new TreeMap<>();
+    NavigableMap<NodeLocation, NodeSnapshotOrBuilder> applyDeletions(ElementSnapshot negativeTree,
+                                                                     NavigableSet<NodeLocation> deletions,
+                                                                     NavigableSet<NodeLocation> renames) {
+        NavigableMap<NodeLocation, NodeSnapshotOrBuilder> dirtyNodes = new TreeMap<>();
         TreeDeleteStack treeDeleteStack = new TreeDeleteStack(negativeTree, deletions, renames, dirtyNodes);
         for (NodeLocation deleteLocation : deletions) {
             treeDeleteStack.feed(deleteLocation);
@@ -107,16 +108,18 @@ public class PatchHelper {
      * @param diffList
      * @return
      */
-    NavigableMap<NodeLocation, NodeSnapshot> applyStaticPatch(NavigableMap<NodeLocation, NodeSnapshot> negativeTempNodes,
-                                                              List<Diff> diffList) {
-        NavigableMap<NodeLocation, NodeSnapshot> newTempNodes = new TreeMap<>();
+    NavigableMap<NodeLocation, NodeSnapshotOrBuilder> applyStaticPatch(
+            NavigableMap<NodeLocation, NodeSnapshotOrBuilder> negativeTempNodes,
+            List<Diff> diffList) {
+
+        NavigableMap<NodeLocation, NodeSnapshotOrBuilder> newTempNodes = new TreeMap<>();
 
         for (Diff diff : diffList) {
             if (diff.getPositiveLocation() == null) {
                 continue;
             }
 
-            NodeSnapshot negativeNode = null;
+            NodeSnapshotOrBuilder negativeNode = null;
             if (diff.getNegativeLocation() != null) {
                 negativeNode = negativeTempNodes.get(diff.getNegativeLocation());
                 if (negativeNode == null) {
@@ -124,7 +127,7 @@ public class PatchHelper {
                 }
             }
 
-            NodeSnapshot positiveNode = applyNodePatch(negativeNode, diff);
+            NodeSnapshotOrBuilder positiveNode = applyNodePatch(negativeNode, diff);
             if (positiveNode == null) {
                 throw new IllegalStateException();
             }
@@ -134,9 +137,9 @@ public class PatchHelper {
         return newTempNodes;
     }
 
-    ElementSnapshot applyInsertions(ElementSnapshot negativeTree,
-                                    NavigableMap<NodeLocation, NodeSnapshot> positiveTempNodes,
-                                    NavigableMap<NodeLocation, Diff> insertions) {
+    ElementSnapshotOrBuilder applyInsertions(ElementSnapshotOrBuilder negativeTree,
+                                             NavigableMap<NodeLocation, NodeSnapshotOrBuilder> positiveTempNodes,
+                                             NavigableMap<NodeLocation, Diff> insertions) {
         TreeInsertStack treeInsertStack = new TreeInsertStack(negativeTree,
                 positiveTempNodes,
                 insertions);
@@ -145,9 +148,9 @@ public class PatchHelper {
         }
         treeInsertStack.terminate();
 
-        ElementSnapshot newTree = (ElementSnapshot) positiveTempNodes.get(NodeLocation.root());
+        ElementSnapshotOrBuilder newTree = (ElementSnapshotOrBuilder) positiveTempNodes.get(NodeLocation.root());
         if (newTree == null) {
-            newTree = (ElementSnapshot) positiveTempNodes.get(NodeLocation.root());
+            newTree = (ElementSnapshotOrBuilder) positiveTempNodes.get(NodeLocation.root());
         }
         if (newTree == null) {
             newTree = negativeTree;
@@ -163,11 +166,11 @@ public class PatchHelper {
      * @return A new patched node object, with previous node reference refer to
      * the specified <code>negativeNode</code>
      */
-    AbstractNodeSnapshotBuilder applyNodePatch(NodeSnapshot negativeNode, Diff diff) {
+    AbstractNodeSnapshotBuilder applyNodePatch(NodeSnapshotOrBuilder negativeNode, Diff diff) {
         if (diff instanceof ElementDiff) {
-            return applyElementPatch((ElementSnapshot) negativeNode, (ElementDiff) diff);
+            return applyElementPatch((ElementSnapshotOrBuilder) negativeNode, (ElementDiff) diff);
         } else if (diff instanceof TextNodeDiff) {
-            return applyTextNodePatch(((TextNodeSnapshot) negativeNode), (TextNodeDiff) diff);
+            return applyTextNodePatch(((TextNodeSnapshotOrBuilder) negativeNode), (TextNodeDiff) diff);
         } else {
             throw new RuntimeException();
         }
@@ -180,7 +183,7 @@ public class PatchHelper {
      * @param diff
      * @return A new patched element builder object.
      */
-    ElementSnapshotBuilder applyElementPatch(ElementSnapshot negativeElement, ElementDiff diff) {
+    ElementSnapshotBuilder applyElementPatch(ElementSnapshotOrBuilder negativeElement, ElementDiff diff) {
         if (diff == null) {
             throw new IllegalArgumentException();
         }
@@ -194,11 +197,11 @@ public class PatchHelper {
         } else {
             newElement = negativeElement instanceof ElementSnapshotBuilder ?
                     (ElementSnapshotBuilder) negativeElement :
-                    new ElementSnapshotBuilder(negativeElement);
+                    new ElementSnapshotBuilder((ElementSnapshot) negativeElement);
         }
 
         for (Map.Entry<String, String> negAttrEntry : diff.getNegativeAttributes().entrySet()) {
-            if (!newElement.hasAttr(negAttrEntry.getKey())) {
+            if (!newElement.hasAttribute(negAttrEntry.getKey())) {
                 throw new IllegalStateException();
             }
             String removed = newElement.removeAttr(negAttrEntry.getKey());
@@ -206,7 +209,7 @@ public class PatchHelper {
         }
 
         for (Map.Entry<String, String> posAttr : diff.getPositiveAttributes().entrySet()) {
-            if (newElement.hasAttr(posAttr.getKey())) {
+            if (newElement.hasAttribute(posAttr.getKey())) {
                 throw new IllegalStateException();
             }
             newElement.setAttribute(posAttr.getKey(), posAttr.getValue());
@@ -222,7 +225,7 @@ public class PatchHelper {
      * @param diff
      * @return A new patched text node builder object.
      */
-    TextNodeSnapshotBuilder applyTextNodePatch(TextNodeSnapshot negativeText, TextNodeDiff diff) {
+    TextNodeSnapshotBuilder applyTextNodePatch(TextNodeSnapshotOrBuilder negativeText, TextNodeDiff diff) {
         if (diff == null) {
             throw new IllegalArgumentException();
         }
@@ -265,17 +268,19 @@ public class PatchHelper {
 
         TextNodeSnapshotBuilder newTextNode = negativeText instanceof TextNodeSnapshotBuilder ?
                 (TextNodeSnapshotBuilder) negativeText : negativeText != null ?
-                new TextNodeSnapshotBuilder(negativeText) :
+                new TextNodeSnapshotBuilder((TextNodeSnapshot) negativeText) :
                 new TextNodeSnapshotBuilder();
         newTextNode.setData(data);
         return newTextNode;
     }
 
-    private NodeSnapshot getNodeByLocation(NodeSnapshot root, NodeLocation location) {
+    private NodeSnapshotOrBuilder getNodeByLocation(NodeSnapshotOrBuilder root, NodeLocation location) {
         return getNodeByLocation(root, NodeLocation.root(), location);
     }
 
-    private NodeSnapshot getNodeByLocation(NodeSnapshot node, NodeLocation nodeLocation, NodeLocation targetLocation) {
+    private NodeSnapshotOrBuilder getNodeByLocation(NodeSnapshotOrBuilder node,
+                                                    NodeLocation nodeLocation,
+                                                    NodeLocation targetLocation) {
         if (nodeLocation.equals(targetLocation)) {
             return node;
         }
@@ -288,7 +293,7 @@ public class PatchHelper {
              i < targetLocation.getDepth() && node != null;
              i++) {
             int index = targetLocation.getIndexOfLevel(i);
-            List<NodeSnapshot> children = ((ElementSnapshot) node).getChildren();
+            List<? extends NodeSnapshotOrBuilder> children = ((ElementSnapshotOrBuilder) node).getChildren();
             if (index >= children.size()) {
                 return null;
             }
@@ -340,7 +345,7 @@ public class PatchHelper {
         private ElementSnapshot negativeTree;
         private NavigableSet<NodeLocation> deletions;
         private NavigableSet<NodeLocation> renames;
-        private Map<NodeLocation, NodeSnapshot> dirtyNodes;
+        private Map<NodeLocation, NodeSnapshotOrBuilder> dirtyNodes;
 
         /**
          * Construct a stack for deleting tree nodes.
@@ -356,7 +361,7 @@ public class PatchHelper {
         TreeDeleteStack(ElementSnapshot negativeTree,
                         NavigableSet<NodeLocation> deletions,
                         NavigableSet<NodeLocation> renames,
-                        Map<NodeLocation, NodeSnapshot> dirtyNodes) {
+                        Map<NodeLocation, NodeSnapshotOrBuilder> dirtyNodes) {
             this.negativeTree = negativeTree;
             this.deletions = deletions;
             this.renames = renames;
@@ -386,14 +391,14 @@ public class PatchHelper {
             for (int i = originChildCount - 1; i >= 0; i--) {
                 NodeLocation childLocation = parentLocation.append(i);
                 if (deletions.contains(childLocation)) {
-                    NodeSnapshot removedChild = elementBuilder.removeChild(i);
+                    NodeSnapshotOrBuilder removedChild = elementBuilder.removeChild(i);
                     if (renames.contains(childLocation) && !dirtyNodes.containsKey(childLocation)) {
                         dirtyNodes.put(childLocation, removedChild);
                     }
                     continue;
                 }
 
-                NodeSnapshot child = dirtyNodes.get(childLocation);
+                NodeSnapshotOrBuilder child = dirtyNodes.get(childLocation);
                 if (child != null) {
                     elementBuilder.removeChild(i);
                     elementBuilder.addChild(i, child);
@@ -409,9 +414,9 @@ public class PatchHelper {
     }
 
     class TreeInsertStack extends TreePatchStack {
-        private ElementSnapshot negativeTree;
+        private ElementSnapshotOrBuilder negativeTree;
         private NavigableMap<NodeLocation, Diff> insertions;
-        private NavigableMap<NodeLocation, NodeSnapshot> positiveTempNodes;
+        private NavigableMap<NodeLocation, NodeSnapshotOrBuilder> positiveTempNodes;
 
         /**
          * Construct a stack for tree nodes insertion.
@@ -420,8 +425,8 @@ public class PatchHelper {
          * @param positiveTempNodes temp nodes indexed by positive locations.
          * @param insertions        sorted insertion map of location-diff pairs.
          */
-        public TreeInsertStack(ElementSnapshot negativeTree,
-                               NavigableMap<NodeLocation, NodeSnapshot> positiveTempNodes,
+        public TreeInsertStack(ElementSnapshotOrBuilder negativeTree,
+                               NavigableMap<NodeLocation, NodeSnapshotOrBuilder> positiveTempNodes,
                                NavigableMap<NodeLocation, Diff> insertions) {
             this.negativeTree = negativeTree;
             this.positiveTempNodes = positiveTempNodes;
@@ -434,15 +439,15 @@ public class PatchHelper {
                 return; // last reduce
             }
 
-            ElementSnapshot parentElem = (ElementSnapshot) positiveTempNodes.get(parentLocation);
+            ElementSnapshotOrBuilder parentElem = (ElementSnapshotOrBuilder) positiveTempNodes.get(parentLocation);
             if (parentElem == null) {
-                Map.Entry<NodeLocation, NodeSnapshot> ancestor = positiveTempNodes.floorEntry(parentLocation);
+                Map.Entry<NodeLocation, NodeSnapshotOrBuilder> ancestor = positiveTempNodes.floorEntry(parentLocation);
                 if (ancestor != null) {
-                    parentElem = (ElementSnapshot) getNodeByLocation(ancestor.getValue(),
+                    parentElem = (ElementSnapshotOrBuilder) getNodeByLocation(ancestor.getValue(),
                             ancestor.getKey(), parentLocation);
 
                 } else {
-                    parentElem = (ElementSnapshot) getNodeByLocation(negativeTree, parentLocation);
+                    parentElem = (ElementSnapshotOrBuilder) getNodeByLocation(negativeTree, parentLocation);
                 }
             }
 
@@ -452,12 +457,12 @@ public class PatchHelper {
 
             ElementSnapshotBuilder newParent = parentElem instanceof ElementSnapshotBuilder ?
                     (ElementSnapshotBuilder) parentElem :
-                    new ElementSnapshotBuilder(parentElem);
+                    new ElementSnapshotBuilder((ElementSnapshot) parentElem);
 
             int endIndex = parentElem.getChildren().size() + insertIndices.size();
             for (int positiveIndex = 0; positiveIndex < endIndex; positiveIndex++) {
                 NodeLocation childLocation = parentLocation.append(positiveIndex);
-                NodeSnapshot child = positiveTempNodes.get(childLocation);
+                NodeSnapshotOrBuilder child = positiveTempNodes.get(childLocation);
                 if (child != null) {
                     newParent.addChild(positiveIndex, child);
                 }

@@ -24,32 +24,9 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-import java.util.Collection;
 import java.util.List;
 
-public interface ElementSnapshot extends NodeSnapshot {
+public interface ElementSnapshot extends NodeSnapshot, ElementSnapshotOrBuilder {
     @Override
-    default NodeType getNodeType() {
-        return NodeType.ELEMENT_NODE;
-    }
-
-    @Override
-    default String getNodeName() {
-        return getTagName();
-    }
-
-    String getTagName();
-
-    Collection<AttributeSnapshot> getAttributes();
-
-    List<NodeSnapshot> getChildren();
-
-    @Override
-    ElementSnapshot getPreviousSnapshot();
-
-    @Override
-    ElementSnapshot getOriginalSnapshot();
-
-    @Override
-    ElementSnapshot duplicate(boolean linked);
+    List<? extends NodeSnapshot> getChildren();
 }

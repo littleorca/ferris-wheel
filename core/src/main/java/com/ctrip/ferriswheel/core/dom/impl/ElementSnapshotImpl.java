@@ -26,6 +26,7 @@ package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
 import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
+import com.ctrip.ferriswheel.core.dom.NodeEssential;
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 
 import java.util.ArrayList;
@@ -36,11 +37,11 @@ import java.util.List;
 public class ElementSnapshotImpl extends AbstractNodeSnapshot implements ElementSnapshot {
     private final String tagName;
     private final Collection<AttributeSnapshot> attributes;
-    private final List<NodeSnapshot> children;
+    private final List<? extends NodeSnapshot> children;
 
     public ElementSnapshotImpl(String tagName,
                                Collection<AttributeSnapshot> attributes,
-                               List<NodeSnapshot> children,
+                               List<? extends NodeSnapshot> children,
                                ElementSnapshot previousSnapshot) {
         super(previousSnapshot);
         this.tagName = tagName;
@@ -59,8 +60,65 @@ public class ElementSnapshotImpl extends AbstractNodeSnapshot implements Element
     }
 
     @Override
-    public List<NodeSnapshot> getChildren() {
+    public boolean hasAttribute(String name) {
+        // TODO review
+        for (AttributeSnapshot a : getAttributes()) {
+            if (a.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String getAttribute(String name) {
+        // TODO review
+        for (AttributeSnapshot a : getAttributes()) {
+            if (a.getName().equals(name)) {
+                return a.getValue();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String getTextContent() {
+        return null;//TODO
+    }
+
+    @Override
+    public int getChildCount() {
+        return getChildren().size();
+    }
+
+    @Override
+    public List<? extends NodeSnapshot> getChildren() {
         return children == null ? Collections.emptyList() : children;
+    }
+
+    @Override
+    public NodeEssential getChild(int index) {
+        return getChildren().get(index);
+    }
+
+    @Override
+    public NodeEssential getChild(String name) {
+        for (NodeSnapshot child : getChildren()) {
+            if (child.getNodeName().equals(name)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public NodeEssential firstChild() {
+        return children == null ? null : children.get(0);
+    }
+
+    @Override
+    public NodeEssential lastChild() {
+        return children == null ? null : children.get(children.size() - 1);
     }
 
     @Override
@@ -94,7 +152,7 @@ public class ElementSnapshotImpl extends AbstractNodeSnapshot implements Element
             }
         }
 
-        List<NodeSnapshot> list = getChildren();
+        List<? extends NodeSnapshot> list = getChildren();
         for (int i = 0; i < list.size(); i++) {
             String childLinePrefix = (i == list.size() - 1) ?
                     linePrefix + " `-" : linePrefix + " |-";

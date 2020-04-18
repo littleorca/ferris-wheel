@@ -24,27 +24,6 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-public interface TextNodeSnapshot extends NodeSnapshot {
-    String TEXT_NODE_NAME = "#text";
+public interface TextNodeSnapshot extends TextNodeSnapshotOrBuilder {
 
-    @Override
-    default NodeType getNodeType() {
-        return NodeType.TEXT_NODE;
-    }
-
-    @Override
-    default String getNodeName() {
-        return TEXT_NODE_NAME;
-    }
-
-    String getData();
-
-    @Override
-    TextNodeSnapshot getPreviousSnapshot();
-
-    @Override
-    TextNodeSnapshot getOriginalSnapshot();
-
-    @Override
-    TextNodeSnapshot duplicate(boolean linked);
 }

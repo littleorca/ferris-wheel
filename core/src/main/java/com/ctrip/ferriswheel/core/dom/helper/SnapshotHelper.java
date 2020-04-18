@@ -24,10 +24,7 @@
 
 package com.ctrip.ferriswheel.core.dom.helper;
 
-import com.ctrip.ferriswheel.core.dom.Attribute;
-import com.ctrip.ferriswheel.core.dom.Element;
-import com.ctrip.ferriswheel.core.dom.Node;
-import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.*;
 
 import java.util.Stack;
 
@@ -65,7 +62,9 @@ public class SnapshotHelper {
 
     private static NodeSnapshot snapshotSingleNode(Node n, NodeSnapshotMapper mapper) {
         NodeSnapshot previousSnapshot = mapper.map(n);
-        NodeSnapshot newSnapshot = previousSnapshot.duplicate(true);
+        NodeSnapshotOrBuilder copy = previousSnapshot.duplicate(true);
+        NodeSnapshot newSnapshot = (copy instanceof AbstractNodeSnapshotBuilder) ?
+                ((AbstractNodeSnapshotBuilder) copy).build() : (NodeSnapshot) copy;
         mapper.map(n, newSnapshot);
         return newSnapshot;
     }
