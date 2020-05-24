@@ -36,6 +36,7 @@ import java.util.*;
 
 public class DiffHelper {
     private SequenceDifferenceAnalyzer analyzer = new MyersDifferenceAnalyzer();
+    private NodeRevisionTracer nodeRevisionTracer = new WeakNodeSnapshotTracer();
 
     /**
      * Analyse the differences between negative root node and positive root node.
@@ -316,13 +317,7 @@ public class DiffHelper {
     }
 
     boolean isSameNode(NodeEssential nodeA, NodeEssential nodeB) {
-        if (nodeA == nodeB) {
-            return true;
-        }
-        if (nodeA instanceof NodeSnapshot && nodeB instanceof NodeSnapshot) {
-            return ((NodeSnapshot) nodeA).getOriginalSnapshot() == ((NodeSnapshot) nodeB).getOriginalSnapshot();
-        }
-        return false;
+        return nodeRevisionTracer.isSameOrigin(nodeA, nodeB);
     }
 
     private void diffChildItems(DiffContext context, ElementSnapshot element) {

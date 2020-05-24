@@ -32,6 +32,7 @@ import com.ctrip.ferriswheel.core.dom.WorkbookDocument;
 import com.ctrip.ferriswheel.core.dom.WorkbookElement;
 import com.ctrip.ferriswheel.core.dom.helper.Tag;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,8 +75,8 @@ public final class WorkbookDocumentImpl extends AbstractDocument implements Work
 
         AbstractElement element;
         try {
-            element = (AbstractElement) elementClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            element = (AbstractElement) elementClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
         element.initialize(this);

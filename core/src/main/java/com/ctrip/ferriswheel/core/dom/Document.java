@@ -24,7 +24,7 @@
 
 package com.ctrip.ferriswheel.core.dom;
 
-public interface Document extends ContainerNode {
+public interface Document extends Node {
     @Override
     default NodeType getNodeType() {
         return NodeType.DOCUMENT_NODE;

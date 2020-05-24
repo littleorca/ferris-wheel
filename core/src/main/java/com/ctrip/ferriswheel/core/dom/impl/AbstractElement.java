@@ -33,6 +33,13 @@ import java.util.Collection;
 public abstract class AbstractElement extends AbstractContainerNode implements Element {
     protected static final String ATTR_NAME = "name";
 
+    protected AbstractElement() {
+    }
+
+    protected AbstractElement(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     private AttributeMap<AttributeImpl> attributes = new AttributeMap<>();
 
     @Override

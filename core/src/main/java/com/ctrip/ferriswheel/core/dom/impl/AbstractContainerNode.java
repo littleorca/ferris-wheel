@@ -24,7 +24,6 @@
 
 package com.ctrip.ferriswheel.core.dom.impl;
 
-import com.ctrip.ferriswheel.core.dom.ContainerNode;
 import com.ctrip.ferriswheel.core.dom.Node;
 import com.ctrip.ferriswheel.core.dom.helper.NodeList;
 
@@ -33,8 +32,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class AbstractContainerNode extends AbstractNode implements ContainerNode {
+public abstract class AbstractContainerNode extends AbstractNode implements Node {
     private NodeList<AbstractNode> children = new NodeList<>();
+
+    protected AbstractContainerNode() {
+    }
+
+    protected AbstractContainerNode(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 
     @Override
     public void insertChild(Node child, Node ref) {
@@ -187,12 +193,12 @@ public abstract class AbstractContainerNode extends AbstractNode implements Cont
 
     @Override
     public AbstractNode previousSibling() {
-        return null; // TODO
+        return null; // TODO not implemented yet
     }
 
     @Override
     public AbstractNode nextSibling() {
-        return null; // TODO
+        return null; // TODO not implemented yet
     }
 
     @Override

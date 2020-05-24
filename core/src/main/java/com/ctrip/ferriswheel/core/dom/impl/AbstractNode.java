@@ -30,9 +30,16 @@ import com.ctrip.ferriswheel.core.dom.NodeWrapper;
 import java.io.Serializable;
 
 public abstract class AbstractNode implements Node, Serializable {
-    private transient AbstractDocument ownerDocument;
-    private transient AbstractNode parentNode;
-    private transient boolean dirty = false;
+    private AbstractDocument ownerDocument;
+    private AbstractNode parentNode;
+    private boolean dirty = false;
+
+    protected AbstractNode() {
+    }
+
+    protected AbstractNode(AbstractDocument ownerDocument) {
+        this.ownerDocument = ownerDocument;
+    }
 
     void initialize(AbstractDocument document) {
         if (ownerDocument != null) {
@@ -155,8 +162,18 @@ public abstract class AbstractNode implements Node, Serializable {
 
     @Override
     public void setDirty(boolean dirty) {
+        if (this.dirty == dirty) {
+            return;
+        }
+
         this.dirty = dirty;
-        if (dirty && getParentNode() != null) {
+
+        if (!dirty) { // mark all descendant nodes clean
+            for (int i = 0; i < getChildCount(); i++) {
+                getChild(i).setDirty(false);
+            }
+
+        } else if (getParentNode() != null) { // mark all ascendant nodes dirty
             getParentNode().setDirty(true);
         }
     }

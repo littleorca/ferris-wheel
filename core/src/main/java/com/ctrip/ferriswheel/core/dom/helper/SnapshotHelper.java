@@ -26,47 +26,53 @@ package com.ctrip.ferriswheel.core.dom.helper;
 
 import com.ctrip.ferriswheel.core.dom.*;
 
-import java.util.Stack;
-
 public class SnapshotHelper {
-    public static NodeSnapshot snapshotTree(Node root, NodeSnapshotMapper mapper) {
-        Stack<Node> pendingNodes = new Stack<>();
-        pendingNodes.push(root);
-        NodeSnapshot snapshot = null;
-        while (!pendingNodes.isEmpty()) {
-            Node n = pendingNodes.peek();
-            boolean clean = true;
-            if (n instanceof Element) {
-                for (Attribute attr : ((Element) n).getAttributes()) {
-                    if (attr.isDirty()) {
-                        clean = false;
-                        pendingNodes.push(attr);
-                    }
-                }
-            }
-            for (int i = 0; i < n.getChildCount(); i++) {
-                Node c = n.getChild(i);
-                if (c.isDirty()) {
-                    clean = false;
-                    pendingNodes.push(c);
-                }
-            }
-            if (clean) {
-                pendingNodes.pop();
-                snapshot = snapshotSingleNode(n, mapper);
-                n.setDirty(false);
-            }
+
+    public static NodeSnapshot snapshotNode(Node n, NodeRevisionTracer nodeTracer) {
+        NodeSnapshot previousSnapshot = nodeTracer.getSnapshot(n);
+
+        if (!n.isDirty() && previousSnapshot != null) {
+            return previousSnapshot;
         }
-        return snapshot;
+
+        NodeSnapshot newSnapshot;
+
+        switch (n.getNodeType()) {
+            case ELEMENT_NODE:
+                newSnapshot = snapshotElement((Element) n, nodeTracer);
+                break;
+            case TEXT_NODE:
+                newSnapshot = snapshotText((TextNode) n, (TextNodeSnapshot) previousSnapshot);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        nodeTracer.setSnapshot(n, newSnapshot);
+        return newSnapshot;
     }
 
-    private static NodeSnapshot snapshotSingleNode(Node n, NodeSnapshotMapper mapper) {
-        NodeSnapshot previousSnapshot = mapper.map(n);
-        NodeSnapshotOrBuilder copy = previousSnapshot.duplicate(true);
-        NodeSnapshot newSnapshot = (copy instanceof AbstractNodeSnapshotBuilder) ?
-                ((AbstractNodeSnapshotBuilder) copy).build() : (NodeSnapshot) copy;
-        mapper.map(n, newSnapshot);
-        return newSnapshot;
+    static ElementSnapshot snapshotElement(Element element,
+                                           NodeRevisionTracer nodeTracer) {
+        ElementSnapshotBuilder builder = new ElementSnapshotBuilder();
+        builder.setPreviousSnapshot(nodeTracer.getSnapshot(element));
+        builder.setTagName(element.getTagName());
+
+        for (Attribute attr : element.getAttributes()) {
+            builder.setAttribute(attr.getName(), attr.getValue());
+        }
+        for (int i = 0; i < element.getChildCount(); i++) {
+            Node child = element.getChild(i);
+            builder.addChild(i, snapshotNode(child, nodeTracer));
+        }
+        return builder.build();
+    }
+
+    static TextNodeSnapshot snapshotText(TextNode textNode, TextNodeSnapshot previousSnapshot) {
+        TextNodeSnapshotBuilder builder = new TextNodeSnapshotBuilder();
+        builder.setPreviousSnapshot(previousSnapshot);
+        builder.setData(textNode.getData());
+        return builder.build();
     }
 
 }

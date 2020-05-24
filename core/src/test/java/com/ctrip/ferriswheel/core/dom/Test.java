@@ -26,9 +26,7 @@ package com.ctrip.ferriswheel.core.dom;
 
 import com.ctrip.ferriswheel.common.variant.DynamicValue;
 import com.ctrip.ferriswheel.common.variant.Value;
-import com.ctrip.ferriswheel.core.dom.helper.NodeSnapshotMapper;
-import com.ctrip.ferriswheel.core.dom.helper.Serializer;
-import com.ctrip.ferriswheel.core.dom.helper.SnapshotHelper;
+import com.ctrip.ferriswheel.core.dom.helper.*;
 import com.ctrip.ferriswheel.core.dom.impl.WorkbookDocumentImpl;
 
 import java.util.Arrays;
@@ -74,20 +72,8 @@ public class Test {
         w.removeChild(s3);
         System.out.println(Serializer.serialize(w));
 
-        NodeSnapshotMapper mapper = new NodeSnapshotMapper() {
-            private Map<Node, NodeSnapshot> map = new HashMap<>();
-
-            @Override
-            public void map(Node node, NodeSnapshot snapshot) {
-                map.put(node, snapshot);
-            }
-
-            @Override
-            public NodeSnapshot map(Node node) {
-                return map.get(node);
-            }
-        };
-        NodeSnapshot tree = SnapshotHelper.snapshotTree(w, mapper);
+        NodeRevisionTracer tracer = new WeakNodeSnapshotTracer();
+        NodeSnapshot tree = SnapshotHelper.snapshotNode(w, tracer);
         System.out.println(tree);
 
         ChartElement chart = d.createElement(ChartElement.class);
@@ -95,7 +81,7 @@ public class Test {
         chart.setTitle(new DynamicValue("=t1!A1", Value.str("Line chart 1")));
 
         System.out.println(Serializer.serialize(w));
-        NodeSnapshot tree2 = SnapshotHelper.snapshotTree(w, mapper);
+        NodeSnapshot tree2 = SnapshotHelper.snapshotNode(w, tracer);
         System.out.println(tree2);
     }
 }

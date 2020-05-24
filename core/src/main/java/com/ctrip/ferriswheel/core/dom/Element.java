@@ -26,7 +26,7 @@ package com.ctrip.ferriswheel.core.dom;
 
 import java.util.Collection;
 
-public interface Element extends ContainerNode, ElementEssential {
+public interface Element extends Node, ElementEssential {
 
     @Override
     String getTagName();
