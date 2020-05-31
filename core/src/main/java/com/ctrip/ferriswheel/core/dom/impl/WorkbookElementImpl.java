@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.WorkbookElement;
 
 public final class WorkbookElementImpl extends AbstractLayoutElement implements WorkbookElement {
 
+    protected WorkbookElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

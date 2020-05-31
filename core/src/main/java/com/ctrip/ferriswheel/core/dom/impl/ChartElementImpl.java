@@ -38,6 +38,10 @@ import java.util.List;
 public final class ChartElementImpl extends AbstractLayoutElement implements ChartElement {
     protected static final String ATTR_TYPE = "type";
 
+    protected ChartElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public String getType() {
         return getAttribute(ATTR_TYPE);

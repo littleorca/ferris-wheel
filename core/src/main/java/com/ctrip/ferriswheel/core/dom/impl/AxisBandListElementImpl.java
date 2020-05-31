@@ -32,6 +32,10 @@ import java.util.List;
 
 public final class AxisBandListElementImpl extends AbstractElement implements AxisBandListElement {
 
+    protected AxisBandListElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public List<AxisBand> getBands() {
         List<AxisBand> list = new ArrayList<>(getChildCount());

@@ -26,10 +26,11 @@ package com.ctrip.ferriswheel.core.dom.helper;
 
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 import com.ctrip.ferriswheel.core.dom.TextNodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.TextNodeSnapshotOrBuilder;
 import com.ctrip.ferriswheel.core.dom.impl.TextNodeSnapshotImpl;
 
 public class TextNodeSnapshotBuilder extends AbstractNodeSnapshotBuilder
-        implements TextNodeSnapshot {
+        implements TextNodeSnapshotOrBuilder {
     private String data;
 
     public TextNodeSnapshotBuilder() {

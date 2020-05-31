@@ -129,7 +129,7 @@ public class TestSnapshotHelper extends TestCase {
     class TestDocument extends AbstractDocument {
         @Override
         protected Element createDocumentElement() {
-            return null;
+            return createElement("root");
         }
 
         @Override

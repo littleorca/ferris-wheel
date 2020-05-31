@@ -42,6 +42,10 @@ public abstract class AbstractAxisElement extends AbstractElement implements Axi
     private static final String ATTR_STACKING = "stacking";
     private static final String ATTR_FORMAT = "format";
 
+    protected AbstractAxisElement(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public String getTitle() {
         return getAttribute(ATTR_TITLE);

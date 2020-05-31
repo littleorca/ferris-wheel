@@ -27,6 +27,7 @@ package com.ctrip.ferriswheel.core.dom.impl;
 import com.ctrip.ferriswheel.common.Sheet;
 import com.ctrip.ferriswheel.common.Version;
 import com.ctrip.ferriswheel.common.action.ActionListener;
+import com.ctrip.ferriswheel.core.dom.Document;
 import com.ctrip.ferriswheel.core.dom.Element;
 import com.ctrip.ferriswheel.core.dom.WorkbookDocument;
 import com.ctrip.ferriswheel.core.dom.WorkbookElement;
@@ -75,11 +76,10 @@ public final class WorkbookDocumentImpl extends AbstractDocument implements Work
 
         AbstractElement element;
         try {
-            element = (AbstractElement) elementClass.getDeclaredConstructor().newInstance();
+            element = (AbstractElement) elementClass.getDeclaredConstructor(Document.class).newInstance(this);
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        element.initialize(this);
         return elementInterface.cast(element);
     }
 

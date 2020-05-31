@@ -33,10 +33,12 @@ public final class AttributeImpl extends AbstractNode implements Attribute {
     private String value;
 
     public AttributeImpl(String name) {
+        super(null);
         this.name = name;
     }
 
     public AttributeImpl(String name, String value) {
+        super(null);
         this.name = name;
         this.value = value;
     }

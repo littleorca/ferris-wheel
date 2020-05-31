@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.YValuesElement;
 
 public final class YValuesElementImpl extends AbstractValuesElement implements YValuesElement {
 
+    protected YValuesElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

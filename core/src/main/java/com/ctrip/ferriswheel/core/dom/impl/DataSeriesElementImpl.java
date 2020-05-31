@@ -29,6 +29,10 @@ import com.ctrip.ferriswheel.core.dom.DataSeriesElement;
 
 public final class DataSeriesElementImpl extends AbstractElement implements DataSeriesElement {
 
+    protected DataSeriesElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public DynamicVariant getName() {
         return mapFirstChild(NameElementImpl.class, NameElementImpl::getVariant, null);

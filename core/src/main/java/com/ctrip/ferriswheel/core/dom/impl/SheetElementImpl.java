@@ -36,6 +36,10 @@ import java.util.Iterator;
 
 public final class SheetElementImpl extends AbstractLayoutElement implements SheetElement {
 
+    protected SheetElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public String getName() {
         return null;

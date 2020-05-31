@@ -310,7 +310,7 @@ public class TestPatchHelper extends TestCase {
         TextNodeSnapshot negativeText = new TextNodeSnapshotImpl("hello world", null);
         TextNodeDiff textDiff = new TextNodeDiff(NodeLocation.root(), NodeLocation.root());
         textDiff.setLines(Arrays.asList(new LineDiff(-1, "hello world")));
-        TextNodeSnapshot positiveText = (TextNodeSnapshot) patchHelper.applyNodePatch(negativeText, textDiff);
+        TextNodeSnapshotOrBuilder positiveText = (TextNodeSnapshotOrBuilder) patchHelper.applyNodePatch(negativeText, textDiff);
         assertNotSame(negativeText, positiveText);
         assertSame(negativeText, positiveText.getPreviousSnapshot());
         assertEquals("", positiveText.getData());
@@ -372,7 +372,7 @@ public class TestPatchHelper extends TestCase {
     public void testApplyTextNodePatch() {
         TextNodeSnapshot negativeText = new TextNodeSnapshotImpl(null, null);
         TextNodeDiff emptyDiff = new TextNodeDiff(NodeLocation.root(), NodeLocation.root());
-        TextNodeSnapshot positiveText = patchHelper.applyTextNodePatch(negativeText, emptyDiff);
+        TextNodeSnapshotOrBuilder positiveText = patchHelper.applyTextNodePatch(negativeText, emptyDiff);
         assertSame(negativeText, positiveText.getPreviousSnapshot());
         assertEquals(negativeText.getData(), positiveText.getData());
         assertNull(positiveText.getData());

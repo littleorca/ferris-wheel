@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.CategoriesElement;
 
 public final class CategoriesElementImpl extends AbstractVariantElement implements CategoriesElement {
 
+    protected CategoriesElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

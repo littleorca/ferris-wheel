@@ -41,6 +41,10 @@ public abstract class AbstractVariantElement extends AbstractElement implements 
 
     private transient DynamicValue variant;
 
+    protected AbstractVariantElement(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public boolean isFormula() {
         return getVariant().isFormula();

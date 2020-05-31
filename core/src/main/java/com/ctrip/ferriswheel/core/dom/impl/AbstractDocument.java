@@ -24,23 +24,27 @@
 
 package com.ctrip.ferriswheel.core.dom.impl;
 
-import com.ctrip.ferriswheel.core.dom.Document;
-import com.ctrip.ferriswheel.core.dom.Element;
-import com.ctrip.ferriswheel.core.dom.Node;
-import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.*;
 
 public abstract class AbstractDocument extends AbstractContainerNode implements Document {
-    public static final String NODE_NAME = "#document";
-    private transient Element documentElement;
+    public static final String DOCUMENT_NODE_NAME = "#document";
+    private Element documentElement;
 
-    @Override
-    public String getNodeName() {
-        return NODE_NAME;
+    protected AbstractDocument() {
+        super(null);
+        this.documentElement = createDocumentElement();
+        super.appendChild(documentElement);
+    }
+
+    protected AbstractDocument(ElementEssential documentElementEssential) {
+        super(null);
+        this.documentElement = createDocumentElement(documentElementEssential);
+        super.appendChild(documentElement);
     }
 
     @Override
-    public AbstractDocument getOwnerDocument() {
-        return this;
+    public String getNodeName() {
+        return DOCUMENT_NODE_NAME;
     }
 
     @Override
@@ -80,29 +84,58 @@ public abstract class AbstractDocument extends AbstractContainerNode implements 
 
     @Override
     public Element getDocumentElement() {
-        if (documentElement == null) {
-            documentElement = lastChild(Element.class);
-        }
-        if (documentElement == null) {
-            documentElement = createDocumentElement();
-            super.appendChild(documentElement);
-        }
         return documentElement;
+    }
+
+    protected void setDocumentElement(Element documentElement) {
+        if (!super.removeChild(this.documentElement)) {
+            throw new RuntimeException();
+        }
+        this.documentElement = documentElement;
+        super.appendChild(documentElement);
     }
 
     protected abstract Element createDocumentElement();
 
+    protected Element createDocumentElement(ElementEssential elementEssential) {
+        return createElement(elementEssential);
+    }
+
+    protected Node createNode(NodeEssential nodeEssential) {
+        if (nodeEssential.getNodeType() == NodeType.ELEMENT_NODE) {
+            return createElement((ElementEssential) nodeEssential);
+
+        } else if (nodeEssential.getNodeType() == NodeType.TEXT_NODE) {
+            return createTextNode((TextNodeEssential) nodeEssential);
+        } else {
+            throw new RuntimeException("Unsupported node type: " + nodeEssential.getNodeType());
+        }
+    }
+
+    protected Element createElement(ElementEssential elementEssential) {
+        Element element = createElement(elementEssential.getNodeName());
+        for (AttributeEssential attr : elementEssential.getAttributes()) {
+            element.setAttribute(attr.getName(), attr.getValue());
+        }
+        for (int i = 0; i < elementEssential.getChildCount(); i++) {
+            element.appendChild(createNode(elementEssential.getChild(i)));
+        }
+        return element;
+    }
+
+    protected TextNode createTextNode(TextNodeEssential textNodeEssential) {
+        return createTextNode(textNodeEssential.getNodeValue());
+    }
+
     @Override
     public AttributeImpl createAttribute(String name) {
         AttributeImpl attrNode = new AttributeImpl(name);
-        attrNode.initialize(this);
         return attrNode;
     }
 
     @Override
     public TextNodeImpl createTextNode(String textContent) {
-        TextNodeImpl textNode = new TextNodeImpl(textContent);
-        textNode.initialize(this);
+        TextNodeImpl textNode = new TextNodeImpl(this, textContent);
         return textNode;
     }
 

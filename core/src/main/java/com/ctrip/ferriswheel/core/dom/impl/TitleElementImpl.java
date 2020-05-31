@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.TitleElement;
 
 public final class TitleElementImpl extends AbstractVariantElement implements TitleElement {
 
+    protected TitleElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

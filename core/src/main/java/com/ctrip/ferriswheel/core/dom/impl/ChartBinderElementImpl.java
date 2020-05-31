@@ -34,6 +34,10 @@ public final class ChartBinderElementImpl extends AbstractVariantElement impleme
     private static final String ATTR_CATEGORIES_PLACEMENT = "categories-placement";
     private static final String ATTR_SERIES_NAME_PLACEMENT = "series-name-placement";
 
+    protected ChartBinderElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public DynamicVariant getData() {
         return this.getVariant();

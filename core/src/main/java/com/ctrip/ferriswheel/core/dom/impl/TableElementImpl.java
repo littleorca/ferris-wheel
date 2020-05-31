@@ -38,6 +38,10 @@ import java.util.Map;
 
 public final class TableElementImpl extends AbstractLayoutElement implements TableElement {
 
+    protected TableElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public int getRowCount() {
         return 0;

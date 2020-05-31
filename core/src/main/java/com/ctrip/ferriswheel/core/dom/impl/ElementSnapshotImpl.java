@@ -26,7 +26,6 @@ package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.AttributeSnapshot;
 import com.ctrip.ferriswheel.core.dom.ElementSnapshot;
-import com.ctrip.ferriswheel.core.dom.NodeEssential;
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
 
 import java.util.ArrayList;
@@ -97,12 +96,12 @@ public class ElementSnapshotImpl extends AbstractNodeSnapshot implements Element
     }
 
     @Override
-    public NodeEssential getChild(int index) {
+    public NodeSnapshot getChild(int index) {
         return getChildren().get(index);
     }
 
     @Override
-    public NodeEssential getChild(String name) {
+    public NodeSnapshot getChild(String name) {
         for (NodeSnapshot child : getChildren()) {
             if (child.getNodeName().equals(name)) {
                 return child;
@@ -112,12 +111,12 @@ public class ElementSnapshotImpl extends AbstractNodeSnapshot implements Element
     }
 
     @Override
-    public NodeEssential firstChild() {
+    public NodeSnapshot firstChild() {
         return children == null ? null : children.get(0);
     }
 
     @Override
-    public NodeEssential lastChild() {
+    public NodeSnapshot lastChild() {
         return children == null ? null : children.get(children.size() - 1);
     }
 

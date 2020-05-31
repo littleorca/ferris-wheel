@@ -34,6 +34,10 @@ public final class AxisBandElementImpl extends AbstractElement implements AxisBa
     private static final String ATTR_LABEL = "label";
     private static final String ATTR_COLOR = "color";
 
+    protected AxisBandElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public Interval getInterval() {
         String attrValue = getAttribute(ATTR_INTERVAL);

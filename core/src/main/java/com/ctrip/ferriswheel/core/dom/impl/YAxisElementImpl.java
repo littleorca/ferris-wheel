@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.YAxisElement;
 
 public final class YAxisElementImpl extends AbstractAxisElement implements YAxisElement {
 
+    protected YAxisElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

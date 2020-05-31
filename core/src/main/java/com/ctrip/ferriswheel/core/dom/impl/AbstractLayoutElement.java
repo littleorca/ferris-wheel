@@ -32,6 +32,10 @@ public abstract class AbstractLayoutElement extends AbstractElement {
 
     protected transient Layout layout;
 
+    protected AbstractLayoutElement(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     public Layout getLayout() {
         if (layout == null) {
             String styleAttr = getAttribute(ATTR_STYLE);

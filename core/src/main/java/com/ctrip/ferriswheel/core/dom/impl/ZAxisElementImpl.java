@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.ZAxisElement;
 
 public final class ZAxisElementImpl extends AbstractAxisElement implements ZAxisElement {
 
+    protected ZAxisElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

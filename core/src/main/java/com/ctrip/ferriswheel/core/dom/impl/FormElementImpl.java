@@ -33,6 +33,10 @@ import java.util.List;
 
 public final class FormElementImpl extends AbstractElement implements FormElement {
 
+    protected FormElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public int getFieldCount() {
         return 0;

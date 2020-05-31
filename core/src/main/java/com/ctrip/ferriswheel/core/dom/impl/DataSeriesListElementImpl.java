@@ -32,6 +32,10 @@ import java.util.List;
 
 public final class DataSeriesListElementImpl extends AbstractElement implements DataSeriesListElement {
 
+    protected DataSeriesListElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public DataSeriesElementImpl getChild(String name) {
         return (DataSeriesElementImpl) super.getChild(name);

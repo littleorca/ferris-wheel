@@ -25,36 +25,21 @@
 package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.Node;
-import com.ctrip.ferriswheel.core.dom.NodeWrapper;
 
 import java.io.Serializable;
 
 public abstract class AbstractNode implements Node, Serializable {
-    private AbstractDocument ownerDocument;
+    private final AbstractDocument ownerDocument;
     private AbstractNode parentNode;
     private boolean dirty = false;
-
-    protected AbstractNode() {
-    }
 
     protected AbstractNode(AbstractDocument ownerDocument) {
         this.ownerDocument = ownerDocument;
     }
 
-    void initialize(AbstractDocument document) {
-        if (ownerDocument != null) {
-            throw new IllegalStateException("This node is probably initialized already!");
-        }
-        setOwnerDocument(document);
-    }
-
     @Override
     public AbstractDocument getOwnerDocument() {
         return ownerDocument;
-    }
-
-    private void setOwnerDocument(AbstractDocument document) {
-        this.ownerDocument = document;
     }
 
     @Override
@@ -145,9 +130,6 @@ public abstract class AbstractNode implements Node, Serializable {
             return null;
         }
 
-        if (node instanceof NodeWrapper) {
-            node = ((NodeWrapper) node).expose();
-        }
         if (node instanceof AbstractNode) {
             return (AbstractNode) node;
         }

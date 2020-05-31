@@ -25,8 +25,9 @@
 package com.ctrip.ferriswheel.core.dom.helper;
 
 import com.ctrip.ferriswheel.core.dom.NodeSnapshot;
+import com.ctrip.ferriswheel.core.dom.NodeSnapshotOrBuilder;
 
-public abstract class AbstractNodeSnapshotBuilder implements NodeSnapshot {
+public abstract class AbstractNodeSnapshotBuilder implements NodeSnapshotOrBuilder {
     private NodeSnapshot previousSnapshot;
 
     @Override
@@ -34,19 +35,18 @@ public abstract class AbstractNodeSnapshotBuilder implements NodeSnapshot {
         return previousSnapshot;
     }
 
-    public NodeSnapshot setPreviousSnapshot(NodeSnapshot previousSnapshot) {
+    public NodeSnapshotOrBuilder setPreviousSnapshot(NodeSnapshot previousSnapshot) {
         this.previousSnapshot = previousSnapshot;
         return this;
     }
 
     @Override
     public NodeSnapshot getOriginalSnapshot() {
-        NodeSnapshot originalSnapshot = this;
-        NodeSnapshot temp;
-        while ((temp = originalSnapshot.getPreviousSnapshot()) != null) {
-            originalSnapshot = temp;
+        NodeSnapshot snapshot = getPreviousSnapshot();
+        if (snapshot == null) {
+            return null;
         }
-        return originalSnapshot;
+        return snapshot.getOriginalSnapshot();
     }
 
     public abstract NodeSnapshot build();

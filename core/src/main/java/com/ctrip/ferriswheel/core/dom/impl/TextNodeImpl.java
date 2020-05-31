@@ -33,7 +33,8 @@ public final class TextNodeImpl extends AbstractNode implements TextNode {
 
     private String data = DEFAULT_TEXT_CONTENT;
 
-    public TextNodeImpl(String data) {
+    public TextNodeImpl(AbstractDocument ownerDocument, String data) {
+        super(ownerDocument);
         setData(data);
     }
 

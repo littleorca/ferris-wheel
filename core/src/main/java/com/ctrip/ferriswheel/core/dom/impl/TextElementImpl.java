@@ -28,6 +28,10 @@ import com.ctrip.ferriswheel.common.variant.DynamicVariant;
 import com.ctrip.ferriswheel.core.dom.TextElement;
 
 public final class TextElementImpl extends AbstractLayoutElement implements TextElement {
+    protected TextElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
+
     @Override
     public String getName() {
         return getAttribute(ATTR_NAME);

@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.ValuesElement;
 
 public abstract class AbstractValuesElement extends AbstractVariantElement implements ValuesElement {
 
+    protected AbstractValuesElement(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.XAxisElement;
 
 public final class XAxisElementImpl extends AbstractAxisElement implements XAxisElement {
 
+    protected XAxisElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

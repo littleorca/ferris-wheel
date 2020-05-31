@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.ZValuesElement;
 
 public final class ZValuesElementImpl extends AbstractValuesElement implements ZValuesElement {
 
+    protected ZValuesElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

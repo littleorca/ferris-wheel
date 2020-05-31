@@ -25,4 +25,19 @@
 package com.ctrip.ferriswheel.core.dom;
 
 public interface NodeSnapshot extends NodeSnapshotOrBuilder {
+    default NodeSnapshot getChild(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    default NodeSnapshot getChild(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    default NodeSnapshot firstChild() {
+        return null;
+    }
+
+    default NodeSnapshot lastChild() {
+        return null;
+    }
 }

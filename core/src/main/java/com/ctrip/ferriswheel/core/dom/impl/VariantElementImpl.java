@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.VariantElement;
 
 public final class VariantElementImpl extends AbstractVariantElement implements VariantElement {
 
+    protected VariantElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

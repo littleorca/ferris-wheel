@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.XValuesElement;
 
 public final class XValuesElementImpl extends AbstractValuesElement implements XValuesElement {
 
+    protected XValuesElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

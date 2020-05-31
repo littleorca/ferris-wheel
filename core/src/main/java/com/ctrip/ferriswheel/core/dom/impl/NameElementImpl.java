@@ -28,4 +28,7 @@ import com.ctrip.ferriswheel.core.dom.NameElement;
 
 public final class NameElementImpl extends AbstractVariantElement implements NameElement {
 
+    protected NameElementImpl(AbstractDocument ownerDocument) {
+        super(ownerDocument);
+    }
 }

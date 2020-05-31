@@ -25,6 +25,7 @@
 package com.ctrip.ferriswheel.core.dom.impl;
 
 import com.ctrip.ferriswheel.core.dom.Node;
+import com.ctrip.ferriswheel.core.dom.NodeType;
 import com.ctrip.ferriswheel.core.dom.helper.NodeList;
 
 import java.util.List;
@@ -35,19 +36,21 @@ import java.util.function.Predicate;
 public abstract class AbstractContainerNode extends AbstractNode implements Node {
     private NodeList<AbstractNode> children = new NodeList<>();
 
-    protected AbstractContainerNode() {
-    }
-
     protected AbstractContainerNode(AbstractDocument ownerDocument) {
         super(ownerDocument);
     }
 
+    protected void checkOwnerDocument(Node node) {
+        if (node.getOwnerDocument() != (getNodeType() == NodeType.DOCUMENT_NODE ?
+                this : this.getOwnerDocument())) {
+            throw new IllegalArgumentException("Given node is not created with the same owner document.");
+        }
+    }
+
     @Override
     public void insertChild(Node child, Node ref) {
-        if (child.getOwnerDocument() != getOwnerDocument()) {
-            throw new IllegalArgumentException("Given child node is not create by the same document.");
-        }
-        if (ref != null && ref.getOwnerDocument() != getOwnerDocument()) {
+        checkOwnerDocument(child);
+        if (ref != null && ref.getParentNode() != this) {
             throw new IllegalArgumentException("Invalid referrer node.");
         }
         applyInsertChild(toAbstractNode(child), toAbstractNode(ref));
@@ -75,9 +78,7 @@ public abstract class AbstractContainerNode extends AbstractNode implements Node
 
     @Override
     public void appendChild(Node child) {
-        if (child.getOwnerDocument() != getOwnerDocument()) {
-            throw new IllegalArgumentException("Given child node is not create by the same document.");
-        }
+        checkOwnerDocument(child);
         applyAppendChild(toAbstractNode(child));
     }
 
@@ -107,13 +108,10 @@ public abstract class AbstractContainerNode extends AbstractNode implements Node
 
     @Override
     public boolean removeChild(Node child) {
-        if (child.getOwnerDocument() != getOwnerDocument()) {
-            throw new IllegalArgumentException("Given child node is not create by the same document.");
+        if (child.getParentNode() != this) {
+            throw new IllegalArgumentException("Given node is not a valid child.");
         }
         AbstractNode castedChild = toAbstractNode(child);
-        if (!children.contains(castedChild)) {
-            return false;
-        }
         applyRemoveChild(castedChild);
         return true;
     }
@@ -150,9 +148,9 @@ public abstract class AbstractContainerNode extends AbstractNode implements Node
 
     @Override
     public Node replaceChild(Node newChild, Node oldChild) {
-        if (newChild.getOwnerDocument() != getOwnerDocument() ||
-                oldChild.getOwnerDocument() != getOwnerDocument()) {
-            throw new IllegalArgumentException(); // TODO add detailed message
+        checkOwnerDocument(newChild);
+        if (oldChild.getParentNode() != this) {
+            throw new IllegalArgumentException("Given old child is not a valid child.");
         }
         Node ref = oldChild.nextSibling();
         boolean removed = removeChild(oldChild);
