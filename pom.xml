@@ -51,7 +51,7 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <!-- project -->
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <findbugs-jsr305.version>3.0.1</findbugs-jsr305.version>
         <slf4j-api.version>1.7.24</slf4j-api.version>
         <logback.version>1.1.7</logback.version>
