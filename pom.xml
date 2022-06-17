@@ -58,7 +58,7 @@
         <uuid.version>3.2</uuid.version>
         <httpcore.version>4.4.5</httpcore.version>
         <httpclient.version>4.5.2</httpclient.version>
-        <fastjson.version>1.2.31</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <protobuf.version>3.5.1</protobuf.version>
         <tomcat-jdbc.version>8.5.15</tomcat-jdbc.version>
         <mysql.version>8.0.16</mysql.version>
